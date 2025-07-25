@@ -1,0 +1,5 @@
+File,% covered,Lines,Relevant Lines,Lines covered,Lines missed
+"./app/helpers/application_helper.rb",0,2,2,0,2
+"./app/jobs/application_job.rb",0,7,2,0,2
+"./app/mailers/application_mailer.rb",0,4,4,0,4
+"./app/models/application_record.rb",0,3,3,0,3
