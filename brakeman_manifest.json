@@ -3,9 +3,9 @@
     "app_path": "/home/julian/gingga",
     "rails_version": "8.0.2",
     "security_warnings": 0,
-    "start_time": "2025-07-25 22:47:03 +0200",
-    "end_time": "2025-07-25 22:47:03 +0200",
-    "duration": 0.645545683,
+    "start_time": "2025-07-25 22:47:20 +0200",
+    "end_time": "2025-07-25 22:47:21 +0200",
+    "duration": 0.628872425,
     "checks_performed": [
       "BasicAuth",
       "BasicAuthTimingAttack",
