@@ -38,5 +38,15 @@ module Gingga
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+    config.generators do |g|
+      g.assets            false
+      g.helper            false
+      g.test_framework    :rspec
+      g.jbuilder          false
+      g.routing_specs   false
+      g.request_specs   false
+      g.view_specs false
+      g.orm :active_record, primary_key_type: :uuid
+    end
   end
 end
