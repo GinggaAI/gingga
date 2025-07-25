@@ -1,0 +1,24 @@
+#!/bin/bash
+
+echo "Runnig Rubycritic..."
+bundle exec rubycritic app lib --no-browser
+grep "var score =" tmp/rubycritic/overview.html | awk '{ print $4 }' | cut -d ";" -f1 > tmp/rubycritic_manifest
+w3m tmp/rubycritic/code_index.html > tmp/rubycritic_code
+sed -i '/^$/d' tmp/rubycritic_code
+RATING_LINE=$(grep -n Rating tmp/rubycritic_code | head -n1 | cut -d ":" -f1)
+INITIAL_LINE=$(($RATING_LINE + 1))
+LAST_LINE=$(wc -l tmp/rubycritic_code | cut -d " " -f1 )
+RUBYCRITIC_BEFORE_CHANGES=$(sed -n "$INITIAL_LINE,$LAST_LINE"p tmp/rubycritic_code | LC_ALL=C sort > tmp/rubycritic_manifest_v2)
+cat rubycritic_manifest_v2 | LC_ALL=C sort > tmp/manifest_from_master
+comm tmp/manifest_from_master tmp/rubycritic_manifest_v2 -13 > tmp/changes_in_the_rubycritic_scores
+CHANGES_IN_THE_RUBYCRITIC_SCORES=$(cat tmp/changes_in_the_rubycritic_scores | xargs)
+MASTER_SCORES=$(cat rubycritic_manifest_v2 | xargs)
+
+ruby bin/compare_rubycritic_scores.rb "$MASTER_SCORES" "$CHANGES_IN_THE_RUBYCRITIC_SCORES"
+
+if [ $? -eq 0 ]; then
+  cp tmp/rubycritic_manifest_v2 rubycritic_manifest_v2
+  cp tmp/rubycritic_manifest rubycritic_manifest
+else
+  exit 1
+fi

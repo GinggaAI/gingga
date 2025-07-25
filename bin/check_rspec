@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# When RSpec runs, the output includes colored dots `^[[32m.`, this color should be removed in order to get only the dots
+cat tmp/rspec_manifest | \
+  sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | \
+  sed "s/\x0f//g" | \
+  sed 's/\r//g' > tmp/rspec_manifest_no_colors
+
+cp tmp/rspec_manifest_no_colors tmp/rspec_manifest
+
+LINE_NUMBER=$(( $(grep -n Randomized tmp/rspec_manifest | cut -d":" -f1 | head -n1) +1 ))
+CHARS=$(sed "$( echo $LINE_NUMBER )q;d" tmp/rspec_manifest | fold -w1 | sort | uniq | xargs)
+
+# The output from rspec is expected to contain only dots
+if [ "$CHARS" != "." ]; then
+  echo "****************************************************************************************************************"
+  echo "The specs are either broken or the output is poluted with messages, check out the 'tmp/rspec_manifest' for details"
+  echo "****************************************************************************************************************"
+  echo $CHARS
+  exit 1
+fi

@@ -1,0 +1,18 @@
+#!/bin/sh
+
+echo "Checking paths coverage..."
+
+the_paths=$(bundle exec rails routes | awk '{print $1}' | grep -v rails | grep -v ^POST | grep -v ^PUT | grep -v ^PATCH | grep -v ^GET | grep -v DELETE | grep -v ^turbo | grep -v \/assets | grep -v ^Prefix)
+no_covered=$(for i in $the_paths; do echo "$i $(grep -r $i spec | wc -l)"; done | grep 0$)
+
+if test "$no_covered" != ""
+then
+  echo "Paths missing in tests"
+  # The paths not covered
+  echo $no_covered
+  exit 1
+fi
+
+echo "Checking paths coverage...Done\n"
+
+exit 0

@@ -1,0 +1,25 @@
+#!/bin/sh
+
+RAILS_ENV=test bundle exec rails assets:precompile
+
+bundle exec rspec spec --fail-fast 2>&1 | tee tmp/rspec_manifest
+
+bin/check_rspec
+
+if [ $? -ne 0 ]; then
+  exit 1
+fi
+
+bin/check_coverage
+
+if [ $? -ne 0 ]; then
+  exit 1
+fi
+
+bin/lshot
+
+if [ $? -ne 0 ]; then
+  exit 1
+fi
+
+bundle exec rubocop --autocorrect

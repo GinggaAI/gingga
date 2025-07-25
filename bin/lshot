@@ -1,0 +1,37 @@
+#!/bin/sh
+
+RAILS_ENV=test
+
+bin/check_path_coverage
+if [ $? -ne 0 ]; then
+  exit 1
+fi
+
+bin/check_brakeman
+if [ $? -ne 0 ]; then
+  exit 1
+fi
+
+bin/check_rails_best_practices
+if [ $? -ne 0 ]; then
+  exit 1
+fi
+
+bin/check_rubycritic_v2
+if [ $? -ne 0 ]; then
+  exit 1
+fi
+
+bin/check_ifs_in_views
+if [ $? -ne 0 ]; then
+  echo "New 'ifs' in views found"
+  cat tmp/new_ifs_in_views
+  exit 1
+fi
+
+bin/check_instance_variables_in_controllers
+if [ $? -ne 0 ]; then
+  exit 1
+fi
+
+exit 0

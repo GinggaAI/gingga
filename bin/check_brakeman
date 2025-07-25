@@ -1,0 +1,13 @@
+#!/bin/sh
+
+echo "Running brakeman..."
+bundle exec brakeman -o tmp/brakeman_manifest.json
+
+ruby bin/compare_brakeman_scores.rb brakeman_manifest.json tmp/brakeman_manifest.json
+if [ $? -eq 0 ]; then
+  cp tmp/brakeman_manifest.json brakeman_manifest.json
+  git add brakeman_manifest.json
+  git commit -m "Updates brakeman manifest"
+else
+  exit 1
+fi

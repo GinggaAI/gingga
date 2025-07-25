@@ -1,0 +1,15 @@
+#!/bin/sh
+
+echo "Checking instance variables in controllers..."
+grep -roE "@\w+\s*=" app/controllers/ | sort | uniq | cut -d":" -f1 | uniq -c | sort > tmp/instance_variables_in_controllers
+
+SCORES_BEFORE_CHANGES=$(cat instance_variables_in_controllers | xargs)
+
+SCORES_AFTER_CHANGES=$(cat tmp/instance_variables_in_controllers | xargs)
+
+ruby bin/compare_instance_variables_in_controllers.rb "$SCORES_BEFORE_CHANGES" "$SCORES_AFTER_CHANGES"
+if [ $? -eq 0 ]; then
+  cp tmp/instance_variables_in_controllers instance_variables_in_controllers
+else
+  exit 1
+fi

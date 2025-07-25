@@ -1,0 +1,11 @@
+#!/bin/bash
+
+echo "Runnig Simplecov..."
+
+ruby bin/compare_simplecov_scores.rb
+
+if [ $? -eq 0 ]; then
+  cp coverage/results.csv coverage_results.csv
+else
+  exit 1
+fi

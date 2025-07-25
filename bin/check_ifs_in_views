@@ -1,0 +1,24 @@
+#!/bin/sh
+
+echo "Checking 'ifs' in views"
+
+# search white space followed by 'if' followed by white space in app/views
+grep -rnE "\s*if\s+" app/views/ | grep -v "app\/views\/components" | LC_COLLATE=C LC_ALL=C sort > tmp/ifs_in_views
+
+# compares the whitelist vs the new ifs found and rejects
+# unique lines from the manifests and lines in commond
+# keeping only lines unique to tmp/ifs_in_views
+cat ifs_in_views_whitelist | LC_COLLATE=C LC_ALL=C sort > tmp/sorted_ifs_whitelist
+LC_COLLATE=C LC_ALL=C comm -13 tmp/sorted_ifs_whitelist tmp/ifs_in_views > tmp/new_ifs_in_views
+
+# If there are new ifs in views, the count will be greater tha 0
+NEW_IFS=$(wc -l tmp/new_ifs_in_views | awk '{print $1}')
+
+if [ "$NEW_IFS" -eq "0" ]; then
+  # Replaces the manifest with the new list of ifs in views
+  cp tmp/ifs_in_views ifs_in_views_whitelist
+else
+  echo "Se encontraron nuevos 'ifs' en las vistas"
+  cat tmp/new_ifs_in_views
+  exit 1
+fi

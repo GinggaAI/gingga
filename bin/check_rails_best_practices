@@ -1,0 +1,15 @@
+#!/bin/sh
+
+echo "Runnig Rails Best Practices..."
+bundle exec rails_best_practices . -e "gems,db,bin,config,coverage,log,node_modules,tmp" | grep "Found.*warnings" | awk '{ print $2 }' > tmp/rails_best_practices_manifest
+SCORE_FROM_MASTER=$(cat rails_best_practices_manifest)
+SCORE_FROM_BRANCH=$(cat tmp/rails_best_practices_manifest)
+
+if [ $( echo "$SCORE_FROM_BRANCH > $SCORE_FROM_MASTER" | bc -l ) -eq 1 ]; then
+  echo "****************************************************************************************************************"
+  echo "The number of bad practices has increased"
+  echo "****************************************************************************************************************"
+  exit 1
+else
+  cp tmp/rails_best_practices_manifest rails_best_practices_manifest
+fi
