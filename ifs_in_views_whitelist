@@ -1,0 +1,2 @@
+app/views/pwa/service-worker.js:16://         if (clientPath == event.notification.data.path && "focus" in client) {
+app/views/pwa/service-worker.js:21://       if (clients.openWindow) {
