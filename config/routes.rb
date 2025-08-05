@@ -1,6 +1,5 @@
 Rails.application.routes.draw do
-
-  resource :brand, only: [:show, :edit, :update]
+  resource :brand, only: [ :show, :edit, :update ]
   resource :planning, only: [ :show ]
   resource :viral_ideas, only: [ :show ]
   resource :auto_creation, only: [ :show ]
@@ -27,4 +26,10 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   root "home#show"
+
+
+  if Rails.env.development?
+    # Enable ViewComponent previews at /rails/view_components
+    mount ViewComponent::Engine, at: "/rails/view_components"
+  end
 end
