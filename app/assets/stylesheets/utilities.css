@@ -1,0 +1,20 @@
+/* Project utilities built on top of tokens */
+.u-rounded-sm { border-radius: var(--radius-sm); }
+.u-rounded-md { border-radius: var(--radius-md); }
+.u-rounded-lg { border-radius: var(--radius-lg); }
+
+.u-bg-primary { background-color: var(--color-primary); }
+.u-text-primary { color: var(--color-primary); }
+.u-bg-accent { background-color: var(--color-accent); }
+.u-text-accent { color: var(--color-accent); }
+
+.u-space-inline-md { padding-inline: var(--space-4); }
+.u-space-block-md { padding-block: var(--space-4); }
+
+/* Futuristic helpers */
+.u-ink-bg { background-color: var(--bg); color: var(--text); }
+.u-surface { background-color: var(--surface); color: var(--text); }
+.u-ring-focus:focus { outline: 2px solid var(--cyan); outline-offset: 3px; }
+.u-gradient-hero { background: radial-gradient(60% 60% at 50% 20%, rgba(187,121,252,0.15) 0%, rgba(0,0,0,0) 60%), radial-gradient(40% 40% at 80% 0%, rgba(0,194,255,0.18) 0%, rgba(0,0,0,0) 60%), var(--bg); }
+.u-stack { display: flex; flex-direction: column; gap: var(--space-6); }
+

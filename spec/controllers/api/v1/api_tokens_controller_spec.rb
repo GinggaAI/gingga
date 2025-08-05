@@ -4,27 +4,38 @@ RSpec.describe Api::V1::ApiTokensController, type: :request do
   let(:user) { create(:user) }
 
   before do
+    # Clean api_tokens table before each test to avoid pollution
+    ApiToken.delete_all
+
     # Mock validation service for all tests
     allow_any_instance_of(ApiTokenValidatorService).to receive(:call)
       .and_return({ valid: true })
 
-    # Mock authentication for API testing by defining methods on the controller class
+    # Add authentication methods to the controller for testing
     Api::V1::ApiTokensController.class_eval do
       def authenticate_user!
-        # Mocked - always authenticates
+        # Do nothing - bypass authentication
       end
 
       def current_user
-        @current_user ||= User.find_by(email: 'test@example.com') || FactoryBot.create(:user)
+        @current_user ||= User.find_by(id: self.class.test_user_id)
+      end
+
+      class << self
+        attr_accessor :test_user_id
       end
     end
 
-    # Ensure we have a user that matches our test user
-    allow_any_instance_of(Api::V1::ApiTokensController).to receive(:current_user).and_return(user)
+    Api::V1::ApiTokensController.test_user_id = user.id
+  end
+
+  after do
+    # Clean up the test user id
+    Api::V1::ApiTokensController.test_user_id = nil
   end
 
   describe 'GET /api/v1/api_tokens' do
-    let!(:api_token1) { create(:api_token, :openai, user: user, mode: 'production') }
+    let!(:api_token1) { create(:api_token, :openai, user: user, mode: 'test') }
     let!(:api_token2) { create(:api_token, :heygen, user: user, mode: 'production') }
 
     it 'returns all user api tokens' do
@@ -48,7 +59,7 @@ RSpec.describe Api::V1::ApiTokensController, type: :request do
   end
 
   describe 'GET /api/v1/api_tokens/:id' do
-    let(:api_token) { create(:api_token, user: user) }
+    let(:api_token) { create(:api_token, :openai, user: user, mode: 'test') }
 
     it 'returns the api token' do
       get "/api/v1/api_tokens/#{api_token.id}"
@@ -136,7 +147,7 @@ RSpec.describe Api::V1::ApiTokensController, type: :request do
   end
 
   describe 'PATCH /api/v1/api_tokens/:id' do
-    let(:api_token) { create(:api_token, user: user, mode: 'test') }
+    let(:api_token) { create(:api_token, :openai, user: user, mode: 'test') }
     let(:update_params) do
       {
         api_token: { mode: 'production' }
@@ -173,7 +184,7 @@ RSpec.describe Api::V1::ApiTokensController, type: :request do
   end
 
   describe 'DELETE /api/v1/api_tokens/:id' do
-    let(:api_token) { create(:api_token, user: user) }
+    let(:api_token) { create(:api_token, :openai, user: user, mode: 'test') }
 
     it 'destroys the api token' do
       delete "/api/v1/api_tokens/#{api_token.id}"
