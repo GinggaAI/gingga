@@ -22,7 +22,7 @@ RSpec.describe "Landing Page", type: :system do
 
     it "displays all feature sections with proper headings" do
       visit root_path
-      
+
       # Check all main section headings
       expect(page).to have_text("What Gingga Does")
       expect(page).to have_text("Why Small Brands Choose Gingga")
@@ -34,7 +34,7 @@ RSpec.describe "Landing Page", type: :system do
 
     it "shows feature cards with proper icons and descriptions" do
       visit root_path
-      
+
       # Feature cards
       expect(page).to have_text("Monthly Content Calendar")
       expect(page).to have_text("AI-Powered Visuals")
@@ -45,7 +45,7 @@ RSpec.describe "Landing Page", type: :system do
 
     it "displays all Gingga Guide characters" do
       visit root_path
-      
+
       expect(page).to have_text("Noctua")
       expect(page).to have_text("Clarifies your brand's message")
       expect(page).to have_text("Sagui")
@@ -58,7 +58,7 @@ RSpec.describe "Landing Page", type: :system do
 
     it "shows testimonials from customers" do
       visit root_path
-      
+
       expect(page).to have_text("I used to dread content days. Now it all just flows. Gingga gets my brand.")
       expect(page).to have_text("Camila")
       expect(page).to have_text("Wellness Coach")
@@ -69,7 +69,7 @@ RSpec.describe "Landing Page", type: :system do
 
     it "displays pricing information" do
       visit root_path
-      
+
       expect(page).to have_text("£98")
       expect(page).to have_text("Plans from £98/month")
       expect(page).to have_text("First month: 20% off")
@@ -80,7 +80,7 @@ RSpec.describe "Landing Page", type: :system do
   describe "navigation and structure" do
     it "has proper navigation links" do
       visit root_path
-      
+
       expect(page).to have_link("Features", href: "#features")
       expect(page).to have_link("How It Works", href: "#how-it-works")
       expect(page).to have_link("Guides", href: "#guides")
@@ -89,7 +89,7 @@ RSpec.describe "Landing Page", type: :system do
 
     it "has semantic HTML structure with proper sections" do
       visit root_path
-      
+
       expect(page).to have_css("header")
       expect(page).to have_css("main")
       expect(page).to have_css("section#features")
@@ -101,7 +101,7 @@ RSpec.describe "Landing Page", type: :system do
 
     it "includes footer with company information" do
       visit root_path
-      
+
       expect(page).to have_text("Intelligence in Motion")
       expect(page).to have_link("Privacy Policy")
       expect(page).to have_link("Terms of Service")
@@ -112,14 +112,14 @@ RSpec.describe "Landing Page", type: :system do
   describe "accessibility and usability" do
     it "has multiple CTA buttons for conversion" do
       visit root_path
-      
+
       # Should have at least 2 Get Started buttons
       expect(all('button', text: /Get Started/).count).to be >= 2
     end
 
     it "displays brand identity consistently" do
       visit root_path
-      
+
       # Brand name should appear in multiple places
       expect(page).to have_text("🌀 GINGGA", count: 2) # Nav and footer
       expect(page).to have_text("GINGGA:", count: 1) # Hero
