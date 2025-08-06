@@ -24,6 +24,9 @@ class ApiToken < ApplicationRecord
       throw(:abort)
     end
 
-    self.valid = true
+    self.is_valid = true
+  rescue StandardError => e
+    errors.add(:encrypted_token, "Validation failed: #{e.message}")
+    throw(:abort)
   end
 end

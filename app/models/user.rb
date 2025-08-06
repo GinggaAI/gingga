@@ -8,10 +8,10 @@ class User < ApplicationRecord
 
   def active_token_for(provider, preferred_mode = "production")
     api_tokens
-      .where(provider: provider, valid: true, mode: preferred_mode)
+      .where(provider: provider, is_valid: true, mode: preferred_mode)
       .first ||
       api_tokens
-        .where(provider: provider, valid: true, mode: "test")
+        .where(provider: provider, is_valid: true, mode: "test")
         .first
   end
 end

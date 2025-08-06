@@ -10,6 +10,8 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 require 'rspec/rails'
 require 'simplecov'
 require "simplecov-csv"
+
+
 # Add additional requires below this line. Rails is not loaded until this point!
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
@@ -25,7 +27,7 @@ require "simplecov-csv"
 # directory. Alternatively, in the individual `*_spec.rb` files, manually
 # require only the support files necessary.
 #
-# Rails.root.glob('spec/support/**/*.rb').sort_by(&:to_s).each { |f| require f }
+Rails.root.glob('spec/support/**/*.rb').sort_by(&:to_s).each { |f| require f }
 
 SimpleCov.formatters = SimpleCov::Formatter::MultiFormatter.new([
   SimpleCov::Formatter::HTMLFormatter,
@@ -53,6 +55,22 @@ RSpec.configure do |config|
   config.fixture_paths = [
     Rails.root.join('spec/fixtures')
   ]
+
+  # FactoryBot configuration
+  config.include FactoryBot::Syntax::Methods
+  
+  # Devise test helpers
+  config.include Devise::Test::ControllerHelpers, type: :controller
+  config.include Devise::Test::IntegrationHelpers, type: :request
+
+  # Disable Active Record encryption for tests
+  config.before(:suite) do
+    ActiveRecord::Encryption.configure(
+      primary_key: "test_primary_key_32_chars_long!",
+      deterministic_key: "test_deterministic_key_32_chars_long!",
+      key_derivation_salt: "test_key_derivation_salt"
+    )
+  end
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false

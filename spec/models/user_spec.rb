@@ -7,6 +7,11 @@ RSpec.describe User, type: :model do
 
   describe '#active_token_for' do
     let(:user) { create(:user) }
+    
+    before do
+      allow_any_instance_of(ApiTokenValidatorService).to receive(:call)
+        .and_return({ valid: true })
+    end
 
     context 'when production token exists' do
       let!(:production_token) { create(:api_token, user: user, provider: 'openai', mode: 'production') }
@@ -43,11 +48,14 @@ RSpec.describe User, type: :model do
     end
 
     context 'when no valid tokens exist' do
-      let!(:invalid_token) { create(:api_token, :invalid_token, user: user, provider: 'openai') }
-
       it 'returns nil' do
-        token = user.active_token_for('openai')
-        expect(token).to be_nil
+        # Create token that will be marked as invalid
+        token = create(:api_token, user: user, provider: 'openai')
+        # Update the token to invalid after creation (bypassing validations)
+        token.update_column(:is_valid, false)
+        
+        result = user.active_token_for('openai')
+        expect(result).to be_nil
       end
     end
 

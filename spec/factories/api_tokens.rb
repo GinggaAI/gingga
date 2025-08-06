@@ -4,7 +4,6 @@ FactoryBot.define do
     mode { "production" }
     encrypted_token { "sk-test_token_#{SecureRandom.hex(8)}" }
     user { association :user }
-    valid { true }
 
     trait :openai do
       provider { "openai" }
@@ -30,12 +29,9 @@ FactoryBot.define do
     end
 
     trait :invalid_token do
-      valid { false }
+      is_valid { false }
     end
 
-    before(:create) do |api_token|
-      allow_any_instance_of(ApiTokenValidatorService).to receive(:call)
-        .and_return({ valid: true })
-    end
+    # Note: Mocking should be done in individual tests, not in factories
   end
 end
