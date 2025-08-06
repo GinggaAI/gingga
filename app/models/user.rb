@@ -5,6 +5,7 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
 
   has_many :api_tokens, dependent: :destroy
+  has_many :reels, dependent: :destroy
 
   def active_token_for(provider, preferred_mode = "production")
     api_tokens

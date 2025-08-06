@@ -44,6 +44,7 @@ gem "thruster", require: false
 
 
 gem "haml-rails", "~> 2.0"
+gem "redis", ">= 4.0.1"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -65,6 +66,7 @@ group :development, :test do
   gem "shoulda-matchers", "~> 6.0"
   gem "webmock"
   gem "faker"
+  gem "dotenv-rails"
 end
 
 group :development do
@@ -81,3 +83,4 @@ group :development do
 end
 
 gem "devise", "~> 4.9"
+gem "httparty"
