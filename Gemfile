@@ -63,6 +63,8 @@ group :development, :test do
   gem "simplecov-csv"
   gem "capybara"
   gem "shoulda-matchers", "~> 6.0"
+  gem "webmock"
+  gem "faker"
 end
 
 group :development do
