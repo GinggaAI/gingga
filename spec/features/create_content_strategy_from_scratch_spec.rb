@@ -27,7 +27,7 @@ RSpec.feature "Create a new content strategy from scratch", type: :feature do
     click_on "Save and continue"
     brand.reload
     expect(brand.logos.last.file).to be_attached
-    expect(brand.logos.last.file.filename.to_s).to  eq("test-logo.svg")
+    expect(brand.logos.last.file.filename.to_s).to eq("test-logo.svg")
 
     # Step 2. Colors
     expect(current_path).to eq(brand_profile_path(brand, :colors))
@@ -50,6 +50,5 @@ RSpec.feature "Create a new content strategy from scratch", type: :feature do
     expect(page).to have_content("Week 2")
     expect(page).to have_content("Week 3")
     expect(page).to have_content("Week 4")
-    
   end
 end
