@@ -1,49 +1,26 @@
-require "net/http"
-require "json"
+class Heygen::ValidateKeyService
+  include HTTParty
+  base_uri "https://api.heygen.com"
 
-module Heygen
-  class ValidateKeyService
-    API_URLS = {
-      "test" => "https://api.heygen.com/v1/user/remaining_quota",
-      "production" => "https://api.heygen.com/v1/user/remaining_quota"
-    }.freeze
+  def initialize(token:, mode:)
+    @token = token
+    @mode = mode
+  end
 
-    def initialize(token:, mode:)
-      @token = token
-      @mode = mode
+  def call
+    response = self.class.get("/v2/avatars", {
+      headers: {
+        "X-API-KEY" => @token,
+        "Content-Type" => "application/json"
+      }
+    })
+
+    if response.success?
+      { valid: true }
+    else
+      { valid: false, error: "Invalid Heygen API token: #{response.code} - #{response.body}" }
     end
-
-    def call
-      return { valid: false, error: "Invalid mode" } unless API_URLS.key?(@mode)
-
-      response = make_request
-      case response.code
-      when "200"
-        { valid: true }
-      when "401", "403"
-        { valid: false, error: "Invalid API key" }
-      else
-        { valid: false, error: "API validation failed with status #{response.code}" }
-      end
-    rescue StandardError => e
-      { valid: false, error: "Network error: #{e.message}" }
-    end
-
-    private
-
-    attr_reader :token, :mode
-
-    def make_request
-      uri = URI(API_URLS[@mode])
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = true
-      http.read_timeout = 10
-
-      request = Net::HTTP::Get.new(uri)
-      request["X-API-Key"] = @token
-      request["Content-Type"] = "application/json"
-
-      http.request(request)
-    end
+  rescue StandardError => e
+    { valid: false, error: "Token validation failed: #{e.message}" }
   end
 end
