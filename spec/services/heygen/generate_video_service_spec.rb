@@ -3,26 +3,26 @@ require 'webmock/rspec'
 
 RSpec.describe Heygen::GenerateVideoService, type: :service do
   let(:user) { create(:user) }
-  
+
   before do
     # Stub Heygen validation endpoint called during token creation
     stub_request(:get, "https://api.heygen.com/v2/avatars")
       .to_return(status: 200, body: '{"data": []}')
   end
-  
+
   let!(:api_token) do
     token = build(:api_token, user: user, provider: 'heygen', is_valid: true)
     token.save(validate: false)
     token
   end
   let(:reel) { create(:reel, user: user) }
-  
+
   before do
     create(:reel_scene, reel: reel, scene_number: 1, avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'Hello world')
     create(:reel_scene, reel: reel, scene_number: 2, avatar_id: 'avatar_2', voice_id: 'voice_2', script: 'Second scene')
     create(:reel_scene, reel: reel, scene_number: 3, avatar_id: 'avatar_3', voice_id: 'voice_3', script: 'Final scene')
   end
-  
+
   subject { described_class.new(user, reel) }
 
   describe '#call' do
@@ -116,13 +116,13 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
             body: expected_payload.to_json
           }
         ).and_return(double(success?: true, body: mock_response.to_json))
-        
+
         subject.call
       end
 
       it 'returns successful result with video data' do
         result = subject.call
-        
+
         expect(result[:success]).to be true
         expect(result[:data][:video_id]).to eq('heygen_video_123')
         expect(result[:data][:status]).to eq('processing')
@@ -131,7 +131,7 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
       it 'updates reel with heygen video ID' do
         subject.call
         reel.reload
-        
+
         expect(reel.heygen_video_id).to eq('heygen_video_123')
         expect(reel.status).to eq('processing')
       end
@@ -141,13 +141,13 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
 
         it 'includes test: true in payload' do
           expected_test_value = true
-          
+
           expect(Heygen::GenerateVideoService).to receive(:post) do |_path, options|
             payload = JSON.parse(options[:body])
             expect(payload['test']).to eq(expected_test_value)
             double(success?: true, body: mock_response.to_json)
           end
-          
+
           subject.call
         end
       end
@@ -160,7 +160,7 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
 
       it 'returns failure result' do
         result = subject.call
-        
+
         expect(result[:success]).to be false
         expect(result[:error]).to eq('Reel is not ready for generation')
       end
@@ -169,10 +169,10 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
     context 'when user has no valid API token' do
       let(:user_without_token) { create(:user) }
       subject { described_class.new(user_without_token, reel) }
-      
+
       it 'returns failure result' do
         result = subject.call
-        
+
         expect(result[:success]).to be false
         expect(result[:error]).to eq('No valid Heygen API token found')
       end
@@ -188,7 +188,7 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
 
       it 'returns failure result' do
         result = subject.call
-        
+
         expect(result[:success]).to be false
         expect(result[:error]).to include('Failed to generate video')
       end
@@ -206,7 +206,7 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
 
       it 'returns failure result with error message' do
         result = subject.call
-        
+
         expect(result[:success]).to be false
         expect(result[:error]).to eq('Error generating video: Network error')
       end

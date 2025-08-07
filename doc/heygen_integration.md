@@ -209,3 +209,121 @@ config.cache_store = :null_store
 - Background job processing recommended for video generation
 - Consider rate limiting for API-intensive operations
 - Monitor Heygen API quota usage
+
+---
+
+# Heygen Services Testing Guide (Rails Console)
+
+This guide outlines how to manually test each of the Heygen-related service objects using real API tokens and a user context. It assumes the `BaseService` refactor is applied and endpoints are standardized.
+
+---
+
+## 🔐 0. Setup: Create a Valid Token
+
+```ruby
+user = User.find_by(email: "your_email@example.com")
+
+ApiToken.create!(
+  user: user,
+  provider: "heygen",
+  mode: "production",
+  encrypted_token: ENV["HEYGEN_API_KEY"] || "paste_your_api_key_here_for_test",  # Set manually during test if not using ENV
+  is_valid: true
+)
+```
+
+**Note**: Ensure encryption is working and `ENV["ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY"]` is loaded.
+
+---
+
+## 1. 🎭 List Avatars
+
+```ruby
+result = Heygen::ListAvatarsService.new(user).call
+puts result[:data] if result[:success]
+```
+
+**Expected structure:**
+```ruby
+# => [{ id: "avatar_id", name: "John AI", preview_image_url: "..." }, ...]
+```
+
+---
+
+## 2. 🔊 List Voices
+
+```ruby
+result = Heygen::ListVoicesService.new(user).call
+puts result[:data].map { |v| v[:name] } if result[:success]
+```
+
+**With filters:**
+```ruby
+result = Heygen::ListVoicesService.new(user, { language: 'English', gender: 'female' }).call
+puts result[:data] if result[:success]
+```
+
+---
+
+## 3. 🎬 Generate Video (Reel with Scenes)
+
+**Preconditions:**
+- A Reel exists
+- It has 1–3 ReelScene records, each with avatar_id, voice_id, and script
+- `reel.ready_for_generation?` returns true
+- Each scene responds to `.to_heygen_payload`
+
+```ruby
+reel = user.reels.last
+result = Heygen::GenerateVideoService.new(user, reel).call
+puts result
+```
+
+**Expected:**
+```ruby
+{ success: true, data: { video_id: "...", status: "processing" } }
+```
+
+**If it fails:**
+- Ensure avatar and voice IDs are public
+- Use supported resolutions (e.g., 1280x720)
+
+---
+
+## 4. ⏳ Check Video Status
+
+```ruby
+result = Heygen::CheckVideoStatusService.new(user, reel).call
+puts result[:data] if result[:success]
+```
+
+**If result is 404:**
+- Retry after a few seconds
+- Uses endpoint: `/v1/video_status.get`
+
+---
+
+## 5. 🧪 Retry Block (Optional)
+
+```ruby
+5.times do
+  result = Heygen::CheckVideoStatusService.new(user, reel).call
+  break puts(result) if result[:success]
+  sleep 3
+end
+```
+
+---
+
+## 6. 📼 Download or Play the Video
+
+Once status is `completed`, extract the video URL:
+
+```ruby
+video_url = result[:data][:video_url]
+`open #{video_url}` # Or use it in your frontend
+```
+
+---
+
+This manual testing guide validates the Heygen flow end-to-end before connecting it to frontend flows or automations (e.g., via n8n).

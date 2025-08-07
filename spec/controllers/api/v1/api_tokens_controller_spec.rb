@@ -7,18 +7,18 @@ RSpec.describe Api::V1::ApiTokensController, type: :request do
     # Mock validation service for all tests
     allow_any_instance_of(ApiTokenValidatorService).to receive(:call)
       .and_return({ valid: true })
-    
+
     # Mock authentication for API testing by defining methods on the controller class
     Api::V1::ApiTokensController.class_eval do
       def authenticate_user!
         # Mocked - always authenticates
       end
-      
+
       def current_user
         @current_user ||= User.find_by(email: 'test@example.com') || FactoryBot.create(:user)
       end
     end
-    
+
     # Ensure we have a user that matches our test user
     allow_any_instance_of(Api::V1::ApiTokensController).to receive(:current_user).and_return(user)
   end

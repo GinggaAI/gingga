@@ -20,7 +20,7 @@ RSpec.describe Reel, type: :model do
         it 'validates exactly 3 scenes are present' do
           create(:reel_scene, reel: reel, scene_number: 1)
           create(:reel_scene, reel: reel, scene_number: 2)
-          
+
           expect(reel.reload.valid?).to be false
           reel.reload.valid?
           expect(reel.errors[:reel_scenes]).to include('must have exactly 3 scenes for scene_based mode')
@@ -30,7 +30,7 @@ RSpec.describe Reel, type: :model do
           create(:reel_scene, reel: reel, scene_number: 1)
           create(:reel_scene, reel: reel, scene_number: 2)
           create(:reel_scene, reel: reel, scene_number: 3)
-          
+
           expect(reel.reload.valid?).to be true
         end
 
@@ -38,11 +38,11 @@ RSpec.describe Reel, type: :model do
           create(:reel_scene, reel: reel, scene_number: 1, script: 'Complete scene')
           create(:reel_scene, reel: reel, scene_number: 2, script: 'Valid script')
           create(:reel_scene, reel: reel, scene_number: 3, script: 'Valid script')
-          
+
           # Update scenes to be incomplete using update_column to bypass validations
           reel.reel_scenes.by_scene_number(2).first.update_column(:script, '')
           reel.reel_scenes.by_scene_number(3).first.update_column(:script, nil)
-          
+
           expect(reel.reload.valid?).to be false
           reel.reload.valid?
           expect(reel.errors[:reel_scenes]).to include('scenes 2, 3 are incomplete')

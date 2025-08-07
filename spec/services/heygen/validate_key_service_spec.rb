@@ -4,7 +4,7 @@ require 'webmock/rspec'
 RSpec.describe Heygen::ValidateKeyService, type: :service do
   let(:token) { 'sk-test_token_123' }
   let(:mode) { 'test' }
-  
+
   subject { described_class.new(token: token, mode: mode) }
 
   describe '#call' do
@@ -20,7 +20,7 @@ RSpec.describe Heygen::ValidateKeyService, type: :service do
 
       it 'returns valid: true' do
         result = subject.call
-        
+
         expect(result[:valid]).to be true
         expect(result[:error]).to be_nil
       end
@@ -38,7 +38,7 @@ RSpec.describe Heygen::ValidateKeyService, type: :service do
 
       it 'returns valid: false with error message' do
         result = subject.call
-        
+
         expect(result[:valid]).to be false
         expect(result[:error]).to include('Invalid Heygen API token')
         expect(result[:error]).to include('401')
@@ -57,7 +57,7 @@ RSpec.describe Heygen::ValidateKeyService, type: :service do
 
       it 'returns valid: false with error message' do
         result = subject.call
-        
+
         expect(result[:valid]).to be false
         expect(result[:error]).to include('Token validation failed:')
       end
@@ -75,7 +75,7 @@ RSpec.describe Heygen::ValidateKeyService, type: :service do
 
       it 'returns valid: false with error message' do
         result = subject.call
-        
+
         expect(result[:valid]).to be false
         expect(result[:error]).to include('Invalid Heygen API token')
         expect(result[:error]).to include('404')
