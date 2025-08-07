@@ -1,15 +1,11 @@
-class Heygen::ListVoicesService
-  include HTTParty
-  base_uri "https://api.heygen.com"
-
+class Heygen::ListVoicesService < Heygen::BaseService
   def initialize(user, filters = {})
-    @user = user
-    @api_token = user.active_token_for("heygen")
     @filters = filters
+    super(user)
   end
 
   def call
-    return failure_result("No valid Heygen API token found") unless @api_token
+    return failure_result("No valid Heygen API token found") unless api_token_present?
 
     cached_result = Rails.cache.read(cache_key)
     return success_result(filter_voices(cached_result)) if cached_result
@@ -30,16 +26,11 @@ class Heygen::ListVoicesService
   private
 
   def fetch_voices
-    self.class.get("/v2/voices", {
-      headers: {
-        "X-API-KEY" => @api_token.encrypted_token,
-        "Content-Type" => "application/json"
-      }
-    })
+    get(Heygen::Endpoints::LIST_VOICES)
   end
 
   def parse_response(response)
-    data = JSON.parse(response.body)
+    data = parse_json(response)
     return [] unless data["data"]
     voices = data.dig("data", "voices") || []
 
@@ -71,14 +62,6 @@ class Heygen::ListVoicesService
   end
 
   def cache_key
-    "heygen_voices_#{@user.id}_#{@api_token.mode}"
-  end
-
-  def success_result(data)
-    { success: true, data: data }
-  end
-
-  def failure_result(message)
-    { success: false, error: message }
+    cache_key_for("voices")
   end
 end

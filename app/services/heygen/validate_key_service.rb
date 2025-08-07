@@ -1,3 +1,5 @@
+require "ostruct"
+
 class Heygen::ValidateKeyService
   include HTTParty
   base_uri "https://api.heygen.com"
@@ -8,12 +10,7 @@ class Heygen::ValidateKeyService
   end
 
   def call
-    response = self.class.get("/v2/avatars", {
-      headers: {
-        "X-API-KEY" => @token,
-        "Content-Type" => "application/json"
-      }
-    })
+    response = get_avatars
 
     if response.success?
       { valid: true }
@@ -22,5 +19,16 @@ class Heygen::ValidateKeyService
     end
   rescue StandardError => e
     { valid: false, error: "Token validation failed: #{e.message}" }
+  end
+
+  private
+
+  def get_avatars
+    self.class.get(Heygen::Endpoints::VALIDATE_KEY, {
+      headers: {
+        "X-API-KEY" => @token,
+        "Content-Type" => "application/json"
+      }
+    })
   end
 end

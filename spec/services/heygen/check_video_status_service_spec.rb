@@ -3,13 +3,13 @@ require 'webmock/rspec'
 
 RSpec.describe Heygen::CheckVideoStatusService, type: :service do
   let(:user) { create(:user) }
-  
+
   before do
     # Stub Heygen validation endpoint called during token creation
     stub_request(:get, "https://api.heygen.com/v2/avatars")
       .to_return(status: 200, body: '{"data": []}')
   end
-  
+
   let!(:api_token) do
     token = build(:api_token, user: user, provider: 'heygen', is_valid: true)
     token.save(validate: false)
@@ -23,7 +23,7 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
     create(:reel_scene, reel: reel, scene_number: 3)
     reel
   end
-  
+
   subject { described_class.new(user, reel) }
 
   describe '#call' do
@@ -58,7 +58,7 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
 
       it 'returns successful result with status data' do
         result = subject.call
-        
+
         expect(result[:success]).to be true
         expect(result[:data][:status]).to eq('completed')
         expect(result[:data][:video_url]).to eq('https://example.com/video.mp4')
@@ -69,7 +69,7 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
       it 'updates reel with video data' do
         subject.call
         reel.reload
-        
+
         expect(reel.status).to eq('completed')
         expect(reel.video_url).to eq('https://example.com/video.mp4')
         expect(reel.thumbnail_url).to eq('https://example.com/thumbnail.jpg')
@@ -102,7 +102,7 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
       it 'updates reel status but not video data' do
         subject.call
         reel.reload
-        
+
         expect(reel.status).to eq('processing')
         expect(reel.video_url).to be_nil
         expect(reel.thumbnail_url).to be_nil
@@ -135,55 +135,55 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
       it 'updates reel status to failed' do
         subject.call
         reel.reload
-        
+
         expect(reel.status).to eq('failed')
       end
     end
 
     context 'when mapping different Heygen status values' do
-      ['pending', 'processing'].each do |heygen_status|
+      [ 'pending', 'processing' ].each do |heygen_status|
         it "maps '#{heygen_status}' to 'processing'" do
           mock_response = { 'data' => { 'status' => heygen_status } }
-          
+
           stub_request(:get, "https://api.heygen.com/v1/video_status.get")
             .with(query: { video_id: reel.heygen_video_id }, headers: {
               'X-API-KEY' => api_token.encrypted_token,
               'Content-Type' => 'application/json'
             })
             .to_return(status: 200, body: mock_response.to_json)
-          
+
           subject.call
           expect(reel.reload.status).to eq('processing')
         end
       end
 
-      ['completed', 'success'].each do |heygen_status|
+      [ 'completed', 'success' ].each do |heygen_status|
         it "maps '#{heygen_status}' to 'completed'" do
           mock_response = { 'data' => { 'status' => heygen_status } }
-          
+
           stub_request(:get, "https://api.heygen.com/v1/video_status.get")
             .with(query: { video_id: reel.heygen_video_id }, headers: {
               'X-API-KEY' => api_token.encrypted_token,
               'Content-Type' => 'application/json'
             })
             .to_return(status: 200, body: mock_response.to_json)
-          
+
           subject.call
           expect(reel.reload.status).to eq('completed')
         end
       end
 
-      ['failed', 'error'].each do |heygen_status|
+      [ 'failed', 'error' ].each do |heygen_status|
         it "maps '#{heygen_status}' to 'failed'" do
           mock_response = { 'data' => { 'status' => heygen_status } }
-          
+
           stub_request(:get, "https://api.heygen.com/v1/video_status.get")
             .with(query: { video_id: reel.heygen_video_id }, headers: {
               'X-API-KEY' => api_token.encrypted_token,
               'Content-Type' => 'application/json'
             })
             .to_return(status: 200, body: mock_response.to_json)
-          
+
           subject.call
           expect(reel.reload.status).to eq('failed')
         end
@@ -200,10 +200,10 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
         reel
       end
       subject { described_class.new(user, reel_without_video_id) }
-      
+
       it 'returns failure result' do
         result = subject.call
-        
+
         expect(result[:success]).to be false
         expect(result[:error]).to eq('Reel has no Heygen video ID')
       end
@@ -212,10 +212,10 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
     context 'when user has no valid API token' do
       let(:user_without_token) { create(:user) }
       subject { described_class.new(user_without_token, reel) }
-      
+
       it 'returns failure result' do
         result = subject.call
-        
+
         expect(result[:success]).to be false
         expect(result[:error]).to eq('No valid Heygen API token found')
       end
@@ -233,7 +233,7 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
 
       it 'returns failure result' do
         result = subject.call
-        
+
         expect(result[:success]).to be false
         expect(result[:error]).to include('Failed to check video status')
       end
@@ -251,7 +251,7 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
 
       it 'returns failure result with error message' do
         result = subject.call
-        
+
         expect(result[:success]).to be false
         expect(result[:error]).to include('Error checking video status:')
       end
