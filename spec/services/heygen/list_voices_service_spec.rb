@@ -3,19 +3,19 @@ require 'webmock/rspec'
 
 RSpec.describe Heygen::ListVoicesService, type: :service do
   let(:user) { create(:user) }
-  
+
   before do
     # Stub Heygen validation endpoint called during token creation
     stub_request(:get, "https://api.heygen.com/v2/avatars")
       .to_return(status: 200, body: '{"data": []}')
   end
-  
+
   let!(:api_token) do
     token = build(:api_token, user: user, provider: 'heygen', is_valid: true)
     token.save(validate: false)
     token
   end
-  
+
   describe '#call' do
     let(:mock_response) do
       {
@@ -57,11 +57,11 @@ RSpec.describe Heygen::ListVoicesService, type: :service do
 
       it 'returns all voices' do
         result = subject.call
-        
+
         expect(result[:success]).to be true
         expect(result[:data]).to be_an(Array)
         expect(result[:data].length).to eq(2)
-        
+
         voice = result[:data].first
         expect(voice[:id]).to eq('voice_1')
         expect(voice[:name]).to eq('Emma')
@@ -73,10 +73,10 @@ RSpec.describe Heygen::ListVoicesService, type: :service do
 
       it 'caches the result' do
         cache_key = "heygen_voices_#{user.id}_#{api_token.mode}"
-        
+
         expect(Rails.cache).to receive(:read).with(cache_key).and_return(nil)
         expect(Rails.cache).to receive(:write).with(cache_key, anything, expires_in: 18.hours)
-        
+
         subject.call
       end
     end
@@ -92,7 +92,7 @@ RSpec.describe Heygen::ListVoicesService, type: :service do
 
       it 'returns filtered voices by language' do
         result = subject.call
-        
+
         expect(result[:success]).to be true
         expect(result[:data].length).to eq(1)
         expect(result[:data].first[:name]).to eq('Carlos')
@@ -111,7 +111,7 @@ RSpec.describe Heygen::ListVoicesService, type: :service do
 
       it 'returns filtered voices by gender' do
         result = subject.call
-        
+
         expect(result[:success]).to be true
         expect(result[:data].length).to eq(1)
         expect(result[:data].first[:name]).to eq('Emma')
@@ -130,7 +130,7 @@ RSpec.describe Heygen::ListVoicesService, type: :service do
 
       it 'returns voices matching all filters' do
         result = subject.call
-        
+
         expect(result[:success]).to be true
         expect(result[:data].length).to eq(1)
         expect(result[:data].first[:name]).to eq('Emma')
@@ -139,17 +139,17 @@ RSpec.describe Heygen::ListVoicesService, type: :service do
 
     context 'when using cached data' do
       subject { described_class.new(user, { gender: 'male' }) }
-      
+
       it 'applies filters to cached data' do
         cached_data = [
           { id: 'voice_1', name: 'Emma', gender: 'female', language: 'English' },
           { id: 'voice_2', name: 'John', gender: 'male', language: 'English' }
         ]
-        
+
         cache_key = "heygen_voices_#{user.id}_#{api_token.mode}"
         expect(Rails.cache).to receive(:read).with(cache_key).and_return(cached_data)
         expect(Heygen::ListVoicesService).not_to receive(:get)
-        
+
         result = subject.call
         expect(result[:success]).to be true
         expect(result[:data].length).to eq(1)
@@ -160,10 +160,10 @@ RSpec.describe Heygen::ListVoicesService, type: :service do
     context 'when user has no valid API token' do
       let(:user_without_token) { create(:user) }
       subject { described_class.new(user_without_token) }
-      
+
       it 'returns failure result' do
         result = subject.call
-        
+
         expect(result[:success]).to be false
         expect(result[:error]).to eq('No valid Heygen API token found')
       end
@@ -180,7 +180,7 @@ RSpec.describe Heygen::ListVoicesService, type: :service do
 
       it 'returns failure result' do
         result = subject.call
-        
+
         expect(result[:success]).to be false
         expect(result[:error]).to include('Failed to fetch voices')
       end
@@ -195,7 +195,7 @@ RSpec.describe Heygen::ListVoicesService, type: :service do
 
       it 'returns failure result with error message' do
         result = subject.call
-        
+
         expect(result[:success]).to be false
         expect(result[:error]).to eq('Error fetching voices: Network error')
       end

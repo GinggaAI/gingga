@@ -1,4 +1,4 @@
-require 'ostruct'
+require "ostruct"
 
 class Heygen::ValidateKeyService
   include HTTParty
@@ -31,5 +31,4 @@ class Heygen::ValidateKeyService
       }
     })
   end
-
 end

@@ -3,13 +3,13 @@ require 'webmock/rspec'
 
 RSpec.describe Heygen::BaseService, type: :service do
   let(:user) { create(:user) }
-  
+
   before do
     # Stub Heygen validation endpoint called during token creation
     stub_request(:get, "https://api.heygen.com/v2/avatars")
       .to_return(status: 200, body: '{"data": []}')
   end
-  
+
   let!(:api_token) do
     token = build(:api_token, user: user, provider: 'heygen', is_valid: true)
     token.save(validate: false)
@@ -76,7 +76,7 @@ RSpec.describe Heygen::BaseService, type: :service do
   describe '#headers' do
     it 'returns correct headers with API token' do
       headers = subject.send(:headers)
-      
+
       expect(headers).to eq({
         "X-API-KEY" => api_token.encrypted_token,
         "Content-Type" => "application/json"
@@ -100,7 +100,7 @@ RSpec.describe Heygen::BaseService, type: :service do
 
       it 'makes GET request with correct parameters' do
         response = subject.test_get('/test/path', query: { param: 'value' })
-        
+
         expect(response.success?).to be true
         expect(response.body).to eq('{"success": true}')
       end
@@ -112,8 +112,8 @@ RSpec.describe Heygen::BaseService, type: :service do
       end
 
       it 'raises StandardError with original message' do
-        expect { 
-          subject.test_get('/test/path') 
+        expect {
+          subject.test_get('/test/path')
         }.to raise_error(StandardError, 'Network error')
       end
     end
@@ -127,8 +127,8 @@ RSpec.describe Heygen::BaseService, type: :service do
       end
 
       it 'raises StandardError with timeout message' do
-        expect { 
-          subject.test_get('/test/path') 
+        expect {
+          subject.test_get('/test/path')
         }.to raise_error(StandardError, 'Request timeout: timeout occurred')
       end
     end
@@ -150,7 +150,7 @@ RSpec.describe Heygen::BaseService, type: :service do
 
       it 'makes POST request with correct parameters' do
         response = subject.test_post('/test/path', body: { key: 'value' })
-        
+
         expect(response.success?).to be true
         expect(response.body).to eq('{"success": true}')
       end
@@ -171,7 +171,7 @@ RSpec.describe Heygen::BaseService, type: :service do
 
       it 'uses the string body as-is' do
         response = subject.test_post('/test/path', body: '{"key":"value"}')
-        
+
         expect(response.success?).to be true
       end
     end
@@ -182,8 +182,8 @@ RSpec.describe Heygen::BaseService, type: :service do
       end
 
       it 'raises StandardError with original message' do
-        expect { 
-          subject.test_post('/test/path', body: {}) 
+        expect {
+          subject.test_post('/test/path', body: {})
         }.to raise_error(StandardError, 'Network error')
       end
     end

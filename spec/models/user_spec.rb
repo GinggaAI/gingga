@@ -7,7 +7,7 @@ RSpec.describe User, type: :model do
 
   describe '#active_token_for' do
     let(:user) { create(:user) }
-    
+
     before do
       allow_any_instance_of(ApiTokenValidatorService).to receive(:call)
         .and_return({ valid: true })
@@ -53,7 +53,7 @@ RSpec.describe User, type: :model do
         token = create(:api_token, user: user, provider: 'openai')
         # Update the token to invalid after creation (bypassing validations)
         token.update_column(:is_valid, false)
-        
+
         result = user.active_token_for('openai')
         expect(result).to be_nil
       end

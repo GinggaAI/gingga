@@ -1,5 +1,5 @@
-require 'net/http'
-require 'ostruct'
+require "net/http"
+require "ostruct"
 
 class Heygen::BaseService
   include HTTParty

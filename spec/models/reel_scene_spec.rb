@@ -21,7 +21,7 @@ RSpec.describe ReelScene, type: :model do
 
       it 'validates uniqueness of scene_number within reel scope' do
         duplicate_scene = build(:reel_scene, reel: reel, scene_number: 1)
-        
+
         expect(duplicate_scene).not_to be_valid
         expect(duplicate_scene.errors[:scene_number]).to include('has already been taken')
       end
@@ -29,7 +29,7 @@ RSpec.describe ReelScene, type: :model do
       it 'allows same scene_number in different reels' do
         other_reel = create(:reel, user: user)
         other_scene = build(:reel_scene, reel: other_reel, scene_number: 1)
-        
+
         expect(other_scene).to be_valid
       end
     end
@@ -43,7 +43,7 @@ RSpec.describe ReelScene, type: :model do
     describe '.ordered' do
       it 'returns scenes ordered by scene_number' do
         ordered_scenes = reel.reel_scenes.ordered
-        expect(ordered_scenes.pluck(:scene_number)).to eq([1, 2, 3])
+        expect(ordered_scenes.pluck(:scene_number)).to eq([ 1, 2, 3 ])
       end
     end
 
@@ -103,7 +103,7 @@ RSpec.describe ReelScene, type: :model do
 
     it 'returns hash with heygen API format' do
       payload = scene.to_heygen_payload
-      
+
       expect(payload).to eq({
         avatar_id: 'avatar_123',
         voice_id: 'voice_456',
@@ -115,7 +115,7 @@ RSpec.describe ReelScene, type: :model do
   describe 'factory' do
     it 'creates a valid reel scene' do
       scene = create(:reel_scene, reel: reel)
-      
+
       expect(scene).to be_persisted
       expect(scene.reel).to eq(reel)
       expect(scene.scene_number).to be_between(1, 3)
@@ -128,8 +128,8 @@ RSpec.describe ReelScene, type: :model do
       scene_1 = create(:reel_scene, reel: reel, scene_number: 1)
       scene_2 = create(:reel_scene, reel: reel, scene_number: 2)
       scene_3 = create(:reel_scene, reel: reel, scene_number: 3)
-      
-      expect([scene_1.scene_number, scene_2.scene_number, scene_3.scene_number]).to match_array([1, 2, 3])
+
+      expect([ scene_1.scene_number, scene_2.scene_number, scene_3.scene_number ]).to match_array([ 1, 2, 3 ])
     end
   end
 end
