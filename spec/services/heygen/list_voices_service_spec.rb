@@ -6,7 +6,7 @@ RSpec.describe Heygen::ListVoicesService, type: :service do
   
   before do
     # Stub Heygen validation endpoint called during token creation
-    stub_request(:get, "https://api.heygen.com/v1/avatars")
+    stub_request(:get, "https://api.heygen.com/v2/avatars")
       .to_return(status: 200, body: '{"data": []}')
   end
   
@@ -19,28 +19,30 @@ RSpec.describe Heygen::ListVoicesService, type: :service do
   describe '#call' do
     let(:mock_response) do
       {
-        'data' => [
-          {
-            'voice_id' => 'voice_1',
-            'name' => 'Emma',
-            'language' => 'English',
-            'gender' => 'female',
-            'age_group' => 'young_adult',
-            'accent' => 'American',
-            'is_public' => true,
-            'preview_audio_url' => 'https://example.com/emma.mp3'
-          },
-          {
-            'voice_id' => 'voice_2',
-            'name' => 'Carlos',
-            'language' => 'Spanish',
-            'gender' => 'male',
-            'age_group' => 'middle_aged',
-            'accent' => 'Mexican',
-            'is_public' => true,
-            'preview_audio_url' => 'https://example.com/carlos.mp3'
-          }
-        ]
+        'data' => {
+          'voices' => [
+            {
+              'voice_id' => 'voice_1',
+              'name' => 'Emma',
+              'language' => 'English',
+              'gender' => 'female',
+              'age_group' => 'young_adult',
+              'accent' => 'American',
+              'is_public' => true,
+              'preview_audio_url' => 'https://example.com/emma.mp3'
+            },
+            {
+              'voice_id' => 'voice_2',
+              'name' => 'Carlos',
+              'language' => 'Spanish',
+              'gender' => 'male',
+              'age_group' => 'middle_aged',
+              'accent' => 'Mexican',
+              'is_public' => true,
+              'preview_audio_url' => 'https://example.com/carlos.mp3'
+            }
+          ]
+        }
       }
     end
 

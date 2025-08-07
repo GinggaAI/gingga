@@ -6,7 +6,7 @@ RSpec.describe Heygen::ListAvatarsService, type: :service do
   
   before do
     # Stub Heygen validation endpoint called during token creation
-    stub_request(:get, "https://api.heygen.com/v1/avatars")
+    stub_request(:get, "https://api.heygen.com/v2/avatars")
       .to_return(status: 200, body: '{"data": []}')
   end
   
@@ -22,22 +22,24 @@ RSpec.describe Heygen::ListAvatarsService, type: :service do
     context 'when user has valid API token' do
       let(:mock_response) do
         {
-          'data' => [
-            {
-              'avatar_id' => 'avatar_1',
-              'avatar_name' => 'Sarah',
-              'preview_image_url' => 'https://example.com/sarah.jpg',
-              'gender' => 'female',
-              'is_public' => true
-            },
-            {
-              'avatar_id' => 'avatar_2', 
-              'avatar_name' => 'John',
-              'preview_image_url' => 'https://example.com/john.jpg',
-              'gender' => 'male',
-              'is_public' => false
-            }
-          ]
+          'data' => {
+            'avatars' => [
+              {
+                'avatar_id' => 'avatar_1',
+                'avatar_name' => 'Sarah',
+                'preview_image_url' => 'https://example.com/sarah.jpg',
+                'gender' => 'female',
+                'is_public' => true
+              },
+              {
+                'avatar_id' => 'avatar_2', 
+                'avatar_name' => 'John',
+                'preview_image_url' => 'https://example.com/john.jpg',
+                'gender' => 'male',
+                'is_public' => false
+              }
+            ]
+          }
         }
       end
 
@@ -84,7 +86,7 @@ RSpec.describe Heygen::ListAvatarsService, type: :service do
 
       it 'makes API call with correct headers' do
         expect(Heygen::ListAvatarsService).to receive(:get).with(
-          '/v1/avatars',
+          '/v2/avatars',
           {
             headers: {
               'X-API-KEY' => api_token.encrypted_token,

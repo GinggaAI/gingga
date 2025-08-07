@@ -6,7 +6,7 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
   
   before do
     # Stub Heygen validation endpoint called during token creation
-    stub_request(:get, "https://api.heygen.com/v1/avatars")
+    stub_request(:get, "https://api.heygen.com/v2/avatars")
       .to_return(status: 200, body: '{"data": []}')
   end
   
@@ -42,8 +42,8 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
 
       before do
         # Stub the video status check endpoint
-        stub_request(:get, "https://api.heygen.com/v1/video_status/#{reel.heygen_video_id}")
-          .with(headers: {
+        stub_request(:get, "https://api.heygen.com/v1/video_status.get")
+          .with(query: { video_id: reel.heygen_video_id }, headers: {
             'X-API-KEY' => api_token.encrypted_token,
             'Content-Type' => 'application/json'
           })
@@ -91,8 +91,8 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
       end
 
       before do
-        stub_request(:get, "https://api.heygen.com/v1/video_status/#{reel.heygen_video_id}")
-          .with(headers: {
+        stub_request(:get, "https://api.heygen.com/v1/video_status.get")
+          .with(query: { video_id: reel.heygen_video_id }, headers: {
             'X-API-KEY' => api_token.encrypted_token,
             'Content-Type' => 'application/json'
           })
@@ -124,8 +124,8 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
       end
 
       before do
-        stub_request(:get, "https://api.heygen.com/v1/video_status/#{reel.heygen_video_id}")
-          .with(headers: {
+        stub_request(:get, "https://api.heygen.com/v1/video_status.get")
+          .with(query: { video_id: reel.heygen_video_id }, headers: {
             'X-API-KEY' => api_token.encrypted_token,
             'Content-Type' => 'application/json'
           })
@@ -145,8 +145,8 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
         it "maps '#{heygen_status}' to 'processing'" do
           mock_response = { 'data' => { 'status' => heygen_status } }
           
-          stub_request(:get, "https://api.heygen.com/v1/video_status/#{reel.heygen_video_id}")
-            .with(headers: {
+          stub_request(:get, "https://api.heygen.com/v1/video_status.get")
+            .with(query: { video_id: reel.heygen_video_id }, headers: {
               'X-API-KEY' => api_token.encrypted_token,
               'Content-Type' => 'application/json'
             })
@@ -161,8 +161,8 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
         it "maps '#{heygen_status}' to 'completed'" do
           mock_response = { 'data' => { 'status' => heygen_status } }
           
-          stub_request(:get, "https://api.heygen.com/v1/video_status/#{reel.heygen_video_id}")
-            .with(headers: {
+          stub_request(:get, "https://api.heygen.com/v1/video_status.get")
+            .with(query: { video_id: reel.heygen_video_id }, headers: {
               'X-API-KEY' => api_token.encrypted_token,
               'Content-Type' => 'application/json'
             })
@@ -177,8 +177,8 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
         it "maps '#{heygen_status}' to 'failed'" do
           mock_response = { 'data' => { 'status' => heygen_status } }
           
-          stub_request(:get, "https://api.heygen.com/v1/video_status/#{reel.heygen_video_id}")
-            .with(headers: {
+          stub_request(:get, "https://api.heygen.com/v1/video_status.get")
+            .with(query: { video_id: reel.heygen_video_id }, headers: {
               'X-API-KEY' => api_token.encrypted_token,
               'Content-Type' => 'application/json'
             })
@@ -223,8 +223,8 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
 
     context 'when API call fails' do
       before do
-        stub_request(:get, "https://api.heygen.com/v1/video_status/#{reel.heygen_video_id}")
-          .with(headers: {
+        stub_request(:get, "https://api.heygen.com/v1/video_status.get")
+          .with(query: { video_id: reel.heygen_video_id }, headers: {
             'X-API-KEY' => api_token.encrypted_token,
             'Content-Type' => 'application/json'
           })
@@ -241,8 +241,8 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
 
     context 'when an exception occurs' do
       before do
-        stub_request(:get, "https://api.heygen.com/v1/video_status/#{reel.heygen_video_id}")
-          .with(headers: {
+        stub_request(:get, "https://api.heygen.com/v1/video_status.get")
+          .with(query: { video_id: reel.heygen_video_id }, headers: {
             'X-API-KEY' => api_token.encrypted_token,
             'Content-Type' => 'application/json'
           })

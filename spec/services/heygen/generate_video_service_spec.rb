@@ -6,7 +6,7 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
   
   before do
     # Stub Heygen validation endpoint called during token creation
-    stub_request(:get, "https://api.heygen.com/v1/avatars")
+    stub_request(:get, "https://api.heygen.com/v2/avatars")
       .to_return(status: 200, body: '{"data": []}')
   end
   
@@ -99,8 +99,8 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
             }
           ],
           dimension: {
-            width: 1920,
-            height: 1080
+            width: 1280,
+            height: 720
           },
           aspect_ratio: "16:9",
           test: api_token.mode == 'test'
