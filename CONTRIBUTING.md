@@ -100,7 +100,21 @@ Style/FrozenStringLiteralComment:
 
 ---
 
-## 5. Development Workflow
+## 5. 📘 Review Historical Context Before Starting
+
+Before contributing new features or making architectural decisions:
+
+- Navigate to the `/doc` folder
+- Read the `.md` files related to previous implementations (e.g., `heygen_integration.md`)
+- Review known issues, fixes, and quirks in files like:
+  - `doc/heygen_integration.md`
+  - `doc/heygen_integration_issue_fixes.md`
+
+Understanding past decisions, edge cases, and bug history will help avoid regressions and duplicate work. It also ensures consistent design patterns and API usage across the project.
+
+---
+
+## 6. Development Workflow
 1. **Feature Ticket**: Define feature in issue tracker
 2. **Branch**: Create feature branch with `feature/<ticket-id>-<slug>`
 3. **Test First**: Write RSpec specs before implementation
@@ -110,7 +124,7 @@ Style/FrozenStringLiteralComment:
 
 ---
 
-## 6. Onboarding Checklist
+## 7. Onboarding Checklist
 - [ ] Clone repo & run setup script
 - [ ] Create `.env` file with credentials
 - [ ] Run `bundle exec rspec`
