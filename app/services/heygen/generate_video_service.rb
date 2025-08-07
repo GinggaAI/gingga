@@ -1,15 +1,11 @@
-class Heygen::GenerateVideoService
-  include HTTParty
-  base_uri "https://api.heygen.com"
-
+class Heygen::GenerateVideoService < Heygen::BaseService
   def initialize(user, reel)
-    @user = user
     @reel = reel
-    @api_token = user.active_token_for("heygen")
+    super(user)
   end
 
   def call
-    return failure_result("No valid Heygen API token found") unless @api_token
+    return failure_result("No valid Heygen API token found") unless api_token_present?
     return failure_result("Reel is not ready for generation") unless @reel.ready_for_generation?
 
     payload = build_payload
@@ -32,14 +28,7 @@ class Heygen::GenerateVideoService
 
   def generate_video(payload)
     @reel.update!(status: "processing")
-
-    self.class.post("/v2/video/generate", {
-      headers: {
-        "X-API-KEY" => @api_token.encrypted_token,
-        "Content-Type" => "application/json"
-      },
-      body: payload.to_json
-    })
+    post(Heygen::Endpoints::GENERATE_VIDEO, body: payload)
   end
 
   def build_payload
@@ -74,7 +63,7 @@ class Heygen::GenerateVideoService
   end
 
   def parse_response(response)
-    data = JSON.parse(response.body)
+    data = parse_json(response)
     {
       video_id: data.dig("data", "video_id"),
       status: "processing"
@@ -86,13 +75,5 @@ class Heygen::GenerateVideoService
       heygen_video_id: video_data[:video_id],
       status: "processing"
     )
-  end
-
-  def success_result(data)
-    { success: true, data: data }
-  end
-
-  def failure_result(message)
-    { success: false, error: message }
   end
 end

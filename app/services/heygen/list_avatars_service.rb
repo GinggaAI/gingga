@@ -1,14 +1,6 @@
-class Heygen::ListAvatarsService
-  include HTTParty
-  base_uri "https://api.heygen.com"
-
-  def initialize(user)
-    @user = user
-    @api_token = user.active_token_for("heygen")
-  end
-
+class Heygen::ListAvatarsService < Heygen::BaseService
   def call
-    return failure_result("No valid Heygen API token found") unless @api_token
+    return failure_result("No valid Heygen API token found") unless api_token_present?
 
     cached_result = Rails.cache.read(cache_key)
     return success_result(cached_result) if cached_result
@@ -29,16 +21,11 @@ class Heygen::ListAvatarsService
   private
 
   def fetch_avatars
-    self.class.get("/v2/avatars", {
-      headers: {
-        "X-API-KEY" => @api_token.encrypted_token,
-        "Content-Type" => "application/json"
-      }
-    })
+    get(Heygen::Endpoints::LIST_AVATARS)
   end
 
   def parse_response(response)
-    data = JSON.parse(response.body)
+    data = parse_json(response)
     return [] unless data["data"]
 
     avatars = data.dig("data", "avatars") || []
@@ -54,14 +41,6 @@ class Heygen::ListAvatarsService
   end
 
   def cache_key
-    "heygen_avatars_#{@user.id}_#{@api_token.mode}"
-  end
-
-  def success_result(data)
-    { success: true, data: data }
-  end
-
-  def failure_result(message)
-    { success: false, error: message }
+    cache_key_for("avatars")
   end
 end

@@ -91,7 +91,8 @@ RSpec.describe Heygen::ListAvatarsService, type: :service do
             headers: {
               'X-API-KEY' => api_token.encrypted_token,
               'Content-Type' => 'application/json'
-            }
+            },
+            query: {}
           }
         ).and_return(double(success?: true, body: mock_response.to_json))
         

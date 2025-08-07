@@ -1,15 +1,11 @@
-class Heygen::CheckVideoStatusService
-  include HTTParty
-  base_uri "https://api.heygen.com"
-
+class Heygen::CheckVideoStatusService < Heygen::BaseService
   def initialize(user, reel)
-    @user = user
     @reel = reel
-    @api_token = user.active_token_for("heygen")
+    super(user)
   end
 
   def call
-    return failure_result("No valid Heygen API token found") unless @api_token
+    return failure_result("No valid Heygen API token found") unless api_token_present?
     return failure_result("Reel has no Heygen video ID") unless @reel.heygen_video_id
 
     response = check_status
@@ -28,17 +24,11 @@ class Heygen::CheckVideoStatusService
   private
 
   def check_status
-    self.class.get("/v1/video_status.get", {
-      headers: {
-        "X-API-KEY" => @api_token.encrypted_token,
-        "Content-Type" => "application/json"
-      },
-      query: { video_id: @reel.heygen_video_id }
-    })
+    get(Heygen::Endpoints::VIDEO_STATUS, query: { video_id: @reel.heygen_video_id })
   end
 
   def parse_response(response)
-    data = JSON.parse(response.body)
+    data = parse_json(response)
     video_data = data["data"] || {}
 
     {
@@ -77,13 +67,5 @@ class Heygen::CheckVideoStatusService
     end
 
     @reel.update!(update_params)
-  end
-
-  def success_result(data)
-    { success: true, data: data }
-  end
-
-  def failure_result(message)
-    { success: false, error: message }
   end
 end
