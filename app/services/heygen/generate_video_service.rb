@@ -65,8 +65,8 @@ class Heygen::GenerateVideoService
         }
       end,
       dimension: {
-        width: 1920,
-        height: 1080
+        width: 1280,
+        height: 720
       },
       aspect_ratio: "16:9",
       test: @api_token.mode == "test"
@@ -76,7 +76,7 @@ class Heygen::GenerateVideoService
   def parse_response(response)
     data = JSON.parse(response.body)
     {
-      video_id: data["data"]["video_id"],
+      video_id: data.dig("data", "video_id"),
       status: "processing"
     }
   end

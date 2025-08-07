@@ -29,7 +29,7 @@ class Heygen::ListAvatarsService
   private
 
   def fetch_avatars
-    self.class.get("/v1/avatars", {
+    self.class.get("/v2/avatars", {
       headers: {
         "X-API-KEY" => @api_token.encrypted_token,
         "Content-Type" => "application/json"
@@ -41,7 +41,8 @@ class Heygen::ListAvatarsService
     data = JSON.parse(response.body)
     return [] unless data["data"]
 
-    data["data"].map do |avatar|
+    avatars = data.dig("data", "avatars") || []
+    avatars.map do |avatar|
       {
         id: avatar["avatar_id"],
         name: avatar["avatar_name"],

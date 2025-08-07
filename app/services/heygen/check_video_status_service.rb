@@ -28,17 +28,18 @@ class Heygen::CheckVideoStatusService
   private
 
   def check_status
-    self.class.get("/v1/video_status/#{@reel.heygen_video_id}", {
+    self.class.get("/v1/video_status.get", {
       headers: {
         "X-API-KEY" => @api_token.encrypted_token,
         "Content-Type" => "application/json"
-      }
+      },
+      query: { video_id: @reel.heygen_video_id }
     })
   end
 
   def parse_response(response)
     data = JSON.parse(response.body)
-    video_data = data["data"]
+    video_data = data["data"] || {}
 
     {
       status: map_heygen_status(video_data["status"]),

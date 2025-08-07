@@ -30,7 +30,7 @@ class Heygen::ListVoicesService
   private
 
   def fetch_voices
-    self.class.get("/v1/voices", {
+    self.class.get("/v2/voices", {
       headers: {
         "X-API-KEY" => @api_token.encrypted_token,
         "Content-Type" => "application/json"
@@ -41,8 +41,9 @@ class Heygen::ListVoicesService
   def parse_response(response)
     data = JSON.parse(response.body)
     return [] unless data["data"]
+    voices = data.dig("data", "voices") || []
 
-    data["data"].map do |voice|
+    voices.map do |voice|
       {
         id: voice["voice_id"],
         name: voice["name"],
