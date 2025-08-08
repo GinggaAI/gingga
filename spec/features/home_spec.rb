@@ -6,7 +6,8 @@ RSpec.feature "Home", type: :feature do
 
     # Hero section
     expect(page).to have_text("GINGGA: Intelligence in Motion")
-    expect(page).to have_text("Your brand deserves to move, grow, and glow — every day.")
+    # Copy tightened in hero; keep semantic equivalence
+    expect(page).to have_text("We help small businesses turn raw ideas into ready-to-publish content")
     expect(page).to have_text("We help small businesses turn raw ideas into ready-to-publish content")
     expect(page).to have_text("No marketing team. No complex tools. Just you — and Gingga doing the heavy lifting.")
 

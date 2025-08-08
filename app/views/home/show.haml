@@ -1,43 +1,29 @@
 - content_for :head do
   %link{ href: "https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap", rel: "stylesheet" }
 
-%main.font-poppins
+%main.font-poppins{ style: "background-color: var(--bg); color: var(--text);" }
 
-/ Navigation
-%header
-  %nav.fixed.top-0.w-full.bg-white.bg-opacity-95.backdrop-blur-md.z-50.border-b.border-gray-100
-    .max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8
-      .flex.justify-between.items-center.h-16
-        .font-montserrat.font-bold.text-2xl.text-gingga-dark
-          🌀 GINGGA
-        .hidden.md:flex.space-x-8
-          %a.text-gray-700.hover:text-gingga-orange.transition-colors{ href: "#features" } Features
-          %a.text-gray-700.hover:text-gingga-orange.transition-colors{ href: "#how-it-works" } How It Works
-          %a.text-gray-700.hover:text-gingga-orange.transition-colors{ href: "#guides" } Guides
-          %a.text-gray-700.hover:text-gingga-orange.transition-colors{ href: "#pricing" } Pricing
-        %button.btn-primary.px-6.py-3.rounded-full.font-medium.shadow-md.hover:shadow-lg.w-full.md:w-auto
-          Get Started
+= render(Ui::NavComponent.new)
 
 / Section 1: Hero
-%section.gradient-hero.min-h-screen.flex.items-center.justify-center.text-white.relative.overflow-hidden.pt-28
-  .absolute.inset-0.bg-gradient-to-br.from-transparent.via-gingga-violet.via-opacity-10.to-gingga-cyan.to-opacity-10
-  .max-w-6xl.mx-auto.px-4.sm:px-6.lg:px-8.text-center.relative.z-10.max-w-xl.mx-auto
-    %h1.font-montserrat.font-bold.text-5xl.md:text-6xl.mb-6.leading-tight
-      %span.text-gingga-gold GINGGA:
-      %br
-      Intelligence in 
-      %span.text-gingga-cyan Motion
-    %p.text-lg.md:text-xl.mb-8.max-w-4xl.mx-auto.leading-relaxed.text-on-dark
-      Your brand deserves to move, grow, and glow — every day.
-      %br
-      We help small businesses turn raw ideas into ready-to-publish content that connects, converts, and compounds over time.
-    %p.text-lg.mb-12.max-w-3xl.mx-auto.text-on-dark-muted
+%section.bg-gingga-dark.text-white{ data: { controller: "reveal" } }
+  .max-w-3xl.mx-auto.px-6.py-16.md:py-24.text-center
+    %h1.font-montserrat.font-bold.text-4xl.sm:text-6xl.tracking-tight{ style: "line-height:1.05" }
+      %span GINGGA:
+      %span.text-gingga-gold  Intelligence
+      %span  in 
+      %span.text-gingga-cyan  Motion
+    %p.mt-4.sm:mt-5.text-lg.sm:text-xl.leading-relaxed.text-on-dark
+      We help small businesses turn raw ideas into ready-to-publish content that connects,
+      converts, and compounds over time.
+    %p.mt-3.text-sm.text-on-dark-muted
       No marketing team. No complex tools. Just you — and Gingga doing the heavy lifting.
-    %button.btn-primary.px-12.py-4.rounded-full.text-lg.font-semibold.shadow-md.hover:shadow-lg.w-full.md:w-auto
-      Get Started Now
+    .mt-8
+      %button.btn-primary.px-6.py-3.rounded-full.font-semibold.shadow-md.hover:shadow-lg{ data: { controller: "cta-pulse", tracking: "hero_cta" } }
+        Get Started Now
 
 / Section 2: What Gingga Does
-%section#features.py-20.gradient-section
+%section#features.py-20.gradient-section{ data: { controller: "reveal" } }
   .max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8
     .text-center.mb-16
       %h2.font-montserrat.font-bold.text-4xl.md:text-5xl.mb-6.text-gingga-dark
@@ -87,7 +73,7 @@
         You don't need to be a content expert. Just be you. We'll do the rest.
 
 / Section 3: Why Small Brands Choose Gingga
-%section.py-20.bg-gingga-dark
+%section.py-20.bg-gingga-dark{ data: { controller: "reveal" } }
   .max-w-6xl.mx-auto.px-4.sm:px-6.lg:px-8
     .text-center.mb-16
       %h2.font-montserrat.font-bold.text-4xl.md:text-5xl.mb-6.text-white
@@ -124,7 +110,7 @@
           %p.text-on-dark-muted Built to keep your voice, not replace it
 
 / Section 4: How Gingga Works
-%section#how-it-works.py-20.gradient-section
+%section#how-it-works.py-20.gradient-section{ data: { controller: "reveal" } }
   .max-w-6xl.mx-auto.px-4.sm:px-6.lg:px-8
     .text-center.mb-16
       %h2.font-montserrat.font-bold.text-4xl.md:text-5xl.mb-6.text-gingga-dark
@@ -155,7 +141,7 @@
           %h3.font-montserrat.font-semibold.text-2xl.mb-3.text-gingga-dark Your brand shows up. And grows.
 
 / Section 5: Meet the Gingga Guides
-%section#guides.py-20.bg-white
+%section#guides.py-20.bg-white{ data: { controller: "reveal" } }
   .max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8
     .text-center.mb-16
       %h2.font-montserrat.font-bold.text-4xl.md:text-5xl.mb-6.text-gingga-dark
@@ -187,7 +173,7 @@
         %p.text-gray-600 Turns followers into long-term clients
 
 / Section 6: What People Are Saying
-%section.py-20.gradient-section
+%section.py-20.gradient-section{ data: { controller: "reveal" } }
   .max-w-6xl.mx-auto.px-4.sm:px-6.lg:px-8
     .text-center.mb-16
       %h2.font-montserrat.font-bold.text-4xl.md:text-5xl.mb-6.text-gingga-dark
@@ -217,33 +203,25 @@
             %p.text-gray-600 Barbershop Owner
 
 / Section 7: Pricing + CTA
-%section#pricing.py-20.bg-gingga-dark
+%section#pricing.py-20.bg-gingga-dark{ data: { controller: "reveal" } }
   .max-w-6xl.mx-auto.px-4.sm:px-6.lg:px-8.text-center
-    %h2.font-montserrat.font-bold.text-4xl.md:text-5xl.mb-6.text-white
+    %h2.font-montserrat.font-bold.text-4xl.md:text-5xl.mb-6{ style: "color: var(--text)" }
       Start Growing — 
-      %span.text-gingga-cream Without Burning Out
+      %span{ style: "color: var(--text)" } Without Burning Out
     
-    .rounded-3xl.p-12.mb-12.max-w-2xl.mx-auto.bg-white.bg-opacity-10.backdrop-blur-lg
-      %p.text-4xl.font-bold.mb-6.text-gingga-dark.bg-gingga-cream.px-4.py-4.rounded-2xl.inline-block £98
-      %p.text-2xl.mb-2.text-white 
-        Plans from 
-        %span.font-bold £98/month
-      %p.text-lg.mb-6.text-gingga-cyan ✨ First month: 20% off
-      %p.text-lg.mb-8.text-on-dark Book a free discovery call or start today
-      
-      %button.btn-primary.px-12.py-4.rounded-full.text-xl.font-semibold.mb-4.w-full.md:w-auto.shadow-md.hover:shadow-lg
-        Get Started Now
+    .mx-auto.max-w-md.px-6.py-16
+      .rounded-3xl.p-8.shadow-xl{ style: "background-color: var(--text); box-shadow: 0 1px 0 rgba(0,0,0,0.05) inset" }
+        %h3.text-5xl.font-bold.leading-tight{ style: "color: var(--bg)" } £98
+        %p.mt-2{ style: "color: rgba(14,12,22,0.8)" }
+          Plans from 
+          %span.font-semibold{ style: "color: var(--bg)" } £98/month
+        %p.mt-2.text-sm.font-medium{ style: "color: var(--cyan)" } ✨ First month: 20% off
+        %button.mt-6.w-full.btn-primary.text-white.font-semibold.py-3.rounded-full
+          Get Started Now
+        %p.mt-3.text-xs{ style: "color: rgba(14,12,22,0.7)" } Book a free discovery call or start today
     
     .text-center
       %p.text-lg.text-on-dark-muted Ready to transform your content strategy?
 
 / Footer
-%footer.bg-black.text-white.py-12
-  .max-w-6xl.mx-auto.px-4.sm:px-6.lg:px-8.text-center
-    .font-montserrat.font-bold.text-3xl.mb-4.text-gingga-gold
-      🌀 GINGGA
-    %p.text-gray-400.mb-6 Intelligence in Motion
-    .flex.justify-center.space-x-6.text-sm
-      %a.text-white.hover:text-gingga-orange.transition-colors{ href: "#" } Privacy Policy
-      %a.text-white.hover:text-gingga-orange.transition-colors{ href: "#" } Terms of Service
-      %a.text-white.hover:text-gingga-orange.transition-colors{ href: "#" } Contact
+= render(Ui::FooterComponent.new)
