@@ -33,7 +33,7 @@ RSpec.describe Api::V1::ApiTokensController, type: :request do
 
       json_response = JSON.parse(response.body)
       expect(json_response.length).to eq(2)
-      expect(json_response.first).to include('id', 'provider', 'mode', 'is_valid')
+      expect(json_response.first).to include('id', 'provider', 'mode', 'valid')
       expect(json_response.first).not_to include('encrypted_token')
     end
 
@@ -115,6 +115,23 @@ RSpec.describe Api::V1::ApiTokensController, type: :request do
 
       token = ApiToken.last
       expect(token.user).to eq(user)
+    end
+
+    context 'with invalid token' do
+      before do
+        allow_any_instance_of(ApiTokenValidatorService).to receive(:call)
+          .and_return({ valid: false, error: 'Invalid API key' })
+      end
+
+      it 'returns 422 with validation error' do
+        expect {
+          post '/api/v1/api_tokens', params: valid_params
+        }.not_to change(ApiToken, :count)
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        json_response = JSON.parse(response.body)
+        expect(json_response['errors']['encrypted_token']).to be_present
+      end
     end
   end
 

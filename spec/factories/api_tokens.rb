@@ -4,6 +4,7 @@ FactoryBot.define do
     mode { "production" }
     encrypted_token { "sk-test_token_#{SecureRandom.hex(8)}" }
     user { association :user }
+    is_valid { true }
 
     trait :openai do
       provider { "openai" }
