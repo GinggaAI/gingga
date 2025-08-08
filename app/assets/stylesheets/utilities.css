@@ -1,0 +1,13 @@
+/* Project utilities built on top of tokens */
+.u-rounded-sm { border-radius: var(--radius-sm); }
+.u-rounded-md { border-radius: var(--radius-md); }
+.u-rounded-lg { border-radius: var(--radius-lg); }
+
+.u-bg-primary { background-color: var(--color-primary); }
+.u-text-primary { color: var(--color-primary); }
+.u-bg-accent { background-color: var(--color-accent); }
+.u-text-accent { color: var(--color-accent); }
+
+.u-space-inline-md { padding-inline: var(--space-4); }
+.u-space-block-md { padding-block: var(--space-4); }
+

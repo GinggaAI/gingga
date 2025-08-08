@@ -79,3 +79,11 @@ group :development do
 end
 
 gem "devise", "~> 4.9"
+
+# View components for reusable UI with previews/specs
+gem "view_component"
+
+group :development, :test do
+  # Lint ERB templates in CI
+  gem "erb_lint", require: false
+end
