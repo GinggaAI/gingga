@@ -6,7 +6,7 @@ RSpec.describe ApiTokenValidatorService do
     let(:token) { 'test-token' }
     let(:mode) { 'production' }
 
-    context 'with valid provider' do
+    context 'with openai provider' do
       let(:provider) { 'openai' }
       let(:validator_instance) { instance_double(Openai::ValidateKeyService) }
 
@@ -16,7 +16,7 @@ RSpec.describe ApiTokenValidatorService do
           .and_return(validator_instance)
       end
 
-      it 'calls the appropriate validator service' do
+      it 'dispatches to Openai::ValidateKeyService' do
         expect(validator_instance).to receive(:call).and_return({ valid: true })
 
         result = service.call
@@ -28,6 +28,31 @@ RSpec.describe ApiTokenValidatorService do
 
         result = service.call
         expect(result).to eq({ valid: false, error: 'Invalid token' })
+      end
+    end
+
+    context 'with heygen provider' do
+      let(:provider) { 'heygen' }
+      let(:validator_instance) { instance_double(Heygen::ValidateKeyService) }
+
+      before do
+        allow(Heygen::ValidateKeyService).to receive(:new)
+          .with(token: token, mode: mode)
+          .and_return(validator_instance)
+      end
+
+      it 'dispatches to Heygen::ValidateKeyService' do
+        expect(validator_instance).to receive(:call).and_return({ valid: true })
+
+        result = service.call
+        expect(result).to eq({ valid: true })
+      end
+
+      it 'propagates error from underlying validator' do
+        allow(validator_instance).to receive(:call).and_return({ valid: false, error: 'API key invalid' })
+
+        result = service.call
+        expect(result).to eq({ valid: false, error: 'API key invalid' })
       end
     end
 
