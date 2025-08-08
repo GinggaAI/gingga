@@ -47,7 +47,7 @@ end
 # If there are pending migrations it will invoke `db:test:prepare` to
 # recreate the test database by loading the schema.
 # If you are not using ActiveRecord, you can remove these lines.
-unless ENV["SKIP_DB"] == "1"
+if ENV["RUN_DB_TESTS"] == "1"
   begin
     ActiveRecord::Migration.maintain_test_schema!
   rescue ActiveRecord::PendingMigrationError => e
@@ -79,7 +79,8 @@ RSpec.configure do |config|
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false
   # instead of true.
-  config.use_transactional_fixtures = true
+  # Disable transactional fixtures by default so non-DB specs don't try to connect
+  config.use_transactional_fixtures = false
 
   # You can uncomment this line to turn off ActiveRecord support entirely.
   # config.use_active_record = false
@@ -120,4 +121,7 @@ RSpec.configure do |config|
   # Include ViewComponent helpers in component specs
   config.include ViewComponent::TestHelpers, type: :component
   config.include Capybara::RSpecMatchers, type: :component
+
+  # Exclude DB-required specs by default. Run them with RUN_DB_TESTS=1
+  config.filter_run_excluding requires_db: true unless ENV["RUN_DB_TESTS"] == "1"
 end
