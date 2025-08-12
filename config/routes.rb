@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
 
-  resource :brand, only: [:edit, :update]
+  resource :brand, only: [:show, :edit, :update]
   resource :planning, only: [ :show ]
   resource :viral_ideas, only: [ :show ]
   resource :auto_creation, only: [ :show ]
