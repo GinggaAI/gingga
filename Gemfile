@@ -84,3 +84,11 @@ end
 
 gem "devise", "~> 4.9"
 gem "httparty"
+
+# View components for reusable UI with previews/specs
+gem "view_component"
+
+group :development, :test do
+  # Lint ERB templates in CI
+  gem "erb_lint", require: false
+end

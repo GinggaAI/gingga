@@ -37,3 +37,66 @@ jobs:
       - name: Lint code for consistent style
         run: bin/rubocop -f github
 
+  erb_lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Lint ERB templates
+        run: bundle exec erblint --format json app/views app/components
+
+  accessibility:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: myuser
+          POSTGRES_PASSWORD: mypassword
+          POSTGRES_DB: gingga_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U myuser" --health-interval=10s --health-timeout=5s --health-retries=5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Install pa11y-ci
+        run: npm install -D pa11y-ci
+
+      - name: Prepare database
+        env:
+          RAILS_ENV: test
+        run: |
+          bin/rails db:prepare
+
+      - name: Start server
+        env:
+          RAILS_ENV: test
+        run: bin/rails server -p 4000 -e test &
+
+      - name: Wait for server
+        run: npx wait-on http://127.0.0.1:4000
+
+      - name: Run accessibility checks
+        run: npx pa11y-ci
+
