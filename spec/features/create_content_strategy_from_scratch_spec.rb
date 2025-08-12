@@ -2,7 +2,7 @@ require 'rails_helper'
 
 # TODO: Add timecop to set the current date to August 1st
 
-RSpec.feature "Create a new content strategy from scratch", type: :feature do
+RSpec.feature "Create a new content strategy from scratch", type: :feature, requires_db: true do
   scenario "The database is empty and the user wants to create a new content strategy" do
     visit root_path
     expect(page).to have_text("Gingga")

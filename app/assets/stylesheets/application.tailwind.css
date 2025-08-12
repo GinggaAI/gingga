@@ -19,3 +19,139 @@
     @apply inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 w-full bg-gradient-to-r text-white font-medium py-3 rounded-xl transition-all duration-200 transform hover:scale-105 from-button-gradient-from to-button-gradient-to hover:from-button-gradient-from/90 hover:to-button-gradient-to/90;
   }
 }
+@import "./tokens.css";
+@import "./utilities.css";
+@import "../../components/ui/button_component.css";
+
+/* Gingga Brand Variables */
+:root {
+  /* Brand Colors */
+  --gingga-dark: #0e0c16;
+  --gingga-orange: #f26419;
+  --gingga-gold: #ffc857;
+  --gingga-cream: #f5f1ea;
+  --gingga-cyan: #00c2ff;
+  --gingga-violet: #bb79fc;
+  
+  /* Color Role Mapping */
+  --brand-primary: var(--gingga-orange);
+  --brand-secondary: var(--gingga-gold);
+  --brand-accent-tech: var(--gingga-cyan);
+  --brand-accent-human: var(--gingga-violet);
+  --brand-dark: var(--gingga-dark);
+  --brand-light: var(--gingga-cream);
+  
+  /* Semantic Colors */
+  --color-background-dark: var(--gingga-dark);
+  --color-background-light: var(--gingga-cream);
+  --color-text-on-dark: rgba(255, 255, 255, 0.9);
+  --color-text-on-dark-muted: rgba(255, 255, 255, 0.8);
+  --color-text-on-light: var(--gingga-dark);
+  --color-primary-action: var(--gingga-orange);
+  --color-primary-action-hover: #e55a0d;
+}
+
+/* Typography Utilities */
+.font-montserrat {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.font-poppins {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Hover Effects */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Brand Color Utilities */
+.bg-gingga-dark {
+  background-color: var(--gingga-dark);
+}
+
+.bg-gingga-orange {
+  background-color: var(--gingga-orange);
+}
+
+.bg-gingga-gold {
+  background-color: var(--gingga-gold);
+}
+
+.bg-gingga-cream {
+  background-color: var(--gingga-cream);
+}
+
+.bg-gingga-cyan {
+  background-color: var(--gingga-cyan);
+}
+
+.bg-gingga-violet {
+  background-color: var(--gingga-violet);
+}
+
+.text-gingga-dark {
+  color: var(--gingga-dark);
+}
+
+.text-gingga-orange {
+  color: var(--gingga-orange);
+}
+
+.text-gingga-gold {
+  color: var(--gingga-gold);
+}
+
+.text-gingga-cream {
+  color: var(--gingga-cream);
+}
+
+.text-gingga-cyan {
+  color: var(--gingga-cyan);
+}
+
+.text-gingga-violet {
+  color: var(--gingga-violet);
+}
+
+.border-gingga-orange {
+  border-color: var(--gingga-orange);
+}
+
+/* Background Gradients */
+.gradient-hero {
+  background: linear-gradient(135deg, var(--gingga-dark) 0%, #1a1625 50%, var(--gingga-dark) 100%);
+}
+
+.gradient-section {
+  background: linear-gradient(135deg, var(--gingga-cream) 0%, #ffffff 100%);
+}
+
+/* Button Styles */
+.btn-primary {
+  background-color: var(--color-primary-action);
+  color: white;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-action-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(242, 100, 25, 0.3);
+}
+
+/* Text Color Utilities for Dark Backgrounds */
+.text-on-dark {
+  color: var(--color-text-on-dark);
+}
+
+.text-on-dark-muted {
+  color: var(--color-text-on-dark-muted);
+}

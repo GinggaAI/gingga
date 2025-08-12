@@ -1,0 +1,13 @@
+EnableDefaultLinters: true
+Linters:
+  FinalNewline:
+    Enabled: true
+  SpaceInHtmlTag:
+    Enabled: true
+  RightTrim:
+    Enabled: true
+  SelfClosingTag:
+    Enabled: true
+  HardCodedString:
+    Enabled: false
+
