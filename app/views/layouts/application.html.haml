@@ -1,5 +1,5 @@
 !!!
-%html
+%html{:lang => "en", :style => "scroll-behavior: smooth;"}
   %head
     %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
     %title= content_for(:title) || "Gingga"
@@ -9,12 +9,123 @@
     = csrf_meta_tags
     = csp_meta_tag
     = yield :head
-    %link{:href => "/icon.png", :rel => "icon", :type => "image/png"}/
-    %link{:href => "/icon.svg", :rel => "icon", :type => "image/svg+xml"}/
-    %link{:href => "/icon.png", :rel => "apple-touch-icon"}/
+    %link{:href => "https://fonts.googleapis.com", :rel => "preconnect"}/
+    %link{:crossorigin => "", :href => "https://fonts.gstatic.com", :rel => "preconnect"}/
+    %link{:href => "https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Geist:wght@100..900&display=swap", :rel => "stylesheet"}/
     = stylesheet_link_tag :app, "data-turbo-track": "reload"
     = javascript_include_tag "application", "data-turbo-track": "reload", type: "module"
   %body
     %p.notice= notice
     %p.alert= alert
     = yield
+    .flex.h-screen{:class => "bg-[#F8F5EF]"}
+      .w-64.text-white.flex.flex-col{:class => "bg-[#0F172A]"}
+        .p-6.border-b.border-gray-700
+          .flex.items-center.gap-3
+            .w-8.h-8.rounded-lg.flex.items-center.justify-center{:class => "bg-[#FFC940]"}
+              %span.text-black.font-bold.text-lg G
+            %span.text-xl.font-bold Gingga
+        %nav.flex-1.p-4
+          %ul.space-y-2
+            %li
+              %button.nav-item
+                %svg.lucide.lucide-user.w-5.h-5{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
+                  %path{:d => "M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"}
+                  %circle{:cx => "12", :cy => "7", :r => "4"}
+                My Brand
+            %li
+              %button.nav-item
+                %svg.lucide.lucide-calendar.w-5.h-5{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}>
+                  %path{:d => "M8 2v4"}
+                  %path{:d => "M16 2v4"}
+                  %rect{:height => "18", :rx => "2", :width => "18", :x => "3", :y => "4"}
+                  %path{:d => "M3 10h18"}
+                Smart Planning
+            %li
+              %button.nav-item
+                %svg.lucide.lucide-trending-up.w-5.h-5{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}>
+                  %polyline{:points => "22 7 13.5 15.5 8.5 10.5 2 17"}
+                  %polyline{:points => "16 7 22 7 22 13"}
+                Viral Ideas
+            %li
+              %button.nav-item
+                %svg.lucide.lucide-wand-sparkles.w-5.h-5{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}>
+                  %path{:d => "m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"}
+                  %path{:d => "m14 7 3 3"}
+                  %path{:d => "M5 6v4"}
+                  %path{:d => "M19 14v4"}
+                  %path{:d => "M10 2v2"}
+                  %path{:d => "M7 8H3"}
+                  %path{:d => "M21 16h-4"}
+                  %path{:d => "M11 3H9"}
+                Auto Creation
+            %li
+              %button.nav-item
+                %svg.lucide.lucide-chart-column.w-5.h-5{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}>
+                  %path{:d => "M3 3v16a2 2 0 0 0 2 2h16"}
+                  %path{:d => "M18 17V9"}
+                  %path{:d => "M13 17V5"}
+                  %path{:d => "M8 17v-3"}
+                Analytics
+            %li
+              %button.nav-item
+                %svg.lucide.lucide-users.w-5.h-5{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}>
+                  %path{:d => "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"}
+                  %circle{:cx => "9", :cy => "7", :r => "4"}
+                  %path{:d => "M22 21v-2a4 4 0 0 0-3-3.87"}
+                  %path{:d => "M16 3.13a4 4 0 0 1 0 7.75"}
+                Community
+            %li
+              %button.nav-item
+                %svg.lucide.lucide-settings.w-5.h-5{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}>
+                  %path{:d => "M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"}
+                  %circle{:cx => "12", :cy => "12", :r => "3"}
+                Settings
+        .p-4
+          %button.btn-global-cta{class: ""}
+            %svg.lucide.lucide-lightbulb.w-5.h-5.mr-2{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}>
+              %path{:d => "M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"}
+              %path{:d => "M9 18h6"}
+              %path{:d => "M10 22h4"}
+            Nueva Idea Viral
+      %main.flex-1.overflow-y-auto
+        .p-8
+          .max-w-6xl.mx-auto
+            .mb-8
+              %h1.text-3xl.font-bold.text-gray-900.mb-2 My Brand
+              %p.text-gray-600 Define and manage your brand identity
+            .space-y-6{"data-orientation" => "horizontal", :dir => "ltr"}
+              .h-10.items-center.justify-center.text-muted-foreground.grid.w-full.grid-cols-2.bg-white.border-2.border-gray-200.rounded-xl.p-1{"aria-orientation" => "horizontal", "data-orientation" => "horizontal", :role => "tablist", :style => "outline:none", :tabindex => "0"}
+                %button.whitespace-nowrap.px-3.text-sm.ring-offset-background.transition-all.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.rounded-lg.font-medium{"aria-controls" => "radix-«Ra7db»-content-profile", "aria-selected" => "true", :class => "py-1.5 data-[state=active]:shadow-sm data-[state=active]:bg-[#FFC940] data-[state=active]:text-black", "data-orientation" => "horizontal", "data-radix-collection-item" => "", "data-state" => "active", :id => "radix-«Ra7db»-trigger-profile", :role => "tab", :tabindex => "-1", :type => "button"}
+                  Brand
+                  Profile
+                %button.inline-flex.items-center.justify-center.whitespace-nowrap.px-3.text-sm.ring-offset-background.transition-all.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.rounded-lg.font-medium{"aria-controls" => "radix-«Ra7db»-content-kit", "aria-selected" => "false", :class => "py-1.5 data-[state=active]:shadow-sm data-[state=active]:bg-[#FFC940] data-[state=active]:text-black", "data-orientation" => "horizontal", "data-radix-collection-item" => "", "data-state" => "inactive", :id => "radix-«Ra7db»-trigger-kit", :role => "tab", :tabindex => "-1", :type => "button"}
+                  Brand
+                  Kit
+              .mt-2.ring-offset-background.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2{"aria-labelledby" => "radix-«Ra7db»-trigger-profile", "data-orientation" => "horizontal", "data-state" => "active", :id => "radix-«Ra7db»-content-profile", :role => "tabpanel", :style => "animation-duration:0s", :tabindex => "0"}
+                .bg-card.text-card-foreground.border-0.shadow-lg.rounded-2xl
+                  .flex.flex-col.p-6.pb-6{:class => "space-y-1.5"}
+                    .font-semibold.tracking-tight.text-2xl.text-gray-900 Brand Profile
+                  .p-6.pt-0.space-y-6
+                    %div
+                      %label.block.text-sm.font-medium.text-gray-700.mb-2
+                        Brand
+                        Name
+                      %input.flex.h-10.w-full.bg-background.px-3.py-2.text-base.ring-offset-background.file:border-0.file:bg-transparent.file:text-sm.file:font-medium.file:text-foreground.placeholder:text-muted-foreground.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:cursor-not-allowed.disabled:opacity-50.md:text-sm.rounded-xl.border-2.border-gray-200{:class => "focus:border-[#FFC940]", :placeholder => "Enter your brand name", :value => ""}/
+                    %div
+                      %label.block.text-sm.font-medium.text-gray-700.mb-2
+                        Who is your
+                        audience?
+                      %textarea.flex.w-full.bg-background.px-3.py-2.text-base.ring-offset-background.placeholder:text-muted-foreground.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:cursor-not-allowed.disabled:opacity-50.md:text-sm.rounded-xl.border-2.border-gray-200{:class => "focus:border-[#FFC940] min-h-[100px]", :placeholder => "Describe your target audience... What are their dreams, fears, and pain points?"}
+                    %div
+                      %label.block.text-sm.font-medium.text-gray-700.mb-2
+                        What do you sell or
+                        offer?
+                      %textarea.flex.w-full.bg-background.px-3.py-2.text-base.ring-offset-background.placeholder:text-muted-foreground.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:cursor-not-allowed.disabled:opacity-50.md:text-sm.rounded-xl.border-2.border-gray-200{:class => "focus:border-[#FFC940] min-h-[100px]", :placeholder => "Describe your products or services..."}
+                    %div
+                      %label.block.text-sm.font-medium.text-gray-700.mb-2
+                        Brand purpose or
+                        mission
+                      %textarea.flex.w-full.bg-background.px-3.py-2.text-base.ring-offset-background.placeholder:text-muted-foreground.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:cursor-not-allowed.disabled:opacity-50.md:text-sm.rounded-xl.border-2.border-gray-200{:class => "focus:border-[#FFC940] min-h-[100px]", :placeholder => "What's your brand's mission and purpose..."}
+                    %input.btn-submit{:type => "submit", :value => "Save Profile"}/
+              .mt-2.ring-offset-background.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2{"aria-labelledby" => "radix-«Ra7db»-trigger-kit", "data-orientation" => "horizontal", "data-state" => "inactive", :hidden => "", :id => "radix-«Ra7db»-content-kit", :role => "tabpanel", :tabindex => "0"}

@@ -1,1 +1,21 @@
 @import "tailwindcss";
+@theme {
+  --font-display: 'GeistSans', 'GeistSans Fallback', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --color-gingga: rgb(63, 161, 71);
+  --color-button-gradient-from: rgb(255, 104, 72);
+  --color-button-gradient-to: rgb(163, 127, 255);
+}
+
+@layer component {
+  .nav-item {
+    @apply w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-gray-300 hover:bg-gray-800 hover:text-white;
+  }
+
+  .btn-submit {
+    @apply inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 h-10 bg-[#FFC940] hover:bg-[#FF6848] text-black font-medium px-8 py-3 rounded-xl;
+  }
+
+  .btn-global-cta {
+    @apply inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 w-full bg-gradient-to-r text-white font-medium py-3 rounded-xl transition-all duration-200 transform hover:scale-105 from-button-gradient-from to-button-gradient-to hover:from-button-gradient-from/90 hover:to-button-gradient-to/90;
+  }
+}
