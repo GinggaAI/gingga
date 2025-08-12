@@ -4,11 +4,5 @@
 
 import { application } from "./application"
 
-import CtaPulseController from "./cta_pulse_controller"
-application.register("cta-pulse", CtaPulseController)
-
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
-
-import RevealController from "./reveal_controller"
-application.register("reveal", RevealController)

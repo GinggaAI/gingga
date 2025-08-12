@@ -1,227 +1,41 @@
-- content_for :head do
-  %link{ href: "https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap", rel: "stylesheet" }
-
-%main.font-poppins{ style: "background-color: var(--bg); color: var(--text);" }
-
-= render(Ui::NavComponent.new)
-
-/ Section 1: Hero
-%section.bg-gingga-dark.text-white{ data: { controller: "reveal" } }
-  .max-w-3xl.mx-auto.px-6.py-16.md:py-24.text-center
-    %h1.font-montserrat.font-bold.text-4xl.sm:text-6xl.tracking-tight{ style: "line-height:1.05" }
-      %span GINGGA:
-      %span.text-gingga-gold  Intelligence
-      %span  in 
-      %span.text-gingga-cyan  Motion
-    %p.mt-4.sm:mt-5.text-lg.sm:text-xl.leading-relaxed.text-on-dark
-      We help small businesses turn raw ideas into ready-to-publish content that connects,
-      converts, and compounds over time.
-    %p.mt-3.text-sm.text-on-dark-muted
-      No marketing team. No complex tools. Just you — and Gingga doing the heavy lifting.
-    .mt-8
-      %button.btn-primary.px-6.py-3.rounded-full.font-semibold.shadow-md.hover:shadow-lg{ data: { controller: "cta-pulse", tracking: "hero_cta" } }
-        Get Started Now
-
-/ Section 2: What Gingga Does
-%section#features.py-20.gradient-section{ data: { controller: "reveal" } }
-  .max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8
-    .text-center.mb-16
-      %h2.font-montserrat.font-bold.text-4xl.md:text-5xl.mb-6.text-gingga-dark
-        What Gingga Does
-      %p.text-xl.text-gray-700.max-w-3xl.mx-auto
-        From scattered ideas to scroll-stopping content — in minutes.
-    
-    .grid.md:grid-cols-2.lg:grid-cols-3.gap-8.mb-12
-      .bg-white.p-8.rounded-2xl.shadow-lg.hover-lift
-        .w-12.h-12.mb-4.flex.items-center.justify-center.rounded-lg.bg-gingga-cyan
-          %svg.w-6.h-6.text-white{ fill: "currentColor", viewBox: "0 0 20 20" }
-            %path{ d: "M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" }
-        %h3.font-montserrat.font-semibold.text-xl.mb-3.text-gingga-dark Monthly Content Calendar
-        %p.text-gray-600 A full monthly content calendar, built around your brand
-      
-      .bg-white.p-8.rounded-2xl.shadow-lg.hover-lift
-        .w-12.h-12.mb-4.flex.items-center.justify-center.rounded-lg.bg-gingga-orange
-          %svg.w-6.h-6.text-white{ fill: "currentColor", viewBox: "0 0 20 20" }
-            %path{ d: "M2 6a2 2 0 012-2h6a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" }
-        %h3.font-montserrat.font-semibold.text-xl.mb-3.text-gingga-dark AI-Powered Visuals
-        %p.text-gray-600 Reels and visuals made by AI, fine-tuned by real humans
-      
-      .bg-white.p-8.rounded-2xl.shadow-lg.hover-lift
-        .w-12.h-12.mb-4.flex.items-center.justify-center.rounded-lg.bg-gingga-cyan
-          %svg.w-6.h-6.text-white{ fill: "currentColor", viewBox: "0 0 20 20" }
-            %path{ d: "M10 12a2 2 0 100-4 2 2 0 000 4z" }
-            %path{ "fill-rule": "evenodd", d: "M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z", "clip-rule": "evenodd" }
-        %h3.font-montserrat.font-semibold.text-xl.mb-3.text-gingga-dark Smart Scheduling
-        %p.text-gray-600 Captions and posts, written and scheduled for you
-      
-      .bg-white.p-8.rounded-2xl.shadow-lg.hover-lift
-        .w-12.h-12.mb-4.flex.items-center.justify-center.rounded-lg.bg-gingga-violet
-          %svg.w-6.h-6.text-white{ fill: "currentColor", viewBox: "0 0 20 20" }
-            %path{ "fill-rule": "evenodd", d: "M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z", "clip-rule": "evenodd" }
-        %h3.font-montserrat.font-semibold.text-xl.mb-3.text-gingga-dark Intelligent Replies
-        %p.text-gray-600 Smart replies that turn followers into clients
-      
-      .bg-white.p-8.rounded-2xl.shadow-lg.hover-lift
-        .w-12.h-12.mb-4.flex.items-center.justify-center.rounded-lg.bg-gingga-cyan
-          %svg.w-6.h-6.text-white{ fill: "currentColor", viewBox: "0 0 20 20" }
-            %path{ d: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" }
-        %h3.font-montserrat.font-semibold.text-xl.mb-3.text-gingga-dark Adaptive Learning
-        %p.text-gray-600 A system that learns your style and evolves with you
-    
-    .text-center
-      %p.text-xl.font-medium.text-gingga-dark
-        You don't need to be a content expert. Just be you. We'll do the rest.
-
-/ Section 3: Why Small Brands Choose Gingga
-%section.py-20.bg-gingga-dark{ data: { controller: "reveal" } }
-  .max-w-6xl.mx-auto.px-4.sm:px-6.lg:px-8
-    .text-center.mb-16
-      %h2.font-montserrat.font-bold.text-4xl.md:text-5xl.mb-6.text-white
-        Why Small Brands Choose 
-        %span.text-gingga-orange Gingga
-      %p.text-xl.max-w-3xl.mx-auto.text-on-dark
-        Most small businesses struggle to show up online.
-        %br
-        Gingga makes it effortless — and effective.
-    
-    .grid.md:grid-cols-2.gap-8
-      .flex.items-start.space-x-4
-        .text-2xl.text-gingga-orange ✔️
-        %div
-          %h3.font-montserrat.font-semibold.text-xl.mb-2.text-white No tech overwhelm
-          %p.text-on-dark-muted Simple. Guided. Stress-free.
-      
-      .flex.items-start.space-x-4
-        .text-2xl.text-gingga-orange ⏱️
-        %div
-          %h3.font-montserrat.font-semibold.text-xl.mb-2.text-white Saves you hours
-          %p.text-on-dark-muted Content creation on autopilot
-      
-      .flex.items-start.space-x-4
-        .text-2xl.text-gingga-orange 💬
-        %div
-          %h3.font-montserrat.font-semibold.text-xl.mb-2.text-white Drives real conversations
-          %p.text-on-dark-muted Our replies actually convert
-      
-      .flex.items-start.space-x-4
-        .text-2xl.text-gingga-orange 🧠
-        %div
-          %h3.font-montserrat.font-semibold.text-xl.mb-2.text-white AI + Human brilliance
-          %p.text-on-dark-muted Built to keep your voice, not replace it
-
-/ Section 4: How Gingga Works
-%section#how-it-works.py-20.gradient-section{ data: { controller: "reveal" } }
-  .max-w-6xl.mx-auto.px-4.sm:px-6.lg:px-8
-    .text-center.mb-16
-      %h2.font-montserrat.font-bold.text-4xl.md:text-5xl.mb-6.text-gingga-dark
-        How Gingga Works
-    
-    .space-y-12
-      .flex.flex-col.md:flex-row.items-center.space-y-6.md:space-y-0.md:space-x-12
-        .flex-shrink-0.w-16.h-16.text-white.rounded-full.flex.items-center.justify-center.text-2xl.font-bold.bg-gingga-orange 1
-        .flex-1.text-center.md:text-left
-          %h3.font-montserrat.font-semibold.text-2xl.mb-3.text-gingga-dark Tell us about your brand
-          %p.text-lg.text-gray-700 (1 simple form — voice, vibe, goals)
-      
-      .flex.flex-col.md:flex-row.items-center.space-y-6.md:space-y-0.md:space-x-12
-        .flex-shrink-0.w-16.h-16.text-white.rounded-full.flex.items-center.justify-center.text-2xl.font-bold.bg-gingga-orange 2
-        .flex-1.text-center.md:text-left
-          %h3.font-montserrat.font-semibold.text-2xl.mb-3.text-gingga-dark We create your content engine
-          %p.text-lg.text-gray-700 (calendar, captions, visuals — all aligned with you)
-      
-      .flex.flex-col.md:flex-row.items-center.space-y-6.md:space-y-0.md:space-x-12
-        .flex-shrink-0.w-16.h-16.text-white.rounded-full.flex.items-center.justify-center.text-2xl.font-bold.bg-gingga-orange 3
-        .flex-1.text-center.md:text-left
-          %h3.font-montserrat.font-semibold.text-2xl.mb-3.text-gingga-dark You approve. We schedule.
-          %p.text-lg.text-gray-700 (Instagram, TikTok, and more — ready to go)
-      
-      .flex.flex-col.md:flex-row.items-center.space-y-6.md:space-y-0.md:space-x-12
-        .flex-shrink-0.w-16.h-16.text-white.rounded-full.flex.items-center.justify-center.text-2xl.font-bold.bg-gingga-orange 4
-        .flex-1.text-center.md:text-left
-          %h3.font-montserrat.font-semibold.text-2xl.mb-3.text-gingga-dark Your brand shows up. And grows.
-
-/ Section 5: Meet the Gingga Guides
-%section#guides.py-20.bg-white{ data: { controller: "reveal" } }
-  .max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8
-    .text-center.mb-16
-      %h2.font-montserrat.font-bold.text-4xl.md:text-5xl.mb-6.text-gingga-dark
-        Meet the Gingga Guides
-      %p.text-xl.text-gray-700.max-w-4xl.mx-auto
-        Your creative crew behind the screen — each one designed to help your brand move with meaning:
-      %p.text-lg.text-gray-600.mt-4
-        They're not just characters. They're your co-creators.
-    
-    .grid.md:grid-cols-2.lg:grid-cols-4.gap-8
-      .p-8.rounded-2xl.text-center.hover-lift.bg-gradient-to-br.from-gray-50.to-gray-100
-        .text-6xl.mb-6 🦉
-        %h3.font-montserrat.font-bold.text-xl.mb-3.text-gingga-dark Noctua
-        %p.text-gray-600 Clarifies your brand's message
-      
-      .p-8.rounded-2xl.text-center.hover-lift.bg-gradient-to-br.from-gingga-gold.from-opacity-10.to-gingga-gold.to-opacity-20
-        .text-6xl.mb-6 🐒
-        %h3.font-montserrat.font-bold.text-xl.mb-3.text-gingga-dark Sagui
-        %p.text-gray-600 Sparks content ideas with real-time prompts
-      
-      .p-8.rounded-2xl.text-center.hover-lift.bg-gradient-to-br.from-gingga-cyan.from-opacity-10.to-gingga-cyan.to-opacity-20
-        .text-6xl.mb-6 🦊
-        %h3.font-montserrat.font-bold.text-xl.mb-3.text-gingga-dark Voxa
-        %p.text-gray-600 Brings your visuals and videos to life
-      
-      .p-8.rounded-2xl.text-center.hover-lift.bg-gradient-to-br.from-gingga-violet.from-opacity-10.to-gingga-violet.to-opacity-20
-        .text-6xl.mb-6 🐘
-        %h3.font-montserrat.font-bold.text-xl.mb-3.text-gingga-violet Alumo
-        %p.text-gray-600 Turns followers into long-term clients
-
-/ Section 6: What People Are Saying
-%section.py-20.gradient-section{ data: { controller: "reveal" } }
-  .max-w-6xl.mx-auto.px-4.sm:px-6.lg:px-8
-    .text-center.mb-16
-      %h2.font-montserrat.font-bold.text-4xl.md:text-5xl.mb-6.text-gingga-dark
-        What People Are Saying
-    
-    .grid.md:grid-cols-2.gap-8
-      .bg-white.p-8.rounded-2xl.shadow-lg.hover-lift
-        .text-4xl.mb-4.text-gingga-gold ⭐⭐⭐⭐⭐
-        %p.text-lg.text-gray-700.mb-6.italic
-          "I used to dread content days. Now it all just flows. Gingga gets my brand."
-        .flex.items-center
-          .w-12.h-12.rounded-full.flex.items-center.justify-center.text-white.font-bold.mr-4.bg-gradient-to-br.from-gingga-gold.to-gingga-orange
-            C
-          %div
-            %p.font-semibold.text-gingga-dark Camila
-            %p.text-gray-600 Wellness Coach
-      
-      .bg-white.p-8.rounded-2xl.shadow-lg.hover-lift
-        .text-4xl.mb-4.text-gingga-gold ⭐⭐⭐⭐⭐
-        %p.text-lg.text-gray-700.mb-6.italic
-          "This feels like magic. Clients think I hired a whole team."
-        .flex.items-center
-          .w-12.h-12.rounded-full.flex.items-center.justify-center.text-white.font-bold.mr-4.bg-gradient-to-br.from-gingga-cyan.to-gingga-violet
-            L
-          %div
-            %p.font-semibold.text-gingga-dark Luis
-            %p.text-gray-600 Barbershop Owner
-
-/ Section 7: Pricing + CTA
-%section#pricing.py-20.bg-gingga-dark{ data: { controller: "reveal" } }
-  .max-w-6xl.mx-auto.px-4.sm:px-6.lg:px-8.text-center
-    %h2.font-montserrat.font-bold.text-4xl.md:text-5xl.mb-6{ style: "color: var(--text)" }
-      Start Growing — 
-      %span{ style: "color: var(--text)" } Without Burning Out
-    
-    .mx-auto.max-w-md.px-6.py-16
-      .rounded-3xl.p-8.shadow-xl{ style: "background-color: var(--text); box-shadow: 0 1px 0 rgba(0,0,0,0.05) inset" }
-        %h3.text-5xl.font-bold.leading-tight{ style: "color: var(--bg)" } £98
-        %p.mt-2{ style: "color: rgba(14,12,22,0.8)" }
-          Plans from 
-          %span.font-semibold{ style: "color: var(--bg)" } £98/month
-        %p.mt-2.text-sm.font-medium{ style: "color: var(--cyan)" } ✨ First month: 20% off
-        %button.mt-6.w-full.btn-primary.text-white.font-semibold.py-3.rounded-full
-          Get Started Now
-        %p.mt-3.text-xs{ style: "color: rgba(14,12,22,0.7)" } Book a free discovery call or start today
-    
-    .text-center
-      %p.text-lg.text-on-dark-muted Ready to transform your content strategy?
-
-/ Footer
-= render(Ui::FooterComponent.new)
+%main.flex-1.overflow-y-auto
+  .p-8
+    .max-w-6xl.mx-auto
+      .mb-8
+        %h1.text-3xl.font-bold.text-gray-900.mb-2 My Brand
+        %p.text-gray-600 Define and manage your brand identity
+      .space-y-6{"data-orientation" => "horizontal", :dir => "ltr"}
+        .h-10.items-center.justify-center.text-muted-foreground.grid.w-full.grid-cols-2.bg-white.border-2.border-gray-200.rounded-xl.p-1{"aria-orientation" => "horizontal", "data-orientation" => "horizontal", :role => "tablist", :style => "outline:none", :tabindex => "0"}
+          %button.whitespace-nowrap.px-3.text-sm.ring-offset-background.transition-all.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.rounded-lg.font-medium{"aria-controls" => "radix-«Ra7db»-content-profile", "aria-selected" => "true", :class => "py-1.5 data-[state=active]:shadow-sm data-[state=active]:bg-[#FFC940] data-[state=active]:text-black", "data-orientation" => "horizontal", "data-radix-collection-item" => "", "data-state" => "active", :id => "radix-«Ra7db»-trigger-profile", :role => "tab", :tabindex => "-1", :type => "button"}
+            Brand
+            Profile
+          %button.inline-flex.items-center.justify-center.whitespace-nowrap.px-3.text-sm.ring-offset-background.transition-all.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.rounded-lg.font-medium{"aria-controls" => "radix-«Ra7db»-content-kit", "aria-selected" => "false", :class => "py-1.5 data-[state=active]:shadow-sm data-[state=active]:bg-[#FFC940] data-[state=active]:text-black", "data-orientation" => "horizontal", "data-radix-collection-item" => "", "data-state" => "inactive", :id => "radix-«Ra7db»-trigger-kit", :role => "tab", :tabindex => "-1", :type => "button"}
+            Brand
+            Kit
+        .mt-2.ring-offset-background.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2{"aria-labelledby" => "radix-«Ra7db»-trigger-profile", "data-orientation" => "horizontal", "data-state" => "active", :id => "radix-«Ra7db»-content-profile", :role => "tabpanel", :style => "animation-duration:0s", :tabindex => "0"}
+          .bg-card.text-card-foreground.border-0.shadow-lg.rounded-2xl
+            .flex.flex-col.p-6.pb-6{:class => "space-y-1.5"}
+              .font-semibold.tracking-tight.text-2xl.text-gray-900 Brand Profile
+            .p-6.pt-0.space-y-6
+              %div
+                %label.block.text-sm.font-medium.text-gray-700.mb-2
+                  Brand
+                  Name
+                %input.flex.h-10.w-full.bg-background.px-3.py-2.text-base.ring-offset-background.file:border-0.file:bg-transparent.file:text-sm.file:font-medium.file:text-foreground.placeholder:text-muted-foreground.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:cursor-not-allowed.disabled:opacity-50.md:text-sm.rounded-xl.border-2.border-gray-200{:class => "focus:border-[#FFC940]", :placeholder => "Enter your brand name", :value => ""}/
+              %div
+                %label.block.text-sm.font-medium.text-gray-700.mb-2
+                  Who is your
+                  audience?
+                %textarea.flex.w-full.bg-background.px-3.py-2.text-base.ring-offset-background.placeholder:text-muted-foreground.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:cursor-not-allowed.disabled:opacity-50.md:text-sm.rounded-xl.border-2.border-gray-200{:class => "focus:border-[#FFC940] min-h-[100px]", :placeholder => "Describe your target audience... What are their dreams, fears, and pain points?"}
+              %div
+                %label.block.text-sm.font-medium.text-gray-700.mb-2
+                  What do you sell or
+                  offer?
+                %textarea.flex.w-full.bg-background.px-3.py-2.text-base.ring-offset-background.placeholder:text-muted-foreground.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:cursor-not-allowed.disabled:opacity-50.md:text-sm.rounded-xl.border-2.border-gray-200{:class => "focus:border-[#FFC940] min-h-[100px]", :placeholder => "Describe your products or services..."}
+              %div
+                %label.block.text-sm.font-medium.text-gray-700.mb-2
+                  Brand purpose or
+                  mission
+                %textarea.flex.w-full.bg-background.px-3.py-2.text-base.ring-offset-background.placeholder:text-muted-foreground.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:cursor-not-allowed.disabled:opacity-50.md:text-sm.rounded-xl.border-2.border-gray-200{:class => "focus:border-[#FFC940] min-h-[100px]", :placeholder => "What's your brand's mission and purpose..."}
+              %input.btn-submit{:type => "submit", :value => "Save Profile"}/
+        .mt-2.ring-offset-background.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2{"aria-labelledby" => "radix-«Ra7db»-trigger-kit", "data-orientation" => "horizontal", "data-state" => "inactive", :hidden => "", :id => "radix-«Ra7db»-content-kit", :role => "tabpanel", :tabindex => "0"}
