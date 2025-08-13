@@ -1,0 +1,270 @@
+require 'rails_helper'
+
+RSpec.describe "Planning Strategy Integration", type: :request do
+  let!(:user) { create(:user) }
+  let!(:brand) { create(:brand, user: user) }
+
+  # Mock OpenAI response with complete strategy data
+  let(:mock_openai_response) do
+    {
+      "brand_name" => brand.name,
+      "brand_slug" => brand.slug,
+      "strategy_name" => "Test Monthly Strategy",
+      "month" => "2024-01",
+      "objective_of_the_month" => "Increase brand awareness and engagement",
+      "frequency_per_week" => 3,
+      "monthly_themes" => [ "Brand awareness", "Product showcase", "Community building" ],
+      "content_distribution" => {
+        "instagram" => { "posts" => 8, "reels" => 4 },
+        "tiktok" => { "videos" => 6 }
+      },
+      "weekly_plan" => [
+        {
+          "week_number" => 1,
+          "theme" => "Awareness",
+          "goal" => "Increase brand visibility",
+          "content_pieces" => [
+            {
+              "day" => "Monday",
+              "type" => "Post",
+              "platform" => "instagram",
+              "topic" => "Brand introduction"
+            },
+            {
+              "day" => "Wednesday",
+              "type" => "Reel",
+              "platform" => "instagram",
+              "topic" => "Behind the scenes"
+            },
+            {
+              "day" => "Friday",
+              "type" => "Post",
+              "platform" => "instagram",
+              "topic" => "Product highlight"
+            }
+          ]
+        },
+        {
+          "week_number" => 2,
+          "theme" => "Engagement",
+          "goal" => "Build community interaction",
+          "content_pieces" => [
+            {
+              "day" => "Tuesday",
+              "type" => "Reel",
+              "platform" => "instagram",
+              "topic" => "User-generated content"
+            },
+            {
+              "day" => "Thursday",
+              "type" => "Post",
+              "platform" => "instagram",
+              "topic" => "Interactive poll"
+            },
+            {
+              "day" => "Saturday",
+              "type" => "Live",
+              "platform" => "instagram",
+              "topic" => "Q&A session"
+            }
+          ]
+        }
+      ],
+      "remix_duet_plan" => {
+        "trending_sounds" => [ "sound1", "sound2" ],
+        "collaboration_ideas" => [ "duet_ideas" ]
+      },
+      "publish_windows_local" => {
+        "instagram" => [ "9:00 AM", "6:00 PM" ],
+        "tiktok" => [ "11:00 AM", "8:00 PM" ]
+      }
+    }.to_json
+  end
+
+  before do
+    sign_in user, scope: :user
+
+    # Mock OpenAI service to return structured data
+    mock_chat_client = instance_double(GinggaOpenAI::ChatClient)
+    allow(GinggaOpenAI::ChatClient).to receive(:new).and_return(mock_chat_client)
+    allow(mock_chat_client).to receive(:chat!).and_return(mock_openai_response)
+  end
+
+  describe "Complete strategy generation and display flow" do
+    it "creates complete strategy and displays structured calendar data" do
+      # Debug: Check what's happening with the request
+      expect {
+        post creas_strategist_index_path, params: {
+          month: "2024-01",
+          strategy_form: {
+            objective_of_the_month: "Test objective",
+            frequency_per_week: 3,
+            monthly_themes: "theme1, theme2"
+          }
+        }
+      }.to change(CreasStrategyPlan, :count).by(1)
+
+      # Step 2: Verify redirect with plan_id
+
+      # Step 2: Verify redirect
+      expect(response).to have_http_status(:see_other)
+      expect(response.location).to include("planning?plan_id=")
+
+      plan_id = response.location.match(/plan_id=([^&]+)/)[1]
+      created_plan = CreasStrategyPlan.find(plan_id)
+
+      # Step 3: Verify all data is stored correctly
+      expect(created_plan).to have_attributes(
+        user: user,
+        brand: brand,
+        strategy_name: "Test Monthly Strategy",
+        month: "2024-01",
+        objective_of_the_month: "Increase brand awareness and engagement",
+        frequency_per_week: 3
+      )
+
+      expect(created_plan.monthly_themes).to contain_exactly(
+        "Brand awareness", "Product showcase", "Community building"
+      )
+
+      expect(created_plan.weekly_plan).to be_an(Array)
+      expect(created_plan.weekly_plan.length).to eq(2)
+
+      # Verify first week data structure
+      week_1 = created_plan.weekly_plan[0]
+      expect(week_1).to include(
+        "week_number" => 1,
+        "theme" => "Awareness",
+        "goal" => "Increase brand visibility"
+      )
+      expect(week_1["content_pieces"]).to be_an(Array)
+      expect(week_1["content_pieces"].length).to eq(3)
+
+      # Step 4: Test JSON API endpoint returns formatted data
+      get creas_strategy_plan_path(created_plan.id)
+
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body)
+
+      # Verify formatted response structure
+      expect(json_response).to include(
+        "id" => created_plan.id,
+        "month" => "2024-01",
+        "objective_of_the_month" => "Increase brand awareness and engagement",
+        "weeks" => be_an(Array)
+      )
+
+      # Verify weeks are formatted for frontend
+      weeks = json_response["weeks"]
+      expect(weeks.length).to eq(2)
+
+      week_1_formatted = weeks[0]
+      expect(week_1_formatted).to include(
+        "week_number" => 1,
+        "goal" => "Awareness",
+        "days" => be_an(Array)
+      )
+
+      # Verify days structure for frontend
+      days = week_1_formatted["days"]
+      expect(days.length).to eq(7) # Mon-Sun
+
+      monday = days.find { |d| d["day"] == "Mon" }
+      expect(monday).to include(
+        "day" => "Mon",
+        "contents" => [ "Post" ]
+      )
+
+      wednesday = days.find { |d| d["day"] == "Wed" }
+      expect(wednesday).to include(
+        "day" => "Wed",
+        "contents" => [ "Reel" ]
+      )
+    end
+
+    it "handles missing or incomplete OpenAI response gracefully" do
+      # Mock incomplete response
+      incomplete_response = {
+        "strategy_name" => "Incomplete Strategy",
+        "month" => "2024-01",
+        "objective_of_the_month" => "Test objective",
+        "frequency_per_week" => 2,
+        "weekly_plan" => []
+      }.to_json
+
+      mock_chat_client = instance_double(GinggaOpenAI::ChatClient)
+      allow(GinggaOpenAI::ChatClient).to receive(:new).and_return(mock_chat_client)
+      allow(mock_chat_client).to receive(:chat!).and_return(incomplete_response)
+
+      expect {
+        post creas_strategist_index_path, params: { month: "2024-01" }
+      }.to change(CreasStrategyPlan, :count).by(1)
+
+      created_plan = CreasStrategyPlan.last
+      expect(created_plan.weekly_plan).to eq([])
+
+      # API should still return valid response with empty weeks
+      get creas_strategy_plan_path(created_plan.id)
+      expect(response).to have_http_status(:success)
+
+      json_response = JSON.parse(response.body)
+      expect(json_response["weeks"]).to eq([])
+    end
+
+    it "handles OpenAI service failures" do
+      allow_any_instance_of(Creas::NoctuaStrategyService).to receive(:call)
+        .and_raise(StandardError.new("OpenAI API Error"))
+
+      expect {
+        post creas_strategist_index_path, params: { month: "2024-01" }
+      }.not_to change(CreasStrategyPlan, :count)
+
+      expect(response).to redirect_to(planning_path)
+      follow_redirect!
+      expect(response.body).to include("Smart Planning")
+    end
+  end
+
+  describe "Strategy display without generation" do
+    let!(:existing_plan) do
+      create(:creas_strategy_plan,
+        user: user,
+        brand: brand,
+        strategy_name: "Existing Strategy",
+        weekly_plan: [
+          {
+            "week_number" => 1,
+            "theme" => "Growth",
+            "content_pieces" => [
+              { "day" => "Monday", "type" => "Post" },
+              { "day" => "Friday", "type" => "Reel" }
+            ]
+          }
+        ]
+      )
+    end
+
+    it "displays existing strategy when plan_id is provided" do
+      get planning_path(plan_id: existing_plan.id)
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include("Smart Planning")
+
+      # JavaScript should be present to hydrate calendar
+      expect(response.body).to include("plan_id")
+      expect(response.body).to include("Smart Planning")
+    end
+
+    it "returns correct JSON for existing plan" do
+      get creas_strategy_plan_path(existing_plan.id)
+
+      expect(response).to have_http_status(:success)
+      json_response = JSON.parse(response.body)
+
+      expect(json_response).to include(
+        "id" => existing_plan.id,
+        "strategy_name" => "Existing Strategy"
+      )
+    end
+  end
+end

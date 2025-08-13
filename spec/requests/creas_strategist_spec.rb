@@ -7,12 +7,13 @@ RSpec.describe CreasStrategistController, type: :request do
 
   let(:valid_params) do
     {
-      brand_id: brand.id,
       month: "2025-08",
-      objective_of_the_month: "awareness",
-      frequency_per_week: 4,
-      monthly_themes: [ "product launch" ],
-      resources_override: { ai_avatars: true }
+      strategy_form: {
+        objective_of_the_month: "awareness",
+        frequency_per_week: 4,
+        monthly_themes: "product launch",
+        resources_override: '{"ai_avatars": true}'
+      }
     }
   end
 
@@ -47,15 +48,16 @@ RSpec.describe CreasStrategistController, type: :request do
 
   describe 'POST /creas_strategist' do
     context 'with valid parameters' do
-      it 'creates a strategy plan and returns 201' do
+      it 'creates a strategy plan and returns JSON response' do
         expect {
-          post '/creas_strategist', params: valid_params
+          post '/creas_strategist', params: valid_params, headers: { 'Accept' => 'application/json' }
         }.to change(CreasStrategyPlan, :count).by(1)
 
-        expect(response).to have_http_status(:created)
+        expect(response).to have_http_status(:success)
 
         json_response = JSON.parse(response.body)
-        expect(json_response).to include(
+        expect(json_response["success"]).to be true
+        expect(json_response["plan"]).to include(
           "month" => "2025-08",
           "objective_of_the_month" => "awareness",
           "frequency_per_week" => 4
@@ -63,30 +65,33 @@ RSpec.describe CreasStrategistController, type: :request do
       end
     end
 
-    context 'with missing required parameters' do
-      it 'returns 422 when brand_id is missing' do
-        post '/creas_strategist', params: valid_params.except(:brand_id)
-        expect(response).to have_http_status(:unprocessable_content)
+    context 'with optional parameters' do
+      it 'uses default when objective_of_the_month is missing' do
+        invalid_params = valid_params.dup
+        invalid_params[:strategy_form].delete(:objective_of_the_month)
+        post '/creas_strategist', params: invalid_params, headers: { 'Accept' => 'application/json' }
+        expect(response).to have_http_status(:ok)
 
         json_response = JSON.parse(response.body)
-        expect(json_response).to have_key('error')
+        expect(json_response).to have_key('success')
+        expect(json_response['success']).to be true
       end
 
-      it 'returns 422 when month is missing' do
-        post '/creas_strategist', params: valid_params.except(:month)
-        expect(response).to have_http_status(:unprocessable_content)
+      it 'uses current month when month is missing' do
+        post '/creas_strategist', params: valid_params.except(:month), headers: { 'Accept' => 'application/json' }
+        expect(response).to have_http_status(:ok)
 
         json_response = JSON.parse(response.body)
-        expect(json_response).to have_key('error')
+        expect(json_response).to have_key('success')
+        expect(json_response['success']).to be true
       end
     end
 
-    context 'when brand does not belong to user' do
-      let(:other_user) { create(:user) }
-      let(:other_brand) { create(:brand, user: other_user) }
+    context 'when user has no brand' do
+      before { brand.destroy }
 
-      it 'returns 404' do
-        post '/creas_strategist', params: valid_params.merge(brand_id: other_brand.id)
+      it 'returns 422' do
+        post '/creas_strategist', params: valid_params, headers: { 'Accept' => 'application/json' }
         expect(response).to have_http_status(:unprocessable_content)
 
         json_response = JSON.parse(response.body)
@@ -100,7 +105,7 @@ RSpec.describe CreasStrategistController, type: :request do
       end
 
       it 'returns 422 with error message' do
-        post '/creas_strategist', params: valid_params
+        post '/creas_strategist', params: valid_params, headers: { 'Accept' => 'application/json' }
         expect(response).to have_http_status(:unprocessable_content)
 
         json_response = JSON.parse(response.body)

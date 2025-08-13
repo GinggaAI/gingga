@@ -1,5 +1,6 @@
 class NoctuaBriefAssembler
   def self.call(brand:, strategy_form: {})
+    # binding.break
     brand = Brand.includes(:audiences, :products, :brand_channels).find(brand.id)
     {
       brand_name: brand.name,

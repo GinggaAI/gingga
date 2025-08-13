@@ -103,7 +103,7 @@ RSpec.describe NoctuaBriefAssembler do
 
     context 'with brand having multiple related records' do
       let!(:audience2) { create(:audience, brand: brand) }
-      let!(:product2) { create(:product, brand: brand) }
+      let!(:product2) { create(:product, brand: brand, name: "Second Product") }
       let!(:channel2) { create(:brand_channel, :tiktok, brand: brand) }
 
       it 'includes all related records' do
@@ -114,7 +114,7 @@ RSpec.describe NoctuaBriefAssembler do
     end
 
     context 'when brand has no related records' do
-      let(:brand_without_relations) { create(:brand, user: user) }
+      let(:brand_without_relations) { create(:brand, user: user, slug: "brand-without-relations") }
 
       subject { described_class.call(brand: brand_without_relations) }
 
