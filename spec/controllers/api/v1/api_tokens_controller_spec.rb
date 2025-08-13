@@ -115,7 +115,7 @@ RSpec.describe Api::V1::ApiTokensController, type: :request do
       invalid_params = valid_params.deep_merge(api_token: { provider: 'invalid' })
 
       post '/api/v1/api_tokens', params: invalid_params
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
 
       json_response = JSON.parse(response.body)
       expect(json_response).to have_key('errors')
@@ -139,7 +139,7 @@ RSpec.describe Api::V1::ApiTokensController, type: :request do
           post '/api/v1/api_tokens', params: valid_params
         }.not_to change(ApiToken, :count)
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json_response = JSON.parse(response.body)
         expect(json_response['errors']['encrypted_token']).to be_present
       end
@@ -171,7 +171,7 @@ RSpec.describe Api::V1::ApiTokensController, type: :request do
       invalid_params = update_params.deep_merge(api_token: { provider: 'invalid' })
 
       patch "/api/v1/api_tokens/#{api_token.id}", params: invalid_params
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it 'returns 404 for other users token' do

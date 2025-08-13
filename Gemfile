@@ -84,6 +84,7 @@ end
 
 gem "devise", "~> 4.9"
 gem "httparty"
+gem "ruby-openai", "~> 7.0"
 
 # View components for reusable UI with previews/specs
 gem "view_component"

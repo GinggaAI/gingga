@@ -6,7 +6,17 @@ class ApiTokenValidatorService
   end
 
   def call
-    validator_class = "#{@provider.capitalize}::ValidateKeyService".constantize
+    validator_class = case @provider
+    when "openai"
+                        GinggaOpenAI::ValidateKeyService
+    when "heygen"
+                        Heygen::ValidateKeyService
+    when "kling"
+                        Kling::ValidateKeyService
+    else
+                        raise NameError, "Unsupported provider: #{@provider}"
+    end
+
     validator_class.new(token: @token, mode: @mode).call
   rescue NameError
     { valid: false, error: "Unsupported provider: #{@provider}" }
