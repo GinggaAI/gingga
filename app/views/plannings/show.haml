@@ -54,12 +54,55 @@
                   required: true
           
           .mb-4
-            = form.label "strategy_form[resources_override]", "Resources Override", 
-                class: "block text-sm font-medium mb-1 text-gray-700"
-            = form.text_area "strategy_form[resources_override]", 
-                placeholder: '{"budget": 1000, "team_size": 3, "tools": ["Canva", "Photoshop"]}', 
-                rows: 2, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            %p.text-xs.text-gray-500.mt-1 JSON format for additional resources and constraints
+            %h3.block.text-sm.font-medium.mb-3.text-gray-700 Resources Override
+            %p.text-xs.text-gray-500.mb-3 Configure additional resources and constraints for content creation
+            
+            .grid.grid-cols-1.md:grid-cols-2.gap-4.mb-3
+              .col-span-1
+                %label.block.text-sm.font-medium.mb-1.text-gray-600 Budget Range
+                %select#budget-select.w-full.p-2.border.border-gray-300.rounded-md.focus:ring-2.focus:ring-blue-500.focus:border-blue-500
+                  %option{value: ""} No specific budget
+                  %option{value: "500"} Low budget ($500)
+                  %option{value: "1000"} Medium budget ($1,000)
+                  %option{value: "2500"} High budget ($2,500)
+                  %option{value: "5000"} Premium budget ($5,000)
+              
+              .col-span-1
+                %label.block.text-sm.font-medium.mb-1.text-gray-600 Team Size
+                %select#team-size-select.w-full.p-2.border.border-gray-300.rounded-md.focus:ring-2.focus:ring-blue-500.focus:border-blue-500
+                  %option{value: ""} No specific team size
+                  %option{value: "1"} Solo creator (1 person)
+                  %option{value: "2"} Small team (2 people)
+                  %option{value: "3"} Medium team (3 people)
+                  %option{value: "5"} Large team (5+ people)
+            
+            .grid.grid-cols-1.md:grid-cols-2.gap-4.mb-3
+              .col-span-1
+                %label.block.text-sm.font-medium.mb-1.text-gray-600 Design Tools
+                %select#tools-select.w-full.p-2.border.border-gray-300.rounded-md.focus:ring-2.focus:ring-blue-500.focus:border-blue-500{multiple: true, size: "3"}
+                  %option{value: "Canva"} Canva
+                  %option{value: "Photoshop"} Adobe Photoshop
+                  %option{value: "Figma"} Figma
+                  %option{value: "Sketch"} Sketch
+                  %option{value: "After Effects"} After Effects
+                  %option{value: "Premiere Pro"} Premiere Pro
+                  %option{value: "Final Cut"} Final Cut Pro
+                %p.text-xs.text-gray-500.mt-1 Hold Ctrl/Cmd to select multiple tools
+              
+              .col-span-1
+                %label.block.text-sm.font-medium.mb-1.text-gray-600 Content Resources
+                .space-y-2
+                  %label.flex.items-center
+                    %input#ai-avatars-checkbox.mr-2{type: "checkbox"}
+                    %span.text-sm Use AI avatars
+                  %label.flex.items-center
+                    %input#stock-photos-checkbox.mr-2{type: "checkbox"}
+                    %span.text-sm Use stock photos
+                  %label.flex.items-center
+                    %input#custom-graphics-checkbox.mr-2{type: "checkbox"}
+                    %span.text-sm Create custom graphics
+            
+            = form.hidden_field "strategy_form[resources_override]", id: "resources-override-json"
           
           .flex.justify-between.items-center
             %button#cancel-form.px-4.py-2.border.border-gray-300.rounded-md.hover:bg-gray-50.transition-colors{type: "button"} 
@@ -193,6 +236,9 @@
     if (strategyForm && submitBtn) {
       strategyForm.addEventListener('submit', handleFormSubmit);
     }
+
+    // Resources Override form handling
+    setupResourcesOverrideHandlers();
 
     // Initialize with existing plan if available
     if (currentPlan) {
@@ -790,4 +836,74 @@
     if (resultDiv) {
       resultDiv.style.display = 'none';
     }
+  }
+
+  function setupResourcesOverrideHandlers() {
+    const budgetSelect = document.getElementById('budget-select');
+    const teamSizeSelect = document.getElementById('team-size-select');
+    const toolsSelect = document.getElementById('tools-select');
+    const aiAvatarsCheckbox = document.getElementById('ai-avatars-checkbox');
+    const stockPhotosCheckbox = document.getElementById('stock-photos-checkbox');
+    const customGraphicsCheckbox = document.getElementById('custom-graphics-checkbox');
+    const hiddenInput = document.getElementById('resources-override-json');
+
+    const elements = [budgetSelect, teamSizeSelect, toolsSelect, aiAvatarsCheckbox, stockPhotosCheckbox, customGraphicsCheckbox];
+    
+    elements.forEach(element => {
+      if (element) {
+        const eventType = element.type === 'checkbox' ? 'change' : 'change';
+        element.addEventListener(eventType, updateResourcesOverrideJSON);
+      }
+    });
+
+    // Initialize with empty JSON
+    if (hiddenInput) {
+      hiddenInput.value = '{}';
+    }
+  }
+
+  function updateResourcesOverrideJSON() {
+    const budgetSelect = document.getElementById('budget-select');
+    const teamSizeSelect = document.getElementById('team-size-select');
+    const toolsSelect = document.getElementById('tools-select');
+    const aiAvatarsCheckbox = document.getElementById('ai-avatars-checkbox');
+    const stockPhotosCheckbox = document.getElementById('stock-photos-checkbox');
+    const customGraphicsCheckbox = document.getElementById('custom-graphics-checkbox');
+    const hiddenInput = document.getElementById('resources-override-json');
+
+    if (!hiddenInput) return;
+
+    const resourcesData = {};
+
+    // Budget
+    if (budgetSelect && budgetSelect.value) {
+      resourcesData.budget = parseInt(budgetSelect.value, 10);
+    }
+
+    // Team Size
+    if (teamSizeSelect && teamSizeSelect.value) {
+      resourcesData.team_size = parseInt(teamSizeSelect.value, 10);
+    }
+
+    // Tools (multiple select)
+    if (toolsSelect) {
+      const selectedTools = Array.from(toolsSelect.selectedOptions).map(option => option.value);
+      if (selectedTools.length > 0) {
+        resourcesData.tools = selectedTools;
+      }
+    }
+
+    // Content Resources
+    if (aiAvatarsCheckbox && aiAvatarsCheckbox.checked) {
+      resourcesData.ai_avatars = true;
+    }
+    if (stockPhotosCheckbox && stockPhotosCheckbox.checked) {
+      resourcesData.stock = true;
+    }
+    if (customGraphicsCheckbox && customGraphicsCheckbox.checked) {
+      resourcesData.custom_graphics = true;
+    }
+
+    // Update hidden field with JSON
+    hiddenInput.value = JSON.stringify(resourcesData);
   }

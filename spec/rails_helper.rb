@@ -41,6 +41,7 @@ SimpleCov.start 'rails' do
   add_filter "/gems/"
   add_filter "/config/"
   add_filter "/app/controllers/"
+  add_filter %r{_preview\.rb\z}
 end
 
 # Ensures that the test database schema matches the current schema file.
