@@ -1,0 +1,23 @@
+/* Gingga Design System */
+:root {
+  /* Colors */
+  --primary: #FFC857;
+  --secondary: #0F172A;
+  --background: #FFFFFF;
+  --text: #1F2937;
+  --muted: #6B7280;
+  --border: #E5E7EB;
+  --surface: #F9FAFB;
+  
+  /* Spacing */
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+

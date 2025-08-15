@@ -1,0 +1,65 @@
+.ui-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-lg);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.ui-chip--primary {
+  background-color: rgba(255, 200, 87, 0.1);
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.ui-chip--secondary {
+  background-color: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.ui-chip--neutral {
+  background-color: var(--surface);
+  color: var(--muted);
+}
+
+.ui-chip--creative {
+  background: linear-gradient(45deg, #A37FFF, #3AC8FF);
+  color: white;
+}
+
+.ui-chip--accent {
+  background-color: rgba(255, 104, 72, 0.1);
+  color: #FF6848;
+  border: 1px solid #FF6848;
+}
+
+.ui-chip--link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ui-chip__remove {
+  background: none;
+  border: none;
+  color: currentColor;
+  cursor: pointer;
+  font-size: 1.2em;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.ui-chip__remove:hover {
+  opacity: 1;
+}

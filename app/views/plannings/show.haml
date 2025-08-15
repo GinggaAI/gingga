@@ -1,339 +1,793 @@
-%main.flex-1.overflow-y-auto
-  .p-8
-    .max-w-7xl.mx-auto
-      .mb-8
-        %h1.text-3xl.font-bold.text-gray-900.mb-2 Smart Planning
-        %p.text-gray-600 Plan your content strategy with AI-powered insights
-      .space-y-6
-        .bg-card.text-card-foreground.border-0.shadow-lg.rounded-2xl
-          .p-6.flex.flex-row.items-center.justify-between{:class => "space-y-1.5"}
-            .flex.items-center.gap-4
-              %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.border.border-input.hover:bg-accent.hover:text-accent-foreground.h-9.px-3.rounded-xl.bg-transparent{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                %svg.lucide.lucide-chevron-left.w-4.h-4{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                  %path{:d => "m15 18-6-6 6-6"}
-              %h2.text-2xl.font-bold August 2025
-              %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.border.border-input.hover:bg-accent.hover:text-accent-foreground.h-9.px-3.rounded-xl.bg-transparent{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                %svg.lucide.lucide-chevron-right.w-4.h-4{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                  %path{:d => "m9 18 6-6-6-6"}
-            .flex.items-center.gap-3
-              %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.h-10.px-4.py-2.rounded-xl.border-2.border-gray-200.hover:text-black.bg-transparent{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:border-[#FFC940] hover:bg-[#FFC940]"} Overview
-              %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.h-10.px-4.py-2.text-black.rounded-xl{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-[#FFC940] hover:bg-[#FF6848]"}
-                %svg.lucide.lucide-plus.w-4.h-4.mr-2{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}>
-                  %path{:d => "M5 12h14"}
-                  %path{:d => "M12 5v14"}
-                Add Content
-        .grid.gap-6
-          .bg-card.text-card-foreground.border-0.shadow-lg.rounded-2xl
-            .flex.flex-col.p-6.pb-4{:class => "space-y-1.5"}
-              .flex.items-center.justify-between
-                .font-semibold.tracking-tight.text-lg Week 1
-                .flex.items-center.gap-3
-                  %span.text-sm.text-gray-600 Content Goal:
-                  %button.flex.h-10.items-center.justify-between.border-input.bg-background.px-3.py-2.text-sm.ring-offset-background.placeholder:text-muted-foreground.focus:outline-none.focus:ring-2.focus:ring-ring.focus:ring-offset-2.disabled:cursor-not-allowed.disabled:opacity-50.w-40.rounded-xl.border-2{"aria-autocomplete" => "none", "aria-controls" => "radix-«r3o»", "aria-expanded" => "false", :class => "[&>span]:line-clamp-1", "data-state" => "closed", :dir => "ltr", :role => "combobox", :type => "button"}
-                    %span{:style => "pointer-events: none;"} Awareness
-                    %svg.lucide.lucide-chevron-down.h-4.w-4.opacity-50{"aria-hidden" => "true", :fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                      %path{:d => "m6 9 6 6 6-6"}
-            .p-6.pt-0
-              .grid.grid-cols-7.gap-4
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Mon
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    .p-2.rounded-lg.text-white.text-xs.flex.items-center.gap-2{:class => "bg-[#3AC8FF]"}
-                      %svg.lucide.lucide-instagram.w-4.h-4{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %rect{:height => "20", :rx => "5", :ry => "5", :width => "20", :x => "2", :y => "2"}
-                        %path{:d => "M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"}
-                        %line{:x1 => "17.5", :x2 => "17.51", :y1 => "6.5", :y2 => "6.5"}
-                      %span.capitalize post
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Tue
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Wed
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    .p-2.rounded-lg.text-white.text-xs.flex.items-center.gap-2{:class => "bg-[#3AC8FF]"}
-                      %svg.lucide.lucide-video.w-4.h-4{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"}
-                        %rect{:height => "12", :rx => "2", :width => "14", :x => "2", :y => "6"}
-                      %span.capitalize reel
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Thu
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Fri
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    .p-2.rounded-lg.text-white.text-xs.flex.items-center.gap-2{:class => "bg-[#3AC8FF]"}
-                      %svg.lucide.lucide-instagram.w-4.h-4{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %rect{:height => "20", :rx => "5", :ry => "5", :width => "20", :x => "2", :y => "2"}
-                        %path{:d => "M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"}
-                        %line{:x1 => "17.5", :x2 => "17.51", :y1 => "6.5", :y2 => "6.5"}
-                      %span.capitalize post
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Sat
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Sun
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-          .bg-card.text-card-foreground.border-0.shadow-lg.rounded-2xl
-            .flex.flex-col.p-6.pb-4{:class => "space-y-1.5"}
-              .flex.items-center.justify-between
-                .font-semibold.tracking-tight.text-lg Week 2
-                .flex.items-center.gap-3
-                  %span.text-sm.text-gray-600 Content Goal:
-                  %button.flex.h-10.items-center.justify-between.border-input.bg-background.px-3.py-2.text-sm.ring-offset-background.placeholder:text-muted-foreground.focus:outline-none.focus:ring-2.focus:ring-ring.focus:ring-offset-2.disabled:cursor-not-allowed.disabled:opacity-50.w-40.rounded-xl.border-2{"aria-autocomplete" => "none", "aria-controls" => "radix-«r3p»", "aria-expanded" => "false", :class => "[&>span]:line-clamp-1", "data-state" => "closed", :dir => "ltr", :role => "combobox", :type => "button"}
-                    %span{:style => "pointer-events: none;"} Engagement
-                    %svg.lucide.lucide-chevron-down.h-4.w-4.opacity-50{"aria-hidden" => "true", :fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                      %path{:d => "m6 9 6 6 6-6"}
-            .p-6.pt-0
-              .grid.grid-cols-7.gap-4
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Mon
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Tue
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    .p-2.rounded-lg.text-white.text-xs.flex.items-center.gap-2{:class => "bg-[#A37FFF]"}
-                      %svg.lucide.lucide-video.w-4.h-4{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"}
-                        %rect{:height => "12", :rx => "2", :width => "14", :x => "2", :y => "6"}
-                      %span.capitalize reel
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Wed
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Thu
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    .p-2.rounded-lg.text-white.text-xs.flex.items-center.gap-2{:class => "bg-[#A37FFF]"}
-                      %svg.lucide.lucide-instagram.w-4.h-4{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %rect{:height => "20", :rx => "5", :ry => "5", :width => "20", :x => "2", :y => "2"}
-                        %path{:d => "M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"}
-                        %line{:x1 => "17.5", :x2 => "17.51", :y1 => "6.5", :y2 => "6.5"}
-                      %span.capitalize post
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Fri
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Sat
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    .p-2.rounded-lg.text-white.text-xs.flex.items-center.gap-2{:class => "bg-[#A37FFF]"}
-                      %svg.lucide.lucide-radio.w-4.h-4{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M4.9 19.1C1 15.2 1 8.8 4.9 4.9"}
-                        %path{:d => "M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"}
-                        %circle{:cx => "12", :cy => "12", :r => "2"}
-                        %path{:d => "M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"}
-                        %path{:d => "M19.1 4.9C23 8.8 23 15.1 19.1 19"}
-                      %span.capitalize live
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Sun
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-          .bg-card.text-card-foreground.border-0.shadow-lg.rounded-2xl
-            .flex.flex-col.p-6.pb-4{:class => "space-y-1.5"}
-              .flex.items-center.justify-between
-                .font-semibold.tracking-tight.text-lg Week 3
-                .flex.items-center.gap-3
-                  %span.text-sm.text-gray-600 Content Goal:
-                  %button.flex.h-10.items-center.justify-between.border-input.bg-background.px-3.py-2.text-sm.ring-offset-background.placeholder:text-muted-foreground.focus:outline-none.focus:ring-2.focus:ring-ring.focus:ring-offset-2.disabled:cursor-not-allowed.disabled:opacity-50.w-40.rounded-xl.border-2{"aria-autocomplete" => "none", "aria-controls" => "radix-«r3q»", "aria-expanded" => "false", :class => "[&>span]:line-clamp-1", "data-state" => "closed", :dir => "ltr", :role => "combobox", :type => "button"}
-                    %span{:style => "pointer-events: none;"} Launch
-                    %svg.lucide.lucide-chevron-down.h-4.w-4.opacity-50{"aria-hidden" => "true", :fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                      %path{:d => "m6 9 6 6 6-6"}
-            .p-6.pt-0
-              .grid.grid-cols-7.gap-4
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Mon
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    .p-2.rounded-lg.text-white.text-xs.flex.items-center.gap-2{:class => "bg-[#FF6848]"}
-                      %svg.lucide.lucide-instagram.w-4.h-4{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %rect{:height => "20", :rx => "5", :ry => "5", :width => "20", :x => "2", :y => "2"}
-                        %path{:d => "M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"}
-                        %line{:x1 => "17.5", :x2 => "17.51", :y1 => "6.5", :y2 => "6.5"}
-                      %span.capitalize post
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Tue
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Wed
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    .p-2.rounded-lg.text-white.text-xs.flex.items-center.gap-2{:class => "bg-[#FF6848]"}
-                      %svg.lucide.lucide-video.w-4.h-4{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"}
-                        %rect{:height => "12", :rx => "2", :width => "14", :x => "2", :y => "6"}
-                      %span.capitalize reel
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Thu
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Fri
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    .p-2.rounded-lg.text-white.text-xs.flex.items-center.gap-2{:class => "bg-[#FF6848]"}
-                      %svg.lucide.lucide-instagram.w-4.h-4{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %rect{:height => "20", :rx => "5", :ry => "5", :width => "20", :x => "2", :y => "2"}
-                        %path{:d => "M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"}
-                        %line{:x1 => "17.5", :x2 => "17.51", :y1 => "6.5", :y2 => "6.5"}
-                      %span.capitalize post
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Sat
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Sun
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-          .bg-card.text-card-foreground.border-0.shadow-lg.rounded-2xl
-            .flex.flex-col.p-6.pb-4{:class => "space-y-1.5"}
-              .flex.items-center.justify-between
-                .font-semibold.tracking-tight.text-lg Week 4
-                .flex.items-center.gap-3
-                  %span.text-sm.text-gray-600 Content Goal:
-                  %button.flex.h-10.items-center.justify-between.border-input.bg-background.px-3.py-2.text-sm.ring-offset-background.placeholder:text-muted-foreground.focus:outline-none.focus:ring-2.focus:ring-ring.focus:ring-offset-2.disabled:cursor-not-allowed.disabled:opacity-50.w-40.rounded-xl.border-2{"aria-autocomplete" => "none", "aria-controls" => "radix-«r3r»", "aria-expanded" => "false", :class => "[&>span]:line-clamp-1", "data-state" => "closed", :dir => "ltr", :role => "combobox", :type => "button"}
-                    %span{:style => "pointer-events: none;"} Conversion
-                    %svg.lucide.lucide-chevron-down.h-4.w-4.opacity-50{"aria-hidden" => "true", :fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                      %path{:d => "m6 9 6 6 6-6"}
-            .p-6.pt-0
-              .grid.grid-cols-7.gap-4
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Mon
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Tue
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    .p-2.rounded-lg.text-white.text-xs.flex.items-center.gap-2{:class => "bg-[#FFC940]"}
-                      %svg.lucide.lucide-video.w-4.h-4{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"}
-                        %rect{:height => "12", :rx => "2", :width => "14", :x => "2", :y => "6"}
-                      %span.capitalize reel
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Wed
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Thu
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    .p-2.rounded-lg.text-white.text-xs.flex.items-center.gap-2{:class => "bg-[#FFC940]"}
-                      %svg.lucide.lucide-instagram.w-4.h-4{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %rect{:height => "20", :rx => "5", :ry => "5", :width => "20", :x => "2", :y => "2"}
-                        %path{:d => "M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"}
-                        %line{:x1 => "17.5", :x2 => "17.51", :y1 => "6.5", :y2 => "6.5"}
-                      %span.capitalize post
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Fri
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Sat
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
-                .space-y-2
-                  %h4.text-sm.font-medium.text-gray-700.text-center Sun
-                  .bg-gray-50.rounded-xl.p-3.space-y-2{:class => "min-h-[120px]"}
-                    .p-2.rounded-lg.text-white.text-xs.flex.items-center.gap-2{:class => "bg-[#FFC940]"}
-                      %svg.lucide.lucide-instagram.w-4.h-4{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %rect{:height => "20", :rx => "5", :ry => "5", :width => "20", :x => "2", :y => "2"}
-                        %path{:d => "M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"}
-                        %line{:x1 => "17.5", :x2 => "17.51", :y1 => "6.5", :y2 => "6.5"}
-                      %span.capitalize post
-                    %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.px-3.w-full.h-8.text-gray-400.hover:text-gray-600.border-2.border-dashed.border-gray-300.hover:border-gray-400.rounded-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
-                      %svg.lucide.lucide-plus.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                        %path{:d => "M5 12h14"}
-                        %path{:d => "M12 5v14"}
+.container
+  .max-w-6xl.mx-auto.p-8
+    
+    %h1.text-3xl.font-bold.mb-2 Smart Planning
+    %p.text-gray-600.mb-8 Plan your content strategy with AI-powered insights
+
+    .bg-white.rounded-lg.shadow.mb-6
+      .flex.items-center.justify-between.p-6
+        .flex.items-center.gap-4
+          %button.px-3.py-1.text-gray-600.hover:text-gray-800
+            %span ←
+          %h2.text-2xl.font-bold= @current_month_display
+          %button.px-3.py-1.text-gray-600.hover:text-gray-800
+            %span →
+        
+        .flex.items-center.gap-3
+          %button#toggle-overview.px-4.py-2.border.rounded.hover:bg-gray-50 See general content strategy
+          %button#toggle-form.px-4.py-2.bg-blue-600.text-white.rounded.hover:bg-blue-700 
+            %span#button-text Add Content
+
+    #strategy-form.bg-white.rounded-lg.shadow.mb-6{style: "display: none;"}
+      .p-6
+        .flex.items-center.justify-between.mb-4
+          %h3.text-lg.font-semibold 🧠 Generate New Content Strategy
+          #form-status.text-sm.text-gray-500{style: "display: none;"}
+        
+        = form_with url: creas_strategist_index_path, method: :post, local: false, 
+            id: "strategy-creation-form", class: "strategy-form" do |form|
+          = form.hidden_field :month, value: @current_month
+          
+          .grid.grid-cols-1.md:grid-cols-2.gap-4.mb-4
+            .col-span-1.md:col-span-2
+              = form.label "strategy_form[objective_of_the_month]", "Objective of the Month", 
+                  class: "block text-sm font-medium mb-1 text-gray-700"
+              = form.text_area "strategy_form[objective_of_the_month]", 
+                  placeholder: "e.g., Increase brand awareness and engagement", 
+                  rows: 3, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+                  required: true
+            
+            .col-span-1
+              = form.label "strategy_form[monthly_themes]", "Monthly Themes", 
+                  class: "block text-sm font-medium mb-1 text-gray-700"
+              = form.text_field "strategy_form[monthly_themes]", 
+                  placeholder: "Brand awareness, Product showcase, Community engagement", 
+                  class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              %p.text-xs.text-gray-500.mt-1 Separate with commas
+            
+            .col-span-1
+              = form.label "strategy_form[frequency_per_week]", "Frequency per Week", 
+                  class: "block text-sm font-medium mb-1 text-gray-700"
+              = form.number_field "strategy_form[frequency_per_week]", 
+                  placeholder: "3", min: 1, max: 7, value: 3,
+                  class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+                  required: true
+          
+          .mb-4
+            = form.label "strategy_form[resources_override]", "Resources Override", 
+                class: "block text-sm font-medium mb-1 text-gray-700"
+            = form.text_area "strategy_form[resources_override]", 
+                placeholder: '{"budget": 1000, "team_size": 3, "tools": ["Canva", "Photoshop"]}', 
+                rows: 2, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            %p.text-xs.text-gray-500.mt-1 JSON format for additional resources and constraints
+          
+          .flex.justify-between.items-center
+            %button#cancel-form.px-4.py-2.border.border-gray-300.rounded-md.hover:bg-gray-50.transition-colors{type: "button"} 
+              Cancel
+            %button#submit-strategy.px-6.py-2.bg-blue-600.text-white.rounded-md.hover:bg-blue-700.transition-colors.disabled:bg-gray-400{type: "submit"}
+              %span.submit-text Generate Strategy
+              %span.loading-spinner{style: "display: none;"} 
+                %svg.animate-spin.w-4.h-4.inline.mr-2{fill: "none", viewBox: "0 0 24 24"}
+                  %circle.opacity-25{cx: "12", cy: "12", r: "10", stroke: "currentColor", "stroke-width": "4"}
+                  %path.opacity-75{fill: "currentColor", d: "m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"}
+                Generating...
+
+    #strategy-result.bg-green-50.border.border-green-200.rounded-lg.p-6.mb-6{style: "display: none;"}
+      .flex.items-start.justify-between.mb-4
+        .flex.items-center.gap-2
+          %svg.w-5.h-5.text-green-600{fill: "currentColor", viewBox: "0 0 20 20"}
+            %path{"fill-rule": "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z", "clip-rule": "evenodd"}
+          %h3.text-lg.font-semibold.text-green-800 Strategy Generated Successfully!
+        %button.text-gray-400.hover:text-gray-600.text-xl.font-bold{onclick: "hideStrategyOverview()"} &times;
+      
+      #strategy-content.space-y-4
+        .grid.grid-cols-1.md:grid-cols-3.gap-4.text-sm
+          .bg-white.p-3.rounded.border
+            %h4.font-medium.text-gray-900.mb-1 Strategy Name
+            %p#strategy-name.text-gray-600 -
+          .bg-white.p-3.rounded.border
+            %h4.font-medium.text-gray-900.mb-1 Posts per Week
+            %p#strategy-frequency.text-gray-600 -
+          .bg-white.p-3.rounded.border
+            %h4.font-medium.text-gray-900.mb-1 Total Posts
+            %p#strategy-total.text-gray-600 -
+        
+        .bg-white.p-4.rounded.border
+          %h4.font-medium.text-gray-900.mb-2 Monthly Objective
+          %p#strategy-objective.text-gray-600 -
+        
+        .bg-white.p-4.rounded.border
+          %h4.font-medium.text-gray-900.mb-2 Content Themes
+          #strategy-themes.text-gray-600 -
+
+    #error-message.bg-red-50.border.border-red-200.rounded-lg.p-4.mb-6{style: "display: none;"}
+      .flex.items-center.gap-2.text-red-800
+        %svg.w-5.h-5{fill: "currentColor", viewBox: "0 0 20 20"}
+          %path{"fill-rule": "evenodd", d: "M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z", "clip-rule": "evenodd"}
+        %span#error-text Error generating strategy
+
+    .space-y-6
+      - %w[Week1 Week2 Week3 Week4].each_with_index do |week, week_index|
+        .bg-white.rounded-lg.shadow
+          .flex.items-center.justify-between.p-4.border-b
+            %h3.font-semibold= week
+            .flex.items-center.gap-2
+              %span.text-sm Goal:
+              %select.p-1.border.rounded.text-sm
+                %option Awareness
+                %option Engagement
+                %option Conversion
+          
+          .p-4
+            .grid.grid-cols-7.gap-4
+              - %w[Mon Tue Wed Thu Fri Sat Sun].each do |day|
+                .text-center
+                  %h4.text-sm.font-medium.mb-2= day
+                  .bg-gray-50.rounded.p-3.week-content-slot{style: "min-height: 120px;"}
+                    %button.w-full.h-8.border-2.border-dashed.border-gray-300.rounded.text-gray-400.hover:border-gray-400.hover:text-gray-600
+                      +
+          
+          .week-details.bg-gray-50.p-4.rounded.mt-4{style: "display: none;", id: "week-details-#{week_index}"}
+            .text-lg.font-semibold.mb-3.text-gray-700 📋 Week #{week_index + 1} - Content Details
+            .content-details-grid.grid.grid-cols-1.gap-3
+
+:javascript
+  let currentMonth = '#{@current_month}';
+  let currentPlan = #{@current_plan ? @current_plan.to_json.html_safe : 'null'};
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('toggle-form');
+    const overviewBtn = document.getElementById('toggle-overview');
+    const form = document.getElementById('strategy-form');
+    const resultDiv = document.getElementById('strategy-result');
+    const cancelBtn = document.getElementById('cancel-form');
+    const strategyForm = document.getElementById('strategy-creation-form');
+    const submitBtn = document.getElementById('submit-strategy');
+    const errorDiv = document.getElementById('error-message');
+    
+    // Form toggle button
+    if (toggleBtn && form) {
+      toggleBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const isFormVisible = form.style.display !== 'none';
+        form.style.display = isFormVisible ? 'none' : 'block';
+        if (resultDiv) resultDiv.style.display = 'none';
+        hideMessages();
+      });
+    }
+    
+    // Overview toggle button - same behavior as form toggle
+    if (overviewBtn && resultDiv) {
+      overviewBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const isResultVisible = resultDiv.style.display !== 'none';
+        
+        if (isResultVisible) {
+          // Hide if currently visible
+          resultDiv.style.display = 'none';
+        } else {
+          // Show with appropriate content
+          if (currentPlan) {
+            showStrategyOverview();
+          } else {
+            showBrandOverview();
+          }
+        }
+        
+        // Hide form and error messages (but not result div - we're managing that)
+        if (form) form.style.display = 'none';
+        hideErrorMessage();
+      });
+    }
+    
+    // Cancel button
+    if (cancelBtn && form) {
+      cancelBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        form.style.display = 'none';
+        resetForm();
+      });
+    }
+
+    // Form submission
+    if (strategyForm && submitBtn) {
+      strategyForm.addEventListener('submit', handleFormSubmit);
+    }
+
+    // Initialize with existing plan if available
+    if (currentPlan) {
+      displayStrategyResult(currentPlan);
+      populateCalendarWithStrategy(currentPlan);
+      updateButtonText();
+      updateOverviewButton();
+      // Keep overview hidden by default - user clicks to show, just like content details
+      if (resultDiv) resultDiv.style.display = 'none';
+    } else {
+      // Hide overview button when no plan
+      updateOverviewButton();
+    }
+    
+    // Also check for plan_id parameter for direct access
+    const urlParams = new URLSearchParams(window.location.search);
+    const planId = urlParams.get('plan_id');
+    if (planId && (!currentPlan || currentPlan.id != planId)) {
+      loadStrategyPlan(planId);
+    }
+  });
+
+  function handleFormSubmit(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const submitBtn = document.getElementById('submit-strategy');
+    const submitText = submitBtn.querySelector('.submit-text');
+    const loadingSpinner = submitBtn.querySelector('.loading-spinner');
+    
+    // Show loading state
+    setLoadingState(true, submitBtn, submitText, loadingSpinner);
+    hideMessages();
+    
+    const formData = new FormData(form);
+    
+    // Create AbortController for timeout handling
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+    
+    fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      },
+      signal: controller.signal
+    })
+    .then(response => {
+      clearTimeout(timeoutId);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      setLoadingState(false, submitBtn, submitText, loadingSpinner);
+      
+      if (data.success) {
+        currentPlan = data.plan;
+        displayStrategyResult(data.plan, true); // Show result after form submission
+        populateCalendarWithStrategy(data.plan);
+        document.getElementById('strategy-form').style.display = 'none';
+        resetForm();
+        updateButtonText();
+        updateOverviewButton();
+        
+        // Update URL with plan_id without page reload
+        if (data.plan && data.plan.id) {
+          const newUrl = new URL(window.location);
+          newUrl.searchParams.set('plan_id', data.plan.id);
+          window.history.pushState({}, '', newUrl);
+        }
+      } else {
+        showError(data.error || 'Failed to generate strategy');
+      }
+    })
+    .catch(error => {
+      clearTimeout(timeoutId);
+      setLoadingState(false, submitBtn, submitText, loadingSpinner);
+      
+      if (error.name === 'AbortError') {
+        // Strategy might still be generating, check for it
+        showError('Generation is taking longer than expected. Checking for completed strategy...');
+        setTimeout(() => checkExistingStrategy(currentMonth), 5000);
+      } else {
+        showError('Network error occurred. Please try again.');
+        console.error('Error:', error);
+      }
+    });
+  }
+
+  function setLoadingState(loading, submitBtn, submitText, loadingSpinner) {
+    if (loading) {
+      submitBtn.disabled = true;
+      submitText.style.display = 'none';
+      loadingSpinner.style.display = 'inline-flex';
+    } else {
+      submitBtn.disabled = false;
+      submitText.style.display = 'inline';
+      loadingSpinner.style.display = 'none';
+    }
+  }
+
+  function displayStrategyResult(plan, shouldShow = false) {
+    const resultDiv = document.getElementById('strategy-result');
+    if (!resultDiv || !plan) return;
+    
+    // Restore original title when showing strategy
+    const titleEl = resultDiv.querySelector('h3');
+    if (titleEl) {
+      titleEl.innerHTML = '<svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Strategy Generated Successfully!';
+      titleEl.className = 'text-lg font-semibold text-green-800';
+    }
+    
+    // Update result content
+    document.getElementById('strategy-name').textContent = plan.strategy_name || '-';
+    document.getElementById('strategy-frequency').textContent = plan.frequency_per_week || '-';
+    document.getElementById('strategy-total').textContent = 
+      plan.frequency_per_week ? (plan.frequency_per_week * 4) + ' posts' : '-';
+    document.getElementById('strategy-objective').textContent = plan.objective_of_the_month || '-';
+    
+    // Update themes - extract from content_distribution or use monthly_themes
+    const themesEl = document.getElementById('strategy-themes');
+    let themes = [];
+    
+    // Try to get themes from monthly_themes first
+    if (plan.monthly_themes && plan.monthly_themes.length > 0) {
+      themes = plan.monthly_themes;
+    } 
+    // If empty, extract themes from content_distribution
+    else if (plan.content_distribution) {
+      themes = Object.keys(plan.content_distribution).map(key => {
+        const dist = plan.content_distribution[key];
+        return dist.goal || key; // Use goal or the key itself as theme
+      });
+    }
+    
+    if (themes.length > 0) {
+      themesEl.innerHTML = themes.map(theme => 
+        `<span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-2 mb-1">${theme}</span>`
+      ).join('');
+    } else {
+      themesEl.textContent = '-';
+    }
+    
+    // Only show if explicitly requested (like after form submission)
+    if (shouldShow) {
+      resultDiv.style.display = 'block';
+      resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    // Setup close button
+    const closeBtn = document.getElementById('close-result');
+    if (closeBtn) {
+      closeBtn.onclick = function() {
+        resultDiv.style.display = 'none';
+      };
+    }
+  }
+
+  function showError(message) {
+    const errorDiv = document.getElementById('error-message');
+    const errorText = document.getElementById('error-text');
+    
+    if (errorDiv && errorText) {
+      errorText.textContent = message;
+      errorDiv.style.display = 'block';
+      errorDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function hideMessages() {
+    const resultDiv = document.getElementById('strategy-result');
+    const errorDiv = document.getElementById('error-message');
+    
+    if (resultDiv) resultDiv.style.display = 'none';
+    if (errorDiv) errorDiv.style.display = 'none';
+  }
+
+  function hideErrorMessage() {
+    const errorDiv = document.getElementById('error-message');
+    if (errorDiv) errorDiv.style.display = 'none';
+  }
+
+  function resetForm() {
+    const form = document.getElementById('strategy-creation-form');
+    if (form) {
+      // Reset all form fields except hidden month field
+      const inputs = form.querySelectorAll('input:not([type="hidden"]), textarea, select');
+      inputs.forEach(input => {
+        if (input.type === 'number') {
+          input.value = input.getAttribute('value') || '';
+        } else {
+          input.value = '';
+        }
+      });
+    }
+  }
+
+  function loadStrategyPlan(planId) {
+    fetch(`/creas_strategy_plans/${planId}`)
+      .then(response => response.json())
+      .then(plan => {
+        console.log('Strategy plan loaded:', plan);
+        currentPlan = plan;
+        displayStrategyResult(plan, false); // Just populate content, don't show
+        populateCalendarWithStrategy(plan);
+        updateButtonText();
+        updateOverviewButton();
+      })
+      .catch(error => {
+        console.error('Error loading strategy:', error);
+        showError('Failed to load strategy plan');
+      });
+  }
+
+  function checkExistingStrategy(month) {
+    fetch(`/planning/strategy_for_month?month=${month}`)
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('No strategy found');
+      })
+      .then(plan => {
+        if (plan && plan.id) {
+          currentPlan = plan;
+          displayStrategyResult(plan, false); // Just populate content, don't show
+          populateCalendarWithStrategy(plan);
+          updateButtonText();
+          
+          // Update URL with plan_id
+          const newUrl = new URL(window.location);
+          newUrl.searchParams.set('plan_id', plan.id);
+          window.history.pushState({}, '', newUrl);
+        }
+      })
+      .catch(error => {
+        console.log('No existing strategy found for month:', month);
+        // Keep form closed by default but ready to use
+        document.getElementById('strategy-form').style.display = 'none';
+      });
+  }
+
+  function updateButtonText() {
+    const buttonText = document.getElementById('button-text');
+    if (buttonText && currentPlan) {
+      buttonText.textContent = 'Add New Content';
+    } else if (buttonText) {
+      buttonText.textContent = 'Add Content';
+    }
+  }
+
+  function updateOverviewButton() {
+    const overviewBtn = document.getElementById('toggle-overview');
+    // Always show the overview button if we have a brand
+    if (overviewBtn) {
+      overviewBtn.style.display = 'inline-block';
+      overviewBtn.style.opacity = '1';
+      // Update button text based on whether we have a strategy or not
+      if (currentPlan) {
+        overviewBtn.textContent = 'See content strategy';
+      } else {
+        overviewBtn.textContent = 'See brand overview';
+      }
+    }
+  }
+
+  function populateCalendarWithStrategy(plan) {
+    if (!plan || !plan.weekly_plan) return;
+    
+    // Clear existing content first
+    const allContentSlots = document.querySelectorAll('.week-content-slot');
+    allContentSlots.forEach(slot => {
+      slot.innerHTML = '<button class="w-full h-8 border-2 border-dashed border-gray-300 rounded text-gray-400 hover:border-gray-400 hover:text-gray-600">+</button>';
+    });
+    
+    // Debug: log the weekly plan structure
+    console.log('Weekly plan structure:', plan.weekly_plan);
+    
+    // Populate with new content from weekly_plan structure
+    const weeklyPlan = plan.weekly_plan || [];
+    weeklyPlan.forEach((week, weekIndex) => {
+      console.log(`Processing week ${weekIndex + 1}:`, week);
+      
+      // Handle different possible structures in weekly_plan
+      // Look for content in various possible fields
+      let contentPieces = [];
+      
+      if (week.content_pieces) {
+        contentPieces = week.content_pieces;
+      } else if (week.posts) {
+        contentPieces = week.posts;
+      } else if (week.ideas) {
+        contentPieces = week.ideas;
+      } else if (Array.isArray(week)) {
+        contentPieces = week;
+      }
+      
+      console.log(`Found ${contentPieces.length} content pieces for week ${weekIndex + 1}`);
+      
+      contentPieces.forEach((piece, pieceIndex) => {
+        console.log(`Processing piece ${pieceIndex}:`, piece);
+        addContentToCalendar(weekIndex, pieceIndex % 7, piece); // Distribute across days
+      });
+    });
+  }
+
+  function getDayIndex(dayName) {
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    return days.indexOf(dayName);
+  }
+
+  function getDayIndexFromPiece(piece) {
+    // Handle different day formats that might come from the API
+    let dayName = piece.day || piece.scheduled_day || piece.publish_day;
+    
+    if (!dayName) {
+      // If no day specified, try to extract from other fields
+      return -1;
+    }
+    
+    // Handle different day formats
+    if (typeof dayName === 'string') {
+      // Convert "Mon", "Tue" etc to full names
+      const shortToFull = {
+        'Mon': 'Monday', 'Tue': 'Tuesday', 'Wed': 'Wednesday', 'Thu': 'Thursday',
+        'Fri': 'Friday', 'Sat': 'Saturday', 'Sun': 'Sunday'
+      };
+      
+      dayName = shortToFull[dayName] || dayName;
+    }
+    
+    return getDayIndex(dayName);
+  }
+
+  function addContentToCalendar(weekIndex, dayIndex, contentPiece) {
+    const weekElements = document.querySelectorAll('.bg-white.rounded-lg.shadow');
+    // Count correctly: skip form and result sections, find actual week containers
+    let actualWeekIndex = 0;
+    let weekElement = null;
+    
+    for (let i = 0; i < weekElements.length; i++) {
+      const element = weekElements[i];
+      // Look for elements that contain week content (have the week structure)
+      if (element.querySelector('.week-content-slot')) {
+        if (actualWeekIndex === weekIndex) {
+          weekElement = element;
+          break;
+        }
+        actualWeekIndex++;
+      }
+    }
+    
+    if (!weekElement) {
+      console.log(`Week element not found for weekIndex: ${weekIndex}`);
+      return;
+    }
+    
+    const dayElements = weekElement.querySelectorAll('.week-content-slot');
+    const dayElement = dayElements[dayIndex];
+    
+    if (!dayElement) {
+      console.log(`Day element not found for dayIndex: ${dayIndex}`);
+      return;
+    }
+    
+    // Extract content information from the piece
+    const platform = contentPiece.platform || 'Instagram';
+    const contentType = contentPiece.type || contentPiece.title || 'Post';
+    const title = contentPiece.title || contentPiece.hook || contentPiece.cta || 'Draft';
+    const icon = getContentIcon(platform, contentType);
+    
+    console.log(`Adding content to week ${weekIndex + 1}, day ${dayIndex + 1}:`, {
+      platform, 
+      contentType, 
+      title: title.substring(0, 30) + '...'
+    });
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'bg-blue-500 text-white text-xs p-2 rounded mb-2 cursor-pointer hover:bg-blue-600 transition-colors';
+    contentDiv.innerHTML = `${icon} ${title.length > 20 ? title.substring(0, 20) + '...' : title}`;
+    contentDiv.title = title; // Full title on hover
+    contentDiv.onclick = () => showContentDetails(weekIndex, contentPiece);
+    
+    // Insert before the + button
+    const addButton = dayElement.querySelector('button');
+    if (addButton) {
+      dayElement.insertBefore(contentDiv, addButton);
+    } else {
+      dayElement.appendChild(contentDiv);
+    }
+  }
+
+  function getContentIcon(platform, contentType) {
+    // Default to Instagram Reel icon as mentioned all content is reels for now
+    const platformIcons = {
+      'Instagram': '📸',
+      'TikTok': '🎵', 
+      'YouTube': '🎥',
+      'Facebook': '👥',
+      'Twitter': '🐦',
+      'LinkedIn': '💼'
+    };
+    
+    // Content type icons
+    const typeIcons = {
+      'Reel': '🎬',
+      'Post': '📸',
+      'Story': '📱',
+      'Carousel': '🖼️',
+      'Video': '🎥'
+    };
+    
+    // Since you mentioned all are reels for now, use the reel icon
+    if (contentType && typeIcons[contentType]) {
+      return typeIcons[contentType];
+    }
+    
+    // Otherwise, use platform specific icon or default to reel
+    return platformIcons[platform] || '🎬';
+  }
+
+  function showContentDetails(weekIndex, contentPiece) {
+    const weekDetailsId = `week-details-${weekIndex}`;
+    let weekDetails = document.getElementById(weekDetailsId);
+    
+    // If week details section doesn't exist, create it
+    if (!weekDetails) {
+      const weekElements = document.querySelectorAll('.bg-white.rounded-lg.shadow');
+      // Find the correct week element (same logic as addContentToCalendar)
+      let actualWeekIndex = 0;
+      let weekElement = null;
+      
+      for (let i = 0; i < weekElements.length; i++) {
+        const element = weekElements[i];
+        if (element.querySelector('.week-content-slot')) {
+          if (actualWeekIndex === weekIndex) {
+            weekElement = element;
+            break;
+          }
+          actualWeekIndex++;
+        }
+      }
+      
+      if (!weekElement) return;
+      
+      weekDetails = document.createElement('div');
+      weekDetails.id = weekDetailsId;
+      weekDetails.className = 'week-details bg-gray-50 p-4 rounded mt-4';
+      weekDetails.style.display = 'none';
+      weekDetails.innerHTML = `
+        <div class="flex justify-between items-center mb-3">
+          <div class="text-lg font-semibold text-gray-700">📋 Week ${weekIndex + 1} - Content Details</div>
+          <button onclick="hideContentDetails('${weekDetailsId}')" class="text-gray-500 hover:text-gray-700 text-xl">&times;</button>
+        </div>
+        <div class="content-details-grid grid grid-cols-1 gap-3"></div>
+      `;
+      
+      weekElement.appendChild(weekDetails);
+    }
+    
+    // Add or update content in the details section
+    const detailsGrid = weekDetails.querySelector('.content-details-grid');
+    const contentId = `content-${weekIndex}-${Date.now()}`;
+    
+    const title = contentPiece.title || 'Content Draft';
+    const platform = contentPiece.platform || 'Instagram';
+    const type = contentPiece.type || 'Post';
+    
+    const contentDetailHTML = `
+      <div id="${contentId}" class="bg-white p-4 rounded border-l-4 border-blue-500 shadow-sm">
+        <div class="flex justify-between items-start mb-3">
+          <h4 class="text-lg font-semibold text-gray-900">${title}</h4>
+          <div class="flex items-center gap-2">
+            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">${platform} ${type}</span>
+            <button onclick="removeContentDetail('${contentId}')" class="text-gray-400 hover:text-gray-600 text-lg font-bold">&times;</button>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="space-y-3">
+            ${contentPiece.hook ? `
+              <div class="bg-blue-50 p-3 rounded">
+                <h5 class="font-medium text-gray-900 mb-1">Hook</h5>
+                <p class="text-sm text-gray-700">${contentPiece.hook}</p>
+              </div>
+            ` : ''}
+            
+            ${contentPiece.cta ? `
+              <div class="bg-green-50 p-3 rounded">
+                <h5 class="font-medium text-gray-900 mb-1">Call to Action</h5>
+                <p class="text-sm text-gray-700">${contentPiece.cta}</p>
+              </div>
+            ` : ''}
+          </div>
+          
+          <div class="space-y-3">
+            ${contentPiece.description ? `
+              <div class="bg-yellow-50 p-3 rounded">
+                <h5 class="font-medium text-gray-900 mb-1">Description</h5>
+                <p class="text-sm text-gray-700">${contentPiece.description}</p>
+              </div>
+            ` : ''}
+            
+            ${contentPiece.visual_notes ? `
+              <div class="bg-purple-50 p-3 rounded">
+                <h5 class="font-medium text-gray-900 mb-1">Visual Notes</h5>
+                <p class="text-sm text-gray-700">${contentPiece.visual_notes}</p>
+              </div>
+            ` : ''}
+            
+            ${contentPiece.pillar ? `
+              <div class="bg-indigo-50 p-3 rounded">
+                <h5 class="font-medium text-gray-900 mb-1">Content Pillar</h5>
+                <p class="text-sm text-gray-700">${contentPiece.pillar}</p>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+    
+    detailsGrid.insertAdjacentHTML('beforeend', contentDetailHTML);
+    weekDetails.style.display = 'block';
+    
+    // Smooth scroll to the details section
+    weekDetails.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function hideContentDetails(weekDetailsId) {
+    const weekDetails = document.getElementById(weekDetailsId);
+    if (weekDetails) {
+      weekDetails.style.display = 'none';
+      // Clear the content details
+      const detailsGrid = weekDetails.querySelector('.content-details-grid');
+      if (detailsGrid) {
+        detailsGrid.innerHTML = '';
+      }
+    }
+  }
+
+  function removeContentDetail(contentId) {
+    const contentDetail = document.getElementById(contentId);
+    if (contentDetail) {
+      contentDetail.remove();
+      
+      // If this was the last content detail in the section, hide the whole section
+      const parentGrid = contentDetail.parentElement;
+      if (parentGrid && parentGrid.children.length === 0) {
+        const weekDetails = parentGrid.closest('.week-details');
+        if (weekDetails) {
+          weekDetails.style.display = 'none';
+        }
+      }
+    }
+  }
+
+  function showStrategyOverview() {
+    const resultDiv = document.getElementById('strategy-result');
+    if (resultDiv && currentPlan) {
+      resultDiv.style.display = 'block';
+      resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function showBrandOverview() {
+    const resultDiv = document.getElementById('strategy-result');
+    if (resultDiv) {
+      // Update the title and content for brand overview
+      const titleEl = resultDiv.querySelector('h3');
+      if (titleEl) {
+        titleEl.innerHTML = '<svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm3 2h6v2H7V4zm8 6a1 1 0 100-2 1 1 0 000 2zm-8-1a1 1 0 11-2 0 1 1 0 012 0zm0 4a1 1 0 11-2 0 1 1 0 012 0zm3 1h4v-2H8v2z" clip-rule="evenodd"></svg>Brand Overview - Ready to create content strategy!';
+        titleEl.className = 'text-lg font-semibold text-blue-800';
+      }
+      
+      // Update strategy content with brand info placeholder
+      document.getElementById('strategy-name').textContent = 'No strategy created yet';
+      document.getElementById('strategy-frequency').textContent = 'Click "Add Content" to get started';
+      document.getElementById('strategy-total').textContent = '-';
+      document.getElementById('strategy-objective').textContent = 'Create your first content strategy to see objectives and themes here.';
+      
+      const themesEl = document.getElementById('strategy-themes');
+      themesEl.innerHTML = '<span class="text-gray-500 italic">Themes will appear when you generate a strategy</span>';
+      
+      resultDiv.style.display = 'block';
+      resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function hideStrategyOverview() {
+    const resultDiv = document.getElementById('strategy-result');
+    if (resultDiv) {
+      resultDiv.style.display = 'none';
+    }
+  }

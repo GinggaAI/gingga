@@ -1,7 +1,7 @@
 require "net/http"
 require "json"
 
-module Openai
+module GinggaOpenAI
   class ValidateKeyService
     API_URLS = {
       "test" => "https://api.openai.com/v1/models",

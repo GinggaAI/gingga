@@ -6,6 +6,7 @@ class User < ApplicationRecord
 
   has_many :api_tokens, dependent: :destroy
   has_many :reels, dependent: :destroy
+  has_many :brands, dependent: :destroy
 
   def active_token_for(provider, preferred_mode = "production")
     api_tokens

@@ -1,7 +1,23 @@
 Rails.application.routes.draw do
+  resource :brand, only: [ :show, :edit, :update ]
+  get "/my-brand", to: "brands#edit", as: "my_brand"
 
-  resource :brand, only: [:show, :edit, :update]
-  resource :planning, only: [ :show ]
+  resource :planning, only: [ :show ] do
+    member do
+      get :strategy_for_month
+    end
+  end
+  get "/smart-planning", to: "plannings#smart_planning", as: "smart_planning"
+
+  resources :reels, only: [ :index, :new, :create, :show ] do
+    collection do
+      get "scene-based", to: "reels#scene_based"
+      post "scene-based", to: "reels#create_scene_based"
+      get "narrative", to: "reels#narrative"
+      post "narrative", to: "reels#create_narrative"
+    end
+  end
+
   resource :viral_ideas, only: [ :show ]
   resource :auto_creation, only: [ :show ]
   resource :analytics, only: [ :show ]
@@ -14,8 +30,14 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :api_tokens, except: [ :new, :edit ]
+      resources :categories, only: [ :index ]
+      resources :formats, only: [ :index ]
     end
   end
+
+  # CREAS endpoints
+  resources :creas_strategist, only: [ :create ]
+  resources :creas_strategy_plans, only: [ :show ], path: "creas_strategy_plans"
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
@@ -27,4 +49,10 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   root "home#show"
+
+
+  if Rails.env.development?
+    # Enable ViewComponent previews at /rails/view_components
+    mount ViewComponent::Engine, at: "/rails/view_components"
+  end
 end

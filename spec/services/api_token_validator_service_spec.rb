@@ -8,15 +8,15 @@ RSpec.describe ApiTokenValidatorService do
 
     context 'with openai provider' do
       let(:provider) { 'openai' }
-      let(:validator_instance) { instance_double(Openai::ValidateKeyService) }
+      let(:validator_instance) { instance_double(GinggaOpenAI::ValidateKeyService) }
 
       before do
-        allow(Openai::ValidateKeyService).to receive(:new)
+        allow(GinggaOpenAI::ValidateKeyService).to receive(:new)
           .with(token: token, mode: mode)
           .and_return(validator_instance)
       end
 
-      it 'dispatches to Openai::ValidateKeyService' do
+      it 'dispatches to GinggaOpenAI::ValidateKeyService' do
         expect(validator_instance).to receive(:call).and_return({ valid: true })
 
         result = service.call
@@ -69,7 +69,7 @@ RSpec.describe ApiTokenValidatorService do
       let(:provider) { 'openai' }
 
       before do
-        allow(Openai::ValidateKeyService).to receive(:new).and_raise(StandardError, 'Network error')
+        allow(GinggaOpenAI::ValidateKeyService).to receive(:new).and_raise(StandardError, 'Network error')
       end
 
       it 'returns error message' do
