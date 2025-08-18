@@ -29,3 +29,8 @@
 
 en:
   hello: "Hello world"
+  
+  plannings:
+    create_first_strategy: "Create your first AI-powered strategy to see weekly plans here"
+    strategy_not_found: "No strategy found for month"
+    invalid_month: "Invalid Month"

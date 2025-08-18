@@ -24,6 +24,7 @@ module Creas
       If a critical item is missing, ask before generating.
 
       STRATEGY RULES
+      • Generate exactly frequency_per_week × 4 weeks of content ideas (e.g., 3/week = 12 total, 4/week = 16 total).
       • Distribute weekly posting volume strategically across platforms/pillars.
       • Map clear goals & formats to each pillar.
       • Every idea must include a specific hook + story logic.
@@ -56,7 +57,10 @@ module Creas
         },
 
         "weekly_plan":[
-          {"week":1,"publish_cadence":4,"ideas":[WEEK_IDEA_OBJ, WEEK_IDEA_OBJ]}
+          {"week":1,"publish_cadence":"use frequency_per_week value","ideas":"exactly frequency_per_week number of WEEK_IDEA_OBJ"},
+          {"week":2,"publish_cadence":"use frequency_per_week value","ideas":"exactly frequency_per_week number of WEEK_IDEA_OBJ"},
+          {"week":3,"publish_cadence":"use frequency_per_week value","ideas":"exactly frequency_per_week number of WEEK_IDEA_OBJ"},
+          {"week":4,"publish_cadence":"use frequency_per_week value","ideas":"exactly frequency_per_week number of WEEK_IDEA_OBJ"}
         ]
       }
 
@@ -115,7 +119,7 @@ module Creas
       status: draft | in_production | ready_for_review | approved
 
       VALIDATION (auto-check before output)
-      1 brief complete; else ask. 2 weekly total ≈ frequency_per_week × weeks (±1). 3 primary pillar 40–50%; others 50–60% total. 4 language guidance aligns with content_language/splits.
+      1 brief complete; else ask. 2 CRITICAL: total ideas across all 4 weeks MUST equal exactly frequency_per_week × 4. 3 primary pillar 40–50%; others 50–60% total. 4 language guidance aligns with content_language/splits.
       5 each idea has recommended_template + correct video_source. 6 all IDs valid/unique; month = YYYY-MM. 7 respect brand_guardrails. 8 return a single JSON object; no prose/markdown.
       SYS
     end

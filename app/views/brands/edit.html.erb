@@ -379,11 +379,79 @@ document.addEventListener('turbo:load', function() {
               <label class="block text-sm font-medium text-theme">Audience Name</label>
               <input type="text" name="brand[audiences_attributes][${audienceIndex}][name]" placeholder="e.g., Young Professionals, Tech Enthusiasts" class="form-input w-full">
             </div>
-            <div class="space-y-2">
-              <label class="block text-sm font-medium text-theme">Demographics (JSON)</label>
-              <textarea name="brand[audiences_attributes][${audienceIndex}][demographic_profile]" placeholder='{"age_range": "25-35", "location": "Urban areas"}' rows="3" class="form-input w-full text-sm"></textarea>
-              <p class="text-xs text-gray-500">JSON format for demographic data</p>
+            
+            <div class="md:col-span-2 space-y-4">
+              <label class="block text-sm font-medium text-theme">Demographics</label>
+              <div class="bg-white border rounded-lg p-4 space-y-3">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <!-- Age Range -->
+                  <div class="space-y-2">
+                    <label class="block text-xs font-medium text-gray-700">Age Range</label>
+                    <select class="form-input w-full text-sm demographic-field" data-field="age_range">
+                      <option value="">Select age range</option>
+                      <option value="13-17">13-17</option>
+                      <option value="18-24">18-24</option>
+                      <option value="25-34">25-34</option>
+                      <option value="35-44">35-44</option>
+                      <option value="45-54">45-54</option>
+                      <option value="55-64">55-64</option>
+                      <option value="65+">65+</option>
+                    </select>
+                  </div>
+
+                  <!-- Gender -->
+                  <div class="space-y-2">
+                    <label class="block text-xs font-medium text-gray-700">Gender</label>
+                    <select class="form-input w-full text-sm demographic-field" data-field="gender">
+                      <option value="">Select gender</option>
+                      <option value="all">All genders</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="non_binary">Non-binary</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <!-- Location Type -->
+                  <div class="space-y-2">
+                    <label class="block text-xs font-medium text-gray-700">Location Type</label>
+                    <select class="form-input w-full text-sm demographic-field" data-field="location_type">
+                      <option value="">Select location type</option>
+                      <option value="global">Global</option>
+                      <option value="urban">Urban areas</option>
+                      <option value="suburban">Suburban areas</option>
+                      <option value="rural">Rural areas</option>
+                      <option value="metropolitan">Metropolitan areas</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <!-- Specific Location -->
+                  <div class="space-y-2">
+                    <label class="block text-xs font-medium text-gray-700">Specific Location</label>
+                    <input type="text" class="form-input w-full text-sm demographic-field" data-field="location" placeholder="e.g., United States, Europe, Latin America">
+                  </div>
+
+                  <!-- Income Level -->
+                  <div class="space-y-2">
+                    <label class="block text-xs font-medium text-gray-700">Income Level</label>
+                    <select class="form-input w-full text-sm demographic-field" data-field="income">
+                      <option value="">Select income level</option>
+                      <option value="low">Low income</option>
+                      <option value="lower_middle">Lower middle class</option>
+                      <option value="middle">Middle class</option>
+                      <option value="upper_middle">Upper middle class</option>
+                      <option value="high">High income</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Hidden field to store the JSON -->
+                <input type="hidden" name="brand[audiences_attributes][${audienceIndex}][demographic_profile]" value="{}" class="demographic-json-field">
+              </div>
             </div>
+
             <div class="space-y-2">
               <label class="block text-sm font-medium text-theme">Interests</label>
               <input type="text" name="brand[audiences_attributes][${audienceIndex}][interests]" placeholder="technology, fitness, travel, food" class="form-input w-full">
@@ -399,6 +467,9 @@ document.addEventListener('turbo:load', function() {
       `;
       audiencesContainer.insertAdjacentHTML('beforeend', template);
       audienceIndex++;
+      
+      // Initialize demographics for the newly added audience
+      setTimeout(initializeDemographicsFields, 100);
     });
   }
 
@@ -507,5 +578,59 @@ document.addEventListener('turbo:load', function() {
       }
     }
   });
+
+  // Demographics fields handling
+  let demographicsListenersAdded = false;
+
+  function initializeDemographicsFields() {
+    // Initialize existing demographics fields
+    document.querySelectorAll('.demographic-field').forEach(function(field) {
+      const currentValue = field.getAttribute('data-current');
+      if (currentValue && field.tagName === 'SELECT') {
+        field.value = currentValue;
+      }
+    });
+
+    // Add change listeners to update JSON (only once)
+    if (!demographicsListenersAdded) {
+      document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('demographic-field')) {
+          updateDemographicJson(e.target);
+        }
+      });
+
+      document.addEventListener('input', function(e) {
+        if (e.target.classList.contains('demographic-field')) {
+          updateDemographicJson(e.target);
+        }
+      });
+
+      demographicsListenersAdded = true;
+    }
+  }
+
+  function updateDemographicJson(changedField) {
+    const container = changedField.closest('.bg-gray-50');
+    if (!container) return;
+
+    const jsonField = container.querySelector('.demographic-json-field');
+    if (!jsonField) return;
+
+    const demographicFields = container.querySelectorAll('.demographic-field:not(.demographic-json-field)');
+    const demographicData = {};
+
+    demographicFields.forEach(function(field) {
+      const fieldName = field.getAttribute('data-field');
+      const value = field.value.trim();
+      if (fieldName && value) {
+        demographicData[fieldName] = value;
+      }
+    });
+
+    jsonField.value = JSON.stringify(demographicData);
+  }
+
+  // Initialize demographics when page loads
+  initializeDemographicsFields();
 });
 </script>

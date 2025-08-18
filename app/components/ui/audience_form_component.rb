@@ -14,6 +14,12 @@ class Ui::AudienceFormComponent < ViewComponent::Base
     audience.demographic_profile.to_json
   end
 
+  def demographic_field_value(field_name)
+    return "" unless audience.demographic_profile.present?
+    return "" unless audience.demographic_profile.is_a?(Hash)
+    audience.demographic_profile[field_name.to_s] || ""
+  end
+
   def interests_value
     return "" unless audience.interests.present?
     audience.interests.join(", ")

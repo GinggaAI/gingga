@@ -17,17 +17,20 @@ RSpec.describe NoctuaBriefAssembler do
       }
     end
 
-    subject { described_class.call(brand: brand, strategy_form: strategy_form) }
+    let(:month) { '2025-08' }
+
+    subject { described_class.call(brand: brand, strategy_form: strategy_form, month: month) }
 
     it 'returns a hash with all required brand keys' do
       expect(subject).to include(
         :brand_name, :brand_slug, :industry, :value_proposition, :mission, :voice,
-        :languages, :region, :timezone, :audiences, :products, :channels, :guardrails
+        :languages, :region, :timezone, :audiences, :products, :channels, :guardrails, :month
       )
     end
 
     it 'includes strategy form fields' do
       expect(subject).to include(
+        month: '2025-08',
         objective_of_the_month: 'awareness',
         monthly_themes: [ 'product launch', 'customer success' ],
         frequency_per_week: 4,
@@ -101,6 +104,14 @@ RSpec.describe NoctuaBriefAssembler do
       end
     end
 
+    context 'without month parameter' do
+      subject { described_class.call(brand: brand, strategy_form: strategy_form) }
+
+      it 'handles missing month gracefully' do
+        expect(subject[:month]).to be_nil
+      end
+    end
+
     context 'with brand having multiple related records' do
       let!(:audience2) { create(:audience, brand: brand) }
       let!(:product2) { create(:product, brand: brand, name: "Second Product") }
@@ -116,7 +127,7 @@ RSpec.describe NoctuaBriefAssembler do
     context 'when brand has no related records' do
       let(:brand_without_relations) { create(:brand, user: user, slug: "brand-without-relations") }
 
-      subject { described_class.call(brand: brand_without_relations) }
+      subject { described_class.call(brand: brand_without_relations, month: month) }
 
       it 'returns empty arrays for relations' do
         expect(subject[:audiences]).to eq([])
