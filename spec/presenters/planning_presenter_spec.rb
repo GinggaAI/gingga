@@ -99,7 +99,7 @@ RSpec.describe PlanningPresenter do
     context 'with plan_id parameter' do
       let!(:plan) { create(:creas_strategy_plan, brand: brand, month: '2024-12') }
       let(:params) { { plan_id: plan.id } }
-      
+
       it 'returns specific plan by ID' do
         expect(presenter.current_plan_json).to include(plan.strategy_name)
       end
@@ -107,7 +107,7 @@ RSpec.describe PlanningPresenter do
 
     context 'with missing month parameter (should use current month)' do
       let(:params) { {} }
-      
+
       it 'searches for current month plan' do
         travel_to Date.new(2025, 8, 15) do
           plan = create(:creas_strategy_plan, brand: brand, month: '2025-8')

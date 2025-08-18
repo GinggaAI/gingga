@@ -6,11 +6,11 @@
       <h1 class="text-3xl font-bold text-theme">Brand Profile</h1>
       <p class="text-base mt-2 text-muted">Define your brand identity and content preferences</p>
     </div>
-    
+
     <% if @brands.any? %>
       <div class="flex items-center gap-4">
         <span class="text-sm text-muted">Managing:</span>
-        <select onchange="if(this.value) window.location.href='/my-brand?brand_id=' + this.value" 
+        <select onchange="if(this.value) window.location.href='/my-brand?brand_id=' + this.value"
                 class="px-3 py-2 rounded-lg border bg-surface border-muted text-theme">
           <% @brands.each do |brand| %>
             <option value="<%= brand.id %>" <%= 'selected' if brand == @brand %>><%= brand.name || "Untitled Brand" %></option>
@@ -44,7 +44,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="space-y-2">
           <%= form.label :name, "Brand Name", class: "block text-sm font-medium text-theme" %>
-          <%= form.text_field :name, 
+          <%= form.text_field :name,
                 placeholder: "E.g. Brand that inspires young creatives",
                 class: "form-input w-full" %>
         </div>
@@ -104,7 +104,7 @@
           <%= form.text_area :value_proposition,
                 placeholder: "Describe your products or services...",
                 rows: 4,
-                class: "form-input w-full"%>
+                class: "form-input w-full" %>
         </div>
 
         <div class="space-y-2">
@@ -112,7 +112,7 @@
           <%= form.text_area :mission,
                 placeholder: "What's your brand's mission and purpose...",
                 rows: 4,
-                class: "form-input w-full"%>
+                class: "form-input w-full" %>
         </div>
       </div>
     <% end %>
@@ -223,8 +223,289 @@
       </div>
     <% end %>
 
+    <!-- Strategy Readiness Status -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+      <div class="flex items-center">
+        <% if @presenter.strategy_ready? %>
+          <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+          </svg>
+          <span class="text-green-800 font-medium">Ready for strategy creation!</span>
+        <% else %>
+          <svg class="w-5 h-5 text-yellow-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+          </svg>
+          <span class="text-yellow-800"><%= @presenter.strategy_readiness_message %></span>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Target Audiences Section -->
+    <%= render Ui::FormSectionComponent.new(
+      title: "Target Audiences",
+      description: "Define who your content is targeting"
+    ) do %>
+      <div id="audiences-section">
+        <div class="mb-4">
+          <% if @presenter.has_audiences? %>
+            <p class="text-sm text-gray-600 mb-4">
+              Current summary: <span class="font-medium"><%= @presenter.audience_demographics_summary %></span>
+            </p>
+          <% else %>
+            <p class="text-sm text-gray-600 mb-4">No audiences defined yet.</p>
+          <% end %>
+        </div>
+
+        <div id="audiences-container">
+          <%= form.fields_for :audiences do |audience_form| %>
+            <%= render Ui::AudienceFormComponent.new(
+              form: audience_form,
+              audience: audience_form.object,
+              index: audience_form.options[:child_index]
+            ) %>
+          <% end %>
+        </div>
+
+        <button type="button" id="add-audience-btn"
+                class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          Add Audience
+        </button>
+      </div>
+    <% end %>
+
+    <!-- Products & Services Section -->
+    <%= render Ui::FormSectionComponent.new(
+      title: "Products & Services",
+      description: "What you offer to your audience"
+    ) do %>
+      <div id="products-section">
+        <div class="mb-4">
+          <% if @presenter.has_products? %>
+            <p class="text-sm text-gray-600 mb-4">
+              Current products: <span class="font-medium"><%= @presenter.products_summary %></span>
+            </p>
+          <% else %>
+            <p class="text-sm text-gray-600 mb-4">No products defined yet.</p>
+          <% end %>
+        </div>
+
+        <div id="products-container">
+          <%= form.fields_for :products do |product_form| %>
+            <%= render Ui::ProductFormComponent.new(
+              form: product_form,
+              product: product_form.object,
+              index: product_form.options[:child_index]
+            ) %>
+          <% end %>
+        </div>
+
+        <button type="button" id="add-product-btn"
+                class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          Add Product
+        </button>
+      </div>
+    <% end %>
+
+    <!-- Social Media Channels Section -->
+    <%= render Ui::FormSectionComponent.new(
+      title: "Social Media Channels",
+      description: "Platforms where you publish content"
+    ) do %>
+      <div id="channels-section">
+        <div class="mb-4">
+          <% if @presenter.has_brand_channels? %>
+            <p class="text-sm text-gray-600 mb-4">
+              Active channels: <span class="font-medium"><%= @presenter.channels_summary %></span>
+            </p>
+          <% else %>
+            <p class="text-sm text-gray-600 mb-4">No channels configured yet.</p>
+          <% end %>
+        </div>
+
+        <div id="channels-container">
+          <%= form.fields_for :brand_channels do |channel_form| %>
+            <%= render Ui::BrandChannelFormComponent.new(
+              form: channel_form,
+              brand_channel: channel_form.object,
+              index: channel_form.options[:child_index]
+            ) %>
+          <% end %>
+        </div>
+
+        <button type="button" id="add-channel-btn"
+                class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          Add Channel
+        </button>
+      </div>
+    <% end %>
+
     <div class="flex justify-end pt-6">
       <%= render Ui::ButtonComponent.new(label: "Save Profile", variant: :primary, type: :submit, size: :lg) %>
     </div>
   <% end %>
 </div>
+
+<script>
+document.addEventListener('turbo:load', function() {
+  let audienceIndex = <%= @brand.audiences.count %>;
+  let productIndex = <%= @brand.products.count %>;
+  let channelIndex = <%= @brand.brand_channels.count %>;
+
+  // Add Audience functionality
+  const addAudienceBtn = document.getElementById('add-audience-btn');
+  const audiencesContainer = document.getElementById('audiences-container');
+
+  if (addAudienceBtn && audiencesContainer) {
+    addAudienceBtn.addEventListener('click', function() {
+      const template = `
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+          <div class="flex items-center justify-between mb-4">
+            <h4 class="text-md font-semibold text-theme">New Audience</h4>
+            <button type="button" class="text-red-600 hover:text-red-800 text-sm font-medium remove-audience-btn">
+              Remove
+            </button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-theme">Audience Name</label>
+              <input type="text" name="brand[audiences_attributes][${audienceIndex}][name]" placeholder="e.g., Young Professionals, Tech Enthusiasts" class="form-input w-full">
+            </div>
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-theme">Demographics (JSON)</label>
+              <textarea name="brand[audiences_attributes][${audienceIndex}][demographic_profile]" placeholder='{"age_range": "25-35", "location": "Urban areas"}' rows="3" class="form-input w-full text-sm"></textarea>
+              <p class="text-xs text-gray-500">JSON format for demographic data</p>
+            </div>
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-theme">Interests</label>
+              <input type="text" name="brand[audiences_attributes][${audienceIndex}][interests]" placeholder="technology, fitness, travel, food" class="form-input w-full">
+              <p class="text-xs text-gray-500">Separate with commas</p>
+            </div>
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-theme">Digital Behavior</label>
+              <input type="text" name="brand[audiences_attributes][${audienceIndex}][digital_behavior]" placeholder="social_media_active, online_shopper" class="form-input w-full">
+              <p class="text-xs text-gray-500">Separate with commas</p>
+            </div>
+          </div>
+        </div>
+      `;
+      audiencesContainer.insertAdjacentHTML('beforeend', template);
+      audienceIndex++;
+    });
+  }
+
+  // Add Product functionality
+  const addProductBtn = document.getElementById('add-product-btn');
+  const productsContainer = document.getElementById('products-container');
+
+  if (addProductBtn && productsContainer) {
+    addProductBtn.addEventListener('click', function() {
+      const template = `
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+          <div class="flex items-center justify-between mb-4">
+            <h4 class="text-md font-semibold text-theme">New Product</h4>
+            <button type="button" class="text-red-600 hover:text-red-800 text-sm font-medium remove-product-btn">
+              Remove
+            </button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-theme">Product Name</label>
+              <input type="text" name="brand[products_attributes][${productIndex}][name]" placeholder="e.g., Premium SaaS Platform" class="form-input w-full">
+            </div>
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-theme">Pricing</label>
+              <input type="text" name="brand[products_attributes][${productIndex}][pricing_info]" placeholder="e.g., $99/month" class="form-input w-full">
+            </div>
+            <div class="md:col-span-2 space-y-2">
+              <label class="block text-sm font-medium text-theme">Description</label>
+              <textarea name="brand[products_attributes][${productIndex}][description]" placeholder="Describe what your product does..." rows="3" class="form-input w-full"></textarea>
+            </div>
+            <div class="md:col-span-2 space-y-2">
+              <label class="block text-sm font-medium text-theme">Product URL</label>
+              <input type="url" name="brand[products_attributes][${productIndex}][url]" placeholder="https://yourproduct.com" class="form-input w-full">
+            </div>
+          </div>
+        </div>
+      `;
+      productsContainer.insertAdjacentHTML('beforeend', template);
+      productIndex++;
+    });
+  }
+
+  // Add Channel functionality
+  const addChannelBtn = document.getElementById('add-channel-btn');
+  const channelsContainer = document.getElementById('channels-container');
+
+  if (addChannelBtn && channelsContainer) {
+    addChannelBtn.addEventListener('click', function() {
+      const template = `
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+          <div class="flex items-center justify-between mb-4">
+            <h4 class="text-md font-semibold text-theme">New Channel</h4>
+            <button type="button" class="text-red-600 hover:text-red-800 text-sm font-medium remove-channel-btn">
+              Remove
+            </button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-theme">Platform</label>
+              <select name="brand[brand_channels_attributes][${channelIndex}][platform]" class="form-input w-full">
+                <option value="">Select Platform</option>
+                <option value="instagram">Instagram</option>
+                <option value="tiktok">Tiktok</option>
+                <option value="youtube">Youtube</option>
+                <option value="linkedin">Linkedin</option>
+              </select>
+            </div>
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-theme">Handle/Username</label>
+              <input type="text" name="brand[brand_channels_attributes][${channelIndex}][handle]" placeholder="@yourbrand" class="form-input w-full">
+            </div>
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-theme">Priority</label>
+              <select name="brand[brand_channels_attributes][${channelIndex}][priority]" class="form-input w-full">
+                <option value="1">1 - Highest Priority</option>
+                <option value="2">2 - High Priority</option>
+                <option value="3">3 - Medium Priority</option>
+                <option value="4">4 - Low Priority</option>
+                <option value="5">5 - Lowest Priority</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      `;
+      channelsContainer.insertAdjacentHTML('beforeend', template);
+      channelIndex++;
+    });
+  }
+
+  // Remove functionality for dynamically added and existing items
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('remove-audience-btn') ||
+        e.target.classList.contains('remove-product-btn') ||
+        e.target.classList.contains('remove-channel-btn')) {
+
+      const container = e.target.closest('.bg-gray-50');
+      const destroyCheckbox = container.querySelector('.destroy-checkbox');
+
+      if (destroyCheckbox) {
+        // For existing items, mark for destruction
+        destroyCheckbox.checked = true;
+        container.style.display = 'none';
+      } else {
+        // For new items, remove from DOM
+        container.remove();
+      }
+    }
+  });
+});
+</script>

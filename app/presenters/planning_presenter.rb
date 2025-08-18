@@ -1,7 +1,8 @@
 class PlanningPresenter
-  def initialize(params, brand: nil)
+  def initialize(params, brand: nil, current_plan: nil)
     @params = params
     @brand = brand
+    @current_plan = current_plan
   end
 
   def display_month
@@ -29,25 +30,33 @@ class PlanningPresenter
   end
 
   def current_plan
+    # If a plan was passed from the controller, use it
+    return @current_plan if @current_plan
+
     return nil unless @brand
-    
+
     # Check if we have a specific plan_id parameter
     if @params[:plan_id]
       return @brand.creas_strategy_plans.find_by(id: @params[:plan_id])
     end
-    
+
+    # If there's a month parameter but it's invalid, return nil (don't fallback to current month)
+    if @params[:month].present? && safe_month_param.nil?
+      return nil
+    end
+
     # Use the month parameter if available, otherwise use current month
     month_to_search = safe_month_param || current_month
-    
+
     # Try exact match first
     plan = @brand.creas_strategy_plans.where(month: month_to_search).order(created_at: :desc).first
-    
+
     # Try normalized format if not found
     if plan.nil?
       normalized_month = normalize_month_format(month_to_search)
       plan = @brand.creas_strategy_plans.where(month: normalized_month).order(created_at: :desc).first
     end
-    
+
     plan
   end
 

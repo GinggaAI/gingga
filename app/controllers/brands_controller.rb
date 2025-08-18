@@ -9,6 +9,7 @@ class BrandsController < ApplicationController
   def edit
     @brand = current_user_brand || current_user.brands.build
     @brands = current_user.brands.order(:created_at)
+    @presenter = BrandPresenter.new(@brand)
   end
 
   def update
@@ -18,6 +19,7 @@ class BrandsController < ApplicationController
       redirect_to edit_brand_path, notice: "Brand profile updated successfully!"
     else
       @brands = current_user.brands.order(:created_at)
+      @presenter = BrandPresenter.new(@brand)
       render :edit, status: :unprocessable_content
     end
   end
@@ -44,7 +46,11 @@ class BrandsController < ApplicationController
       :region, :timezone, :guardrails, :resources,
       # Virtual attributes for form handling
       :tone_no_go_list, :banned_words_list, :claims_rules_text,
-      :kling_enabled, :stock_enabled, :budget_enabled, :editing_enabled, :ai_avatars_enabled, :podcast_clips_enabled
+      :kling_enabled, :stock_enabled, :budget_enabled, :editing_enabled, :ai_avatars_enabled, :podcast_clips_enabled,
+      # Nested attributes
+      audiences_attributes: [ :id, :name, :demographic_profile, :interests, :digital_behavior, :_destroy ],
+      products_attributes: [ :id, :name, :description, :pricing_info, :url, :_destroy ],
+      brand_channels_attributes: [ :id, :platform, :handle, :priority, :_destroy ]
     )
   end
 end

@@ -1,0 +1,50 @@
+<div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+  <div class="flex items-center justify-between mb-4">
+    <h4 class="text-md font-semibold text-theme">
+      <%= audience.persisted? ? "Audience ##{index + 1}" : "New Audience" %>
+    </h4>
+    <% if audience.persisted? %>
+      <%= form.check_box :_destroy, { class: "hidden destroy-checkbox" }, "1", "0" %>
+      <button type="button" class="text-red-600 hover:text-red-800 text-sm font-medium remove-audience-btn">
+        Remove
+      </button>
+    <% end %>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="space-y-2">
+      <%= form.label :name, "Audience Name", class: "block text-sm font-medium text-theme" %>
+      <%= form.text_field :name,
+            placeholder: "e.g., Young Professionals, Tech Enthusiasts",
+            class: "form-input w-full" %>
+    </div>
+
+    <div class="space-y-2">
+      <%= form.label :demographic_profile, "Demographics (JSON)", class: "block text-sm font-medium text-theme" %>
+      <%= form.text_area :demographic_profile,
+            value: demographic_profile_value,
+            placeholder: '{"age_range": "25-35", "location": "Urban areas", "income": "Middle class"}',
+            rows: 3,
+            class: "form-input w-full text-sm" %>
+      <p class="text-xs text-gray-500">JSON format for demographic data</p>
+    </div>
+
+    <div class="space-y-2">
+      <%= form.label :interests, "Interests", class: "block text-sm font-medium text-theme" %>
+      <%= form.text_field :interests,
+            value: interests_value,
+            placeholder: "technology, fitness, travel, food",
+            class: "form-input w-full" %>
+      <p class="text-xs text-gray-500">Separate with commas</p>
+    </div>
+
+    <div class="space-y-2">
+      <%= form.label :digital_behavior, "Digital Behavior", class: "block text-sm font-medium text-theme" %>
+      <%= form.text_field :digital_behavior,
+            value: digital_behavior_value,
+            placeholder: "social_media_active, online_shopper, early_adopter",
+            class: "form-input w-full" %>
+      <p class="text-xs text-gray-500">Separate with commas</p>
+    </div>
+  </div>
+</div>

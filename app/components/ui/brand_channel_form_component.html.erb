@@ -1,0 +1,38 @@
+<div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+  <div class="flex items-center justify-between mb-4">
+    <h4 class="text-md font-semibold text-theme">
+      <%= brand_channel.persisted? ? "Channel ##{index + 1}" : "New Channel" %>
+    </h4>
+    <% if brand_channel.persisted? %>
+      <%= form.check_box :_destroy, { class: "hidden destroy-checkbox" }, "1", "0" %>
+      <button type="button" class="text-red-600 hover:text-red-800 text-sm font-medium remove-channel-btn">
+        Remove
+      </button>
+    <% end %>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="space-y-2">
+      <%= form.label :platform, "Platform", class: "block text-sm font-medium text-theme" %>
+      <%= form.select :platform,
+            options_for_select(platform_options, brand_channel.platform),
+            { prompt: "Select Platform" },
+            { class: "form-input w-full" } %>
+    </div>
+
+    <div class="space-y-2">
+      <%= form.label :handle, "Handle/Username", class: "block text-sm font-medium text-theme" %>
+      <%= form.text_field :handle,
+            placeholder: "@yourbrand or yourbrand",
+            class: "form-input w-full" %>
+    </div>
+
+    <div class="space-y-2">
+      <%= form.label :priority, "Priority", class: "block text-sm font-medium text-theme" %>
+      <%= form.select :priority,
+            options_for_select(priority_options, brand_channel.priority || 1),
+            {},
+            { class: "form-input w-full" } %>
+    </div>
+  </div>
+</div>
