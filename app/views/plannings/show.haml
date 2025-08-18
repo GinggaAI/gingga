@@ -9,7 +9,7 @@
         .flex.items-center.gap-4
           %button.px-3.py-1.text-gray-600.hover:text-gray-800
             %span ←
-          %h2.text-2xl.font-bold= @current_month_display
+          %h2.text-2xl.font-bold= @presenter.display_month
           %button.px-3.py-1.text-gray-600.hover:text-gray-800
             %span →
         
@@ -26,7 +26,7 @@
         
         = form_with url: creas_strategist_index_path, method: :post, local: false, 
             id: "strategy-creation-form", class: "strategy-form" do |form|
-          = form.hidden_field :month, value: @current_month
+          = form.hidden_field :month, value: @presenter.safe_month_for_js
           
           .grid.grid-cols-1.md:grid-cols-2.gap-4.mb-4
             .col-span-1.md:col-span-2
@@ -175,10 +175,10 @@
             .content-details-grid.grid.grid-cols-1.gap-3
 
 :javascript
-  let currentMonth = '#{@current_month}';
-  let currentPlan = #{@current_plan ? @current_plan.to_json.html_safe : 'null'};
-  
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('turbo:load', function() {
+    // Initialize page variables
+    window.currentMonth = '#{@presenter.safe_month_for_js}';
+    window.currentPlan = #{@presenter.current_plan_json};
     const toggleBtn = document.getElementById('toggle-form');
     const overviewBtn = document.getElementById('toggle-overview');
     const form = document.getElementById('strategy-form');
@@ -210,7 +210,7 @@
           resultDiv.style.display = 'none';
         } else {
           // Show with appropriate content
-          if (currentPlan) {
+          if (window.currentPlan) {
             showStrategyOverview();
           } else {
             showBrandOverview();
@@ -241,9 +241,9 @@
     setupResourcesOverrideHandlers();
 
     // Initialize with existing plan if available
-    if (currentPlan) {
-      displayStrategyResult(currentPlan);
-      populateCalendarWithStrategy(currentPlan);
+    if (window.currentPlan) {
+      displayStrategyResult(window.currentPlan);
+      populateCalendarWithStrategy(window.currentPlan);
       updateButtonText();
       updateOverviewButton();
       // Keep overview hidden by default - user clicks to show, just like content details
@@ -256,7 +256,7 @@
     // Also check for plan_id parameter for direct access
     const urlParams = new URLSearchParams(window.location.search);
     const planId = urlParams.get('plan_id');
-    if (planId && (!currentPlan || currentPlan.id != planId)) {
+    if (planId && (!window.currentPlan || window.currentPlan.id != planId)) {
       loadStrategyPlan(planId);
     }
   });
@@ -299,7 +299,7 @@
       setLoadingState(false, submitBtn, submitText, loadingSpinner);
       
       if (data.success) {
-        currentPlan = data.plan;
+        window.currentPlan = data.plan;
         displayStrategyResult(data.plan, true); // Show result after form submission
         populateCalendarWithStrategy(data.plan);
         document.getElementById('strategy-form').style.display = 'none';
@@ -445,7 +445,7 @@
       .then(response => response.json())
       .then(plan => {
         console.log('Strategy plan loaded:', plan);
-        currentPlan = plan;
+        window.currentPlan = plan;
         displayStrategyResult(plan, false); // Just populate content, don't show
         populateCalendarWithStrategy(plan);
         updateButtonText();
@@ -467,7 +467,7 @@
       })
       .then(plan => {
         if (plan && plan.id) {
-          currentPlan = plan;
+          window.currentPlan = plan;
           displayStrategyResult(plan, false); // Just populate content, don't show
           populateCalendarWithStrategy(plan);
           updateButtonText();
@@ -487,7 +487,7 @@
 
   function updateButtonText() {
     const buttonText = document.getElementById('button-text');
-    if (buttonText && currentPlan) {
+    if (buttonText && window.currentPlan) {
       buttonText.textContent = 'Add New Content';
     } else if (buttonText) {
       buttonText.textContent = 'Add Content';
@@ -501,7 +501,7 @@
       overviewBtn.style.display = 'inline-block';
       overviewBtn.style.opacity = '1';
       // Update button text based on whether we have a strategy or not
-      if (currentPlan) {
+      if (window.currentPlan) {
         overviewBtn.textContent = 'See content strategy';
       } else {
         overviewBtn.textContent = 'See brand overview';
@@ -801,7 +801,7 @@
 
   function showStrategyOverview() {
     const resultDiv = document.getElementById('strategy-result');
-    if (resultDiv && currentPlan) {
+    if (resultDiv && window.currentPlan) {
       resultDiv.style.display = 'block';
       resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }

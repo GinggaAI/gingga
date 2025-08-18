@@ -5,6 +5,7 @@ class PlanningsController < ApplicationController
   before_action :find_existing_strategy, only: [ :show ]
 
   def show
+    @presenter = PlanningPresenter.new(params, brand: @brand)
     @plans = generate_sample_plans
   end
 

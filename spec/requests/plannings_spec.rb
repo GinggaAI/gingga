@@ -40,7 +40,7 @@ RSpec.describe PlanningsController, type: :request do
 
       it "initializes currentPlan as null" do
         get planning_path
-        expect(response.body).to include("let currentPlan = null")
+        expect(response.body).to include("window.currentPlan = null")
       end
 
       it "shows 'Add Content' button" do
