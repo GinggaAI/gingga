@@ -8,6 +8,8 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 # that will avoid rails generators crashing because migrations haven't been run yet
 # return unless Rails.env.test?
 require 'rspec/rails'
+require 'capybara/rspec'
+require 'view_component/test_helpers'
 require 'simplecov'
 require "simplecov-csv"
 
@@ -39,16 +41,19 @@ SimpleCov.start 'rails' do
   add_filter "/gems/"
   add_filter "/config/"
   add_filter "/app/controllers/"
+  add_filter %r{_preview\.rb\z}
 end
 
 # Ensures that the test database schema matches the current schema file.
 # If there are pending migrations it will invoke `db:test:prepare` to
 # recreate the test database by loading the schema.
 # If you are not using ActiveRecord, you can remove these lines.
-begin
-  ActiveRecord::Migration.maintain_test_schema!
-rescue ActiveRecord::PendingMigrationError => e
-  abort e.to_s.strip
+if ENV["RUN_DB_TESTS"] == "1"
+  begin
+    ActiveRecord::Migration.maintain_test_schema!
+  rescue ActiveRecord::PendingMigrationError => e
+    abort e.to_s.strip
+  end
 end
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
@@ -75,7 +80,8 @@ RSpec.configure do |config|
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false
   # instead of true.
-  config.use_transactional_fixtures = true
+  # Disable transactional fixtures by default so non-DB specs don't try to connect
+  config.use_transactional_fixtures = false
 
   # You can uncomment this line to turn off ActiveRecord support entirely.
   # config.use_active_record = false
@@ -112,4 +118,11 @@ RSpec.configure do |config|
       Bullet.end_request
     end
   end
+
+  # Include ViewComponent helpers in component specs
+  config.include ViewComponent::TestHelpers, type: :component
+  config.include Capybara::RSpecMatchers, type: :component
+
+  # Exclude DB-required specs by default. Run them with RUN_DB_TESTS=1
+  config.filter_run_excluding requires_db: true unless ENV["RUN_DB_TESTS"] == "1"
 end

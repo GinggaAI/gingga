@@ -1,7 +1,8 @@
 require 'rails_helper'
 require 'webmock/rspec'
+require Rails.root.join('app/services/gingga_openai/validate_key_service')
 
-RSpec.describe Openai::ValidateKeyService do
+RSpec.describe GinggaOpenAI::ValidateKeyService do
   describe '#call' do
     let(:service) { described_class.new(token: token, mode: mode) }
     let(:token) { 'sk-test123' }

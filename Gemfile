@@ -57,6 +57,7 @@ group :development, :test do
   gem "rubocop-rails-omakase", require: false
 
   gem "rspec-rails"
+  gem "rails-controller-testing"
   gem "factory_bot_rails"
   gem "bullet"
   gem "rack-mini-profiler"
@@ -66,6 +67,7 @@ group :development, :test do
   gem "shoulda-matchers", "~> 6.0"
   gem "webmock"
   gem "faker"
+  gem "database_cleaner-active_record"
   gem "dotenv-rails"
 end
 
@@ -84,3 +86,12 @@ end
 
 gem "devise", "~> 4.9"
 gem "httparty"
+gem "ruby-openai", "~> 7.0"
+
+# View components for reusable UI with previews/specs
+gem "view_component"
+
+group :development, :test do
+  # Lint ERB templates in CI
+  gem "erb_lint", require: false
+end

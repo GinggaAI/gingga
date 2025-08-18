@@ -1,0 +1,23 @@
+!!!
+%html{ lang: "en", style: "scroll-behavior: smooth;" }
+  %head
+    %meta{ content: "text/html; charset=UTF-8", "http-equiv" => "Content-Type" }/
+    %title= content_for(:title) || "Gingga"
+    %meta{ name: "viewport", content: "width=device-width,initial-scale=1" }/
+    %meta{ name: "apple-mobile-web-app-capable", content: "yes" }/
+    %meta{ name: "mobile-web-app-capable", content: "yes" }/
+    = csrf_meta_tags
+    = csp_meta_tag
+    = yield :head
+    %link{ href: "https://fonts.googleapis.com", rel: "preconnect" }/
+    %link{ href: "https://fonts.gstatic.com", rel: "preconnect", crossorigin: "" }/
+    %link{ href: "https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Geist:wght@100..900&display=swap", rel: "stylesheet" }/
+    %link{ href: "/icon.png", rel: "icon", type: "image/png" }/
+    %link{ href: "/icon.svg", rel: "icon", type: "image/svg+xml" }/
+    %link{ href: "/icon.png", rel: "apple-touch-icon" }/
+    = stylesheet_link_tag "application", "data-turbo-track": "reload"
+    = javascript_include_tag "application", "data-turbo-track": "reload", type: "module"
+  %body
+    %p.notice= notice
+    %p.alert= alert
+    = yield

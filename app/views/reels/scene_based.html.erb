@@ -1,0 +1,129 @@
+<% content_for :page_title, "Create Scene-Based Reel" %>
+
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold mb-2 text-gray-900">Create Reel</h1>
+    <p class="text-base text-gray-600">Choose your preferred creation method and generate engaging video content</p>
+  </div>
+
+  <div class="mb-8">
+    <div class="flex bg-gray-100 rounded-lg p-1 max-w-md">
+      <%= link_to scene_based_reels_path, 
+          class: "flex-1 px-4 py-2 text-center rounded-md font-medium transition-colors text-white",
+          style: "background-color: #FFC857" do %>
+        Scene-Based
+      <% end %>
+      <%= link_to narrative_reels_path, 
+          class: "flex-1 px-4 py-2 text-center rounded-md font-medium transition-colors text-gray-600 hover:text-gray-900" do %>
+        Narrative
+      <% end %>
+    </div>
+  </div>
+
+  <%= form_with model: @reel, url: scene_based_reels_path, local: true, 
+                data: { 
+                  controller: "scene-list",
+                  scene_list_scene_count_value: 3
+                }, 
+                class: "space-y-8" do |form| %>
+    
+    <% if @reel.errors.any? %>
+      <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+        <h4 class="text-red-800 font-medium">Please fix the following errors:</h4>
+        <ul class="mt-2 text-red-600 text-sm space-y-1">
+          <% @reel.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= render Ui::FormSectionComponent.new(
+      title: "Basic Reel Info",
+      description: "Essential information about your reel"
+    ) do %>
+      <div class="space-y-6">
+        <div class="space-y-2">
+          <%= form.label :title, "Reel Title", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.text_field :title,
+                placeholder: "Enter the title for your reel...",
+                class: "form-input w-full" %>
+        </div>
+
+        <div class="space-y-2">
+          <%= form.label :description, "Description", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.text_area :description,
+                placeholder: "Briefly describe what your reel will be about...",
+                rows: 3,
+                class: "form-input w-full" %>
+        </div>
+      </div>
+    <% end %>
+
+    <%= render Ui::FormSectionComponent.new(
+      title: "AI Avatar",
+      description: "Choose whether to use AI avatars for your scenes"
+    ) do %>
+      <%= render Ui::ToggleComponent.new(
+        name: "reel[use_ai_avatar]",
+        label: "Use AI Avatars",
+        description: "Enable AI-generated human avatars for talking head scenes",
+        checked: @reel.use_ai_avatar
+      ) %>
+    <% end %>
+
+    <%= render Ui::FormSectionComponent.new(
+      title: "Scene Breakdown",
+      description: "Create individual scenes for your reel. Each scene will have its own script and settings."
+    ) do %>
+      <div class="mb-4 flex items-center justify-between">
+        <span class="text-sm font-medium text-gray-700">
+          <span data-scene-list-target="sceneCounter">3</span> scenes
+        </span>
+        <div class="flex gap-2">
+          <%= render Ui::ButtonComponent.new(
+            label: "Add Scene", 
+            variant: :ghost, 
+            size: :sm
+          ) do %>
+            <button type="button" data-action="click->scene-list#addScene" class="ui-button ui-button--ghost ui-button--sm">
+              <span class="ui-button__label">Add Scene</span>
+            </button>
+          <% end %>
+        </div>
+      </div>
+
+      <div data-scene-list-target="scenesContainer" class="space-y-6">
+        <% 3.times do |i| %>
+          <%= render Ui::SceneFieldsComponent.new(
+            form: form,
+            scene_number: i + 1,
+            scene_data: @reel.reel_scenes[i]&.attributes || {}
+          ) %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%= render Ui::FormSectionComponent.new(
+      title: "Additional Instructions",
+      description: "Any specific requirements or creative direction"
+    ) do %>
+      <div class="space-y-2">
+        <%= form.label :additional_instructions, "Style & Direction Notes", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_area :additional_instructions,
+              placeholder: "Add any specific style preferences, mood, pacing, or technical requirements...",
+              rows: 4,
+              class: "form-input w-full" %>
+      </div>
+    <% end %>
+
+    <div class="flex justify-end pt-6">
+      <%= render Ui::ButtonComponent.new(
+        label: "Generate Scene-Based Reel", 
+        variant: :primary, 
+        type: :submit, 
+        size: :lg
+      ) %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,230 @@
+<% content_for :page_title, "My Brand" %>
+
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-theme">Brand Profile</h1>
+      <p class="text-base mt-2 text-muted">Define your brand identity and content preferences</p>
+    </div>
+    
+    <% if @brands.any? %>
+      <div class="flex items-center gap-4">
+        <span class="text-sm text-muted">Managing:</span>
+        <select onchange="if(this.value) window.location.href='/my-brand?brand_id=' + this.value" 
+                class="px-3 py-2 rounded-lg border bg-surface border-muted text-theme">
+          <% @brands.each do |brand| %>
+            <option value="<%= brand.id %>" <%= 'selected' if brand == @brand %>><%= brand.name || "Untitled Brand" %></option>
+          <% end %>
+        </select>
+        <%= render Ui::ButtonComponent.new(label: "Add New Brand", variant: :ghost, size: :sm) %>
+      </div>
+    <% end %>
+  </div>
+
+  <% if notice %>
+    <%= render Ui::ToastComponent.new(message: notice, variant: :success) %>
+  <% end %>
+
+  <%= form_with model: @brand, url: brand_path, method: :patch, local: true, data: { turbo_frame: "_top" }, class: "space-y-8" do |form| %>
+    <% if @brand.errors.any? %>
+      <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+        <h4 class="text-red-800 font-medium">Please fix the following errors:</h4>
+        <ul class="mt-2 text-red-600 text-sm space-y-1">
+          <% @brand.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= render Ui::FormSectionComponent.new(
+      title: "Brand Identity",
+      description: "Core information about your brand"
+    ) do %>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-2">
+          <%= form.label :name, "Brand Name", class: "block text-sm font-medium text-theme" %>
+          <%= form.text_field :name, 
+                placeholder: "E.g. Brand that inspires young creatives",
+                class: "form-input w-full" %>
+        </div>
+
+        <div class="space-y-2">
+          <%= form.label :slug, "Brand Handle/Slug", class: "block text-sm font-medium text-theme" %>
+          <%= form.text_field :slug,
+                placeholder: "e.g. creative-brand",
+                class: "form-input w-full" %>
+        </div>
+
+        <div class="space-y-2">
+          <%= form.label :industry, "Industry", class: "block text-sm font-medium text-theme" %>
+          <%= form.select :industry,
+                options_for_select([
+                  ["Select Industry", ""],
+                  ["Technology", "technology"],
+                  ["Fashion & Beauty", "fashion"],
+                  ["Food & Beverage", "food"],
+                  ["Health & Fitness", "health"],
+                  ["Education", "education"],
+                  ["Entertainment", "entertainment"],
+                  ["Business & Finance", "business"],
+                  ["Travel & Lifestyle", "travel"],
+                  ["Other", "other"]
+                ], @brand.industry),
+                {},
+                { class: "form-input w-full" } %>
+        </div>
+
+        <div class="space-y-2">
+          <%= form.label :voice, "Brand Voice", class: "block text-sm font-medium text-theme" %>
+          <%= form.select :voice,
+                options_for_select([
+                  ["Select Voice", ""],
+                  ["Professional", "professional"],
+                  ["Friendly", "friendly"],
+                  ["Authoritative", "authoritative"],
+                  ["Casual", "casual"],
+                  ["Inspirational", "inspirational"],
+                  ["Humorous", "humorous"],
+                  ["Educational", "educational"]
+                ], @brand.voice),
+                {},
+                { class: "form-input w-full" } %>
+        </div>
+      </div>
+    <% end %>
+
+    <%= render Ui::FormSectionComponent.new(
+      title: "Audience & Offer",
+      description: "Define your target audience and value proposition"
+    ) do %>
+      <div class="space-y-6">
+        <div class="space-y-2">
+          <%= form.label :value_proposition, "What do you sell or offer?", class: "block text-sm font-medium text-theme" %>
+          <%= form.text_area :value_proposition,
+                placeholder: "Describe your products or services...",
+                rows: 4,
+                class: "form-input w-full"%>
+        </div>
+
+        <div class="space-y-2">
+          <%= form.label :mission, "Brand purpose or mission", class: "block text-sm font-medium text-theme" %>
+          <%= form.text_area :mission,
+                placeholder: "What's your brand's mission and purpose...",
+                rows: 4,
+                class: "form-input w-full"%>
+        </div>
+      </div>
+    <% end %>
+
+    <%= render Ui::FormSectionComponent.new(
+      title: "Content Preferences",
+      description: "Language and regional settings for your content"
+    ) do %>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-2">
+          <%= form.label :content_language, "Content Language", class: "block text-sm font-medium text-theme" %>
+          <%= form.select :content_language,
+                options_for_select([
+                  ["English", "en"],
+                  ["Spanish", "es"],
+                  ["French", "fr"],
+                  ["German", "de"],
+                  ["Italian", "it"],
+                  ["Portuguese", "pt"],
+                  ["Other", "other"]
+                ], @brand.content_language),
+                {},
+                { class: "form-input w-full" } %>
+        </div>
+
+        <div class="space-y-2">
+          <%= form.label :region, "Primary Region", class: "block text-sm font-medium text-theme" %>
+          <%= form.select :region,
+                options_for_select([
+                  ["North America", "north_america"],
+                  ["Europe", "europe"],
+                  ["Asia Pacific", "asia_pacific"],
+                  ["Latin America", "latin_america"],
+                  ["Middle East & Africa", "mea"],
+                  ["Global", "global"]
+                ], @brand.region),
+                {},
+                { class: "form-input w-full" } %>
+        </div>
+
+        <div class="md:col-span-2 space-y-6">
+          <!-- Content Guidelines Section -->
+          <div class="bg-gray-50 p-4 rounded-lg border">
+            <h4 class="text-lg font-semibold text-theme mb-4">Content Guidelines</h4>
+            <div class="space-y-4">
+              <div class="space-y-2">
+                <%= form.label :tone_no_go_list, "Tones to Avoid", class: "block text-sm font-medium text-theme" %>
+                <%= form.text_field :tone_no_go_list,
+                      placeholder: "e.g., aggressive, overly formal, sarcastic",
+                      class: "form-input w-full" %>
+                <p class="text-xs text-gray-500">Separate with commas</p>
+              </div>
+
+              <div class="space-y-2">
+                <%= form.label :banned_words_list, "Banned Words", class: "block text-sm font-medium text-theme" %>
+                <%= form.text_field :banned_words_list,
+                      placeholder: "e.g., competitor names, inappropriate terms",
+                      class: "form-input w-full" %>
+                <p class="text-xs text-gray-500">Separate with commas</p>
+              </div>
+
+              <div class="space-y-2">
+                <%= form.label :claims_rules_text, "Claims & Legal Rules", class: "block text-sm font-medium text-theme" %>
+                <%= form.text_area :claims_rules_text,
+                      placeholder: "Any legal restrictions, claim substantiation requirements, or compliance guidelines...",
+                      rows: 3,
+                      class: "form-input w-full" %>
+              </div>
+            </div>
+          </div>
+
+          <!-- Brand Assets & Resources Section -->
+          <div class="bg-gray-50 p-4 rounded-lg border">
+            <h4 class="text-lg font-semibold text-theme mb-4">Brand Assets & Resources</h4>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="flex items-center space-x-3">
+                <%= form.check_box :kling_enabled, { class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" } %>
+                <%= form.label :kling_enabled, "Kling AI Video", class: "text-sm font-medium text-theme" %>
+              </div>
+
+              <div class="flex items-center space-x-3">
+                <%= form.check_box :stock_enabled, { class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" } %>
+                <%= form.label :stock_enabled, "Stock Content", class: "text-sm font-medium text-theme" %>
+              </div>
+
+              <div class="flex items-center space-x-3">
+                <%= form.check_box :budget_enabled, { class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" } %>
+                <%= form.label :budget_enabled, "Budget Available", class: "text-sm font-medium text-theme" %>
+              </div>
+
+              <div class="flex items-center space-x-3">
+                <%= form.check_box :editing_enabled, { class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" } %>
+                <%= form.label :editing_enabled, "Video Editing", class: "text-sm font-medium text-theme" %>
+              </div>
+
+              <div class="flex items-center space-x-3">
+                <%= form.check_box :ai_avatars_enabled, { class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" } %>
+                <%= form.label :ai_avatars_enabled, "AI Avatars", class: "text-sm font-medium text-theme" %>
+              </div>
+
+              <div class="flex items-center space-x-3">
+                <%= form.check_box :podcast_clips_enabled, { class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" } %>
+                <%= form.label :podcast_clips_enabled, "Podcast Clips", class: "text-sm font-medium text-theme" %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="flex justify-end pt-6">
+      <%= render Ui::ButtonComponent.new(label: "Save Profile", variant: :primary, type: :submit, size: :lg) %>
+    </div>
+  <% end %>
+</div>

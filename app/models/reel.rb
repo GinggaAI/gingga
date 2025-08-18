@@ -2,7 +2,9 @@ class Reel < ApplicationRecord
   belongs_to :user
   has_many :reel_scenes, dependent: :destroy
 
-  validates :mode, presence: true, inclusion: { in: %w[scene_based] }
+  accepts_nested_attributes_for :reel_scenes, allow_destroy: true
+
+  validates :mode, presence: true, inclusion: { in: %w[scene_based narrative] }
   validates :status, inclusion: { in: %w[draft processing completed failed] }
 
   validate :must_have_exactly_three_scenes, if: -> { mode == "scene_based" }
