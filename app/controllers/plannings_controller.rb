@@ -27,6 +27,23 @@ class PlanningsController < ApplicationController
     end
   end
 
+  # POST /planning/voxa_refine
+  def voxa_refine
+    strategy = find_strategy_by_id_or_current
+
+    unless strategy
+      redirect_to planning_path, alert: "No strategy found to refine." and return
+    end
+
+    begin
+      Creas::VoxaContentService.new(strategy_plan: strategy).call
+      redirect_to planning_path(plan_id: strategy.id), notice: "Content items refined successfully with Voxa!"
+    rescue StandardError => e
+      Rails.logger.error "Voxa refinement failed: #{e.message}"
+      redirect_to planning_path(plan_id: strategy.id), alert: "Failed to refine content: #{e.message}"
+    end
+  end
+
   private
 
   # Brand and month setup
@@ -67,6 +84,14 @@ class PlanningsController < ApplicationController
   def find_strategy_for_requested_month
     month = params[:month] || @current_month
     Planning::StrategyFinder.find_for_brand_and_month(@brand, month)
+  end
+
+  def find_strategy_by_id_or_current
+    if params[:plan_id].present?
+      @brand&.creas_strategy_plans&.find_by(id: params[:plan_id])
+    else
+      find_strategy_for_current_month
+    end
   end
 
   def update_current_month_from_strategy

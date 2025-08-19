@@ -5,6 +5,7 @@ RSpec.describe CreasStrategyPlan, type: :model do
     it { should belong_to(:user) }
     it { should belong_to(:brand) }
     it { should have_many(:creas_posts).dependent(:destroy) }
+    it { should have_many(:creas_content_items).dependent(:destroy) }
   end
 
   describe 'validations' do
@@ -50,6 +51,71 @@ RSpec.describe CreasStrategyPlan, type: :model do
 
     it 'has default empty hashes for meta' do
       expect(strategy_plan.meta).to be_a(Hash)
+    end
+  end
+
+  describe 'instance methods' do
+    let(:strategy_plan) { create(:creas_strategy_plan, month: "2025-08") }
+
+    describe '#content_stats' do
+      let!(:item1) { create(:creas_content_item, creas_strategy_plan: strategy_plan, status: "in_production", template: "solo_avatars", video_source: "none") }
+      let!(:item2) { create(:creas_content_item, creas_strategy_plan: strategy_plan, status: "ready_for_review", template: "solo_avatars", video_source: "none") }
+      let!(:item3) { create(:creas_content_item, creas_strategy_plan: strategy_plan, status: "in_production", template: "remix", video_source: "external") }
+
+      it 'returns grouped stats by status, template, and video_source' do
+        stats = strategy_plan.content_stats
+
+        expect(stats[[ "in_production", "solo_avatars", "none" ]]).to eq(1)
+        expect(stats[[ "ready_for_review", "solo_avatars", "none" ]]).to eq(1)
+        expect(stats[[ "in_production", "remix", "external" ]]).to eq(1)
+      end
+    end
+
+    describe '#current_week_items' do
+      context 'when current date is within the strategy month' do
+        let(:strategy_plan) { create(:creas_strategy_plan, month: Date.current.strftime("%Y-%m")) }
+        let!(:week1_item) { create(:creas_content_item, creas_strategy_plan: strategy_plan, week: 1) }
+        let!(:week2_item) { create(:creas_content_item, creas_strategy_plan: strategy_plan, week: 2) }
+
+        it 'returns items for the current week' do
+          current_week = ((Date.current - Date.current.beginning_of_month).to_i / 7) + 1
+          expected_items = strategy_plan.creas_content_items.by_week(current_week)
+
+          result = strategy_plan.current_week_items
+          expect(result.to_a).to eq(expected_items.to_a)
+        end
+      end
+
+      context 'when current date is outside the strategy month' do
+        let(:strategy_plan) { create(:creas_strategy_plan, month: "2024-01") }
+
+        it 'returns empty relation' do
+          result = strategy_plan.current_week_items
+          expect(result).to be_empty
+        end
+      end
+
+      context 'when month is invalid' do
+        let(:strategy_plan) { create(:creas_strategy_plan, month: "invalid-month") }
+
+        it 'returns empty relation' do
+          result = strategy_plan.current_week_items
+          expect(result).to be_empty
+        end
+      end
+
+      context 'when month is empty string' do
+        let(:strategy_plan) do
+          plan = create(:creas_strategy_plan)
+          plan.update_column(:month, '')
+          plan.reload
+        end
+
+        it 'returns empty relation' do
+          result = strategy_plan.current_week_items
+          expect(result).to be_empty
+        end
+      end
     end
   end
 end

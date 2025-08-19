@@ -4,7 +4,7 @@ module Creas
 
     # Version tags help us trace data lineage
     NOCTUA_VERSION = "noctua-2025-08-12"
-    VOXA_VERSION   = "voxa-2025-08-12"
+    VOXA_VERSION   = "voxa-2025-08-19"
 
     # === GPT-1: CREAS Strategist (Noctua) ===
     def noctua_system
@@ -132,9 +132,9 @@ module Creas
     end
 
     # === GPT-2: CREAS Creator (Voxa) ===
-    def voxa_system
+    def voxa_system(strategy_plan_data:)
       <<~SYS
-      You are CREAS Creator (GPT-2). Convert the full JSON from GPT-1 (Noctua) into a batch of ready-to-produce Reels. The GPT-1 JSON is the only source of truth (brand, tone, objective, ideas by week/pillar). Do not contradict it. If a root field is missing (brand, month, objective, frequency), ask. If a piece-level field is missing, omit that item and continue.
+      You are CREAS Creator (Voxa). Convert normalized strategy data from StrategyPlanFormatter + brand context into ready-to-produce content items. You must output STRICT JSON ONLY, with no prose or markdown.
 
       Scope
         Output only Reels (vertical 9:16).
@@ -142,19 +142,53 @@ module Creas
         Choose exactly one template per item: solo_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos.
 
       Input
-        One complete GPT-1 JSON.
+        strategy_plan_data: Normalized output from StrategyPlanFormatter with structure:
+        {
+          "strategy": {
+            "brand_name": "acme",
+            "month": "YYYY-MM",#{' '}
+            "objective_of_the_month": "awareness | engagement | sales | community",
+            "frequency_per_week": 4,
+            "post_types": ["Video","Image","Carousel","Text"],
+            "weekly_plan": [
+              {
+                "week": 1,
+                "ideas": [
+                  {
+                    "id": "YYYYMM-acme-w1-i1-C",
+                    "title": "...",
+                    "hook": "...",#{' '}
+                    "description": "...",
+                    "platform": "Instagram Reels",
+                    "pilar": "C",
+                    "recommended_template": "solo_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos",
+                    "video_source": "none | external | kling"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      #{'  '}
+        brand_context: Brand information with structure:
+        {
+          "brand": {
+            "industry": "...",
+            "value_proposition": "...",#{' '}
+            "mission": "...",
+            "voice": "formal | inspirational | humorous | ...",
+            "priority_platforms": ["Instagram","TikTok"],
+            "languages": {"content_language":"en-US","account_language":"en-US"},
+            "guardrails": {"banned_words":[],"claims_rules":"","tone_no_go":[]}
+          }
+        }
 
-      Output (one JSON object, no prose, no markdown)
-        Create an item for each idea in weekly_plan (priority). You may add ideas from content_distribution if they improve coverage.
-        If GPT-1 provides IDs for ideas, preserve them as origin_id and generate your own production id.
+      Output (one JSON object with items array, no prose, no markdown)
+        Create an item for each idea in strategy.weekly_plan.#{' '}
+        Preserve origin_id from input ideas and generate your own production id.
 
       Output contract
       {
-        "brand_name": "...",
-        "strategy_name": "...",
-        "month": "YYYY-MM",
-        "objective_of_the_month": "awareness | engagement | sales | community",
-        "batch_generated_date": "YYYY-MM-DD",
         "items": [ ITEM_OBJ, ITEM_OBJ ]
       }
 
@@ -272,10 +306,13 @@ module Creas
       SYS
     end
 
-    def voxa_user(strategy_hash)
+    def voxa_user(strategy_plan_data:, brand_context:)
       <<~USR
-      # GPT-1 (Noctua) Strategy JSON
-      #{strategy_hash.to_json}
+      # Strategy Plan Data (from StrategyPlanFormatter)
+      #{strategy_plan_data.to_json}
+
+      # Brand Context
+      #{brand_context.to_json}
       USR
     end
   end

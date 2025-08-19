@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   resource :planning, only: [ :show ] do
     member do
       get :strategy_for_month
+      post :voxa_refine
     end
   end
   get "/smart-planning", to: "plannings#smart_planning", as: "smart_planning"

@@ -7,7 +7,7 @@ RSpec.describe Creas::Prompts do
     end
 
     it 'defines VOXA_VERSION' do
-      expect(Creas::Prompts::VOXA_VERSION).to eq('voxa-2025-08-12')
+      expect(Creas::Prompts::VOXA_VERSION).to eq('voxa-2025-08-19')
     end
   end
 
@@ -153,7 +153,8 @@ RSpec.describe Creas::Prompts do
   end
 
   describe '.voxa_system' do
-    subject { described_class.voxa_system }
+    let(:strategy_plan_data) { { brand_name: "Test Brand" } }
+    subject { described_class.voxa_system(strategy_plan_data: strategy_plan_data) }
 
     it 'returns a comprehensive system prompt' do
       expect(subject).to be_a(String)
@@ -161,8 +162,8 @@ RSpec.describe Creas::Prompts do
     end
 
     it 'identifies as CREAS Creator (Voxa)' do
-      expect(subject).to include('You are CREAS Creator (GPT-2)')
-      expect(subject).to include('Convert the full JSON from GPT-1 (Noctua)')
+      expect(subject).to include('You are CREAS Creator (Voxa)')
+      expect(subject).to include('Convert normalized strategy data from StrategyPlanFormatter')
     end
 
     it 'defines scope and constraints' do
@@ -174,15 +175,15 @@ RSpec.describe Creas::Prompts do
 
     it 'specifies input requirements' do
       expect(subject).to include('Input')
-      expect(subject).to include('One complete GPT-1 JSON')
+      expect(subject).to include('strategy_plan_data: Normalized output from StrategyPlanFormatter')
+      expect(subject).to include('brand_context: Brand information')
     end
 
     it 'defines output contract structure' do
       expect(subject).to include('Output contract')
       expect(subject).to include('brand_name')
-      expect(subject).to include('strategy_name')
-      expect(subject).to include('batch_generated_date')
       expect(subject).to include('items')
+      expect(subject).to include('ITEM_OBJ')
     end
 
     it 'includes comprehensive ITEM_OBJ structure' do
@@ -232,7 +233,7 @@ RSpec.describe Creas::Prompts do
   end
 
   describe '.voxa_user' do
-    let(:strategy_hash) do
+    let(:strategy_plan_data) do
       {
         brand_name: 'Test Brand',
         strategy_name: 'August Strategy 2025',
@@ -270,19 +271,37 @@ RSpec.describe Creas::Prompts do
       }
     end
 
-    subject { described_class.voxa_user(strategy_hash) }
+    let(:brand_context) do
+      {
+        "brand" => {
+          "industry" => "Technology",
+          "value_proposition" => "Innovation in tech",
+          "priority_platforms" => [ "Instagram", "TikTok" ]
+        }
+      }
+    end
+
+    subject { described_class.voxa_user(strategy_plan_data: strategy_plan_data, brand_context: brand_context) }
 
     it 'returns a formatted user prompt with strategy JSON' do
       expect(subject).to be_a(String)
       expect(subject.length).to be > 100
     end
 
-    it 'includes the GPT-1 strategy header' do
-      expect(subject).to include('# GPT-1 (Noctua) Strategy JSON')
+    it 'includes the strategy plan data header' do
+      expect(subject).to include('# Strategy Plan Data (from StrategyPlanFormatter)')
+    end
+
+    it 'includes the brand context header' do
+      expect(subject).to include('# Brand Context')
     end
 
     it 'contains the complete strategy JSON' do
-      expect(subject).to include(strategy_hash.to_json)
+      expect(subject).to include(strategy_plan_data.to_json)
+    end
+
+    it 'contains the brand context JSON' do
+      expect(subject).to include(brand_context.to_json)
     end
 
     it 'includes brand and strategy information' do
@@ -305,8 +324,9 @@ RSpec.describe Creas::Prompts do
 
     it 'handles empty strategy hash gracefully' do
       empty_strategy = {}
-      result = described_class.voxa_user(empty_strategy)
-      expect(result).to include('# GPT-1 (Noctua) Strategy JSON')
+      empty_brand_context = {}
+      result = described_class.voxa_user(strategy_plan_data: empty_strategy, brand_context: empty_brand_context)
+      expect(result).to include('# Strategy Plan Data (from StrategyPlanFormatter)')
       expect(result).to include('{}')
     end
 
@@ -341,7 +361,7 @@ RSpec.describe Creas::Prompts do
 
     it 'voxa_system maintains consistency with noctua templates' do
       noctua = described_class.noctua_system
-      voxa = described_class.voxa_system
+      voxa = described_class.voxa_system(strategy_plan_data: { brand_name: "Test" })
 
       # Both should reference the same template types
       templates = [ 'solo_avatars', 'avatar_and_video', 'narration_over_7_images', 'remix', 'one_to_three_videos' ]
@@ -353,7 +373,7 @@ RSpec.describe Creas::Prompts do
 
     it 'both systems reference consistent KPI focuses' do
       noctua = described_class.noctua_system
-      voxa = described_class.voxa_system
+      voxa = described_class.voxa_system(strategy_plan_data: { brand_name: "Test" })
 
       kpis = [ 'reach', 'saves', 'comments', 'CTR', 'DM' ]
       kpis.each do |kpi|
@@ -364,7 +384,7 @@ RSpec.describe Creas::Prompts do
 
     it 'maintains consistent objective types across both systems' do
       noctua = described_class.noctua_system
-      voxa = described_class.voxa_system
+      voxa = described_class.voxa_system(strategy_plan_data: { brand_name: "Test" })
 
       objectives = 'awareness | engagement | sales | community'
       expect(noctua).to include(objectives)
