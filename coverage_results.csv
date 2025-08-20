@@ -1,5 +1,5 @@
 File,% covered,Lines,Relevant Lines,Lines covered,Lines missed
-"./app/components/ui/audience_form_component.rb",100,26,16,16,0
+"./app/components/ui/audience_form_component.rb",100,32,20,20,0
 "./app/components/ui/badge_component.rb",100,38,20,20,0
 "./app/components/ui/brand_channel_form_component.rb",100,31,19,19,0
 "./app/components/ui/button_component.rb",100,64,38,38,0
@@ -20,8 +20,9 @@ File,% covered,Lines,Relevant Lines,Lines covered,Lines missed
 "./app/models/audience.rb",100,34,15,15,0
 "./app/models/brand.rb",97,70,37,36,1
 "./app/models/brand_channel.rb",100,6,5,5,0
+"./app/models/creas_content_item.rb",100,82,37,37,0
 "./app/models/creas_post.rb",100,17,10,10,0
-"./app/models/creas_strategy_plan.rb",100,7,5,5,0
+"./app/models/creas_strategy_plan.rb",95,36,20,19,1
 "./app/models/product.rb",100,4,3,3,0
 "./app/models/reel.rb",100,38,21,21,0
 "./app/models/reel_scene.rb",100,25,12,12,0
@@ -30,9 +31,12 @@ File,% covered,Lines,Relevant Lines,Lines covered,Lines missed
 "./app/presenters/planning_presenter.rb",96,100,52,50,2
 "./app/serializers/api_token_serializer.rb",100,20,7,7,0
 "./app/services/api_token_validator_service.rb",94,30,16,15,1
+"./app/services/creas/content_item_formatter.rb",100,94,22,22,0
 "./app/services/creas/noctua_strategy_service.rb",100,50,20,20,0
-"./app/services/creas/prompts.rb",100,278,13,13,0
-"./app/services/create_strategy_service.rb",91,87,45,41,4
+"./app/services/creas/prompts.rb",100,319,13,13,0
+"./app/services/creas/strategy_plan_formatter.rb",91,152,54,49,5
+"./app/services/creas/voxa_content_service.rb",96,129,49,47,2
+"./app/services/create_strategy_service.rb",93,87,45,42,3
 "./app/services/gingga_openai/chat_client.rb",100,49,24,24,0
 "./app/services/gingga_openai/client_for_user.rb",100,8,5,5,0
 "./app/services/gingga_openai/validate_key_service.rb",100,49,27,27,0
@@ -44,4 +48,9 @@ File,% covered,Lines,Relevant Lines,Lines covered,Lines missed
 "./app/services/heygen/list_voices_service.rb",100,67,34,34,0
 "./app/services/heygen/validate_key_service.rb",100,34,16,16,0
 "./app/services/kling/validate_key_service.rb",100,49,27,27,0
-"./app/services/noctua_brief_assembler.rb",100,48,7,7,0
+"./app/services/noctua_brief_assembler.rb",100,49,7,7,0
+"./app/services/planning/month_formatter.rb",100,29,16,16,0
+"./app/services/planning/month_normalizer.rb",100,43,22,22,0
+"./app/services/planning/strategy_finder.rb",100,40,18,18,0
+"./app/services/planning/strategy_formatter.rb",92,28,13,12,1
+"./app/services/planning/weekly_plans_builder.rb",96,119,47,45,2

@@ -1,0 +1,6 @@
+      1 app/controllers/creas_strategy_plans_controller.rb
+      2 app/controllers/api/v1/api_tokens_controller.rb
+      2 app/controllers/creas_strategist_controller.rb
+      2 app/controllers/reels_controller.rb
+      3 app/controllers/brands_controller.rb
+      6 app/controllers/plannings_controller.rb
