@@ -102,6 +102,11 @@ RSpec.describe CreasStrategyPlan, type: :model do
           result = strategy_plan.current_week_items
           expect(result).to be_empty
         end
+
+        it 'handles Date::Error gracefully' do
+          # This ensures the Date::Error rescue clause is covered
+          expect { strategy_plan.current_week_items }.not_to raise_error
+        end
       end
 
       context 'when month is empty string' do
@@ -114,6 +119,49 @@ RSpec.describe CreasStrategyPlan, type: :model do
         it 'returns empty relation' do
           result = strategy_plan.current_week_items
           expect(result).to be_empty
+        end
+      end
+
+      context 'when current date is after month end' do
+        before do
+          allow(Date).to receive(:current).and_return(Date.parse("2025-09-01"))
+        end
+
+        let(:strategy_plan) { create(:creas_strategy_plan, month: "2025-08") }
+
+        it 'returns empty relation' do
+          result = strategy_plan.current_week_items
+          expect(result).to be_empty
+        end
+      end
+
+      context 'when current date is before month start' do
+        before do
+          allow(Date).to receive(:current).and_return(Date.parse("2025-07-31"))
+        end
+
+        let(:strategy_plan) { create(:creas_strategy_plan, month: "2025-08") }
+
+        it 'returns empty relation' do
+          result = strategy_plan.current_week_items
+          expect(result).to be_empty
+        end
+      end
+
+      context 'edge cases for week calculation' do
+        before do
+          allow(Date).to receive(:current).and_return(Date.parse("2025-08-15"))
+        end
+
+        let(:strategy_plan) { create(:creas_strategy_plan, month: "2025-08") }
+        let!(:week3_item) { create(:creas_content_item, creas_strategy_plan: strategy_plan, week: 3) }
+        let!(:week1_item) { create(:creas_content_item, creas_strategy_plan: strategy_plan, week: 1) }
+
+        it 'correctly calculates current week for middle of month' do
+          # Aug 15, 2025 should be in week 3 (days 15-21 of month)
+          result = strategy_plan.current_week_items
+          expect(result).to include(week3_item)
+          expect(result).not_to include(week1_item)
         end
       end
     end
