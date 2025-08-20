@@ -50,7 +50,7 @@ jobs:
           bundler-cache: true
 
       - name: Lint ERB templates
-        run: bundle exec erblint --format json app/views app/components
+        run: erb_lint --format json app/views app/components
 
   accessibility:
     runs-on: ubuntu-latest

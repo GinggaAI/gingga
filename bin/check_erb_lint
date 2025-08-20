@@ -1,0 +1,14 @@
+#!/bin/sh
+
+echo "Running erb_lint..."
+erb_lint app/views app/components  --autocorrect
+
+git add app/views app/components
+git commit -m "Views after erb_lint"
+
+if [ $(erb_lint app/views app/components | grep "No errors were found in ERB files" | wc -l) -eq 1 ]; then
+  echo "erb_lint did not find any errors"
+  exit 0
+else
+  exit 1
+fi
