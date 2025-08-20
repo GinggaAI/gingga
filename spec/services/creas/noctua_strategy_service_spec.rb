@@ -86,7 +86,7 @@ RSpec.describe Creas::NoctuaStrategyService do
     it 'stores meta information' do
       plan = subject.call
       expect(plan.meta).to include(
-        "model" => "gpt-4o-mini",
+        "model" => "gpt-4o",
         "prompt_version" => "noctua-v1"
       )
     end

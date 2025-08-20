@@ -3,7 +3,7 @@ require 'webmock/rspec'
 
 RSpec.describe GinggaOpenAI::ChatClient, type: :service do
   let(:user) { create(:user) }
-  let(:model) { 'gpt-4o-mini' }
+  let(:model) { 'gpt-4o' }
   let(:temperature) { 0.4 }
   let(:timeout) { 60 }
   let(:access_token) { 'sk-test_openai_token_123' }
@@ -19,7 +19,7 @@ RSpec.describe GinggaOpenAI::ChatClient, type: :service do
   describe '#initialize' do
     it 'initializes with default values' do
       client = described_class.new(user: user)
-      expect(client.instance_variable_get(:@model)).to eq('gpt-4o-mini')
+      expect(client.instance_variable_get(:@model)).to eq('gpt-4o')
       expect(client.instance_variable_get(:@temperature)).to eq(0.4)
     end
 

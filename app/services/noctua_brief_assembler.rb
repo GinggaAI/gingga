@@ -1,5 +1,5 @@
 class NoctuaBriefAssembler
-  def self.call(brand:, strategy_form: {})
+  def self.call(brand:, strategy_form: {}, month: nil)
     # binding.break
     brand = Brand.includes(:audiences, :products, :brand_channels).find(brand.id)
     {
@@ -39,6 +39,7 @@ class NoctuaBriefAssembler
       },
       guardrails: brand.guardrails,
       # Monthly form fields:
+      month: month,
       objective_of_the_month: strategy_form[:objective_of_the_month],
       monthly_themes: strategy_form[:monthly_themes] || [],
       frequency_per_week: strategy_form[:frequency_per_week],

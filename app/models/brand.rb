@@ -8,6 +8,11 @@ class Brand < ApplicationRecord
   validates :name, :slug, :industry, :voice, presence: true
   validates :slug, uniqueness: { scope: :user_id }
 
+  # Nested attributes
+  accepts_nested_attributes_for :audiences, allow_destroy: true, reject_if: :all_blank
+  accepts_nested_attributes_for :products, allow_destroy: true, reject_if: :all_blank
+  accepts_nested_attributes_for :brand_channels, allow_destroy: true, reject_if: :all_blank
+
   # Virtual attributes for form handling
   attr_accessor :tone_no_go_list, :banned_words_list, :claims_rules_text
   attr_accessor :kling_enabled, :stock_enabled, :budget_enabled, :editing_enabled, :ai_avatars_enabled, :podcast_clips_enabled

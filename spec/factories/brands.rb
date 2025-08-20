@@ -1,8 +1,8 @@
 FactoryBot.define do
   factory :brand do
     association :user
-    name { "Test Brand" }
-    slug { "test-brand" }
+    sequence(:name) { |n| "Test Brand #{n}" }
+    sequence(:slug) { |n| "test-brand-#{n}" }
     industry { "technology" }
     value_proposition { "We provide innovative solutions" }
     mission { "To make technology accessible" }

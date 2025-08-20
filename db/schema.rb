@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_13_114539) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_19_155146) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -69,6 +69,48 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_13_114539) do
     t.datetime "updated_at", null: false
     t.index ["user_id", "slug"], name: "index_brands_on_user_id_and_slug", unique: true
     t.index ["user_id"], name: "index_brands_on_user_id"
+  end
+
+  create_table "creas_content_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "creas_strategy_plan_id", null: false
+    t.uuid "user_id", null: false
+    t.uuid "brand_id", null: false
+    t.string "content_id", null: false
+    t.string "origin_id"
+    t.string "origin_source"
+    t.integer "week"
+    t.integer "week_index"
+    t.string "scheduled_day"
+    t.date "publish_date"
+    t.datetime "publish_datetime_local"
+    t.string "timezone"
+    t.string "content_name"
+    t.string "status"
+    t.date "creation_date"
+    t.string "content_type"
+    t.string "platform"
+    t.string "aspect_ratio"
+    t.string "language"
+    t.string "pilar"
+    t.string "template"
+    t.string "video_source"
+    t.text "post_description"
+    t.text "text_base"
+    t.text "hashtags"
+    t.jsonb "subtitles", default: {}, null: false
+    t.jsonb "dubbing", default: {}, null: false
+    t.jsonb "shotplan", default: {}, null: false
+    t.jsonb "assets", default: {}, null: false
+    t.jsonb "accessibility", default: {}, null: false
+    t.jsonb "meta", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["brand_id"], name: "index_creas_content_items_on_brand_id"
+    t.index ["content_id"], name: "index_creas_content_items_on_content_id", unique: true
+    t.index ["creas_strategy_plan_id", "origin_id"], name: "index_creas_content_items_on_strategy_plan_and_origin_id"
+    t.index ["creas_strategy_plan_id"], name: "index_creas_content_items_on_creas_strategy_plan_id"
+    t.index ["status"], name: "index_creas_content_items_on_status", where: "(status IS NOT NULL)"
+    t.index ["user_id"], name: "index_creas_content_items_on_user_id"
   end
 
   create_table "creas_posts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -196,6 +238,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_13_114539) do
   add_foreign_key "audiences", "brands"
   add_foreign_key "brand_channels", "brands"
   add_foreign_key "brands", "users"
+  add_foreign_key "creas_content_items", "brands"
+  add_foreign_key "creas_content_items", "creas_strategy_plans"
+  add_foreign_key "creas_content_items", "users"
   add_foreign_key "creas_posts", "creas_strategy_plans"
   add_foreign_key "creas_posts", "users"
   add_foreign_key "creas_strategy_plans", "brands"

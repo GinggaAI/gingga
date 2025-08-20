@@ -19,7 +19,7 @@
     %p.mt-3.text-sm.text-on-dark-muted
       No marketing team. No complex tools. Just you — and Gingga doing the heavy lifting.
     .mt-8
-      %button.btn-primary.px-6.py-3.rounded-full.font-semibold.shadow-md.hover:shadow-lg{ data: { controller: "cta-pulse", tracking: "hero_cta" } }
+      = link_to new_user_session_path, class: "btn-primary px-6 py-3 rounded-full font-semibold shadow-md hover:shadow-lg inline-block", data: { controller: "cta-pulse", tracking: "hero_cta" } do
         Get Started Now
 
 / Section 2: What Gingga Does
@@ -216,7 +216,7 @@
           Plans from 
           %span.font-semibold{ style: "color: var(--bg)" } £98/month
         %p.mt-2.text-sm.font-medium{ style: "color: var(--cyan)" } ✨ First month: 20% off
-        %button.mt-6.w-full.btn-primary.text-white.font-semibold.py-3.rounded-full
+        = link_to new_user_session_path, class: "mt-6 w-full btn-primary text-white font-semibold py-3 rounded-full inline-block text-center" do
           Get Started Now
         %p.mt-3.text-xs{ style: "color: rgba(14,12,22,0.7)" } Book a free discovery call or start today
     

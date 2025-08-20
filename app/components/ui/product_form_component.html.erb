@@ -1,0 +1,44 @@
+<div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+  <div class="flex items-center justify-between mb-4">
+    <h4 class="text-md font-semibold text-theme">
+      <%= product.persisted? ? "Product ##{index + 1}" : "New Product" %>
+    </h4>
+    <% if product.persisted? %>
+      <%= form.check_box :_destroy, { class: "hidden destroy-checkbox" }, "1", "0" %>
+      <button type="button" class="text-red-600 hover:text-red-800 text-sm font-medium remove-product-btn">
+        Remove
+      </button>
+    <% end %>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="space-y-2">
+      <%= form.label :name, "Product Name", class: "block text-sm font-medium text-theme" %>
+      <%= form.text_field :name,
+            placeholder: "e.g., Premium SaaS Platform, Fitness App",
+            class: "form-input w-full" %>
+    </div>
+
+    <div class="space-y-2">
+      <%= form.label :pricing_info, "Pricing", class: "block text-sm font-medium text-theme" %>
+      <%= form.text_field :pricing_info,
+            placeholder: "e.g., $99/month, Free with premium options",
+            class: "form-input w-full" %>
+    </div>
+
+    <div class="md:col-span-2 space-y-2">
+      <%= form.label :description, "Description", class: "block text-sm font-medium text-theme" %>
+      <%= form.text_area :description,
+            placeholder: "Describe what your product does and its key benefits...",
+            rows: 3,
+            class: "form-input w-full" %>
+    </div>
+
+    <div class="md:col-span-2 space-y-2">
+      <%= form.label :url, "Product URL", class: "block text-sm font-medium text-theme" %>
+      <%= form.url_field :url,
+            placeholder: "https://yourproduct.com",
+            class: "form-input w-full" %>
+    </div>
+  </div>
+</div>

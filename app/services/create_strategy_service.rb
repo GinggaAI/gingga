@@ -15,7 +15,7 @@ class CreateStrategyService
   def call
     validate_inputs!
     strategy_form = build_strategy_form
-    brief = NoctuaBriefAssembler.call(brand: @brand, strategy_form: strategy_form)
+    brief = NoctuaBriefAssembler.call(brand: @brand, strategy_form: strategy_form, month: @month)
     plan = Creas::NoctuaStrategyService.new(
       user: @user,
       brief: brief,

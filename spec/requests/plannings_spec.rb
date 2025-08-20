@@ -25,7 +25,7 @@ RSpec.describe PlanningsController, type: :request do
         get planning_path
         expect(response).to have_http_status(:success)
         expect(assigns(:brand)).to be_nil
-        expect(assigns(:current_plan)).to be_nil
+        expect(assigns(:current_strategy)).to be_nil
       end
     end
 
@@ -40,7 +40,7 @@ RSpec.describe PlanningsController, type: :request do
 
       it "initializes currentPlan as null" do
         get planning_path
-        expect(response.body).to include("let currentPlan = null")
+        expect(response.body).to include("window.currentPlan = null")
       end
 
       it "shows 'Add Content' button" do
@@ -86,7 +86,7 @@ RSpec.describe PlanningsController, type: :request do
       it "loads the specific strategy plan" do
         get planning_path(plan_id: strategy_plan.id)
         expect(response).to have_http_status(:success)
-        expect(assigns(:current_plan)).to eq(strategy_plan)
+        expect(assigns(:current_strategy)).to eq(strategy_plan)
         expect(assigns(:current_month)).to eq("2024-12")
       end
     end

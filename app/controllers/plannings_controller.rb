@@ -1,142 +1,112 @@
 class PlanningsController < ApplicationController
   before_action :authenticate_user!
-  before_action :find_brand
+  before_action :set_brand
   before_action :set_current_month
-  before_action :find_existing_strategy, only: [ :show ]
+  before_action :set_current_strategy, only: [ :show ]
 
+  # GET /plannings
   def show
-    @plans = generate_sample_plans
+    @presenter = build_presenter
+    @plans = build_weekly_plans
   end
 
+  # GET /plannings/smart_planning
   def smart_planning
-    @plans = generate_sample_plans
+    @plans = build_weekly_plans
   end
 
+  # GET /plannings/strategy_for_month
   def strategy_for_month
-    month = params[:month] || @current_month
-    plan = find_strategy_for_month(month)
+    strategy = find_strategy_for_requested_month
 
-    if plan
-      formatted_plan = format_strategy_for_frontend(plan)
-      render json: formatted_plan
+    if strategy
+      render json: Planning::StrategyFormatter.call(strategy)
     else
-      render json: { error: "No strategy found for month" }, status: :not_found
+      render json: { error: I18n.t("plannings.strategy_not_found") },
+             status: :not_found
+    end
+  end
+
+  # POST /planning/voxa_refine
+  def voxa_refine
+    strategy = find_strategy_by_id_or_current
+
+    unless strategy
+      redirect_to planning_path, alert: "No strategy found to refine." and return
+    end
+
+    begin
+      Creas::VoxaContentService.new(strategy_plan: strategy).call
+      redirect_to planning_path(plan_id: strategy.id), notice: "Content items refined successfully with Voxa!"
+    rescue StandardError => e
+      Rails.logger.error "Voxa refinement failed: #{e.message}"
+      redirect_to planning_path(plan_id: strategy.id), alert: "Failed to refine content: #{e.message}"
     end
   end
 
   private
 
-  def find_brand
+  # Brand and month setup
+  def set_brand
     @brand = current_user.brands.first
-    # Don't redirect for now, let the view handle it
-    # This allows tests to pass and provides better UX
+    # We intentionally don't redirect here to allow views to handle missing brand
+    # This provides better UX and allows tests to pass gracefully
   end
 
   def set_current_month
-    @current_month = params[:month] || Date.current.strftime("%Y-%-m")
-    @current_month_display = format_month_for_display(@current_month)
+    @current_month = params[:month] || current_month_param
+    @current_month_display = Planning::MonthFormatter.format_for_display(@current_month)
   end
 
-  def find_existing_strategy
-    # Check if we have a specific plan_id parameter
-    if params[:plan_id]
-      @current_plan = @brand&.creas_strategy_plans&.find_by(id: params[:plan_id])
-      @current_month = @current_plan.month if @current_plan&.month
+  def current_month_param
+    Date.current.strftime("%Y-%-m")
+  end
+
+  # Strategy loading
+  def set_current_strategy
+    @current_strategy = if params[:plan_id]
+                          find_strategy_by_id
     else
-      # Look for existing strategy for current month
-      Rails.logger.debug "Looking for strategy for month: #{@current_month}"
-      Rails.logger.debug "Brand: #{@brand&.id}"
-      @current_plan = find_strategy_for_month(@current_month)
-      Rails.logger.debug "Found plan: #{@current_plan&.id}"
-    end
-  end
-
-  def find_strategy_for_month(month)
-    return nil unless @brand
-
-    # Simple search first, then try normalized format
-    plan = @brand.creas_strategy_plans.where(month: month).order(created_at: :desc).first
-
-    # If not found, try normalized version
-    if plan.nil?
-      normalized_month = normalize_month_format(month)
-      plan = @brand.creas_strategy_plans.where(month: normalized_month).order(created_at: :desc).first
+                          find_strategy_for_current_month
     end
 
-    plan
+    update_current_month_from_strategy if @current_strategy
   end
 
-  def normalize_month_format(month)
-    # Convert "2025-8" to "2025-08" and vice versa
-    return month unless month.match?(/^\d{4}-\d+$/)
+  def find_strategy_by_id
+    @brand&.creas_strategy_plans&.find_by(id: params[:plan_id])
+  end
 
-    year, month_num = month.split("-")
-    if month_num.length == 1
-      "#{year}-#{month_num.rjust(2, '0')}"
+  def find_strategy_for_current_month
+    Planning::StrategyFinder.find_for_brand_and_month(@brand, @current_month)
+  end
+
+  def find_strategy_for_requested_month
+    month = params[:month] || @current_month
+    Planning::StrategyFinder.find_for_brand_and_month(@brand, month)
+  end
+
+  def find_strategy_by_id_or_current
+    if params[:plan_id].present?
+      @brand&.creas_strategy_plans&.find_by(id: params[:plan_id])
     else
-      "#{year}-#{month_num.to_i}"
+      find_strategy_for_current_month
     end
   end
 
-  def format_month_for_display(month_string)
-    return "Current Month" unless month_string
+  def update_current_month_from_strategy
+    return unless @current_strategy.month.present?
 
-    begin
-      year, month_num = month_string.split("-")
-      date = Date.new(year.to_i, month_num.to_i)
-      date.strftime("%B %Y")
-    rescue
-      month_string
-    end
+    @current_month = @current_strategy.month
+    @current_month_display = Planning::MonthFormatter.format_for_display(@current_month)
   end
 
-  def format_strategy_for_frontend(plan)
-    {
-      id: plan.id,
-      strategy_name: plan.strategy_name,
-      month: plan.month,
-      objective_of_the_month: plan.objective_of_the_month,
-      frequency_per_week: plan.frequency_per_week,
-      monthly_themes: plan.monthly_themes,
-      weekly_plan: plan.weekly_plan
-    }
+  # View data building
+  def build_presenter
+    PlanningPresenter.new(params, brand: @brand, current_plan: @current_strategy)
   end
 
-  def generate_sample_plans
-    # Sample weekly plans - in a real app this would come from OpenAI/database
-    [
-      {
-        week_number: 1,
-        start_date: Date.current.beginning_of_week,
-        end_date: Date.current.beginning_of_week + 6.days,
-        content_count: 5,
-        goals: [ :growth, :engagement ],
-        status: :draft
-      },
-      {
-        week_number: 2,
-        start_date: Date.current.beginning_of_week + 1.week,
-        end_date: Date.current.beginning_of_week + 1.week + 6.days,
-        content_count: 4,
-        goals: [ :retention, :activation ],
-        status: :scheduled
-      },
-      {
-        week_number: 3,
-        start_date: Date.current.beginning_of_week + 2.weeks,
-        end_date: Date.current.beginning_of_week + 2.weeks + 6.days,
-        content_count: 6,
-        goals: [ :growth, :satisfaction ],
-        status: :draft
-      },
-      {
-        week_number: 4,
-        start_date: Date.current.beginning_of_week + 3.weeks,
-        end_date: Date.current.beginning_of_week + 3.weeks + 6.days,
-        content_count: 3,
-        goals: [ :engagement ],
-        status: :published
-      }
-    ]
+  def build_weekly_plans
+    Planning::WeeklyPlansBuilder.call(@current_strategy)
   end
 end
