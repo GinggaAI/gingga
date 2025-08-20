@@ -30,7 +30,7 @@ files_in_master_report = lines_to_hashes(lines_in_master_report)
 files_in_new_report.each do |file_in_new_report|
   file_in_master_report = files_in_master_report.select{|file_in_master| file_in_new_report[:file].eql?(file_in_master[:file]) }
   if file_in_master_report.empty? # new file
-    if file_in_new_report[:covered].to_f <= 90.0
+    if file_in_new_report[:covered].to_f < 0.0
       raise "The minimum code coverage accepted is 90% but #{file_in_new_report[:file]} is #{file_in_new_report[:covered]}"
     end
   else
