@@ -1,11 +1,11 @@
 {
   "scan_info": {
     "app_path": "/home/julian/gingga",
-    "rails_version": "8.0.2",
+    "rails_version": "8.0.2.1",
     "security_warnings": 0,
-    "start_time": "2025-07-25 22:52:52 +0200",
-    "end_time": "2025-07-25 22:52:53 +0200",
-    "duration": 0.648563192,
+    "start_time": "2025-08-20 17:16:15 +0200",
+    "end_time": "2025-08-20 17:16:17 +0200",
+    "duration": 1.849661113,
     "checks_performed": [
       "BasicAuth",
       "BasicAuthTimingAttack",
@@ -86,9 +86,9 @@
       "XMLDoS",
       "YAMLParsing"
     ],
-    "number_of_controllers": 2,
-    "number_of_models": 1,
-    "number_of_templates": 3,
+    "number_of_controllers": 18,
+    "number_of_models": 12,
+    "number_of_templates": 31,
     "ruby_version": "3.4.2",
     "brakeman_version": "7.1.0"
   },
