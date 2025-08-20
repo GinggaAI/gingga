@@ -383,7 +383,7 @@ document.addEventListener('turbo:load', function() {
               <label class="block text-sm font-medium text-theme">Audience Name</label>
               <input type="text" name="brand[audiences_attributes][${audienceIndex}][name]" placeholder="e.g., Young Professionals, Tech Enthusiasts" class="form-input w-full">
             </div>
-            
+
             <div class="md:col-span-2 space-y-4">
               <label class="block text-sm font-medium text-theme">Demographics</label>
               <div class="bg-white border rounded-lg p-4 space-y-3">
@@ -471,7 +471,7 @@ document.addEventListener('turbo:load', function() {
       `;
       audiencesContainer.insertAdjacentHTML('beforeend', template);
       audienceIndex++;
-      
+
       // Initialize demographics for the newly added audience
       setTimeout(initializeDemographicsFields, 100);
     });

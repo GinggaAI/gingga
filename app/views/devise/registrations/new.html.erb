@@ -11,7 +11,7 @@
       </p>
     </div>
 
-    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), 
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name),
                   html: { data: { turbo: false } }, class: "mt-8 space-y-6") do |f| %>
       <% if resource.errors.any? %>
         <div class="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -40,8 +40,8 @@
       <div class="space-y-4">
         <div>
           <%= f.label :email, "Email address", class: "block text-sm font-medium text-gray-700" %>
-          <%= f.email_field :email, 
-                autofocus: true, 
+          <%= f.email_field :email,
+                autofocus: true,
                 autocomplete: "email",
                 class: "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm",
                 placeholder: "Enter your email" %>
@@ -54,7 +54,7 @@
               <span class="text-xs text-gray-500">(<%= @minimum_password_length %> characters minimum)</span>
             <% end %>
           <% end %>
-          <%= f.password_field :password, 
+          <%= f.password_field :password,
                 autocomplete: "new-password",
                 class: "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm",
                 placeholder: "Create a password" %>
@@ -62,7 +62,7 @@
 
         <div>
           <%= f.label :password_confirmation, "Confirm password", class: "block text-sm font-medium text-gray-700" %>
-          <%= f.password_field :password_confirmation, 
+          <%= f.password_field :password_confirmation,
                 autocomplete: "new-password",
                 class: "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm",
                 placeholder: "Confirm your password" %>
@@ -70,14 +70,14 @@
       </div>
 
       <div>
-        <%= f.submit "Create account", 
+        <%= f.submit "Create account",
               class: "group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out" %>
       </div>
 
       <div class="text-center">
         <p class="text-sm text-gray-600">
-          Already have an account? 
-          <%= link_to "Sign in", new_session_path(resource_name), 
+          Already have an account?
+          <%= link_to "Sign in", new_session_path(resource_name),
                 class: "font-medium text-blue-600 hover:text-blue-500" %>
         </p>
       </div>

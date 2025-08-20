@@ -8,25 +8,25 @@
 
   <div class="mb-8">
     <div class="flex bg-gray-100 rounded-lg p-1 max-w-md">
-      <%= link_to scene_based_reels_path, 
+      <%= link_to scene_based_reels_path,
           class: "flex-1 px-4 py-2 text-center rounded-md font-medium transition-colors text-white",
           style: "background-color: #FFC857" do %>
         Scene-Based
       <% end %>
-      <%= link_to narrative_reels_path, 
+      <%= link_to narrative_reels_path,
           class: "flex-1 px-4 py-2 text-center rounded-md font-medium transition-colors text-gray-600 hover:text-gray-900" do %>
         Narrative
       <% end %>
     </div>
   </div>
 
-  <%= form_with model: @reel, url: scene_based_reels_path, local: true, 
-                data: { 
+  <%= form_with model: @reel, url: scene_based_reels_path, local: true,
+                data: {
                   controller: "scene-list",
                   scene_list_scene_count_value: 3
-                }, 
+                },
                 class: "space-y-8" do |form| %>
-    
+
     <% if @reel.errors.any? %>
       <div class="bg-red-50 border border-red-200 rounded-lg p-4">
         <h4 class="text-red-800 font-medium">Please fix the following errors:</h4>
@@ -82,8 +82,8 @@
         </span>
         <div class="flex gap-2">
           <%= render Ui::ButtonComponent.new(
-            label: "Add Scene", 
-            variant: :ghost, 
+            label: "Add Scene",
+            variant: :ghost,
             size: :sm
           ) do %>
             <button type="button" data-action="click->scene-list#addScene" class="ui-button ui-button--ghost ui-button--sm">
@@ -119,9 +119,9 @@
 
     <div class="flex justify-end pt-6">
       <%= render Ui::ButtonComponent.new(
-        label: "Generate Scene-Based Reel", 
-        variant: :primary, 
-        type: :submit, 
+        label: "Generate Scene-Based Reel",
+        variant: :primary,
+        type: :submit,
         size: :lg
       ) %>
     </div>

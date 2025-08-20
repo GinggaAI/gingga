@@ -8,11 +8,11 @@
 
   <div class="mb-8">
     <div class="flex bg-gray-100 rounded-lg p-1 max-w-md">
-      <%= link_to scene_based_reels_path, 
+      <%= link_to scene_based_reels_path,
           class: "flex-1 px-4 py-2 text-center rounded-md font-medium transition-colors text-gray-600 hover:text-gray-900" do %>
         Scene-Based
       <% end %>
-      <%= link_to narrative_reels_path, 
+      <%= link_to narrative_reels_path,
           class: "flex-1 px-4 py-2 text-center rounded-md font-medium transition-colors text-white",
           style: "background-color: #FFC857" do %>
         Narrative
@@ -35,13 +35,13 @@
   </div>
 
   <%= form_with model: @reel, url: narrative_reels_path, local: true,
-                data: { 
+                data: {
                   controller: "narrative-form",
                   narrative_form_categories_url_value: api_v1_categories_path,
                   narrative_form_formats_url_value: api_v1_formats_path
                 },
                 class: "space-y-8" do |form| %>
-    
+
     <% if @reel.errors.any? %>
       <div class="bg-red-50 border border-red-200 rounded-lg p-4">
         <h4 class="text-red-800 font-medium">Please fix the following errors:</h4>
@@ -76,10 +76,10 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="space-y-2">
             <%= form.label :category, "Category", class: "block text-sm font-medium text-gray-700" %>
-            <%= form.select :category, 
-                  [["Select category", ""]], 
+            <%= form.select :category,
+                  [["Select category", ""]],
                   {},
-                  { 
+                  {
                     class: "form-input w-full",
                     data: { narrative_form_target: "categorySelect" }
                   } %>
@@ -88,9 +88,9 @@
           <div class="space-y-2">
             <%= form.label :format, "Target Audience", class: "block text-sm font-medium text-gray-700" %>
             <%= form.select :format,
-                  [["Select audience", ""]], 
+                  [["Select audience", ""]],
                   {},
-                  { 
+                  {
                     class: "form-input w-full",
                     data: { narrative_form_target: "formatSelect" }
                   } %>
@@ -134,7 +134,7 @@
                   ["No Music", "none"]
                 ], @reel.music_preference),
                 {},
-                { 
+                {
                   class: "form-input w-full"
                 } %>
         </div>
@@ -151,7 +151,7 @@
                   ["Cinematic", "cinematic"]
                 ], @reel.style_preference),
                 {},
-                { 
+                {
                   class: "form-input w-full"
                 } %>
         </div>
@@ -160,9 +160,9 @@
 
     <div class="flex justify-end pt-6">
       <%= render Ui::ButtonComponent.new(
-        label: "Generate Narrative Reel", 
-        variant: :primary, 
-        type: :submit, 
+        label: "Generate Narrative Reel",
+        variant: :primary,
+        type: :submit,
         size: :lg
       ) %>
     </div>
