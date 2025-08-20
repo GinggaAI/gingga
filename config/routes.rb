@@ -24,7 +24,11 @@ Rails.application.routes.draw do
   resource :analytics, only: [ :show ]
   resource :community, only: [ :show ]
   resource :settings, only: [ :show ]
-  devise_for :users
+  devise_for :users, controllers: {
+    sessions: "users/sessions",
+    registrations: "users/registrations",
+    passwords: "users/passwords"
+  }
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # API routes

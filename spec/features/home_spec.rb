@@ -84,7 +84,7 @@ RSpec.feature "Home", type: :feature do
 
     # Check for different CTA buttons
     expect(page).to have_button("Get Started") # Navigation
-    expect(page).to have_button("Get Started Now") # Hero and Pricing sections
+    expect(page).to have_link("Get Started Now") # Hero and Pricing sections
 
     # Verify buttons are present and clickable in specific sections
     within('header nav') do
@@ -92,11 +92,11 @@ RSpec.feature "Home", type: :feature do
     end
 
     within('#pricing') do
-      expect(page).to have_button("Get Started Now")
+      expect(page).to have_link("Get Started Now")
     end
 
-    # Verify we have multiple CTA buttons across the page
-    expect(all('button', text: /Get Started/).count).to be >= 2
+    # Verify we have multiple CTA buttons/links across the page
+    expect(all('a,button', text: /Get Started/).count).to be >= 2
   end
 
   scenario "User can navigate using anchor links" do

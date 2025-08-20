@@ -9,7 +9,7 @@ RSpec.describe "Landing Page", type: :system do
     it "displays the main headline and CTA" do
       visit root_path
       expect(page).to have_text("GINGGA: Intelligence in Motion")
-      expect(page).to have_button("Get Started Now")
+      expect(page).to have_link("Get Started Now")
     end
 
     it "renders How Gingga Works steps" do
@@ -113,8 +113,8 @@ RSpec.describe "Landing Page", type: :system do
     it "has multiple CTA buttons for conversion" do
       visit root_path
 
-      # Should have at least 2 Get Started buttons
-      expect(all('button', text: /Get Started/).count).to be >= 2
+      # Should have at least 2 Get Started links
+      expect(all('a', text: /Get Started/).count).to be >= 2
     end
 
     it "displays brand identity consistently" do
