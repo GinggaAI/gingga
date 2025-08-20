@@ -50,7 +50,22 @@ jobs:
           bundler-cache: true
 
       - name: Lint ERB templates
-        run: erb_lint --format json app/views app/components
+        run: bundle exec erb_lint --format json app/views app/components
+
+  bin_shot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Runs bin/shot
+        run: bash bin/shot
 
   accessibility:
     runs-on: ubuntu-latest

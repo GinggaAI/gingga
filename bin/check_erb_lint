@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "Running erb_lint..."
-erb_lint app/views app/components  --autocorrect
+bundle exec erb_lint app/views app/components  --autocorrect &> /dev/null
 
 git add app/views app/components
 git commit -m "Views after erb_lint"
