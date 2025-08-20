@@ -65,7 +65,10 @@ jobs:
           bundler-cache: true
 
       - name: Runs bin/shot
-        run: bash bin/shot
+        uses: hoverkraft-tech/compose-action@v0.0.0
+        with:
+          up-flags: "-d"
+        run: yarn && bundle && bundle exec rails db:setup && bash bin/shot
 
   accessibility:
     runs-on: ubuntu-latest
