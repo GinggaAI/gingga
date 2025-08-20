@@ -22,7 +22,7 @@ app/views/devise/mailer/email_changed.html.erb:3:<% if @resource.try(:unconfirme
 app/views/devise/passwords/edit.html.erb:9:    <% if @minimum_password_length %>
 app/views/devise/passwords/new.html.erb:16:      <% if resource.errors.any? %>
 app/views/devise/registrations/edit.html.erb:11:  <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
-app/views/devise/registrations/edit.html.erb:16:    <%= f.label :password %> <i>(leave blank if you don't want to change it)</i><br />
+app/views/devise/registrations/edit.html.erb:16:    <%= f.label :password %> <i>(leave blank if you don't want to change it)</i><br>
 app/views/devise/registrations/edit.html.erb:18:    <% if @minimum_password_length %>
 app/views/devise/registrations/new.html.erb:16:      <% if resource.errors.any? %>
 app/views/devise/registrations/new.html.erb:53:            <% if @minimum_password_length %>

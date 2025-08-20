@@ -126,7 +126,4 @@ RSpec.configure do |config|
   # Include ViewComponent helpers in component specs
   config.include ViewComponent::TestHelpers, type: :component
   config.include Capybara::RSpecMatchers, type: :component
-
-  # Exclude DB-required specs by default. Run them with RUN_DB_TESTS=1
-  config.filter_run_excluding requires_db: true unless ENV["RUN_DB_TESTS"] == "1"
 end
