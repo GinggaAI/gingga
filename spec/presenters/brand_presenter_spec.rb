@@ -278,4 +278,110 @@ RSpec.describe BrandPresenter do
       end
     end
   end
+
+  describe 'view logic methods' do
+    let(:brands_collection) { [ create(:brand, user: user), create(:brand, user: user) ] }
+    let(:notice) { 'Brand updated successfully!' }
+    let(:presenter_with_params) { described_class.new(brand, { notice: notice, brands_collection: brands_collection }) }
+
+    describe '#show_notice?' do
+      context 'when notice is present' do
+        it 'returns true' do
+          expect(presenter_with_params.show_notice?).to be true
+        end
+      end
+
+      context 'when notice is blank' do
+        let(:presenter_without_notice) { described_class.new(brand, { notice: '', brands_collection: brands_collection }) }
+
+        it 'returns false' do
+          expect(presenter_without_notice.show_notice?).to be false
+        end
+      end
+
+      context 'when notice is nil' do
+        let(:presenter_without_notice) { described_class.new(brand, { notice: nil, brands_collection: brands_collection }) }
+
+        it 'returns false' do
+          expect(presenter_without_notice.show_notice?).to be false
+        end
+      end
+    end
+
+    describe '#notice_message' do
+      it 'returns the notice message' do
+        expect(presenter_with_params.notice_message).to eq('Brand updated successfully!')
+      end
+    end
+
+    describe '#show_brands_selector?' do
+      context 'when brands collection has items' do
+        it 'returns true' do
+          expect(presenter_with_params.show_brands_selector?).to be true
+        end
+      end
+
+      context 'when brands collection is empty' do
+        let(:presenter_without_brands) { described_class.new(brand, { notice: notice, brands_collection: [] }) }
+
+        it 'returns false' do
+          expect(presenter_without_brands.show_brands_selector?).to be false
+        end
+      end
+
+      context 'when brands collection is nil' do
+        let(:presenter_without_brands) { described_class.new(brand, { notice: notice, brands_collection: nil }) }
+
+        it 'returns false' do
+          expect(presenter_without_brands.show_brands_selector?).to be false
+        end
+      end
+    end
+
+    describe '#brands_collection' do
+      context 'when brands collection is provided' do
+        it 'returns the brands collection' do
+          expect(presenter_with_params.brands_collection).to eq(brands_collection)
+        end
+      end
+
+      context 'when brands collection is not provided' do
+        it 'returns empty array' do
+          expect(presenter.brands_collection).to eq([])
+        end
+      end
+    end
+
+    describe '#show_validation_errors?' do
+      context 'when brand has validation errors' do
+        before do
+          brand.errors.add(:name, 'is required')
+        end
+
+        it 'returns true' do
+          expect(presenter.show_validation_errors?).to be true
+        end
+      end
+
+      context 'when brand has no validation errors' do
+        it 'returns false' do
+          expect(presenter.show_validation_errors?).to be false
+        end
+      end
+    end
+
+    describe '#validation_error_messages' do
+      before do
+        brand.errors.add(:name, 'is required')
+        brand.errors.add(:industry, 'must be selected')
+      end
+
+      it 'returns full error messages' do
+        expect(presenter.validation_error_messages).to contain_exactly(
+          'Name is required',
+          'Industry must be selected'
+        )
+      end
+    end
+  end
 end

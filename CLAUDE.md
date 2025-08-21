@@ -80,6 +80,12 @@ Follow these fundamental Rails principles:
    - Controllers should orchestrate, not implement business rules
    - Keep controller actions focused on HTTP concerns
 
+4. **Presenter Pattern for View Logic**
+   - **FORBIDDEN**: No `if` statements in views - this indicates need for a presenter
+   - Extract all conditional logic from views into presenter objects
+   - Views should only contain display logic and simple iteration
+   - Use presenters to encapsulate complex view logic and formatting
+
 ### Required Quality Gates
 - ✅ All tests must pass (`bundle exec rspec`)
 - ✅ 90%+ code coverage on new/modified files

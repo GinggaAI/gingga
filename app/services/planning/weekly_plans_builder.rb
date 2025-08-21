@@ -55,7 +55,7 @@ module Planning
           goals: [],
           status: :needs_strategy,
           ideas: [],
-          message: I18n.t("plannings.create_first_strategy")
+          message: I18n.t("planning.messages.create_first_strategy")
         }
       ]
     end

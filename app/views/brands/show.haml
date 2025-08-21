@@ -2,41 +2,35 @@
   .p-8
     .max-w-6xl.mx-auto
       .mb-8
-        %h1.text-3xl.font-bold.text-gray-900.mb-2 My Brand
-        %p.text-gray-600 Define and manage your brand identity
+        %h1.text-3xl.font-bold.text-gray-900.mb-2= t('brands.title')
+        %p.text-gray-600= t('brands.subtitle')
       .space-y-6{"data-orientation" => "horizontal", :dir => "ltr"}
         .h-10.items-center.justify-center.text-muted-foreground.grid.w-full.grid-cols-2.bg-white.border-2.border-gray-200.rounded-xl.p-1{"aria-orientation" => "horizontal", "data-orientation" => "horizontal", :role => "tablist", :style => "outline:none", :tabindex => "0"}
           %button.whitespace-nowrap.px-3.text-sm.ring-offset-background.transition-all.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.rounded-lg.font-medium{"aria-controls" => "radix-«Ra7db»-content-profile", "aria-selected" => "true", :class => "py-1.5 data-[state=active]:shadow-sm data-[state=active]:bg-[#FFC940] data-[state=active]:text-black", "data-orientation" => "horizontal", "data-radix-collection-item" => "", "data-state" => "active", :id => "radix-«Ra7db»-trigger-profile", :role => "tab", :tabindex => "-1", :type => "button"}
-            Brand
-            Profile
+            = t('brands.brand_profile')
           %button.inline-flex.items-center.justify-center.whitespace-nowrap.px-3.text-sm.ring-offset-background.transition-all.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.rounded-lg.font-medium{"aria-controls" => "radix-«Ra7db»-content-kit", "aria-selected" => "false", :class => "py-1.5 data-[state=active]:shadow-sm data-[state=active]:bg-[#FFC940] data-[state=active]:text-black", "data-orientation" => "horizontal", "data-radix-collection-item" => "", "data-state" => "inactive", :id => "radix-«Ra7db»-trigger-kit", :role => "tab", :tabindex => "-1", :type => "button"}
-            Brand
-            Kit
+            = t('brands.brand_kit')
         .mt-2.ring-offset-background.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2{"aria-labelledby" => "radix-«Ra7db»-trigger-profile", "data-orientation" => "horizontal", "data-state" => "active", :id => "radix-«Ra7db»-content-profile", :role => "tabpanel", :style => "animation-duration:0s", :tabindex => "0"}
           .bg-card.text-card-foreground.border-0.shadow-lg.rounded-2xl
             .flex.flex-col.p-6.pb-6{:class => "space-y-1.5"}
-              .font-semibold.tracking-tight.text-2xl.text-gray-900 Brand Profile
+              .font-semibold.tracking-tight.text-2xl.text-gray-900= t('brands.brand_profile')
             .p-6.pt-0.space-y-6
               %div
                 %label.block.text-sm.font-medium.text-gray-700.mb-2
-                  Brand
-                  Name
-                %input.flex.h-10.w-full.bg-background.px-3.py-2.text-base.ring-offset-background.file:border-0.file:bg-transparent.file:text-sm.file:font-medium.file:text-foreground.placeholder:text-muted-foreground.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:cursor-not-allowed.disabled:opacity-50.md:text-sm.rounded-xl.border-2.border-gray-200{:class => "focus:border-[#FFC940]", :placeholder => "Enter your brand name", :value => ""}/
+                  = t('brands.brand_name')
+                %input.flex.h-10.w-full.bg-background.px-3.py-2.text-base.ring-offset-background.file:border-0.file:bg-transparent.file:text-sm.file:font-medium.file:text-foreground.placeholder:text-muted-foreground.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:cursor-not-allowed.disabled:opacity-50.md:text-sm.rounded-xl.border-2.border-gray-200{:class => "focus:border-[#FFC940]", :placeholder => t('brands.brand_name_placeholder'), :value => ""}/
               %div
                 %label.block.text-sm.font-medium.text-gray-700.mb-2
-                  Who is your
-                  audience?
-                %textarea.flex.w-full.bg-background.px-3.py-2.text-base.ring-offset-background.placeholder:text-muted-foreground.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:cursor-not-allowed.disabled:opacity-50.md:text-sm.rounded-xl.border-2.border-gray-200{:class => "focus:border-[#FFC940] min-h-[100px]", :placeholder => "Describe your target audience... What are their dreams, fears, and pain points?"}
+                  = t('brands.audience_question')
+                %textarea.flex.w-full.bg-background.px-3.py-2.text-base.ring-offset-background.placeholder:text-muted-foreground.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:cursor-not-allowed.disabled:opacity-50.md:text-sm.rounded-xl.border-2.border-gray-200{:class => "focus:border-[#FFC940] min-h-[100px]", :placeholder => t('brands.audience_placeholder')}
               %div
                 %label.block.text-sm.font-medium.text-gray-700.mb-2
-                  What do you sell or
-                  offer?
-                %textarea.flex.w-full.bg-background.px-3.py-2.text-base.ring-offset-background.placeholder:text-muted-foreground.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:cursor-not-allowed.disabled:opacity-50.md:text-sm.rounded-xl.border-2.border-gray-200{:class => "focus:border-[#FFC940] min-h-[100px]", :placeholder => "Describe your products or services..."}
+                  = t('brands.products_question')
+                %textarea.flex.w-full.bg-background.px-3.py-2.text-base.ring-offset-background.placeholder:text-muted-foreground.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:cursor-not-allowed.disabled:opacity-50.md:text-sm.rounded-xl.border-2.border-gray-200{:class => "focus:border-[#FFC940] min-h-[100px]", :placeholder => t('brands.products_placeholder')}
               %div
                 %label.block.text-sm.font-medium.text-gray-700.mb-2
-                  Brand purpose or
-                  mission
-                %textarea.flex.w-full.bg-background.px-3.py-2.text-base.ring-offset-background.placeholder:text-muted-foreground.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:cursor-not-allowed.disabled:opacity-50.md:text-sm.rounded-xl.border-2.border-gray-200{:class => "focus:border-[#FFC940] min-h-[100px]", :placeholder => "What's your brand's mission and purpose..."}
+                  = t('brands.mission_question')
+                %textarea.flex.w-full.bg-background.px-3.py-2.text-base.ring-offset-background.placeholder:text-muted-foreground.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:cursor-not-allowed.disabled:opacity-50.md:text-sm.rounded-xl.border-2.border-gray-200{:class => "focus:border-[#FFC940] min-h-[100px]", :placeholder => t('brands.mission_placeholder')}
               %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.bg-primary.h-10.px-4.bg-gradient-to-r.text-black.font-medium.py-2.rounded-xl{class: "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-primary/90 from-[#FFC940] to-[#FF6848] hover:from-[#FF6848] hover:to-[#A37FFF]", type: "submit"}
-                Save Profile
+                = t('brands.save_profile')
         .mt-2.ring-offset-background.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2{"aria-labelledby" => "radix-«Ra7db»-trigger-kit", "data-orientation" => "horizontal", "data-state" => "inactive", :hidden => "", :id => "radix-«Ra7db»-content-kit", :role => "tabpanel", :tabindex => "0"}

@@ -4,15 +4,15 @@
       .mb-8
         .flex.items-center.justify-between
           %div
-            %h1.text-3xl.font-bold.text-gray-900.mb-2 Analytics
-            %p.text-gray-600 Track your content performance and growth
+            %h1.text-3xl.font-bold.text-gray-900.mb-2= t('analytics.title')
+            %p.text-gray-600= t('analytics.subtitle')
           .flex.items-center.gap-3
             %button.flex.h-10.items-center.justify-between.border-input.bg-background.px-3.py-2.text-sm.ring-offset-background.placeholder:text-muted-foreground.focus:outline-none.focus:ring-2.focus:ring-ring.focus:ring-offset-2.disabled:cursor-not-allowed.disabled:opacity-50.w-32.rounded-xl.border-2{"aria-autocomplete" => "none", "aria-controls" => "radix-«r6o»", "aria-expanded" => "false", :class => "[&>span]:line-clamp-1", "data-state" => "closed", :dir => "ltr", :role => "combobox", :type => "button"}
-              %span{:style => "pointer-events: none;"} Last 30 days
+              %span{:style => "pointer-events: none;"}= t('analytics.last_30_days')
               %svg.lucide.lucide-chevron-down.h-4.w-4.opacity-50{"aria-hidden" => "true", :fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
                 %path{:d => "m6 9 6 6 6-6"}
             %button.flex.h-10.items-center.justify-between.border-input.bg-background.px-3.py-2.text-sm.ring-offset-background.placeholder:text-muted-foreground.focus:outline-none.focus:ring-2.focus:ring-ring.focus:ring-offset-2.disabled:cursor-not-allowed.disabled:opacity-50.w-40.rounded-xl.border-2{"aria-autocomplete" => "none", "aria-controls" => "radix-«r6p»", "aria-expanded" => "false", :class => "[&>span]:line-clamp-1", "data-state" => "closed", :dir => "ltr", :role => "combobox", :type => "button"}
-              %span{:style => "pointer-events: none;"} All platforms
+              %span{:style => "pointer-events: none;"}= t('analytics.all_platforms')
               %svg.lucide.lucide-chevron-down.h-4.w-4.opacity-50{"aria-hidden" => "true", :fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
                 %path{:d => "m6 9 6 6 6-6"}
       .grid.md:grid-cols-3.gap-6.mb-8

@@ -1,0 +1,254 @@
+es:
+  hello: "Hola mundo"
+  
+  # Navigation and Common
+  nav:
+    my_brand: "Mi Marca"
+    smart_planning: "Planificación Inteligente"
+    viral_ideas: "Ideas Virales"
+    auto_creation: "Creación Automática"
+    analytics: "Analíticas"
+    community: "Comunidad"
+    settings: "Configuración"
+    new_viral_idea: "Nueva Idea Viral"
+    logout: "Cerrar Sesión"
+    language: "Idioma"
+    english: "Inglés"
+    spanish: "Español"
+
+  # Settings
+  settings:
+    title: "Configuración"
+    subtitle: "Gestiona las preferencias de tu cuenta e integraciones de API"
+    account_preferences: "Preferencias de Cuenta"
+    account_subtitle: "Gestiona la configuración de tu cuenta y preferencias de idioma"
+    language_settings: "Configuración de Idioma"
+    language_subtitle: "Elige tu idioma preferido para la interfaz"
+
+  # Brands
+  brands:
+    title: "Mi Marca"
+    subtitle: "Define y gestiona la identidad de tu marca"
+    brand_profile: "Perfil de Marca"
+    brand_kit: "Kit de Marca"
+    brand_name: "Nombre de la Marca"
+    brand_name_placeholder: "Ingresa el nombre de tu marca"
+    audience_question: "¿Quién es tu audiencia?"
+    audience_placeholder: "Describe tu audiencia objetivo... ¿Cuáles son sus sueños, miedos y puntos de dolor?"
+    products_question: "¿Qué vendes u ofreces?"
+    products_placeholder: "Describe tus productos o servicios..."
+    mission_question: "Propósito o misión de la marca"
+    mission_placeholder: "¿Cuál es la misión y propósito de tu marca..."
+    save_profile: "Guardar Perfil"
+    
+    # Edit page specific
+    page_title: "Mi Marca"
+    edit_title: "Perfil de Marca"
+    edit_subtitle: "Define la identidad de tu marca y preferencias de contenido"
+    managing_label: "Gestionando:"
+    add_new_brand: "Agregar Nueva Marca"
+    untitled_brand: "Marca Sin Título"
+    fix_errors: "Por favor corrige los siguientes errores:"
+    brand_identity: "Identidad de Marca"
+    brand_identity_desc: "Información principal sobre tu marca"
+    brand_handle: "Handle/Slug de Marca"
+    brand_handle_placeholder: "ej. marca-creativa"
+    industry_label: "Industria"
+    select_industry: "Seleccionar Industria"
+    brand_voice_label: "Voz de Marca"
+    select_voice: "Seleccionar Voz"
+    audience_offer: "Audiencia y Oferta"
+    audience_offer_desc: "Define tu audiencia objetivo y propuesta de valor"
+    value_proposition: "¿Qué vendes u ofreces?"
+    value_proposition_placeholder: "Describe tus productos o servicios..."
+    mission_purpose: "Propósito o misión de marca"
+    mission_purpose_placeholder: "¿Cuál es la misión y propósito de tu marca..."
+    content_preferences: "Preferencias de Contenido"
+    content_preferences_desc: "Configuración de idioma y región para tu contenido"
+    content_language: "Idioma del Contenido"
+    primary_region: "Región Principal"
+    content_guidelines: "Directrices de Contenido"
+    tones_to_avoid: "Tonos a Evitar"
+    tones_to_avoid_placeholder: "ej., agresivo, demasiado formal, sarcástico"
+    separate_commas: "Separar con comas"
+    banned_words: "Palabras Prohibidas"
+    banned_words_placeholder: "ej., nombres de competidores, términos inapropiados"
+    claims_rules: "Reglas de Declaraciones y Legales"
+    claims_rules_placeholder: "Cualquier restricción legal, requisitos de sustentación de declaraciones, o pautas de cumplimiento..."
+    brand_assets: "Activos y Recursos de Marca"
+    strategy_ready: "¡Listo para la creación de estrategia!"
+    target_audiences: "Audiencias Objetivo"
+    target_audiences_desc: "Define a quién está dirigido tu contenido"
+    current_summary: "Resumen actual:"
+    no_audiences: "Aún no se han definido audiencias."
+    add_audience: "Agregar Audiencia"
+    products_services: "Productos y Servicios"
+    products_services_desc: "Lo que ofreces a tu audiencia"
+    current_products: "Productos actuales:"
+    no_products: "Aún no se han definido productos."
+    add_product: "Agregar Producto"
+    social_channels: "Canales de Redes Sociales"
+    social_channels_desc: "Plataformas donde publicas contenido"
+    active_channels: "Canales activos:"
+    no_channels: "Aún no se han configurado canales."
+    add_channel: "Agregar Canal"
+
+  # Viral Ideas
+  viral_ideas:
+    title: "Ideas Virales"
+    subtitle: "Auto-detecta contenido de alto rendimiento de cuentas de referencia"
+    viral_ideas_tab: "Ideas Virales"
+    reference_accounts_tab: "Cuentas de Referencia"
+    search_placeholder: "Buscar ideas virales..."
+    all_categories: "Todas las Categorías"
+    business: "Negocios"
+    marketing: "Marketing"
+    entertainment: "Entretenimiento"
+    analyze: "Analizar"
+    add_to_plan: "Agregar al Plan"
+
+  # Analytics
+  analytics:
+    title: "Analíticas"
+    subtitle: "Rastrea el rendimiento y crecimiento de tu contenido"
+    last_30_days: "Últimos 30 días"
+    all_platforms: "Todas las plataformas"
+
+  # Auto Creation
+  auto_creation:
+    title: "Creación Automática"
+    subtitle: "Genera contenido automáticamente con IA"
+
+  # Community
+  community:
+    title: "Comunidad"
+    subtitle: "Conecta y participa con tu comunidad"
+  
+  # Common buttons and actions
+  buttons:
+    cancel: "Cancelar"
+    save: "Guardar"
+    submit: "Enviar"
+    generate: "Generar"
+    close: "Cerrar"
+    add: "Agregar"
+    edit: "Editar"
+    delete: "Eliminar"
+    back: "Atrás"
+    next: "Siguiente"
+    
+  # Planning module
+  planning:
+    title: "Planificación Inteligente"
+    subtitle: "Planifica tu estrategia de contenido con insights impulsados por IA"
+    see_general_strategy: "Ver estrategia de contenido general"
+    see_content_strategy: "Ver estrategia de contenido"
+    see_brand_overview: "Ver resumen de marca"
+    refine_with_voxa: "Refinar con Voxa"
+    add_content: "Agregar Contenido"
+    add_new_content: "Agregar Nuevo Contenido"
+    
+    # Strategy form
+    strategy_form:
+      title: "🧠 Generar Nueva Estrategia de Contenido"
+      objective_label: "Objetivo del Mes"
+      objective_placeholder: "ej., Aumentar el reconocimiento y engagement de la marca"
+      monthly_themes_label: "Temas Mensuales"
+      monthly_themes_placeholder: "Reconocimiento de marca, Exhibición de productos, Engagement comunitario"
+      monthly_themes_help: "Separar con comas"
+      frequency_label: "Frecuencia por Semana"
+      frequency_placeholder: "3"
+      
+      # Resources override section
+      resources_title: "Anular Recursos"
+      resources_subtitle: "Configurar recursos adicionales y restricciones para la creación de contenido"
+      
+      budget_label: "Rango de Presupuesto"
+      budget_options:
+        none: "Sin presupuesto específico"
+        low: "Presupuesto bajo ($500)"
+        medium: "Presupuesto medio ($1,000)"
+        high: "Presupuesto alto ($2,500)"
+        premium: "Presupuesto premium ($5,000)"
+        
+      team_size_label: "Tamaño del Equipo"
+      team_size_options:
+        none: "Sin tamaño de equipo específico"
+        solo: "Creador individual (1 persona)"
+        small: "Equipo pequeño (2 personas)"
+        medium: "Equipo mediano (3 personas)"
+        large: "Equipo grande (5+ personas)"
+        
+      design_tools_label: "Herramientas de Diseño"
+      design_tools_help: "Mantén presionado Ctrl/Cmd para seleccionar múltiples herramientas"
+      
+      content_resources_label: "Recursos de Contenido"
+      use_ai_avatars: "Usar avatares IA"
+      use_stock_photos: "Usar fotos de stock"
+      create_custom_graphics: "Crear gráficos personalizados"
+      
+      generate_strategy: "Generar Estrategia"
+      generating: "Generando..."
+    
+    # Strategy results
+    strategy_result:
+      title: "¡Estrategia Generada Exitosamente!"
+      content_themes_title: "Temas de Contenido"
+      strategy_name_label: "Nombre de Estrategia"
+      content_strategy_label: "Estrategia de Contenido"
+      posts_per_week_label: "Posts por Semana"
+      total_posts_label: "Posts Totales"
+      posts_unit: "posts"
+      monthly_objective_label: "Objetivo Mensual"
+      no_themes: "No hay temas definidos"
+      
+    # Brand overview
+    brand_overview:
+      title: "Resumen de Marca - ¡Listo para crear estrategia de contenido!"
+      no_strategy: "Aún no se ha creado ninguna estrategia"
+      get_started: "Haz clic en \"Agregar Contenido\" para comenzar"
+      create_first: "Crea tu primera estrategia de contenido para ver objetivos y temas aquí."
+      themes_placeholder: "Los temas aparecerán cuando generes una estrategia"
+    
+    # Week planning
+    weeks:
+      week: "Semana"
+      week_details: "Semana %{number} - Detalles del Contenido"
+      goal_label: "Objetivo:"
+      goals:
+        awareness: "Reconocimiento"
+        engagement: "Engagement"
+        conversion: "Conversión"
+      days:
+        mon: "Lun"
+        tue: "Mar"
+        wed: "Mié"
+        thu: "Jue"
+        fri: "Vie"
+        sat: "Sáb"
+        sun: "Dom"
+        
+    # Content details
+    content:
+      hook: "Gancho"
+      cta: "Llamada a la Acción"
+      description: "Descripción"
+      visual_notes: "Notas Visuales"
+      content_pillar: "Pilar de Contenido"
+      content_draft: "Borrador de Contenido"
+      new_content: "Nuevo Contenido"
+      remove: "Eliminar"
+      refining: "Refinando..."
+      
+    # Messages and errors
+    messages:
+      create_first_strategy: "Crea tu primera estrategia impulsada por IA para ver planes semanales aquí"
+      strategy_not_found: "No se encontró estrategia para el mes"
+      invalid_month: "Mes Inválido"
+      error_generating: "Error generando estrategia"
+      generation_timeout: "La generación está tomando más tiempo del esperado. Verificando estrategia completada..."
+      network_error: "Ocurrió un error de red. Por favor intenta de nuevo."
+      failed_to_load: "Error al cargar el plan de estrategia"
+      no_strategy_to_refine: "No se encontró plan de estrategia para refinar"
+      generation_timeout: "La generación está tomando más tiempo del esperado. Verificando estrategia completada..."
+      network_error: "Ocurrió un error de red. Por favor intenta de nuevo."
