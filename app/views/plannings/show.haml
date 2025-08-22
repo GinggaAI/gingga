@@ -8,10 +8,10 @@
       .bg-card.text-card-foreground.border-0.shadow-lg.rounded-2xl.mb-6
         .flex.items-center.justify-between.p-6
           .flex.items-center.gap-4
-            %button.px-3.py-1.text-gray-600.hover:text-gray-800
+            %button#prev-month.px-3.py-1.text-gray-600.hover:text-gray-800.transition-colors{title: "Previous month"}
               %span ←
             %h2.text-2xl.font-bold.text-gray-900= @presenter.display_month
-            %button.px-3.py-1.text-gray-600.hover:text-gray-800
+            %button#next-month.px-3.py-1.text-gray-600.hover:text-gray-800.transition-colors{title: "Next month"}
               %span →
 
           .flex.items-center.gap-3
@@ -160,6 +160,18 @@
             %path{"fill-rule": "evenodd", d: "M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z", "clip-rule": "evenodd"}
           %span#error-text= t('planning.messages.error_generating')
 
+      - unless @current_strategy
+        #no-strategy-message.bg-gray-50.border.border-gray-200.rounded-2xl.p-8.mb-6.text-center
+          .mb-4
+            %svg.w-16.h-16.mx-auto.text-gray-400{fill: "none", stroke: "currentColor", viewBox: "0 0 24 24"}
+              %path{"stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "1.5", d: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"}
+          %h3.text-xl.font-semibold.text-gray-700.mb-2 No Strategy for #{@presenter.display_month}
+          %p.text-gray-600.mb-4 There is no content strategy for this month yet.
+          %button.inline-flex.items-center.justify-center.gap-2.bg-gradient-to-r.from-blue-500.to-purple-600.text-white.font-medium.py-3.px-6.rounded-xl.hover:from-blue-600.hover:to-purple-700.transition-colors{onclick: "document.getElementById('toggle-form').click()"}
+            %svg.w-5.h-5{fill: "none", stroke: "currentColor", viewBox: "0 0 24 24"}
+              %path{"stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "2", d: "M12 6v6m0 0v6m0-6h6m-6 0H6"}
+            Create Strategy for #{@presenter.display_month}
+
       .space-y-6
         - (1..4).each do |week_number|
           .bg-card.text-card-foreground.border-0.shadow-lg.rounded-2xl
@@ -199,6 +211,8 @@
     const strategyForm = document.getElementById('strategy-creation-form');
     const submitBtn = document.getElementById('submit-strategy');
     const errorDiv = document.getElementById('error-message');
+    const prevMonthBtn = document.getElementById('prev-month');
+    const nextMonthBtn = document.getElementById('next-month');
 
     // Form toggle button
     if (toggleBtn && form) {
@@ -270,6 +284,21 @@
       // Hide overview button when no plan
       updateOverviewButton();
       updateVoxaButton();
+    }
+
+    // Month navigation
+    if (prevMonthBtn) {
+      prevMonthBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        navigateToMonth(getPreviousMonth(window.currentMonth));
+      });
+    }
+
+    if (nextMonthBtn) {
+      nextMonthBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        navigateToMonth(getNextMonth(window.currentMonth));
+      });
     }
 
     // Also check for plan_id parameter for direct access
@@ -644,20 +673,60 @@
 
     // Extract content information from the piece
     const platform = contentPiece.platform || 'Instagram';
-    const contentType = contentPiece.type || contentPiece.title || 'Post';
+    const contentType = contentPiece.type || contentPiece.content_type || 'Post';
     const title = contentPiece.title || contentPiece.hook || contentPiece.cta || 'Draft';
+    const status = contentPiece.status || 'draft';
     const icon = getContentIcon(platform, contentType);
 
     console.log(`Adding content to week ${weekIndex + 1}, day ${dayIndex + 1}:`, {
       platform,
       contentType,
-      title: title.substring(0, 30) + '...'
+      title: title.substring(0, 30) + '...',
+      status
     });
 
+    // Different styling based on status
+    const statusStyles = {
+      'draft': 'bg-gray-100 text-gray-700 border-l-4 border-gray-400',
+      'in_production': 'bg-blue-100 text-blue-700 border-l-4 border-blue-500', 
+      'ready_for_review': 'bg-yellow-100 text-yellow-700 border-l-4 border-yellow-500',
+      'approved': 'bg-green-100 text-green-700 border-l-4 border-green-500'
+    };
+
+    const statusStyle = statusStyles[status] || statusStyles['draft'];
+    const statusBadge = status !== 'draft' ? `<span class="inline-block w-2 h-2 rounded-full bg-current opacity-60 mr-1"></span>` : '';
+
     const contentDiv = document.createElement('div');
-    contentDiv.className = 'bg-blue-500 text-white text-xs p-2 rounded mb-2 cursor-pointer hover:bg-blue-600 transition-colors';
-    contentDiv.innerHTML = `${icon} ${title.length > 20 ? title.substring(0, 20) + '...' : title}`;
-    contentDiv.title = title; // Full title on hover
+    contentDiv.className = `${statusStyle} text-xs p-2 rounded mb-2 cursor-pointer hover:opacity-80 transition-all`;
+    
+    // For in_production posts, show hook and CTA if available
+    let cardContent = `${statusBadge}${icon} ${title.length > 18 ? title.substring(0, 18) + '...' : title}`;
+    if (status === 'in_production') {
+      let extraInfo = [];
+      if (contentPiece.hook) {
+        extraInfo.push(`🎣 ${contentPiece.hook.length > 15 ? contentPiece.hook.substring(0, 15) + '...' : contentPiece.hook}`);
+      }
+      if (contentPiece.cta) {
+        extraInfo.push(`📢 ${contentPiece.cta.length > 15 ? contentPiece.cta.substring(0, 15) + '...' : contentPiece.cta}`);
+      }
+      if (extraInfo.length > 0) {
+        cardContent += `<div class="mt-1 text-[10px] opacity-75">${extraInfo.join('<br>')}</div>`;
+      }
+    }
+    
+    contentDiv.innerHTML = cardContent;
+    
+    // Enhanced tooltip for in_production posts
+    let tooltipText = `${title} (${status.replace('_', ' ')})`;
+    if (status === 'in_production') {
+      if (contentPiece.hook) {
+        tooltipText += `\n🎣 Hook: ${contentPiece.hook}`;
+      }
+      if (contentPiece.cta) {
+        tooltipText += `\n📢 CTA: ${contentPiece.cta}`;
+      }
+    }
+    contentDiv.title = tooltipText;
     contentDiv.onclick = () => showContentDetails(weekIndex, contentPiece);
 
     // Insert before the + button
@@ -743,58 +812,169 @@
 
     const title = contentPiece.title || 'Content Draft';
     const platform = contentPiece.platform || 'Instagram';
-    const type = contentPiece.type || 'Post';
+    const type = contentPiece.type || contentPiece.content_type || 'Post';
+    const status = contentPiece.status || 'draft';
+    const pilar = contentPiece.pilar || contentPiece.pillar || '';
+    
+    // Status styling
+    const statusColors = {
+      'draft': 'bg-gray-100 text-gray-700',
+      'in_production': 'bg-blue-100 text-blue-800', 
+      'ready_for_review': 'bg-yellow-100 text-yellow-800',
+      'approved': 'bg-green-100 text-green-800'
+    };
+    const statusColor = statusColors[status] || statusColors['draft'];
+    const borderColor = status === 'draft' ? 'border-gray-500' : status === 'in_production' ? 'border-blue-500' : status === 'ready_for_review' ? 'border-yellow-500' : 'border-green-500';
 
     const contentDetailHTML = `
-      <div id="${contentId}" class="bg-white p-4 rounded border-l-4 border-blue-500 shadow-sm">
+      <div id="${contentId}" class="bg-white p-4 rounded border-l-4 ${borderColor} shadow-sm">
         <div class="flex justify-between items-start mb-3">
-          <h4 class="text-lg font-semibold text-gray-900">${title}</h4>
-          <div class="flex items-center gap-2">
-            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">${platform} ${type}</span>
-            <button onclick="removeContentDetail('${contentId}')" class="text-gray-400 hover:text-gray-600 text-lg font-bold">&times;</button>
+          <div>
+            <h4 class="text-lg font-semibold text-gray-900">${title}</h4>
+            <div class="flex items-center gap-2 mt-1">
+              <span class="${statusColor} text-xs px-2 py-1 rounded font-medium">${status.replace('_', ' ').toUpperCase()}</span>
+              <span class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">${platform} ${type}</span>
+              ${pilar ? `<span class="bg-indigo-100 text-indigo-700 text-xs px-2 py-1 rounded">Pillar ${pilar}</span>` : ''}
+            </div>
           </div>
+          <button onclick="removeContentDetail('${contentId}')" class="text-gray-400 hover:text-gray-600 text-lg font-bold">&times;</button>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Left Column: Core Content -->
           <div class="space-y-3">
             ${contentPiece.hook ? `
               <div class="bg-blue-50 p-3 rounded">
-                <h5 class="font-medium text-gray-900 mb-1">#{t('planning.content.hook')}</h5>
+                <h5 class="font-medium text-gray-900 mb-1">🎣 Hook</h5>
                 <p class="text-sm text-gray-700">${contentPiece.hook}</p>
+              </div>
+            ` : ''}
+
+            ${contentPiece.description ? `
+              <div class="bg-yellow-50 p-3 rounded">
+                <h5 class="font-medium text-gray-900 mb-1">📝 Description</h5>
+                <p class="text-sm text-gray-700">${contentPiece.description}</p>
               </div>
             ` : ''}
 
             ${contentPiece.cta ? `
               <div class="bg-green-50 p-3 rounded">
-                <h5 class="font-medium text-gray-900 mb-1">#{t('planning.content.cta')}</h5>
+                <h5 class="font-medium text-gray-900 mb-1">📢 Call to Action</h5>
                 <p class="text-sm text-gray-700">${contentPiece.cta}</p>
+              </div>
+            ` : ''}
+
+            ${contentPiece.text_base ? `
+              <div class="bg-slate-50 p-3 rounded">
+                <h5 class="font-medium text-gray-900 mb-1">📄 Text Base</h5>
+                <p class="text-sm text-gray-700 whitespace-pre-line">${contentPiece.text_base}</p>
               </div>
             ` : ''}
           </div>
 
+          <!-- Right Column: Production Details -->
           <div class="space-y-3">
-            ${contentPiece.description ? `
-              <div class="bg-yellow-50 p-3 rounded">
-                <h5 class="font-medium text-gray-900 mb-1">#{t('planning.content.description')}</h5>
-                <p class="text-sm text-gray-700">${contentPiece.description}</p>
-              </div>
-            ` : ''}
-
             ${contentPiece.visual_notes ? `
               <div class="bg-purple-50 p-3 rounded">
-                <h5 class="font-medium text-gray-900 mb-1">#{t('planning.content.visual_notes')}</h5>
+                <h5 class="font-medium text-gray-900 mb-1">🎨 Visual Notes</h5>
                 <p class="text-sm text-gray-700">${contentPiece.visual_notes}</p>
               </div>
             ` : ''}
 
-            ${contentPiece.pillar ? `
+            ${contentPiece.template ? `
               <div class="bg-indigo-50 p-3 rounded">
-                <h5 class="font-medium text-gray-900 mb-1">#{t('planning.content.content_pillar')}</h5>
-                <p class="text-sm text-gray-700">${contentPiece.pillar}</p>
+                <h5 class="font-medium text-gray-900 mb-1">🎬 Template</h5>
+                <p class="text-sm text-gray-700">${contentPiece.template.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>
+              </div>
+            ` : ''}
+
+            ${contentPiece.hashtags ? `
+              <div class="bg-cyan-50 p-3 rounded">
+                <h5 class="font-medium text-gray-900 mb-1">#️⃣ Hashtags</h5>
+                <p class="text-sm text-gray-700">${contentPiece.hashtags}</p>
+              </div>
+            ` : ''}
+
+            ${contentPiece.kpi_focus ? `
+              <div class="bg-orange-50 p-3 rounded">
+                <h5 class="font-medium text-gray-900 mb-1">🎯 KPI Focus</h5>
+                <p class="text-sm text-gray-700">${contentPiece.kpi_focus}</p>
+              </div>
+            ` : ''}
+
+            ${contentPiece.success_criteria ? `
+              <div class="bg-teal-50 p-3 rounded">
+                <h5 class="font-medium text-gray-900 mb-1">📊 Success Criteria</h5>
+                <p class="text-sm text-gray-700">${contentPiece.success_criteria}</p>
               </div>
             ` : ''}
           </div>
         </div>
+        
+        ${contentPiece.publish_date || contentPiece.scheduled_day ? `
+          <div class="mt-4 p-3 bg-blue-50 rounded">
+            <h5 class="font-medium text-gray-900 mb-2">📅 Scheduling</h5>
+            <div class="flex gap-4 text-sm">
+              ${contentPiece.publish_date ? `<span class="text-gray-700"><strong>Publish Date:</strong> ${contentPiece.publish_date}</span>` : ''}
+              ${contentPiece.scheduled_day ? `<span class="text-gray-700"><strong>Day:</strong> ${contentPiece.scheduled_day}</span>` : ''}
+            </div>
+          </div>
+        ` : ''}
+        
+        ${contentPiece.scenes && contentPiece.scenes.length > 0 ? `
+          <div class="mt-4 p-3 bg-purple-50 rounded border-l-4 border-purple-500">
+            <h5 class="font-medium text-gray-900 mb-3">🎬 Shot Plan - Scenes</h5>
+            <div class="space-y-3">
+              ${contentPiece.scenes.map(scene => `
+                <div class="bg-white p-3 rounded border-l-2 border-purple-300">
+                  <div class="flex items-start justify-between mb-2">
+                    <h6 class="font-semibold text-sm text-purple-800">
+                      ${scene.scene_number ? `Scene ${scene.scene_number}` : 'Scene'}
+                      ${scene.role ? ` - ${scene.role}` : ''}
+                    </h6>
+                    ${scene.duration ? `<span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">${scene.duration}</span>` : ''}
+                  </div>
+                  ${scene.description ? `<p class="text-sm text-gray-700 mb-2">${scene.description}</p>` : ''}
+                  ${scene.visual ? `<p class="text-xs text-gray-600"><strong>Visual:</strong> ${scene.visual}</p>` : ''}
+                  ${scene.on_screen_text ? `<p class="text-xs text-gray-600"><strong>On-screen text:</strong> ${scene.on_screen_text}</p>` : ''}
+                  ${scene.voiceover ? `<p class="text-xs text-gray-600"><strong>Voiceover:</strong> ${scene.voiceover}</p>` : ''}
+                  ${scene.visual_elements && scene.visual_elements.length > 0 ? `
+                    <div class="mt-2">
+                      <p class="text-xs font-medium text-gray-600 mb-1">Visual Elements:</p>
+                      <div class="flex flex-wrap gap-1">
+                        ${scene.visual_elements.map(element => `<span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">${element}</span>`).join('')}
+                      </div>
+                    </div>
+                  ` : ''}
+                  ${scene.avatar_id ? `<p class="text-xs text-gray-600 mt-1"><strong>Avatar:</strong> ${scene.avatar_id}</p>` : ''}
+                  ${scene.voice_id ? `<p class="text-xs text-gray-600"><strong>Voice:</strong> ${scene.voice_id}</p>` : ''}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+        
+        ${contentPiece.beats && contentPiece.beats.length > 0 ? `
+          <div class="mt-4 p-3 bg-amber-50 rounded border-l-4 border-amber-500">
+            <h5 class="font-medium text-gray-900 mb-3">📋 Shot Plan - Beats</h5>
+            <div class="space-y-2">
+              ${contentPiece.beats.map(beat => `
+                <div class="bg-white p-2 rounded border-l-2 border-amber-300">
+                  <div class="flex items-center justify-between">
+                    <span class="font-medium text-sm text-amber-800">
+                      ${beat.beat_number ? `Beat ${beat.beat_number}` : 'Beat'}
+                      ${beat.idx ? ` (${beat.idx})` : ''}
+                    </span>
+                    ${beat.duration ? `<span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">${beat.duration}</span>` : ''}
+                  </div>
+                  ${beat.description ? `<p class="text-sm text-gray-700 mt-1">${beat.description}</p>` : ''}
+                  ${beat.image_prompt ? `<p class="text-xs text-gray-600 mt-1"><strong>Image:</strong> ${beat.image_prompt}</p>` : ''}
+                  ${beat.voiceover ? `<p class="text-xs text-gray-600"><strong>Voiceover:</strong> ${beat.voiceover}</p>` : ''}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
       </div>
     `;
 
@@ -1002,4 +1182,25 @@
     // Submit form
     document.body.appendChild(form);
     form.submit();
+  }
+
+  // Month navigation helper functions
+  function getPreviousMonth(currentMonth) {
+    const [year, month] = currentMonth.split('-').map(Number);
+    const date = new Date(year, month - 2); // month - 1 for 0-based, -1 more for previous
+    return `${date.getFullYear()}-${date.getMonth() + 1}`;
+  }
+
+  function getNextMonth(currentMonth) {
+    const [year, month] = currentMonth.split('-').map(Number);
+    const date = new Date(year, month); // month - 1 for 0-based, +1 for next = month
+    return `${date.getFullYear()}-${date.getMonth() + 1}`;
+  }
+
+  function navigateToMonth(newMonth) {
+    // Update URL and reload page with new month
+    const url = new URL(window.location);
+    url.searchParams.set('month', newMonth);
+    url.searchParams.delete('plan_id'); // Remove plan_id when navigating by month
+    window.location.href = url.toString();
   }

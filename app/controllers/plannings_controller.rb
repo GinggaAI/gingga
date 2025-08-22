@@ -6,6 +6,12 @@ class PlanningsController < ApplicationController
 
   # GET /plannings
   def show
+    # Initialize content items from content_distribution if strategy exists but no content items
+    if @current_strategy&.content_distribution.present? && @current_strategy.creas_content_items.empty?
+      Creas::ContentItemInitializerService.new(strategy_plan: @current_strategy).call
+      @current_strategy.reload
+    end
+
     @presenter = build_presenter
     @plans = build_weekly_plans
   end
