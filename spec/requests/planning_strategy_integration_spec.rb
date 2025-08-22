@@ -250,8 +250,8 @@ RSpec.describe "Planning Strategy Integration", type: :request do
       expect(response).to have_http_status(:success)
       expect(response.body).to include("Smart Planning")
 
-      # JavaScript should be present to hydrate calendar
-      expect(response.body).to include("plan_id")
+      # Plan data should be present via Stimulus data attributes to hydrate calendar
+      expect(response.body).to include('data-planning-current-plan-value')
       expect(response.body).to include("Smart Planning")
     end
 

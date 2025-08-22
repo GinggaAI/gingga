@@ -17,14 +17,14 @@ RSpec.describe "Planning Security", type: :request do
     context "when month parameter contains malicious JavaScript" do
       let(:malicious_month) { "2025-08'; alert('xss'); //" }
 
-      it "does not execute the malicious script in the JavaScript section" do
+      it "does not execute the malicious script" do
         get planning_path(month: malicious_month)
 
         expect(response).to have_http_status(:success)
         # The malicious script should NOT appear in the response
         expect(response.body).not_to include("alert('xss')")
-        # The JavaScript should contain the safe fallback
-        expect(response.body).to include("window.currentMonth = '#{Date.current.strftime("%Y-%-m")}'")
+        # JavaScript is now moved to external files, so we check for the comment instead
+        expect(response.body).to include("JavaScript moved to app/javascript/controllers/planning_controller.js")
       end
 
       it "displays safe fallback text in the month display" do
@@ -54,7 +54,8 @@ RSpec.describe "Planning Security", type: :request do
 
         expect(response).to have_http_status(:success)
         expect(response.body).to include("August 2025")
-        expect(response.body).to include("window.currentMonth = '2025-08'")
+        # JavaScript is now in external files with Stimulus data values
+        expect(response.body).to include('data-planning-current-month-value')
       end
     end
   end

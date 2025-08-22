@@ -20,12 +20,12 @@
               = t('brands.managing_label')
           .p-6.pt-0
             .flex.items-center.gap-4
-              %select{:onchange => "if(this.value) window.location.href='/my-brand?brand_id=' + this.value", :class => "flex h-10 w-full bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm rounded-xl border-2 border-gray-200 focus:border-[#FFC940]"}
+              %select{data: { controller: "brand-selector", action: "change->brand-selector#change" }, class: "flex h-10 w-full bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm rounded-xl border-2 border-gray-200 focus:border-[#FFC940]"}
                 - @presenter.brands_collection.each do |brand|
                   %option{:value => brand.id, :selected => ('selected' if brand == @brand)}= brand.name || t('brands.untitled_brand')
               = render Ui::ButtonComponent.new(label: t('brands.add_new_brand'), variant: :ghost, size: :sm)
 
-      = form_with model: @brand, url: brand_path, method: :patch, local: true, data: { turbo_frame: "_top" }, class: "space-y-6" do |form|
+      = form_with model: @brand, url: brand_path, method: :patch, local: true, data: { turbo_frame: "_top", controller: "brand-form", brand_form_audience_index_value: @brand.audiences.count, brand_form_product_index_value: @brand.products.count, brand_form_channel_index_value: @brand.brand_channels.count }, class: "space-y-6" do |form|
         - if @presenter.show_validation_errors?
           .bg-card.text-card-foreground.border-0.shadow-lg.rounded-2xl
             .p-6
@@ -168,7 +168,7 @@
                     %span.font-medium= @presenter.audience_demographics_summary
                 - else
                   %p.text-sm.text-gray-600.mb-4= t('brands.no_audiences')
-              #audiences-container
+              #audiences-container{data: { brand_form_target: "audiencesContainer" }}
                 = form.fields_for :audiences do |audience_form|
                   = render Ui::AudienceFormComponent.new(form: audience_form, audience: audience_form.object, index: audience_form.options[:child_index])
               %button#add-audience-btn.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.border.border-input.bg-background.hover:bg-accent.hover:text-accent-foreground.h-9.px-3.rounded-xl{:type => "button"}
@@ -195,7 +195,7 @@
                     %span.font-medium= @presenter.products_summary
                 - else
                   %p.text-sm.text-gray-600.mb-4= t('brands.no_products')
-              #products-container
+              #products-container{data: { brand_form_target: "productsContainer" }}
                 = form.fields_for :products do |product_form|
                   = render Ui::ProductFormComponent.new(form: product_form, product: product_form.object, index: product_form.options[:child_index])
               %button#add-product-btn.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.border.border-input.bg-background.hover:bg-accent.hover:text-accent-foreground.h-9.px-3.rounded-xl{:type => "button"}
@@ -224,7 +224,7 @@
                     %span.font-medium= @presenter.channels_summary
                 - else
                   %p.text-sm.text-gray-600.mb-4= t('brands.no_channels')
-              #channels-container
+              #channels-container{data: { brand_form_target: "channelsContainer" }}
                 = form.fields_for :brand_channels do |channel_form|
                   = render Ui::BrandChannelFormComponent.new(form: channel_form, brand_channel: channel_form.object, index: channel_form.options[:child_index])
               %button#add-channel-btn.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.border.border-input.bg-background.hover:bg-accent.hover:text-accent-foreground.h-9.px-3.rounded-xl{:type => "button"}
@@ -238,282 +238,4 @@
             .flex.justify-center
               = render Ui::ButtonComponent.new(label: t('brands.save_profile'), variant: :primary, type: :submit, size: :lg)
 
-:javascript
-  document.addEventListener('turbo:load', function() {
-    let audienceIndex = #{@brand.audiences.count};
-    let productIndex = #{@brand.products.count};
-    let channelIndex = #{@brand.brand_channels.count};
-
-    // Add Audience functionality
-    const addAudienceBtn = document.getElementById('add-audience-btn');
-    const audiencesContainer = document.getElementById('audiences-container');
-
-    if (addAudienceBtn && audiencesContainer) {
-      addAudienceBtn.addEventListener('click', function() {
-        const template = `
-          <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
-            <div class="flex items-center justify-between mb-4">
-              <h4 class="text-md font-semibold text-theme">New Audience</h4>
-              <button type="button" class="text-red-600 hover:text-red-800 text-sm font-medium remove-audience-btn">
-                Remove
-              </button>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-theme">Audience Name</label>
-                <input type="text" name="brand[audiences_attributes][${audienceIndex}][name]" placeholder="e.g., Young Professionals, Tech Enthusiasts" class="form-input w-full">
-              </div>
-              
-              <div class="md:col-span-2 space-y-4">
-                <label class="block text-sm font-medium text-theme">Demographics</label>
-                <div class="bg-white border rounded-lg p-4 space-y-3">
-                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <!-- Age Range -->
-                    <div class="space-y-2">
-                      <label class="block text-xs font-medium text-gray-700">Age Range</label>
-                      <select class="form-input w-full text-sm demographic-field" data-field="age_range">
-                        <option value="">Select age range</option>
-                        <option value="13-17">13-17</option>
-                        <option value="18-24">18-24</option>
-                        <option value="25-34">25-34</option>
-                        <option value="35-44">35-44</option>
-                        <option value="45-54">45-54</option>
-                        <option value="55-64">55-64</option>
-                        <option value="65+">65+</option>
-                      </select>
-                    </div>
-
-                    <!-- Gender -->
-                    <div class="space-y-2">
-                      <label class="block text-xs font-medium text-gray-700">Gender</label>
-                      <select class="form-input w-full text-sm demographic-field" data-field="gender">
-                        <option value="">Select gender</option>
-                        <option value="all">All genders</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="non_binary">Non-binary</option>
-                        <option value="other">Other</option>
-                      </select>
-                    </div>
-
-                    <!-- Location Type -->
-                    <div class="space-y-2">
-                      <label class="block text-xs font-medium text-gray-700">Location Type</label>
-                      <select class="form-input w-full text-sm demographic-field" data-field="location_type">
-                        <option value="">Select location type</option>
-                        <option value="global">Global</option>
-                        <option value="urban">Urban areas</option>
-                        <option value="suburban">Suburban areas</option>
-                        <option value="rural">Rural areas</option>
-                        <option value="metropolitan">Metropolitan areas</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Specific Location -->
-                    <div class="space-y-2">
-                      <label class="block text-xs font-medium text-gray-700">Specific Location</label>
-                      <input type="text" class="form-input w-full text-sm demographic-field" data-field="location" placeholder="e.g., United States, Europe, Latin America">
-                    </div>
-
-                    <!-- Income Level -->
-                    <div class="space-y-2">
-                      <label class="block text-xs font-medium text-gray-700">Income Level</label>
-                      <select class="form-input w-full text-sm demographic-field" data-field="income">
-                        <option value="">Select income level</option>
-                        <option value="low">Low income</option>
-                        <option value="lower_middle">Lower middle class</option>
-                        <option value="middle">Middle class</option>
-                        <option value="upper_middle">Upper middle class</option>
-                        <option value="high">High income</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <!-- Hidden field to store the JSON -->
-                  <input type="hidden" name="brand[audiences_attributes][${audienceIndex}][demographic_profile]" value="{}" class="demographic-json-field">
-                </div>
-              </div>
-
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-theme">Interests</label>
-                <input type="text" name="brand[audiences_attributes][${audienceIndex}][interests]" placeholder="technology, fitness, travel, food" class="form-input w-full">
-                <p class="text-xs text-gray-500">Separate with commas</p>
-              </div>
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-theme">Digital Behavior</label>
-                <input type="text" name="brand[audiences_attributes][${audienceIndex}][digital_behavior]" placeholder="social_media_active, online_shopper" class="form-input w-full">
-                <p class="text-xs text-gray-500">Separate with commas</p>
-              </div>
-            </div>
-          </div>
-        `;
-        audiencesContainer.insertAdjacentHTML('beforeend', template);
-        audienceIndex++;
-        
-        // Initialize demographics for the newly added audience
-        setTimeout(initializeDemographicsFields, 100);
-      });
-    }
-
-    // Add Product functionality
-    const addProductBtn = document.getElementById('add-product-btn');
-    const productsContainer = document.getElementById('products-container');
-
-    if (addProductBtn && productsContainer) {
-      addProductBtn.addEventListener('click', function() {
-        const template = `
-          <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
-            <div class="flex items-center justify-between mb-4">
-              <h4 class="text-md font-semibold text-theme">New Product</h4>
-              <button type="button" class="text-red-600 hover:text-red-800 text-sm font-medium remove-product-btn">
-                Remove
-              </button>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-theme">Product Name</label>
-                <input type="text" name="brand[products_attributes][${productIndex}][name]" placeholder="e.g., Premium SaaS Platform" class="form-input w-full">
-              </div>
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-theme">Pricing</label>
-                <input type="text" name="brand[products_attributes][${productIndex}][pricing_info]" placeholder="e.g., $99/month" class="form-input w-full">
-              </div>
-              <div class="md:col-span-2 space-y-2">
-                <label class="block text-sm font-medium text-theme">Description</label>
-                <textarea name="brand[products_attributes][${productIndex}][description]" placeholder="Describe what your product does..." rows="3" class="form-input w-full"></textarea>
-              </div>
-              <div class="md:col-span-2 space-y-2">
-                <label class="block text-sm font-medium text-theme">Product URL</label>
-                <input type="url" name="brand[products_attributes][${productIndex}][url]" placeholder="https://yourproduct.com" class="form-input w-full">
-              </div>
-            </div>
-          </div>
-        `;
-        productsContainer.insertAdjacentHTML('beforeend', template);
-        productIndex++;
-      });
-    }
-
-    // Add Channel functionality
-    const addChannelBtn = document.getElementById('add-channel-btn');
-    const channelsContainer = document.getElementById('channels-container');
-
-    if (addChannelBtn && channelsContainer) {
-      addChannelBtn.addEventListener('click', function() {
-        const template = `
-          <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
-            <div class="flex items-center justify-between mb-4">
-              <h4 class="text-md font-semibold text-theme">New Channel</h4>
-              <button type="button" class="text-red-600 hover:text-red-800 text-sm font-medium remove-channel-btn">
-                Remove
-              </button>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-theme">Platform</label>
-                <select name="brand[brand_channels_attributes][${channelIndex}][platform]" class="form-input w-full">
-                  <option value="">Select Platform</option>
-                  <option value="instagram">Instagram</option>
-                  <option value="tiktok">Tiktok</option>
-                  <option value="youtube">Youtube</option>
-                  <option value="linkedin">Linkedin</option>
-                </select>
-              </div>
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-theme">Handle/Username</label>
-                <input type="text" name="brand[brand_channels_attributes][${channelIndex}][handle]" placeholder="@yourbrand" class="form-input w-full">
-              </div>
-              <div class="space-y-2">
-                <label class="block text-sm font-medium text-theme">Priority</label>
-                <select name="brand[brand_channels_attributes][${channelIndex}][priority]" class="form-input w-full">
-                  <option value="1">1 - Highest Priority</option>
-                  <option value="2">2 - High Priority</option>
-                  <option value="3">3 - Medium Priority</option>
-                  <option value="4">4 - Low Priority</option>
-                  <option value="5">5 - Lowest Priority</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        `;
-        channelsContainer.insertAdjacentHTML('beforeend', template);
-        channelIndex++;
-      });
-    }
-
-    // Remove functionality for dynamically added and existing items
-    document.addEventListener('click', function(e) {
-      if (e.target.classList.contains('remove-audience-btn') ||
-          e.target.classList.contains('remove-product-btn') ||
-          e.target.classList.contains('remove-channel-btn')) {
-
-        const container = e.target.closest('.bg-gray-50');
-        const destroyCheckbox = container.querySelector('.destroy-checkbox');
-
-        if (destroyCheckbox) {
-          // For existing items, mark for destruction
-          destroyCheckbox.checked = true;
-          container.style.display = 'none';
-        } else {
-          // For new items, remove from DOM
-          container.remove();
-        }
-      }
-    });
-
-    // Demographics fields handling
-    let demographicsListenersAdded = false;
-
-    function initializeDemographicsFields() {
-      // Initialize existing demographics fields
-      document.querySelectorAll('.demographic-field').forEach(function(field) {
-        const currentValue = field.getAttribute('data-current');
-        if (currentValue && field.tagName === 'SELECT') {
-          field.value = currentValue;
-        }
-      });
-
-      // Add change listeners to update JSON (only once)
-      if (!demographicsListenersAdded) {
-        document.addEventListener('change', function(e) {
-          if (e.target.classList.contains('demographic-field')) {
-            updateDemographicJson(e.target);
-          }
-        });
-
-        document.addEventListener('input', function(e) {
-          if (e.target.classList.contains('demographic-field')) {
-            updateDemographicJson(e.target);
-          }
-        });
-
-        demographicsListenersAdded = true;
-      }
-    }
-
-    function updateDemographicJson(changedField) {
-      const container = changedField.closest('.bg-gray-50');
-      if (!container) return;
-
-      const jsonField = container.querySelector('.demographic-json-field');
-      if (!jsonField) return;
-
-      const demographicFields = container.querySelectorAll('.demographic-field:not(.demographic-json-field)');
-      const demographicData = {};
-
-      demographicFields.forEach(function(field) {
-        const fieldName = field.getAttribute('data-field');
-        const value = field.value.trim();
-        if (fieldName && value) {
-          demographicData[fieldName] = value;
-        }
-      });
-
-      jsonField.value = JSON.stringify(demographicData);
-    }
-
-    // Initialize demographics when page loads
-    initializeDemographicsFields();
-  });
+/ JavaScript moved to app/javascript/controllers/brand_form_controller.js

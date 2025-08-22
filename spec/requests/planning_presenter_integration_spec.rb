@@ -45,25 +45,26 @@ RSpec.describe 'Planning Presenter Integration', type: :request do
         # Should display month via presenter
         expect(response.body).to include(Date.current.strftime("%B %Y"))
 
-        # Should include plan data via presenter currentPlan JSON
-        expect(response.body).to include('"strategy_name":"Test Strategy"')
-        expect(response.body).to include('"objective_of_the_month":"Test Objective"')
-        expect(response.body).to include('"Test Content"')
+        # Should include plan data via Stimulus data attributes
+        expect(response.body).to include('data-planning-current-plan-value')
+        # Check for HTML-encoded JSON in data attributes
+        expect(response.body).to include('&quot;strategy_name&quot;:&quot;Test Strategy&quot;')
+        expect(response.body).to include('&quot;objective_of_the_month&quot;:&quot;Test Objective&quot;')
+        expect(response.body).to include('&quot;Test Content&quot;')
 
-        # Should not contain null for currentPlan
-        expect(response.body).not_to include('window.currentPlan = null;')
+        # Should not contain null for currentPlan in data attribute (means plan exists)
+        expect(response.body).not_to include('data-planning-current-plan-value="null"')
       end
 
       it 'includes all plan data needed for JavaScript' do
         get planning_path
 
-        json_match = response.body.match(/window\.currentPlan = ({.*?});/m)
-        expect(json_match).to be_present
-
-        plan_json = JSON.parse(json_match[1])
-        expect(plan_json['strategy_name']).to eq('Test Strategy')
-        expect(plan_json['objective_of_the_month']).to eq('Test Objective')
-        expect(plan_json['weekly_plan']).to be_present
+        # Check for Stimulus data attribute containing the plan JSON
+        expect(response.body).to include('data-planning-current-plan-value')
+        # Look for HTML encoded JSON data in the attribute
+        expect(response.body).to include('&quot;strategy_name&quot;:&quot;Test Strategy&quot;')
+        expect(response.body).to include('&quot;objective_of_the_month&quot;:&quot;Test Objective&quot;')
+        expect(response.body).to include('&quot;weekly_plan&quot;')
       end
     end
 
@@ -73,7 +74,7 @@ RSpec.describe 'Planning Presenter Integration', type: :request do
 
         expect(response).to have_http_status(:success)
         expect(response.body).to include(Date.current.strftime("%B %Y"))
-        expect(response.body).to include('window.currentPlan = null;')
+        expect(response.body).to include("data-planning-current-plan-value='null'")
       end
     end
 
@@ -90,7 +91,8 @@ RSpec.describe 'Planning Presenter Integration', type: :request do
         get planning_path(plan_id: strategy_plan.id)
 
         expect(response).to have_http_status(:success)
-        expect(response.body).to include('"strategy_name":"December Strategy"')
+        expect(response.body).to include('data-planning-current-plan-value')
+        expect(response.body).to include('&quot;strategy_name&quot;:&quot;December Strategy&quot;')
       end
     end
 
@@ -108,7 +110,8 @@ RSpec.describe 'Planning Presenter Integration', type: :request do
 
         expect(response).to have_http_status(:success)
         expect(response.body).to include("August 2025")
-        expect(response.body).to include('"strategy_name":"August Strategy"')
+        expect(response.body).to include('data-planning-current-plan-value')
+        expect(response.body).to include('&quot;strategy_name&quot;:&quot;August Strategy&quot;')
       end
     end
   end
@@ -130,7 +133,7 @@ RSpec.describe 'Planning Presenter Integration', type: :request do
       expect(response.body).not_to include("alert('xss')")
       expect(response.body).to include("Invalid Month")
       # Should still show null plan when malicious month fails
-      expect(response.body).to include("window.currentPlan = null;")
+      expect(response.body).to include("data-planning-current-plan-value='null'")
     end
   end
 end

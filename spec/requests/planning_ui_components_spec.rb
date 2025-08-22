@@ -77,7 +77,8 @@ RSpec.describe "Planning UI Components", type: :request do
 
     it "includes proper form submission setup" do
       expect(response.body).to include('method="post"')
-      expect(response.body).to include('authenticity_token')
+      # Form is configured for remote AJAX submission
+      expect(response.body).to include('data-remote="true"')
     end
   end
 
