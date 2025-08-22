@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["strategyResult", "strategyForm", "errorMessage", "errorText", "submitButton", "submitText", "loadingSpinner", "toggleOverview"]
+  // Using direct DOM queries instead of targets for more reliable functionality
   static values = { 
     currentMonth: String,
     currentPlan: Object
@@ -15,16 +15,31 @@ export default class extends Controller {
     this.setupEventListeners()
     this.updateButtonText()
     this.updateOverviewButton()
-    if (this.currentPlanValue) {
-      this.populateCalendarWithStrategy(this.currentPlanValue)
-      this.updateVoxaButton()
+    
+    // Parse and handle current plan if it exists and is not null
+    if (this.currentPlanValue && this.currentPlanValue !== null && this.currentPlanValue !== 'null') {
+      let plan = this.currentPlanValue
+      // If it's a string, try to parse it
+      if (typeof plan === 'string') {
+        try {
+          plan = JSON.parse(plan)
+        } catch (e) {
+          console.warn('Failed to parse current plan JSON:', e)
+          return
+        }
+      }
+      
+      if (plan && plan.weekly_plan) {
+        this.populateCalendarWithStrategy(plan)
+        this.updateVoxaButton()
+      }
     }
   }
 
   setupEventListeners() {
     const toggleBtn = document.getElementById('toggle-form')
     const overviewBtn = document.getElementById('toggle-overview')
-    const cancelBtn = document.getElementById('cancel-strategy')
+    const cancelBtn = document.getElementById('cancel-form')
     const form = document.getElementById('strategy-creation-form')
 
     if (toggleBtn && form) {
@@ -40,9 +55,11 @@ export default class extends Controller {
     if (overviewBtn) {
       overviewBtn.addEventListener('click', (e) => {
         e.preventDefault()
-        const resultDiv = this.strategyResultTarget
-        const isResultVisible = resultDiv.style.display !== 'none'
-        resultDiv.style.display = isResultVisible ? 'none' : 'block'
+        const resultDiv = document.getElementById('strategy-result')
+        if (resultDiv) {
+          const isResultVisible = resultDiv.style.display !== 'none'
+          resultDiv.style.display = isResultVisible ? 'none' : 'block'
+        }
       })
     }
 
@@ -63,8 +80,9 @@ export default class extends Controller {
   }
 
   hideStrategyOverview() {
-    if (this.hasStrategyResultTarget) {
-      this.strategyResultTarget.style.display = 'none'
+    const resultDiv = document.getElementById('strategy-result')
+    if (resultDiv) {
+      resultDiv.style.display = 'none'
     }
   }
 
@@ -170,36 +188,45 @@ export default class extends Controller {
   }
 
   setLoadingState(loading) {
-    if (this.hasSubmitButtonTarget) {
-      this.submitButtonTarget.disabled = loading
+    const submitButton = document.getElementById('submit-strategy')
+    const submitText = document.querySelector('#submit-strategy .submit-text')
+    const loadingSpinner = document.querySelector('#submit-strategy .loading-spinner')
+    
+    if (submitButton) {
+      submitButton.disabled = loading
     }
-    if (this.hasSubmitTextTarget) {
-      this.submitTextTarget.style.display = loading ? 'none' : 'inline'
+    if (submitText) {
+      submitText.style.display = loading ? 'none' : 'inline'
     }
-    if (this.hasLoadingSpinnerTarget) {
-      this.loadingSpinnerTarget.style.display = loading ? 'inline' : 'none'
+    if (loadingSpinner) {
+      loadingSpinner.style.display = loading ? 'inline' : 'none'
     }
   }
 
   displayStrategyResult(plan, shouldShow = false) {
-    if (!this.hasStrategyResultTarget || !plan) return
+    const strategyResult = document.getElementById('strategy-result')
+    if (!strategyResult || !plan) return
     
-    this.strategyResultTarget.style.display = shouldShow ? 'block' : 'none'
+    strategyResult.style.display = shouldShow ? 'block' : 'none'
   }
 
   showError(message) {
-    if (this.hasErrorMessageTarget && this.hasErrorTextTarget) {
-      this.errorTextTarget.textContent = message
-      this.errorMessageTarget.style.display = 'block'
+    const errorMessage = document.getElementById('error-message')
+    const errorText = document.getElementById('error-text')
+    if (errorMessage && errorText) {
+      errorText.textContent = message
+      errorMessage.style.display = 'block'
     }
   }
 
   hideMessages() {
-    if (this.hasStrategyResultTarget) {
-      this.strategyResultTarget.style.display = 'none'
+    const strategyResult = document.getElementById('strategy-result')
+    const errorMessage = document.getElementById('error-message')
+    if (strategyResult) {
+      strategyResult.style.display = 'none'
     }
-    if (this.hasErrorMessageTarget) {
-      this.errorMessageTarget.style.display = 'none'
+    if (errorMessage) {
+      errorMessage.style.display = 'none'
     }
   }
 
@@ -225,8 +252,9 @@ export default class extends Controller {
   }
 
   updateOverviewButton() {
-    if (this.hasToggleOverviewTarget) {
-      this.toggleOverviewTarget.style.display = 'block'
+    const toggleOverview = document.getElementById('toggle-overview')
+    if (toggleOverview) {
+      toggleOverview.style.display = 'block'
     }
   }
 
