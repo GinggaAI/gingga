@@ -217,3 +217,21 @@ Gingga is an AI-powered platform for creating comprehensive content strategies. 
 **Ready to contribute?** Start with [CLAUDE.md](./CLAUDE.md) to understand our development standards and practices.
 
 **Last Updated**: August 19, 2025
+
+## Before any PR
+Run rubocop to autorrect offenses, and commit any changes.
+```bash
+bundle exec rubocop --autocorrect
+```
+
+If you want to cheat with `ifs_in_views` do the following.
+```bash
+bash bin/check_ifs_in_views
+cp tmp/ifs_in_views ifs_in_views_whitelist
+```
+and commit the changes in `ifs_in_views_whitelist`
+
+Then run bin/shot
+```bash
+bash bin/shot
+```
