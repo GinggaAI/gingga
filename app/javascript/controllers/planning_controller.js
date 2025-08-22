@@ -32,6 +32,8 @@ export default class extends Controller {
       if (plan && plan.weekly_plan) {
         this.populateCalendarWithStrategy(plan)
         this.updateVoxaButton()
+        // Also populate the strategy result for the overview button
+        this.displayStrategyResult(plan, false) // Don't show by default, just populate
       }
     }
   }
@@ -207,7 +209,50 @@ export default class extends Controller {
     const strategyResult = document.getElementById('strategy-result')
     if (!strategyResult || !plan) return
     
+    // Populate strategy result elements
+    this.populateStrategyResultData(plan)
+    
     strategyResult.style.display = shouldShow ? 'block' : 'none'
+  }
+
+  populateStrategyResultData(plan) {
+    
+    // Update strategy name
+    const strategyName = document.getElementById('strategy-name')
+    if (strategyName && plan.strategy_name) {
+      strategyName.textContent = plan.strategy_name
+    }
+    
+    // Update frequency
+    const strategyFrequency = document.getElementById('strategy-frequency')
+    if (strategyFrequency && plan.frequency_per_week) {
+      strategyFrequency.textContent = plan.frequency_per_week
+    }
+    
+    // Update total posts (frequency * 4 weeks)
+    const strategyTotal = document.getElementById('strategy-total')
+    if (strategyTotal && plan.frequency_per_week) {
+      strategyTotal.textContent = plan.frequency_per_week * 4
+    }
+    
+    // Update objective
+    const strategyObjective = document.getElementById('strategy-objective')
+    if (strategyObjective && plan.objective_of_the_month) {
+      strategyObjective.textContent = plan.objective_of_the_month
+    }
+    
+    // Update themes
+    const strategyThemes = document.getElementById('strategy-themes')
+    if (strategyThemes && plan.monthly_themes) {
+      strategyThemes.innerHTML = ''
+      const themes = Array.isArray(plan.monthly_themes) ? plan.monthly_themes : [plan.monthly_themes]
+      themes.forEach(theme => {
+        const themeTag = document.createElement('span')
+        themeTag.className = 'bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-full'
+        themeTag.textContent = theme
+        strategyThemes.appendChild(themeTag)
+      })
+    }
   }
 
   showError(message) {
@@ -271,14 +316,26 @@ export default class extends Controller {
       })
     })
 
-    // Add new content
+    // Handle different data structures
     plan.weekly_plan.forEach((week, weekIndex) => {
+      // Handle structure with content_pieces array (test format)
       if (week.content_pieces) {
         week.content_pieces.forEach(piece => {
           const dayIndex = this.getDayIndexFromPiece(piece)
           if (dayIndex !== -1) {
             this.addContentToCalendar(weekIndex, dayIndex, piece)
           }
+        })
+      }
+      
+      // Handle structure with ideas array (current database structure)
+      if (week.ideas && week.ideas.length > 0) {
+        week.ideas.forEach((idea, ideaIndex) => {
+          // Distribute ideas across the week based on frequency
+          // Use a simple distribution: spread evenly across the week
+          const totalIdeas = week.ideas.length
+          const dayIndex = Math.floor((ideaIndex * 7) / totalIdeas)
+          this.addContentToCalendar(weekIndex, dayIndex, idea)
         })
       }
     })
@@ -306,9 +363,10 @@ export default class extends Controller {
         const dayElement = dayColumns[dayIndex]
         const contentDiv = document.createElement('div')
         
-        const title = contentPiece.title || contentPiece.content_title || 'Content'
+        const title = contentPiece.title || contentPiece.content_title || contentPiece.topic || 'Content'
         const platform = contentPiece.platform || 'Instagram'
-        const icon = this.getContentIcon(platform, contentPiece.content_type)
+        const contentType = contentPiece.content_type || contentPiece.type || 'Post'
+        const icon = this.getContentIcon(platform, contentType)
         
         contentDiv.className = 'bg-blue-50 border border-blue-200 rounded-lg p-2 text-xs cursor-pointer hover:bg-blue-100 transition-colors'
         contentDiv.innerHTML = `<div class="font-medium">${icon} ${title.substring(0, 20)}${title.length > 20 ? '...' : ''}</div>`
