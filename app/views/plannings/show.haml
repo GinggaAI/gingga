@@ -644,20 +644,33 @@
 
     // Extract content information from the piece
     const platform = contentPiece.platform || 'Instagram';
-    const contentType = contentPiece.type || contentPiece.title || 'Post';
+    const contentType = contentPiece.type || contentPiece.content_type || 'Post';
     const title = contentPiece.title || contentPiece.hook || contentPiece.cta || 'Draft';
+    const status = contentPiece.status || 'draft';
     const icon = getContentIcon(platform, contentType);
 
     console.log(`Adding content to week ${weekIndex + 1}, day ${dayIndex + 1}:`, {
       platform,
       contentType,
-      title: title.substring(0, 30) + '...'
+      title: title.substring(0, 30) + '...',
+      status
     });
 
+    // Different styling based on status
+    const statusStyles = {
+      'draft': 'bg-gray-100 text-gray-700 border-l-4 border-gray-400',
+      'in_production': 'bg-blue-100 text-blue-700 border-l-4 border-blue-500', 
+      'ready_for_review': 'bg-yellow-100 text-yellow-700 border-l-4 border-yellow-500',
+      'approved': 'bg-green-100 text-green-700 border-l-4 border-green-500'
+    };
+
+    const statusStyle = statusStyles[status] || statusStyles['draft'];
+    const statusBadge = status !== 'draft' ? `<span class="inline-block w-2 h-2 rounded-full bg-current opacity-60 mr-1"></span>` : '';
+
     const contentDiv = document.createElement('div');
-    contentDiv.className = 'bg-blue-500 text-white text-xs p-2 rounded mb-2 cursor-pointer hover:bg-blue-600 transition-colors';
-    contentDiv.innerHTML = `${icon} ${title.length > 20 ? title.substring(0, 20) + '...' : title}`;
-    contentDiv.title = title; // Full title on hover
+    contentDiv.className = `${statusStyle} text-xs p-2 rounded mb-2 cursor-pointer hover:opacity-80 transition-all`;
+    contentDiv.innerHTML = `${statusBadge}${icon} ${title.length > 18 ? title.substring(0, 18) + '...' : title}`;
+    contentDiv.title = `${title} (${status.replace('_', ' ')})`; // Full title and status on hover
     contentDiv.onclick = () => showContentDetails(weekIndex, contentPiece);
 
     // Insert before the + button
@@ -743,16 +756,32 @@
 
     const title = contentPiece.title || 'Content Draft';
     const platform = contentPiece.platform || 'Instagram';
-    const type = contentPiece.type || 'Post';
+    const type = contentPiece.type || contentPiece.content_type || 'Post';
+    const status = contentPiece.status || 'draft';
+    const pilar = contentPiece.pilar || contentPiece.pillar || '';
+    
+    // Status styling
+    const statusColors = {
+      'draft': 'bg-gray-100 text-gray-700',
+      'in_production': 'bg-blue-100 text-blue-800', 
+      'ready_for_review': 'bg-yellow-100 text-yellow-800',
+      'approved': 'bg-green-100 text-green-800'
+    };
+    const statusColor = statusColors[status] || statusColors['draft'];
+    const borderColor = status === 'draft' ? 'border-gray-500' : status === 'in_production' ? 'border-blue-500' : status === 'ready_for_review' ? 'border-yellow-500' : 'border-green-500';
 
     const contentDetailHTML = `
-      <div id="${contentId}" class="bg-white p-4 rounded border-l-4 border-blue-500 shadow-sm">
+      <div id="${contentId}" class="bg-white p-4 rounded border-l-4 ${borderColor} shadow-sm">
         <div class="flex justify-between items-start mb-3">
-          <h4 class="text-lg font-semibold text-gray-900">${title}</h4>
-          <div class="flex items-center gap-2">
-            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">${platform} ${type}</span>
-            <button onclick="removeContentDetail('${contentId}')" class="text-gray-400 hover:text-gray-600 text-lg font-bold">&times;</button>
+          <div>
+            <h4 class="text-lg font-semibold text-gray-900">${title}</h4>
+            <div class="flex items-center gap-2 mt-1">
+              <span class="${statusColor} text-xs px-2 py-1 rounded font-medium">${status.replace('_', ' ').toUpperCase()}</span>
+              <span class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">${platform} ${type}</span>
+              ${pilar ? `<span class="bg-indigo-100 text-indigo-700 text-xs px-2 py-1 rounded">Pillar ${pilar}</span>` : ''}
+            </div>
           </div>
+          <button onclick="removeContentDetail('${contentId}')" class="text-gray-400 hover:text-gray-600 text-lg font-bold">&times;</button>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -787,14 +816,31 @@
               </div>
             ` : ''}
 
-            ${contentPiece.pillar ? `
-              <div class="bg-indigo-50 p-3 rounded">
-                <h5 class="font-medium text-gray-900 mb-1">#{t('planning.content.content_pillar')}</h5>
-                <p class="text-sm text-gray-700">${contentPiece.pillar}</p>
+            ${contentPiece.kpi_focus ? `
+              <div class="bg-orange-50 p-3 rounded">
+                <h5 class="font-medium text-gray-900 mb-1">KPI Focus</h5>
+                <p class="text-sm text-gray-700">${contentPiece.kpi_focus}</p>
+              </div>
+            ` : ''}
+
+            ${contentPiece.success_criteria ? `
+              <div class="bg-teal-50 p-3 rounded">
+                <h5 class="font-medium text-gray-900 mb-1">Success Criteria</h5>
+                <p class="text-sm text-gray-700">${contentPiece.success_criteria}</p>
               </div>
             ` : ''}
           </div>
         </div>
+        
+        ${contentPiece.publish_date || contentPiece.scheduled_day ? `
+          <div class="mt-4 p-3 bg-blue-50 rounded">
+            <h5 class="font-medium text-gray-900 mb-2">📅 Scheduling</h5>
+            <div class="flex gap-4 text-sm">
+              ${contentPiece.publish_date ? `<span class="text-gray-700"><strong>Publish Date:</strong> ${contentPiece.publish_date}</span>` : ''}
+              ${contentPiece.scheduled_day ? `<span class="text-gray-700"><strong>Day:</strong> ${contentPiece.scheduled_day}</span>` : ''}
+            </div>
+          </div>
+        ` : ''}
       </div>
     `;
 

@@ -4,11 +4,12 @@ class CreasContentItem < ApplicationRecord
   belongs_to :brand
 
   validates :content_id, presence: true, uniqueness: true
-  validates :content_name, :status, :creation_date, :publish_date, :content_type,
+  validates :content_name, :status, :creation_date, :content_type,
             :platform, :week, :pilar, :template, :video_source, presence: true
+  validates :publish_date, presence: true, unless: -> { status == 'draft' }
 
   validates :status, inclusion: {
-    in: %w[in_production ready_for_review approved],
+    in: %w[draft in_production ready_for_review approved],
     message: "%{value} is not a valid status"
   }
 
