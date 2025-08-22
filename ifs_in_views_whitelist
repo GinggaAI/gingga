@@ -1,23 +1,23 @@
-app/views/brands/edit.html.erb:12:    <% if @brands.any? %>
-app/views/brands/edit.html.erb:18:            <option value="<%= brand.id %>" <%= 'selected' if brand == @brand %>><%= brand.name || "Untitled Brand" %></option>
-app/views/brands/edit.html.erb:231:        <% if @presenter.strategy_ready? %>
-app/views/brands/edit.html.erb:252:          <% if @presenter.has_audiences? %>
-app/views/brands/edit.html.erb:26:  <% if notice %>
-app/views/brands/edit.html.erb:288:          <% if @presenter.has_products? %>
-app/views/brands/edit.html.erb:31:    <% if @brand.errors.any? %>
-app/views/brands/edit.html.erb:324:          <% if @presenter.has_brand_channels? %>
-app/views/brands/edit.html.erb:371:  if (addAudienceBtn && audiencesContainer) {
-app/views/brands/edit.html.erb:484:  if (addProductBtn && productsContainer) {
-app/views/brands/edit.html.erb:523:  if (addChannelBtn && channelsContainer) {
-app/views/brands/edit.html.erb:568:    if (e.target.classList.contains('remove-audience-btn') ||
-app/views/brands/edit.html.erb:575:      if (destroyCheckbox) {
-app/views/brands/edit.html.erb:593:      if (currentValue && field.tagName === 'SELECT') {
-app/views/brands/edit.html.erb:599:    if (!demographicsListenersAdded) {
-app/views/brands/edit.html.erb:601:        if (e.target.classList.contains('demographic-field')) {
-app/views/brands/edit.html.erb:607:        if (e.target.classList.contains('demographic-field')) {
-app/views/brands/edit.html.erb:618:    if (!container) return;
-app/views/brands/edit.html.erb:621:    if (!jsonField) return;
-app/views/brands/edit.html.erb:629:      if (fieldName && value) {
+app/views/brands/edit.html.haml:13:      - if @presenter.show_brands_selector?
+app/views/brands/edit.html.haml:142:                - if @presenter.strategy_ready?
+app/views/brands/edit.html.haml:165:                - if @presenter.has_audiences?
+app/views/brands/edit.html.haml:192:                - if @presenter.has_products?
+app/views/brands/edit.html.haml:221:                - if @presenter.has_brand_channels?
+app/views/brands/edit.html.haml:251:    if (addAudienceBtn && audiencesContainer) {
+app/views/brands/edit.html.haml:25:                  %option{:value => brand.id, :selected => ('selected' if brand == @brand)}= brand.name || t('brands.untitled_brand')
+app/views/brands/edit.html.haml:29:        - if @presenter.show_validation_errors?
+app/views/brands/edit.html.haml:364:    if (addProductBtn && productsContainer) {
+app/views/brands/edit.html.haml:3:- if @presenter.show_notice?
+app/views/brands/edit.html.haml:403:    if (addChannelBtn && channelsContainer) {
+app/views/brands/edit.html.haml:448:      if (e.target.classList.contains('remove-audience-btn') ||
+app/views/brands/edit.html.haml:455:        if (destroyCheckbox) {
+app/views/brands/edit.html.haml:473:        if (currentValue && field.tagName === 'SELECT') {
+app/views/brands/edit.html.haml:479:      if (!demographicsListenersAdded) {
+app/views/brands/edit.html.haml:481:          if (e.target.classList.contains('demographic-field')) {
+app/views/brands/edit.html.haml:487:          if (e.target.classList.contains('demographic-field')) {
+app/views/brands/edit.html.haml:498:      if (!container) return;
+app/views/brands/edit.html.haml:501:      if (!jsonField) return;
+app/views/brands/edit.html.haml:509:        if (fieldName && value) {
 app/views/devise/mailer/email_changed.html.erb:3:<% if @resource.try(:unconfirmed_email?) %>
 app/views/devise/passwords/edit.html.erb:9:    <% if @minimum_password_length %>
 app/views/devise/passwords/new.html.erb:16:      <% if resource.errors.any? %>
@@ -35,88 +35,91 @@ app/views/devise/shared/_links.html.erb:1:<%- if controller_name != 'sessions' %
 app/views/devise/shared/_links.html.erb:21:<%- if devise_mapping.omniauthable? %>
 app/views/devise/shared/_links.html.erb:5:<%- if devise_mapping.registerable? && controller_name != 'registrations' %>
 app/views/devise/shared/_links.html.erb:9:<%- if devise_mapping.recoverable? && controller_name != 'passwords' && controller_name != 'registrations' %>
-app/views/plannings/show.haml:196:    if (toggleBtn && form) {
-app/views/plannings/show.haml:201:        if (resultDiv) resultDiv.style.display = 'none';
-app/views/plannings/show.haml:207:    if (overviewBtn && resultDiv) {
-app/views/plannings/show.haml:212:        if (isResultVisible) {
-app/views/plannings/show.haml:213:          // Hide if currently visible
-app/views/plannings/show.haml:217:          if (window.currentPlan) {
-app/views/plannings/show.haml:225:        if (form) form.style.display = 'none';
-app/views/plannings/show.haml:231:    if (cancelBtn && form) {
-app/views/plannings/show.haml:240:    if (strategyForm && submitBtn) {
-app/views/plannings/show.haml:245:    if (voxaBtn) {
-app/views/plannings/show.haml:252:    // Initialize with existing plan if available
-app/views/plannings/show.haml:253:    if (window.currentPlan) {
-app/views/plannings/show.haml:260:      if (resultDiv) resultDiv.style.display = 'none';
-app/views/plannings/show.haml:270:    if (planId && (!window.currentPlan || window.currentPlan.id != planId)) {
-app/views/plannings/show.haml:304:      if (!response.ok) {
-app/views/plannings/show.haml:312:      if (data.success) {
-app/views/plannings/show.haml:323:        if (data.plan && data.plan.id) {
-app/views/plannings/show.haml:336:      if (error.name === 'AbortError') {
-app/views/plannings/show.haml:348:    if (loading) {
-app/views/plannings/show.haml:361:    if (!resultDiv || !plan) return;
-app/views/plannings/show.haml:365:    if (titleEl) {
-app/views/plannings/show.haml:382:    if (plan.monthly_themes && plan.monthly_themes.length > 0) {
-app/views/plannings/show.haml:386:    else if (plan.content_distribution) {
-app/views/plannings/show.haml:393:    if (themes.length > 0) {
-app/views/plannings/show.haml:401:    // Only show if explicitly requested (like after form submission)
-app/views/plannings/show.haml:402:    if (shouldShow) {
-app/views/plannings/show.haml:409:    if (closeBtn) {
-app/views/plannings/show.haml:420:    if (errorDiv && errorText) {
-app/views/plannings/show.haml:431:    if (resultDiv) resultDiv.style.display = 'none';
-app/views/plannings/show.haml:432:    if (errorDiv) errorDiv.style.display = 'none';
-app/views/plannings/show.haml:437:    if (errorDiv) errorDiv.style.display = 'none';
-app/views/plannings/show.haml:442:    if (form) {
-app/views/plannings/show.haml:446:        if (input.type === 'number') {
-app/views/plannings/show.haml:476:        if (response.ok) {
-app/views/plannings/show.haml:482:        if (plan && plan.id) {
-app/views/plannings/show.haml:504:    if (buttonText && window.currentPlan) {
-app/views/plannings/show.haml:506:    } else if (buttonText) {
-app/views/plannings/show.haml:513:    // Always show the overview button if we have a brand
-app/views/plannings/show.haml:514:    if (overviewBtn) {
-app/views/plannings/show.haml:518:      if (window.currentPlan) {
-app/views/plannings/show.haml:527:    if (!plan || !plan.weekly_plan) return;
-app/views/plannings/show.haml:547:      if (week.content_pieces) {
-app/views/plannings/show.haml:549:      } else if (week.posts) {
-app/views/plannings/show.haml:551:      } else if (week.ideas) {
-app/views/plannings/show.haml:553:      } else if (Array.isArray(week)) {
-app/views/plannings/show.haml:575:    if (!dayName) {
-app/views/plannings/show.haml:581:    if (typeof dayName === 'string') {
-app/views/plannings/show.haml:603:      if (element.querySelector('.week-content-slot')) {
-app/views/plannings/show.haml:604:        if (actualWeekIndex === weekIndex) {
-app/views/plannings/show.haml:612:    if (!weekElement) {
-app/views/plannings/show.haml:620:    if (!dayElement) {
-app/views/plannings/show.haml:645:    if (addButton) {
-app/views/plannings/show.haml:673:    if (contentType && typeIcons[contentType]) {
-app/views/plannings/show.haml:686:    if (!weekDetails) {
-app/views/plannings/show.haml:694:        if (element.querySelector('.week-content-slot')) {
-app/views/plannings/show.haml:695:          if (actualWeekIndex === weekIndex) {
-app/views/plannings/show.haml:703:      if (!weekElement) return;
-app/views/plannings/show.haml:790:    if (weekDetails) {
-app/views/plannings/show.haml:794:      if (detailsGrid) {
-app/views/plannings/show.haml:802:    if (contentDetail) {
-app/views/plannings/show.haml:807:      if (parentGrid && parentGrid.children.length === 0) {
-app/views/plannings/show.haml:809:        if (weekDetails) {
-app/views/plannings/show.haml:818:    if (resultDiv && window.currentPlan) {
-app/views/plannings/show.haml:826:    if (resultDiv) {
-app/views/plannings/show.haml:829:      if (titleEl) {
-app/views/plannings/show.haml:850:    if (resultDiv) {
-app/views/plannings/show.haml:867:      if (element) {
-app/views/plannings/show.haml:874:    if (hiddenInput) {
-app/views/plannings/show.haml:888:    if (!hiddenInput) return;
-app/views/plannings/show.haml:893:    if (budgetSelect && budgetSelect.value) {
-app/views/plannings/show.haml:898:    if (teamSizeSelect && teamSizeSelect.value) {
-app/views/plannings/show.haml:903:    if (toolsSelect) {
-app/views/plannings/show.haml:905:      if (selectedTools.length > 0) {
-app/views/plannings/show.haml:911:    if (aiAvatarsCheckbox && aiAvatarsCheckbox.checked) {
-app/views/plannings/show.haml:914:    if (stockPhotosCheckbox && stockPhotosCheckbox.checked) {
-app/views/plannings/show.haml:917:    if (customGraphicsCheckbox && customGraphicsCheckbox.checked) {
-app/views/plannings/show.haml:927:    if (voxaBtn) {
-app/views/plannings/show.haml:928:      if (window.currentPlan && window.currentPlan.id) {
-app/views/plannings/show.haml:939:    if (!window.currentPlan || !window.currentPlan.id) {
-app/views/plannings/show.haml:948:    if (voxaBtn) voxaBtn.disabled = true;
-app/views/plannings/show.haml:949:    if (voxaButtonText) voxaButtonText.textContent = 'Refining...';
-app/views/plannings/show.haml:960:    if (csrfToken) {
+app/views/home/show.haml:109:          Start with a free discovery call. ProSumer pricing available if you run Gingga for yourself.
+app/views/plannings/show.haml:204:    if (toggleBtn && form) {
+app/views/plannings/show.haml:209:        if (resultDiv) resultDiv.style.display = 'none';
+app/views/plannings/show.haml:215:    if (overviewBtn && resultDiv) {
+app/views/plannings/show.haml:220:        if (isResultVisible) {
+app/views/plannings/show.haml:221:          // Hide if currently visible
+app/views/plannings/show.haml:225:          if (window.currentPlan) {
+app/views/plannings/show.haml:233:        if (form) form.style.display = 'none';
+app/views/plannings/show.haml:239:    if (cancelBtn && form) {
+app/views/plannings/show.haml:248:    if (strategyForm && submitBtn) {
+app/views/plannings/show.haml:253:    if (voxaBtn) {
+app/views/plannings/show.haml:260:    // Initialize with existing plan if available
+app/views/plannings/show.haml:261:    if (window.currentPlan) {
+app/views/plannings/show.haml:268:      if (resultDiv) resultDiv.style.display = 'none';
+app/views/plannings/show.haml:278:    if (planId && (!window.currentPlan || window.currentPlan.id != planId)) {
+app/views/plannings/show.haml:312:      if (!response.ok) {
+app/views/plannings/show.haml:320:      if (data.success) {
+app/views/plannings/show.haml:331:        if (data.plan && data.plan.id) {
+app/views/plannings/show.haml:344:      if (error.name === 'AbortError') {
+app/views/plannings/show.haml:356:    if (loading) {
+app/views/plannings/show.haml:369:    if (!resultDiv || !plan) return;
+app/views/plannings/show.haml:373:    if (titleEl) {
+app/views/plannings/show.haml:380:    if (iconEl) {
+app/views/plannings/show.haml:397:    if (plan.monthly_themes && plan.monthly_themes.length > 0) {
+app/views/plannings/show.haml:401:    else if (plan.content_distribution) {
+app/views/plannings/show.haml:408:    if (themes.length > 0) {
+app/views/plannings/show.haml:417:    // Only show if explicitly requested (like after form submission)
+app/views/plannings/show.haml:418:    if (shouldShow) {
+app/views/plannings/show.haml:425:    if (closeBtn) {
+app/views/plannings/show.haml:436:    if (errorDiv && errorText) {
+app/views/plannings/show.haml:447:    if (resultDiv) resultDiv.style.display = 'none';
+app/views/plannings/show.haml:448:    if (errorDiv) errorDiv.style.display = 'none';
+app/views/plannings/show.haml:453:    if (errorDiv) errorDiv.style.display = 'none';
+app/views/plannings/show.haml:458:    if (form) {
+app/views/plannings/show.haml:462:        if (input.type === 'number') {
+app/views/plannings/show.haml:492:        if (response.ok) {
+app/views/plannings/show.haml:498:        if (plan && plan.id) {
+app/views/plannings/show.haml:520:    if (buttonText && window.currentPlan) {
+app/views/plannings/show.haml:522:    } else if (buttonText) {
+app/views/plannings/show.haml:529:    // Always show the overview button if we have a brand
+app/views/plannings/show.haml:530:    if (overviewBtn) {
+app/views/plannings/show.haml:534:      if (window.currentPlan) {
+app/views/plannings/show.haml:543:    if (!plan || !plan.weekly_plan) return;
+app/views/plannings/show.haml:563:      if (week.content_pieces) {
+app/views/plannings/show.haml:565:      } else if (week.posts) {
+app/views/plannings/show.haml:567:      } else if (week.ideas) {
+app/views/plannings/show.haml:569:      } else if (Array.isArray(week)) {
+app/views/plannings/show.haml:591:    if (!dayName) {
+app/views/plannings/show.haml:597:    if (typeof dayName === 'string') {
+app/views/plannings/show.haml:621:      if (element.querySelector('.week-content-slot')) {
+app/views/plannings/show.haml:623:        if (actualWeekIndex === weekIndex) {
+app/views/plannings/show.haml:631:    if (!weekElement) {
+app/views/plannings/show.haml:640:    if (!dayElement) {
+app/views/plannings/show.haml:665:    if (addButton) {
+app/views/plannings/show.haml:693:    if (contentType && typeIcons[contentType]) {
+app/views/plannings/show.haml:706:    if (!weekDetails) {
+app/views/plannings/show.haml:714:        if (element.querySelector('.week-content-slot')) {
+app/views/plannings/show.haml:715:          if (actualWeekIndex === weekIndex) {
+app/views/plannings/show.haml:723:      if (!weekElement) return;
+app/views/plannings/show.haml:810:    if (weekDetails) {
+app/views/plannings/show.haml:814:      if (detailsGrid) {
+app/views/plannings/show.haml:822:    if (contentDetail) {
+app/views/plannings/show.haml:827:      if (parentGrid && parentGrid.children.length === 0) {
+app/views/plannings/show.haml:829:        if (weekDetails) {
+app/views/plannings/show.haml:838:    if (resultDiv && window.currentPlan) {
+app/views/plannings/show.haml:846:    if (resultDiv) {
+app/views/plannings/show.haml:849:      if (titleEl) {
+app/views/plannings/show.haml:856:      if (iconEl) {
+app/views/plannings/show.haml:877:    if (resultDiv) {
+app/views/plannings/show.haml:894:      if (element) {
+app/views/plannings/show.haml:901:    if (hiddenInput) {
+app/views/plannings/show.haml:915:    if (!hiddenInput) return;
+app/views/plannings/show.haml:920:    if (budgetSelect && budgetSelect.value) {
+app/views/plannings/show.haml:925:    if (teamSizeSelect && teamSizeSelect.value) {
+app/views/plannings/show.haml:930:    if (toolsSelect) {
+app/views/plannings/show.haml:932:      if (selectedTools.length > 0) {
+app/views/plannings/show.haml:938:    if (aiAvatarsCheckbox && aiAvatarsCheckbox.checked) {
+app/views/plannings/show.haml:941:    if (stockPhotosCheckbox && stockPhotosCheckbox.checked) {
+app/views/plannings/show.haml:944:    if (customGraphicsCheckbox && customGraphicsCheckbox.checked) {
+app/views/plannings/show.haml:954:    if (voxaBtn) {
+app/views/plannings/show.haml:955:      if (window.currentPlan && window.currentPlan.id) {
+app/views/plannings/show.haml:966:    if (!window.currentPlan || !window.currentPlan.id) {
+app/views/plannings/show.haml:975:    if (voxaBtn) voxaBtn.disabled = true;
+app/views/plannings/show.haml:976:    if (voxaButtonText) voxaButtonText.textContent = '#{t('planning.content.refining')}';
+app/views/plannings/show.haml:987:    if (csrfToken) {
 app/views/pwa/service-worker.js:16://         if (clientPath == event.notification.data.path && "focus" in client) {
 app/views/pwa/service-worker.js:21://       if (clients.openWindow) {
 app/views/reels/narrative.html.erb:45:    <% if @reel.errors.any? %>
