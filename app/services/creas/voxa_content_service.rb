@@ -103,6 +103,8 @@ module Creas
         assets: item["assets"] || {},
         accessibility: item["accessibility"] || {},
         meta: (item["meta"] || {}).merge(
+          hook: item["hook"],
+          cta: item["cta"],
           kpi_focus: item["kpi_focus"],
           success_criteria: item["success_criteria"],
           compliance_check: item["compliance_check"]

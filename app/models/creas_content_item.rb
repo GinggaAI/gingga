@@ -71,6 +71,14 @@ class CreasContentItem < ApplicationRecord
     read_attribute(:compliance_check) || meta.dig("compliance_check") || "ok"
   end
 
+  def hook
+    meta.dig("hook")
+  end
+
+  def cta
+    meta.dig("cta")
+  end
+
   private
 
   def no_newlines_in_hashtags
