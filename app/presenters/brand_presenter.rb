@@ -2,6 +2,8 @@ class BrandPresenter
   def initialize(brand, params = {})
     @brand = brand
     @params = params
+    @notice = params[:notice]
+    @brands_collection = params[:brands_collection]
   end
 
   def name
@@ -84,6 +86,31 @@ class BrandPresenter
 
     channels = brand_channels.map(&:platform)
     channels.map(&:capitalize).join(", ")
+  end
+
+  # View logic methods to eliminate if statements from views
+  def show_notice?
+    @notice.present?
+  end
+
+  def notice_message
+    @notice
+  end
+
+  def show_brands_selector?
+    brands_collection.any?
+  end
+
+  def brands_collection
+    @brands_collection || []
+  end
+
+  def show_validation_errors?
+    @brand.errors.any?
+  end
+
+  def validation_error_messages
+    @brand.errors.full_messages
   end
 
   private

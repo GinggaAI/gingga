@@ -22,7 +22,7 @@ class PlanningsController < ApplicationController
     if strategy
       render json: Planning::StrategyFormatter.call(strategy)
     else
-      render json: { error: I18n.t("plannings.strategy_not_found") },
+      render json: { error: I18n.t("planning.messages.strategy_not_found") },
              status: :not_found
     end
   end

@@ -5,72 +5,58 @@ RSpec.feature "Home", type: :feature do
     visit root_path
 
     # Hero section
-    expect(page).to have_text("GINGGA: Intelligence in Motion")
-    # Copy tightened in hero; keep semantic equivalence
-    expect(page).to have_text("We help small businesses turn raw ideas into ready-to-publish content")
-    expect(page).to have_text("We help small businesses turn raw ideas into ready-to-publish content")
-    expect(page).to have_text("No marketing team. No complex tools. Just you — and Gingga doing the heavy lifting.")
+    expect(page).to have_text("One place. All your content. Powered by AI, guided by your voice.")
+    expect(page).to have_text("Gingga makes it easy for everyday creators to publish high-quality content fast—without being techy.")
+    expect(page).to have_text("AI, Already Done For You")
 
     # Navigation
-    expect(page).to have_link("Features")
-    expect(page).to have_link("How It Works")
-    expect(page).to have_link("Guides")
-    expect(page).to have_link("Pricing")
+    expect(page).to have_link("How it works")
+    expect(page).to have_link("Get Started")
 
-    # What Gingga Does section
-    expect(page).to have_text("What Gingga Does")
-    expect(page).to have_text("From scattered ideas to scroll-stopping content — in minutes.")
-    expect(page).to have_text("Monthly Content Calendar")
-    expect(page).to have_text("AI-Powered Visuals")
-    expect(page).to have_text("Smart Scheduling")
-    expect(page).to have_text("Intelligent Replies")
-    expect(page).to have_text("Adaptive Learning")
-    expect(page).to have_text("You don't need to be a content expert. Just be you. We'll do the rest.")
+    # What You Get section - updated to new 4-box structure
+    expect(page).to have_text("What You Get")
+    expect(page).to have_text("Noctua (The Strategist)")
+    expect(page).to have_text("Voxa (The Voice Constructor)")
+    expect(page).to have_text("Sagui (The Prompt Crafter)")
+    expect(page).to have_text("Alumo (Your Sales Assistant)")
+    expect(page).to have_text("Brand mapping and content clarity—so every post reflects your voice.")
+    expect(page).to have_text("From raw ideas to practical scripts, complete with images and post descriptions.")
+    expect(page).to have_text("Smart prompts turned into ready-to-use posts.")
+    expect(page).to have_text("Replies, captures leads, and books clients automatically.")
 
     # Why Small Brands Choose Gingga section
-    expect(page).to have_text("Why Small Brands Choose Gingga")
-    expect(page).to have_text("Most small businesses struggle to show up online.")
-    expect(page).to have_text("Gingga makes it effortless — and effective.")
-    expect(page).to have_text("No tech overwhelm")
-    expect(page).to have_text("Saves you hours")
-    expect(page).to have_text("Drives real conversations")
-    expect(page).to have_text("AI + Human brilliance")
+    expect(page).to have_text("Why small brands choose Gingga")
+    expect(page).to have_text("Show up daily without burnout.")
+    expect(page).to have_text("Keep your voice. Multiply your output.")
+    expect(page).to have_text("Intelligence that learns and compounds every week.")
+    expect(page).to have_text("Brand-first: clarity → ideas → execution")
+    expect(page).to have_text("No complex tools or constant meetings")
+    expect(page).to have_text("Results that grow with rhythm and consistency")
 
-    # How Gingga Works section
-    expect(page).to have_text("How Gingga Works")
-    expect(page).to have_text("Tell us about your brand")
-    expect(page).to have_text("We create your content engine")
-    expect(page).to have_text("You approve. We schedule.")
-    expect(page).to have_text("Your brand shows up. And grows.")
+    # How it works section
+    expect(page).to have_text("How it works")
+    expect(page).to have_text("Noctua maps your brand")
+    expect(page).to have_text("Sagui spins prompts into ideas")
+    expect(page).to have_text("Voxa crafts visuals")
+    expect(page).to have_text("Alumo anchors the rhythm")
+    expect(page).to have_text("Voice, values, audience and goals in one simple intake.")
 
-    # Meet the Gingga Guides section
-    expect(page).to have_text("Meet the Gingga Guides")
-    expect(page).to have_text("Your creative crew behind the screen")
-    expect(page).to have_text("They're not just characters. They're your co-creators.")
-    expect(page).to have_text("Noctua")
-    expect(page).to have_text("Clarifies your brand's message")
-    expect(page).to have_text("Sagui")
-    expect(page).to have_text("Sparks content ideas with real-time prompts")
-    expect(page).to have_text("Voxa")
-    expect(page).to have_text("Brings your visuals and videos to life")
-    expect(page).to have_text("Alumo")
-    expect(page).to have_text("Turns followers into long-term clients")
 
     # Testimonials section
-    expect(page).to have_text("What People Are Saying")
-    expect(page).to have_text("I used to dread content days. Now it all just flows. Gingga gets my brand.")
-    expect(page).to have_text("Camila")
-    expect(page).to have_text("Wellness Coach")
-    expect(page).to have_text("This feels like magic. Clients think I hired a whole team.")
-    expect(page).to have_text("Luis")
-    expect(page).to have_text("Barbershop Owner")
+    expect(page).to have_text("What people are saying")
+    expect(page).to have_text("I used to dread content days. Now it flows.")
+    expect(page).to have_text("Camila — Wellness Coach")
+    expect(page).to have_text("Feels like magic. Clients think I hired a team.")
+    expect(page).to have_text("Luis — Barbershop Owner")
 
     # Pricing section
-    expect(page).to have_text("Start Growing — Without Burning Out")
-    expect(page).to have_text("Plans from £98/month")
-    expect(page).to have_text("First month: 20% off")
-    expect(page).to have_text("Book a free discovery call or start today")
-    expect(page).to have_text("Ready to transform your content strategy?")
+    expect(page).to have_text("Choose your rhythm")
+    expect(page).to have_text("£248/mo")
+    expect(page).to have_text("£585/mo")
+    expect(page).to have_text("£748/mo")
+    expect(page).to have_text("£1,498/mo")
+    expect(page).to have_text("Book a free discovery call")
+    expect(page).to have_text("Start with a free discovery call. ProSumer pricing available if you run Gingga for yourself.")
 
     # Footer
     expect(page).to have_text("Intelligence in Motion")
@@ -83,46 +69,43 @@ RSpec.feature "Home", type: :feature do
     visit root_path
 
     # Check for different CTA buttons
-    expect(page).to have_button("Get Started") # Navigation
-    expect(page).to have_link("Get Started Now") # Hero and Pricing sections
+    expect(page).to have_link("Get Started") # Navigation
+    expect(page).to have_link("Start Now") # Hero section
+    expect(page).to have_link("Book a free discovery call") # Pricing sections
 
     # Verify buttons are present and clickable in specific sections
-    within('header nav') do
-      expect(page).to have_button("Get Started")
+    within('header') do
+      expect(page).to have_link("Get Started")
     end
 
-    within('#pricing') do
-      expect(page).to have_link("Get Started Now")
+    within('#cta') do
+      expect(page).to have_link("Book a free discovery call")
     end
 
     # Verify we have multiple CTA buttons/links across the page
-    expect(all('a,button', text: /Get Started/).count).to be >= 2
+    expect(all('a', text: /Get Started|Start Now|Book a free discovery call/).count).to be >= 2
   end
 
   scenario "User can navigate using anchor links" do
     visit root_path
 
     # Test navigation links exist and have proper href attributes
-    expect(page).to have_link("Features", href: "#features")
-    expect(page).to have_link("How It Works", href: "#how-it-works")
-    expect(page).to have_link("Guides", href: "#guides")
-    expect(page).to have_link("Pricing", href: "#pricing")
+    expect(page).to have_link("How it works", href: "#how")
   end
 
   scenario "Page displays proper brand elements and styling" do
     visit root_path
 
     # Check that brand elements are present
-    expect(page).to have_text("🌀 GINGGA") # Brand logo
-    expect(page).to have_text("🦉") # Noctua emoji
-    expect(page).to have_text("🐒") # Sagui emoji
-    expect(page).to have_text("🦊") # Voxa emoji
-    expect(page).to have_text("🐘") # Alumo emoji
+    expect(page).to have_text("GINGGA") # Brand logo in header and footer
+    expect(page).to have_text("Intelligence in Motion") # Brand tagline
 
     # Check section IDs for proper navigation
-    expect(page).to have_css("#features")
-    expect(page).to have_css("#how-it-works")
-    expect(page).to have_css("#guides")
-    expect(page).to have_css("#pricing")
+    expect(page).to have_css("#how")
+    expect(page).to have_css("#cta")
+
+    # Check for proper sections
+    expect(page).to have_css("header")
+    expect(page).to have_css("footer")
   end
 end

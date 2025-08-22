@@ -9,7 +9,10 @@ class BrandsController < ApplicationController
   def edit
     @brand = current_user_brand || current_user.brands.build
     @brands = current_user.brands.order(:created_at)
-    @presenter = BrandPresenter.new(@brand)
+    @presenter = BrandPresenter.new(@brand, {
+      notice: flash[:notice],
+      brands_collection: @brands
+    })
   end
 
   def update
@@ -19,7 +22,10 @@ class BrandsController < ApplicationController
       redirect_to edit_brand_path, notice: "Brand profile updated successfully!"
     else
       @brands = current_user.brands.order(:created_at)
-      @presenter = BrandPresenter.new(@brand)
+      @presenter = BrandPresenter.new(@brand, {
+        notice: flash[:notice],
+        brands_collection: @brands
+      })
       render :edit, status: :unprocessable_content
     end
   end

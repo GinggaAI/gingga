@@ -8,72 +8,59 @@ RSpec.describe "Landing Page", type: :system do
   describe "main page content" do
     it "displays the main headline and CTA" do
       visit root_path
-      expect(page).to have_text("GINGGA: Intelligence in Motion")
-      expect(page).to have_link("Get Started Now")
+      expect(page).to have_text("One place. All your content. Powered by AI, guided by your voice.")
+      expect(page).to have_link("Get Started")
     end
 
     it "renders How Gingga Works steps" do
       visit root_path
-      expect(page).to have_text("Tell us about your brand")
-      expect(page).to have_text("We create your content engine")
-      expect(page).to have_text("You approve. We schedule.")
-      expect(page).to have_text("Your brand shows up. And grows.")
+      expect(page).to have_text("Noctua maps your brand")
+      expect(page).to have_text("Sagui spins prompts into ideas")
+      expect(page).to have_text("Voxa crafts visuals")
+      expect(page).to have_text("Alumo anchors the rhythm")
     end
 
     it "displays all feature sections with proper headings" do
       visit root_path
 
       # Check all main section headings
-      expect(page).to have_text("What Gingga Does")
-      expect(page).to have_text("Why Small Brands Choose Gingga")
-      expect(page).to have_text("How Gingga Works")
-      expect(page).to have_text("Meet the Gingga Guides")
-      expect(page).to have_text("What People Are Saying")
-      expect(page).to have_text("Start Growing — Without Burning Out")
+      expect(page).to have_text("What You Get")
+      expect(page).to have_text("Why small brands choose Gingga")
+      expect(page).to have_text("How it works")
+      expect(page).to have_text("What people are saying")
+      expect(page).to have_text("Choose your rhythm")
     end
 
     it "shows feature cards with proper icons and descriptions" do
       visit root_path
 
-      # Feature cards
-      expect(page).to have_text("Monthly Content Calendar")
-      expect(page).to have_text("AI-Powered Visuals")
-      expect(page).to have_text("Smart Scheduling")
-      expect(page).to have_text("Intelligent Replies")
-      expect(page).to have_text("Adaptive Learning")
+      # Feature cards - updated to new 4-box structure
+      expect(page).to have_text("Noctua (The Strategist)")
+      expect(page).to have_text("Voxa (The Voice Constructor)")
+      expect(page).to have_text("Sagui (The Prompt Crafter)")
+      expect(page).to have_text("Alumo (Your Sales Assistant)")
+      expect(page).to have_text("Brand mapping and content clarity—so every post reflects your voice.")
+      expect(page).to have_text("From raw ideas to practical scripts, complete with images and post descriptions.")
     end
 
-    it "displays all Gingga Guide characters" do
-      visit root_path
-
-      expect(page).to have_text("Noctua")
-      expect(page).to have_text("Clarifies your brand's message")
-      expect(page).to have_text("Sagui")
-      expect(page).to have_text("Sparks content ideas with real-time prompts")
-      expect(page).to have_text("Voxa")
-      expect(page).to have_text("Brings your visuals and videos to life")
-      expect(page).to have_text("Alumo")
-      expect(page).to have_text("Turns followers into long-term clients")
-    end
 
     it "shows testimonials from customers" do
       visit root_path
 
-      expect(page).to have_text("I used to dread content days. Now it all just flows. Gingga gets my brand.")
-      expect(page).to have_text("Camila")
-      expect(page).to have_text("Wellness Coach")
-      expect(page).to have_text("This feels like magic. Clients think I hired a whole team.")
-      expect(page).to have_text("Luis")
-      expect(page).to have_text("Barbershop Owner")
+      expect(page).to have_text("I used to dread content days. Now it flows.")
+      expect(page).to have_text("Camila — Wellness Coach")
+      expect(page).to have_text("Feels like magic. Clients think I hired a team.")
+      expect(page).to have_text("Luis — Barbershop Owner")
     end
 
     it "displays pricing information" do
       visit root_path
 
-      expect(page).to have_text("£98")
-      expect(page).to have_text("Plans from £98/month")
-      expect(page).to have_text("First month: 20% off")
-      expect(page).to have_text("Book a free discovery call or start today")
+      expect(page).to have_text("£248/mo")
+      expect(page).to have_text("£585/mo")
+      expect(page).to have_text("£748/mo")
+      expect(page).to have_text("£1,498/mo")
+      expect(page).to have_text("Book a free discovery call")
     end
   end
 
@@ -81,21 +68,16 @@ RSpec.describe "Landing Page", type: :system do
     it "has proper navigation links" do
       visit root_path
 
-      expect(page).to have_link("Features", href: "#features")
-      expect(page).to have_link("How It Works", href: "#how-it-works")
-      expect(page).to have_link("Guides", href: "#guides")
-      expect(page).to have_link("Pricing", href: "#pricing")
+      expect(page).to have_link("How it works", href: "#how")
+      expect(page).to have_link("Get Started")
     end
 
     it "has semantic HTML structure with proper sections" do
       visit root_path
 
       expect(page).to have_css("header")
-      expect(page).to have_css("main")
-      expect(page).to have_css("section#features")
-      expect(page).to have_css("section#how-it-works")
-      expect(page).to have_css("section#guides")
-      expect(page).to have_css("section#pricing")
+      expect(page).to have_css("section#how")
+      expect(page).to have_css("section#cta")
       expect(page).to have_css("footer")
     end
 
@@ -113,16 +95,18 @@ RSpec.describe "Landing Page", type: :system do
     it "has multiple CTA buttons for conversion" do
       visit root_path
 
-      # Should have at least 2 Get Started links
-      expect(all('a', text: /Get Started/).count).to be >= 2
+      # Should have Get Started and Start Now links
+      expect(page).to have_link("Get Started")
+      expect(page).to have_link("Start Now")
+      expect(page).to have_link("Book a free discovery call", count: 4)
     end
 
     it "displays brand identity consistently" do
       visit root_path
 
-      # Brand name should appear in multiple places
-      expect(page).to have_text("🌀 GINGGA", count: 2) # Nav and footer
-      expect(page).to have_text("GINGGA:", count: 1) # Hero
+      # Brand name should appear in nav and footer
+      expect(page).to have_text("GINGGA", count: 2) # Nav and footer
+      expect(page).to have_text("Intelligence in Motion")
     end
   end
 end

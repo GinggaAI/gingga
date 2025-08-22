@@ -22,7 +22,7 @@ module Planning
     private
 
     def null_object
-      { error: I18n.t("plannings.strategy_not_found") }
+      { error: I18n.t("planning.messages.strategy_not_found") }
     end
   end
 end

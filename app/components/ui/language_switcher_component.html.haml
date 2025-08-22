@@ -1,0 +1,19 @@
+.space-y-3
+  %label.text-sm.font-medium.text-gray-700
+    = t('nav.language')
+  .space-y-2
+    - available_locales.each do |locale_info|
+      = link_to switch_locale_path(locale_info[:code]), 
+          class: "#{locale_info[:current] ? 'bg-indigo-100 border-indigo-200 text-indigo-700' : 'bg-white border-gray-200 text-gray-900 hover:bg-gray-50'} relative flex items-center justify-between p-3 border rounded-lg transition-colors",
+          method: :get do
+        .flex.items-center.gap-3
+          - if locale_info[:code] == 'en'
+            %span.text-xl 🇺🇸
+          - elsif locale_info[:code] == 'es' 
+            %span.text-xl 🇪🇸
+          .flex.flex-col
+            %span.font-medium= locale_info[:name]
+            %span.text-xs.text-gray-500= locale_info[:code].upcase
+        - if locale_info[:current]
+          %svg.w-5.h-5.text-indigo-600{fill: "currentColor", viewBox: "0 0 20 20"}
+            %path{d: "M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z", "fill-rule": "evenodd", "clip-rule": "evenodd"}

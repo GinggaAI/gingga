@@ -1,227 +1,142 @@
 - content_for :head do
-  %link{ href: "https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap", rel: "stylesheet" }
+  %link{ href: "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap", rel: "stylesheet" }
+  :css
+    .how-it-works-number {
+      z-index: 10;
+      margin-left: -0.75rem;
+    }
 
-%main.font-poppins.u-stack{ style: "background-color: var(--bg); color: var(--text);" }
+.font-sans.bg-white.text-black
+  / Sticky CTA for mobile
+  .md:hidden.fixed.bottom-0.inset-x-0.z-40.p-3
+    = link_to new_user_session_path, class: "block text-center bg-black text-white rounded-full py-3 font-semibold shadow-xl border border-black hover:bg-yellow-400 hover:text-black transition" do
+      Launch your content in 10 minutes
 
-= render(Ui::NavComponent.new)
+  / Header
+  %header.sticky.top-0.z-30.bg-white.backdrop-blur.border-b.border-black{ style: "background: rgba(255,255,255,0.8)" }
+    .max-w-6xl.mx-auto.px-4.py-4.flex.items-center.justify-between
+      .font-extrabold.tracking-tight.text-xl GINGGA
+      = link_to new_user_session_path, class: "hidden md:inline-flex bg-black text-white px-5 py-2 rounded-full border border-black hover:bg-yellow-400 hover:text-black transition" do
+        Get Started
 
-/ Section 1: Hero
-%section.bg-gingga-dark.text-white
-  .max-w-3xl.mx-auto.px-6.py-16.md:py-24.text-center
-    %h1.font-montserrat.font-bold.text-4xl.sm:text-6xl.tracking-tight{ style: "line-height:1.05" }
-      %span GINGGA:
-      %span.text-gingga-gold  Intelligence
-      %span  in 
-      %span.text-gingga-cyan  Motion
-    %p.mt-4.sm:mt-5.text-lg.sm:text-xl.leading-relaxed.text-on-dark
-      We help small businesses turn raw ideas into ready-to-publish content that connects,
-      converts, and compounds over time.
-    %p.mt-3.text-sm.text-on-dark-muted
-      No marketing team. No complex tools. Just you — and Gingga doing the heavy lifting.
-    .mt-8
-      = link_to new_user_session_path, class: "btn-primary px-6 py-3 rounded-full font-semibold shadow-md hover:shadow-lg inline-block", data: { controller: "cta-pulse", tracking: "hero_cta" } do
-        Get Started Now
+  / HERO Section
+  %section.relative.overflow-hidden.text-white{ id: "hero-section", style: "background-color: #2D3142" }
+    .max-w-6xl.mx-auto.px-6.md:px-8.py-20.md:py-32.grid.md:grid-cols-2.gap-10.items-center
+      %div
+        %p.uppercase.tracking-widest.text-xs.mb-3{ style: "color: rgba(255,255,255,0.6)" }
+          AI, Already Done For You
+        %h1.text-4xl.md:text-6xl.font-extrabold.leading-tight
+          One place. All your content. Powered by AI, guided by your voice.
+        %p.mt-6.text-lg.md:text-xl{ style: "color: rgba(255,255,255,0.8)" }
+          Gingga makes it easy for everyday creators to publish high-quality content fast—without being techy.
+        .mt-10.flex.gap-4
+          = link_to new_user_session_path, class: "px-8 py-3 rounded-full font-semibold shadow-xl border transition", style: "background-color: #FFC857; color: black; border-color: #FFC857" do
+            Start Now
+          %a.px-8.py-3.rounded-full.font-semibold.border.transition{ href: "#how", style: "border-color: rgba(255,255,255,0.3); color: white" }
+            How it works
 
-/ Section 2: What Gingga Does
-%section#features.py-20.gradient-section
-  .max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8
-    .text-center.mb-16
-      %h2.font-montserrat.font-bold.text-4xl.md:text-5xl.mb-6.text-gingga-dark
-        What Gingga Does
-      %p.text-xl.text-gray-700.max-w-3xl.mx-auto
-        From scattered ideas to scroll-stopping content — in minutes.
-    
-    .grid.md:grid-cols-2.lg:grid-cols-3.gap-8.mb-12
-      .bg-white.p-8.rounded-2xl.shadow-lg.hover-lift
-        .w-12.h-12.mb-4.flex.items-center.justify-center.rounded-lg.bg-gingga-cyan
-          %svg.w-6.h-6.text-white{ fill: "currentColor", viewBox: "0 0 20 20" }
-            %path{ d: "M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" }
-        %h3.font-montserrat.font-semibold.text-xl.mb-3.text-gingga-dark Monthly Content Calendar
-        %p.text-gray-600 A full monthly content calendar, built around your brand
-      
-      .bg-white.p-8.rounded-2xl.shadow-lg.hover-lift
-        .w-12.h-12.mb-4.flex.items-center.justify-center.rounded-lg.bg-gingga-orange
-          %svg.w-6.h-6.text-white{ fill: "currentColor", viewBox: "0 0 20 20" }
-            %path{ d: "M2 6a2 2 0 012-2h6a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" }
-        %h3.font-montserrat.font-semibold.text-xl.mb-3.text-gingga-dark AI-Powered Visuals
-        %p.text-gray-600 Reels and visuals made by AI, fine-tuned by real humans
-      
-      .bg-white.p-8.rounded-2xl.shadow-lg.hover-lift
-        .w-12.h-12.mb-4.flex.items-center.justify-center.rounded-lg.bg-gingga-cyan
-          %svg.w-6.h-6.text-white{ fill: "currentColor", viewBox: "0 0 20 20" }
-            %path{ d: "M10 12a2 2 0 100-4 2 2 0 000 4z" }
-            %path{ "fill-rule": "evenodd", d: "M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z", "clip-rule": "evenodd" }
-        %h3.font-montserrat.font-semibold.text-xl.mb-3.text-gingga-dark Smart Scheduling
-        %p.text-gray-600 Captions and posts, written and scheduled for you
-      
-      .bg-white.p-8.rounded-2xl.shadow-lg.hover-lift
-        .w-12.h-12.mb-4.flex.items-center.justify-center.rounded-lg.bg-gingga-violet
-          %svg.w-6.h-6.text-white{ fill: "currentColor", viewBox: "0 0 20 20" }
-            %path{ "fill-rule": "evenodd", d: "M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z", "clip-rule": "evenodd" }
-        %h3.font-montserrat.font-semibold.text-xl.mb-3.text-gingga-dark Intelligent Replies
-        %p.text-gray-600 Smart replies that turn followers into clients
-      
-      .bg-white.p-8.rounded-2xl.shadow-lg.hover-lift
-        .w-12.h-12.mb-4.flex.items-center.justify-center.rounded-lg.bg-gingga-cyan
-          %svg.w-6.h-6.text-white{ fill: "currentColor", viewBox: "0 0 20 20" }
-            %path{ d: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" }
-        %h3.font-montserrat.font-semibold.text-xl.mb-3.text-gingga-dark Adaptive Learning
-        %p.text-gray-600 A system that learns your style and evolves with you
-    
-    .text-center
-      %p.text-xl.font-medium.text-gingga-dark
-        You don't need to be a content expert. Just be you. We'll do the rest.
+      / Visual  
+      .flex.items-center.justify-center.h-full{ id: "hero-video-container-wrapper" }
+        .relative{ id: "hero-video-container", style: "aspect-ratio: 4/5" }
+          %video#hero-video.rounded-2xl.border.shadow-2xl.w-full.h-full.object-cover{ autoplay: true, muted: true, loop: true, playsinline: true, style: "border-color: rgba(255,255,255,0.1); box-shadow: 0 0 120px -40px #FFC857; margin-top: 6em" }
+            %source{ src: "/videos/hero-video.mp4", type: "video/mp4" }
+            Your browser does not support the video tag.
 
-/ Section 3: Why Small Brands Choose Gingga
-%section.py-20.bg-gingga-dark
-  .max-w-6xl.mx-auto.px-4.sm:px-6.lg:px-8
-    .text-center.mb-16
-      %h2.font-montserrat.font-bold.text-4xl.md:text-5xl.mb-6.text-white
-        Why Small Brands Choose 
-        %span.text-gingga-orange Gingga
-      %p.text-xl.max-w-3xl.mx-auto.text-on-dark
-        Most small businesses struggle to show up online.
-        %br
-        Gingga makes it effortless — and effective.
-    
-    .grid.md:grid-cols-2.gap-8
-      .flex.items-start.space-x-4
-        .text-2xl.text-gingga-orange ✔️
-        %div
-          %h3.font-montserrat.font-semibold.text-xl.mb-2.text-white No tech overwhelm
-          %p.text-on-dark-muted Simple. Guided. Stress-free.
-      
-      .flex.items-start.space-x-4
-        .text-2xl.text-gingga-orange ⏱️
-        %div
-          %h3.font-montserrat.font-semibold.text-xl.mb-2.text-white Saves you hours
-          %p.text-on-dark-muted Content creation on autopilot
-      
-      .flex.items-start.space-x-4
-        .text-2xl.text-gingga-orange 💬
-        %div
-          %h3.font-montserrat.font-semibold.text-xl.mb-2.text-white Drives real conversations
-          %p.text-on-dark-muted Our replies actually convert
-      
-      .flex.items-start.space-x-4
-        .text-2xl.text-gingga-orange 🧠
-        %div
-          %h3.font-montserrat.font-semibold.text-xl.mb-2.text-white AI + Human brilliance
-          %p.text-on-dark-muted Built to keep your voice, not replace it
+  / KPI STRIP
+  %section.bg-white.border-y{ style: "border-color: rgba(0,0,0,0.05)" }
+    .max-w-6xl.mx-auto.px-6.py-10.grid.grid-cols-2.md:grid-cols-4.gap-6.text-center
+      - [{ k: "10x cheaper", l: "Than hiring an agency" }, { k: "24 hours saved/month", l: "Focus on running your business" }, { k: "<1 min setup", l: "Start publishing instantly" }, { k: "100% branded", l: "Content tailored to your voice" }].each do |item|
+        .p-4
+          .text-4xl.font-extrabold.tracking-tight= item[:k]
+          .text-sm.uppercase.tracking-wide{ style: "color: rgba(0,0,0,0.6)" }= item[:l]
 
-/ Section 4: How Gingga Works
-%section#how-it-works.py-20.gradient-section
-  .max-w-6xl.mx-auto.px-4.sm:px-6.lg:px-8
-    .text-center.mb-16
-      %h2.font-montserrat.font-bold.text-4xl.md:text-5xl.mb-6.text-gingga-dark
-        How Gingga Works
-    
-    .space-y-12
-      .flex.flex-col.md:flex-row.items-center.space-y-6.md:space-y-0.md:space-x-12
-        .flex-shrink-0.w-16.h-16.text-white.rounded-full.flex.items-center.justify-center.text-2xl.font-bold.bg-gingga-orange 1
-        .flex-1.text-center.md:text-left
-          %h3.font-montserrat.font-semibold.text-2xl.mb-3.text-gingga-dark Tell us about your brand
-          %p.text-lg.text-gray-700 (1 simple form — voice, vibe, goals)
-      
-      .flex.flex-col.md:flex-row.items-center.space-y-6.md:space-y-0.md:space-x-12
-        .flex-shrink-0.w-16.h-16.text-white.rounded-full.flex.items-center.justify-center.text-2xl.font-bold.bg-gingga-orange 2
-        .flex-1.text-center.md:text-left
-          %h3.font-montserrat.font-semibold.text-2xl.mb-3.text-gingga-dark We create your content engine
-          %p.text-lg.text-gray-700 (calendar, captions, visuals — all aligned with you)
-      
-      .flex.flex-col.md:flex-row.items-center.space-y-6.md:space-y-0.md:space-x-12
-        .flex-shrink-0.w-16.h-16.text-white.rounded-full.flex.items-center.justify-center.text-2xl.font-bold.bg-gingga-orange 3
-        .flex-1.text-center.md:text-left
-          %h3.font-montserrat.font-semibold.text-2xl.mb-3.text-gingga-dark You approve. We schedule.
-          %p.text-lg.text-gray-700 (Instagram, TikTok, and more — ready to go)
-      
-      .flex.flex-col.md:flex-row.items-center.space-y-6.md:space-y-0.md:space-x-12
-        .flex-shrink-0.w-16.h-16.text-white.rounded-full.flex.items-center.justify-center.text-2xl.font-bold.bg-gingga-orange 4
-        .flex-1.text-center.md:text-left
-          %h3.font-montserrat.font-semibold.text-2xl.mb-3.text-gingga-dark Your brand shows up. And grows.
+  / WHAT YOU GET
+  %section.py-20
+    .max-w-6xl.mx-auto.px-6
+      %h2.text-3xl.md:text-4xl.font-bold.mb-8 What You Get
+      .grid.md:grid-cols-2.gap-8
+        - [{ t: "Noctua (The Strategist)", d1: "Brand mapping and content clarity—so every post reflects your voice.", d2: "Transforms your brand's information into a draft content schedule.", img: "noctual-symbol.png", color: "#FFC857" }, { t: "Voxa (The Voice Constructor)", d1: "From raw ideas to practical scripts, complete with images and post descriptions.", d2: "Your content, ready to be created.", img: "voxa-symbol.png", color: "#F26419" }, { t: "Sagui (The Prompt Crafter)", d1: "Smart prompts turned into ready-to-use posts.", d2: "Helps bring your ideas to life.", img: "sagui_symbol_2.png", color: "#00C2FF" }, { t: "Alumo (Your Sales Assistant)", d1: "Replies, captures leads, and books clients automatically.", d2: "Understands your audience deeply.", img: "alumo-symbol.png", color: "#8E7CC3" }].each do |item|
+          .bg-black.text-white.rounded-2xl.p-8.border.border-black.shadow-lg.transition.hover:shadow-2xl{ style: "box-shadow: 0 0 0 2px #{item[:color]}20" }
+            .flex.items-center.gap-3.mb-4
+              = image_tag item[:img], alt: item[:t], class: "w-8 h-8 object-contain"
+              %h3.text-xl.font-bold{ style: "color: #{item[:color]}" }= item[:t]
+            %p.mb-3{ style: "color: rgba(255,255,255,0.9)" }= item[:d1]
+            %p{ style: "color: rgba(255,255,255,0.7)" }= item[:d2]
 
-/ Section 5: Meet the Gingga Guides
-%section#guides.py-20.bg-white
-  .max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8
-    .text-center.mb-16
-      %h2.font-montserrat.font-bold.text-4xl.md:text-5xl.mb-6.text-gingga-dark
-        Meet the Gingga Guides
-      %p.text-xl.text-gray-700.max-w-4xl.mx-auto
-        Your creative crew behind the screen — each one designed to help your brand move with meaning:
-      %p.text-lg.text-gray-600.mt-4
-        They're not just characters. They're your co-creators.
-    
-    .grid.md:grid-cols-2.lg:grid-cols-4.gap-8
-      .p-8.rounded-2xl.text-center.hover-lift.bg-gradient-to-br.from-gray-50.to-gray-100
-        .text-6xl.mb-6 🦉
-        %h3.font-montserrat.font-bold.text-xl.mb-3.text-gingga-dark Noctua
-        %p.text-gray-600 Clarifies your brand's message
-      
-      .p-8.rounded-2xl.text-center.hover-lift.bg-gradient-to-br.from-gingga-gold.from-opacity-10.to-gingga-gold.to-opacity-20
-        .text-6xl.mb-6 🐒
-        %h3.font-montserrat.font-bold.text-xl.mb-3.text-gingga-dark Sagui
-        %p.text-gray-600 Sparks content ideas with real-time prompts
-      
-      .p-8.rounded-2xl.text-center.hover-lift.bg-gradient-to-br.from-gingga-cyan.from-opacity-10.to-gingga-cyan.to-opacity-20
-        .text-6xl.mb-6 🦊
-        %h3.font-montserrat.font-bold.text-xl.mb-3.text-gingga-dark Voxa
-        %p.text-gray-600 Brings your visuals and videos to life
-      
-      .p-8.rounded-2xl.text-center.hover-lift.bg-gradient-to-br.from-gingga-violet.from-opacity-10.to-gingga-violet.to-opacity-20
-        .text-6xl.mb-6 🐘
-        %h3.font-montserrat.font-bold.text-xl.mb-3.text-gingga-violet Alumo
-        %p.text-gray-600 Turns followers into long-term clients
+  / WHY
+  %section.py-20{ style: "background-color: #FFC857" }
+    .max-w-6xl.mx-auto.px-6.grid.md:grid-cols-2.gap-10.items-start
+      .space-y-6
+        - ["Show up daily without burnout.", "Keep your voice. Multiply your output.", "Intelligence that learns and compounds every week."].each do |text|
+          %p.text-xl.font-semibold= text
+      .bg-white.rounded-2xl.p-8.border{ style: "border-color: rgba(0,0,0,0.05)" }
+        %h3.text-2xl.font-bold.mb-3 Why small brands choose Gingga
+        %ul.space-y-2.list-disc.pl-5
+          %li Brand-first: clarity → ideas → execution
+          %li No complex tools or constant meetings
+          %li Results that grow with rhythm and consistency
 
-/ Section 6: What People Are Saying
-%section.py-20.gradient-section
-  .max-w-6xl.mx-auto.px-4.sm:px-6.lg:px-8
-    .text-center.mb-16
-      %h2.font-montserrat.font-bold.text-4xl.md:text-5xl.mb-6.text-gingga-dark
-        What People Are Saying
-    
-    .grid.md:grid-cols-2.gap-8
-      .bg-white.p-8.rounded-2xl.shadow-lg.hover-lift
-        .text-4xl.mb-4.text-gingga-gold ⭐⭐⭐⭐⭐
-        %p.text-lg.text-gray-700.mb-6.italic
-          "I used to dread content days. Now it all just flows. Gingga gets my brand."
-        .flex.items-center
-          .w-12.h-12.rounded-full.flex.items-center.justify-center.text-white.font-bold.mr-4.bg-gradient-to-br.from-gingga-gold.to-gingga-orange
-            C
-          %div
-            %p.font-semibold.text-gingga-dark Camila
-            %p.text-gray-600 Wellness Coach
-      
-      .bg-white.p-8.rounded-2xl.shadow-lg.hover-lift
-        .text-4xl.mb-4.text-gingga-gold ⭐⭐⭐⭐⭐
-        %p.text-lg.text-gray-700.mb-6.italic
-          "This feels like magic. Clients think I hired a whole team."
-        .flex.items-center
-          .w-12.h-12.rounded-full.flex.items-center.justify-center.text-white.font-bold.mr-4.bg-gradient-to-br.from-gingga-cyan.to-gingga-violet
-            L
-          %div
-            %p.font-semibold.text-gingga-dark Luis
-            %p.text-gray-600 Barbershop Owner
 
-/ Section 7: Pricing + CTA
-%section#pricing.py-20.bg-gingga-dark
-  .max-w-6xl.mx-auto.px-4.sm:px-6.lg:px-8.text-center
-    %h2.font-montserrat.font-bold.text-4xl.md:text-5xl.mb-6{ style: "color: var(--text)" }
-      Start Growing — 
-      %span{ style: "color: var(--text)" } Without Burning Out
-    
-    .mx-auto.max-w-md.px-6.py-16
-      .rounded-3xl.p-8.shadow-xl{ style: "background-color: var(--text); box-shadow: 0 1px 0 rgba(0,0,0,0.05) inset" }
-        %h3.text-5xl.font-bold.leading-tight{ style: "color: var(--bg)" } £98
-        %p.mt-2{ style: "color: rgba(14,12,22,0.8)" }
-          Plans from 
-          %span.font-semibold{ style: "color: var(--bg)" } £98/month
-        %p.mt-2.text-sm.font-medium{ style: "color: var(--cyan)" } ✨ First month: 20% off
-        = link_to new_user_session_path, class: "mt-6 w-full btn-primary text-white font-semibold py-3 rounded-full inline-block text-center" do
-          Get Started Now
-        %p.mt-3.text-xs{ style: "color: rgba(14,12,22,0.7)" } Book a free discovery call or start today
-    
-    .text-center
-      %p.text-lg.text-on-dark-muted Ready to transform your content strategy?
+  / HOW IT WORKS
+  %section#how.py-24
+    .max-w-5xl.mx-auto.px-6
+      %h2.text-3xl.md:text-4xl.font-bold.mb-12.text-center How it works
+      %ol.relative.border-l.ml-4.space-y-10{ style: "border-color: rgba(0,0,0,0.1)" }
+        - [{ h: "Noctua maps your brand", s: "Voice, values, audience and goals in one simple intake." }, { h: "Sagui spins prompts into ideas", s: "Scripts, hooks and content angles for the month." }, { h: "Voxa crafts visuals", s: "Reels and graphics aligned to your universe." }, { h: "Alumo anchors the rhythm", s: "You approve — we schedule and keep the cadence." }].each_with_index do |step, i|
+          %li.ml-4.relative
+            %span.absolute.w-6.h-6.rounded-full.bg-black.text-white.text-xs.font-bold.flex.items-center.justify-center.how-it-works-number{ style: "top: 0" }= i + 1
+            %h3.text-xl.font-semibold{ style: "margin-left: 1em" }= step[:h]
+            %p{ style: "color: rgba(0,0,0,0.6)" }= step[:s]
 
-/ Footer
-= render(Ui::FooterComponent.new)
+  / TESTIMONIALS
+  %section.py-24.bg-black.text-white
+    .max-w-6xl.mx-auto.px-6.text-center
+      %h2.text-3xl.md:text-4xl.font-bold.mb-12 What people are saying
+      .grid.md:grid-cols-2.gap-8
+        - [{ q: "I used to dread content days. Now it flows.", a: "Camila — Wellness Coach" }, { q: "Feels like magic. Clients think I hired a team.", a: "Luis — Barbershop Owner" }].each do |testimonial|
+          .bg-white.text-black.rounded-2xl.p-10.shadow-lg
+            %p.text-2xl.mb-4{ style: "color: #FFC857" } ★★★★★
+            %p.italic.mb-4= "\"#{testimonial[:q]}\""
+            %p.font-semibold= testimonial[:a]
+
+  / PRICING / CTA
+  %section#cta.relative.py-28.bg-white
+    .absolute.inset-0.-z-10{ style: "background: radial-gradient(ellipse at center, rgba(255,200,87,0.20), transparent 60%)" }
+    .max-w-6xl.mx-auto.px-6
+      .text-center.mb-12
+        %h2.text-4xl.font-extrabold.mb-3 Choose your rhythm
+        %p.text-lg
+          Start with a free discovery call. ProSumer pricing available if you run Gingga for yourself.
+
+      .grid.md:grid-cols-4.gap-6
+        - [{ name: "Rhythm", price: "£248/mo", badge: "Starter", perks: ["Monthly calendar", "3 reels + 2 carousels", "Basic scheduling"] }, { name: "Frequency", price: "£585/mo", badge: "Growth", perks: ["8–12 posts/month", "Concepts + scripts", "Automated approvals"] }, { name: "Resonance", price: "£748/mo", badge: "Pro", perks: ["12–16 posts/month", "DM replies (light)", "Reporting & insights"] }, { name: "Orbit", price: "£1,498/mo", badge: "Scale", perks: ["Full content ops", "Lead capture flows", "Priority support"] }].each do |plan|
+          .rounded-3xl.p-6.border.bg-white{ style: "border-color: rgba(0,0,0,0.1)" }
+            .flex.items-center.justify-between
+              %h3.text-xl.font-bold= plan[:name]
+              %span.text-xs.px-2.py-1.rounded-full{ style: "background: rgba(0,0,0,0.05)" }= plan[:badge]
+            .text-3xl.font-extrabold.mt-4= plan[:price]
+            %ul.mt-6.space-y-2.text-sm{ style: "color: rgba(0,0,0,0.8)" }
+              - plan[:perks].each do |perk|
+                %li= "• #{perk}"
+            = link_to new_user_session_path, class: "w-full mt-6 px-4 py-2 rounded-full bg-black text-white hover:bg-yellow-400 hover:text-black transition inline-block text-center" do
+              Book a free discovery call
+
+  / FAQ
+  %section.py-20.border-t{ style: "border-color: rgba(0,0,0,0.05)" }
+    .max-w-4xl.mx-auto.px-6
+      %h3.text-2xl.font-bold.mb-6 FAQ
+      .divide-y{ style: "border-color: rgba(0,0,0,0.1)" }
+        - [{ q: "Do you replace a marketing team?", a: "No. Gingga amplifies you. We keep your voice and scale output so you can focus on the business." }, { q: "How fast can we start?", a: "Within 24 hours after you complete the onboarding form." }, { q: "Which platforms do you support?", a: "Instagram and TikTok to start. Others on request." }].each do |faq|
+          %details.py-4
+            %summary.cursor-pointer.font-semibold= faq[:q]
+            %p.mt-2{ style: "color: rgba(0,0,0,0.7)" }= faq[:a]
+
+  / FOOTER
+  %footer.bg-black.text-white.py-12.text-center
+    %p.mb-2.font-bold.text-xl GINGGA
+    %p.text-sm.mb-4 Intelligence in Motion
+    %hr.my-4{ style: "background-color: rgba(255,255,255,0.2); border: none; height: 1px" }
+    .flex.justify-center.gap-6.text-sm
+      %a.hover:text-yellow-400{ href: "#" } Privacy Policy
+      %a.hover:text-yellow-400{ href: "#" } Terms of Service
+      %a.hover:text-yellow-400{ href: "#" } Contact

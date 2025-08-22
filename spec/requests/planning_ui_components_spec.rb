@@ -57,10 +57,10 @@ RSpec.describe "Planning UI Components", type: :request do
     end
 
     it "displays the calendar grid structure" do
-      expect(response.body).to include("Week1")
-      expect(response.body).to include("Week2")
-      expect(response.body).to include("Week3")
-      expect(response.body).to include("Week4")
+      expect(response.body).to include("Week 1")
+      expect(response.body).to include("Week 2")
+      expect(response.body).to include("Week 3")
+      expect(response.body).to include("Week 4")
       expect(response.body).to include("Mon")
       expect(response.body).to include("Tue")
       expect(response.body).to include("Wed")
@@ -76,8 +76,8 @@ RSpec.describe "Planning UI Components", type: :request do
     end
 
     it "includes proper form submission setup" do
-      expect(response.body).to include('action="/creas_strategist"')
       expect(response.body).to include('method="post"')
+      expect(response.body).to include('authenticity_token')
     end
   end
 

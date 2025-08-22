@@ -9,23 +9,54 @@ body {
 
 /* Layout components */
 .sidebar {
-  background-color: var(--secondary);
+  background-color: #0f172a;
   color: white;
 }
 
-.sidebar .nav-item {
-  @apply flex items-center gap-3 p-3 text-white/70 no-underline rounded-lg transition-all;
+/* Menu Items - Clean Solution */
+.menu-item {
+  margin: 0 12px 4px 12px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
 }
 
-.sidebar .nav-item:hover {
-  background-color: rgba(255, 200, 87, 0.2);
-  color: var(--primary);
+.menu-item a,
+.menu-item a:visited,
+.menu-item a:link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  border-radius: 12px;
+  transition: all 0.2s ease;
 }
 
-.logo {
-  background-color: var(--primary);
-  color: var(--secondary);
+.menu-item svg {
+  color: rgba(255, 255, 255, 0.7);
 }
+
+.menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateX(4px);
+}
+
+.menu-item:hover a,
+.menu-item:hover svg {
+  color: white;
+}
+
+.menu-item.active {
+  background-color: #fbbf24;
+}
+
+.menu-item.active a,
+.menu-item.active svg {
+  color: black;
+  font-weight: 500;
+}
+
 
 /* Form utilities */
 .form-input {

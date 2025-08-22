@@ -1,29 +1,39 @@
 Rails.application.routes.draw do
-  resource :brand, only: [ :show, :edit, :update ]
-  get "/my-brand", to: "brands#edit", as: "my_brand"
+  # Routes without locale (for backwards compatibility and health checks)
+  get "up" => "rails/health#show", as: :rails_health_check
 
-  resource :planning, only: [ :show ] do
-    member do
-      get :strategy_for_month
-      post :voxa_refine
+  # Routes with optional locale scope
+  scope "(:locale)", locale: /en|es/ do
+    resource :brand, only: [ :show, :edit, :update ]
+    get "/my-brand", to: "brands#edit", as: "my_brand"
+
+    resource :planning, only: [ :show ] do
+      member do
+        get :strategy_for_month
+        post :voxa_refine
+      end
     end
-  end
-  get "/smart-planning", to: "plannings#smart_planning", as: "smart_planning"
+    get "/smart-planning", to: "plannings#smart_planning", as: "smart_planning"
 
-  resources :reels, only: [ :index, :new, :create, :show ] do
-    collection do
-      get "scene-based", to: "reels#scene_based"
-      post "scene-based", to: "reels#create_scene_based"
-      get "narrative", to: "reels#narrative"
-      post "narrative", to: "reels#create_narrative"
+    resources :reels, only: [ :index, :new, :create, :show ] do
+      collection do
+        get "scene-based", to: "reels#scene_based"
+        post "scene-based", to: "reels#create_scene_based"
+        get "narrative", to: "reels#narrative"
+        post "narrative", to: "reels#create_narrative"
+      end
     end
+
+    resource :viral_ideas, only: [ :show ]
+    resource :auto_creation, only: [ :show ]
+    resource :analytics, only: [ :show ]
+    resource :community, only: [ :show ]
+    resource :settings, only: [ :show ]
+
+    # Defines the root path route ("/")
+    root "home#show"
   end
 
-  resource :viral_ideas, only: [ :show ]
-  resource :auto_creation, only: [ :show ]
-  resource :analytics, only: [ :show ]
-  resource :community, only: [ :show ]
-  resource :settings, only: [ :show ]
   devise_for :users, controllers: {
     sessions: "users/sessions",
     registrations: "users/registrations",
@@ -44,16 +54,12 @@ Rails.application.routes.draw do
   resources :creas_strategist, only: [ :create ]
   resources :creas_strategy_plans, only: [ :show ], path: "creas_strategy_plans"
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
-
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  # Defines the root path route ("/")
-  root "home#show"
+  # Default root without locale (redirects to home)
+  get "/", to: redirect("/#{I18n.default_locale}"), constraints: lambda { |req| req.format.html? }
 
 
   if Rails.env.development?

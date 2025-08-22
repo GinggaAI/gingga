@@ -4,3 +4,124 @@
 
 @import "./tokens.css";
 @import "./utilities.css";
+
+/* Toast Component Styles */
+.ui-toast {
+  @apply fixed top-4 right-4 z-50 max-w-md w-full bg-white border rounded-lg shadow-lg p-4 flex items-start gap-3;
+  animation: slideInRight 0.3s ease-out;
+}
+
+.ui-toast--success {
+  @apply border-green-200 bg-green-50;
+}
+
+.ui-toast--success .ui-toast__icon {
+  @apply text-green-600 font-bold text-lg;
+}
+
+.ui-toast--success .ui-toast__message {
+  @apply text-green-800;
+}
+
+.ui-toast--warning {
+  @apply border-yellow-200 bg-yellow-50;
+}
+
+.ui-toast--warning .ui-toast__icon {
+  @apply text-yellow-600 font-bold text-lg;
+}
+
+.ui-toast--warning .ui-toast__message {
+  @apply text-yellow-800;
+}
+
+.ui-toast--error {
+  @apply border-red-200 bg-red-50;
+}
+
+.ui-toast--error .ui-toast__icon {
+  @apply text-red-600 font-bold text-lg;
+}
+
+.ui-toast--error .ui-toast__message {
+  @apply text-red-800;
+}
+
+.ui-toast--info {
+  @apply border-blue-200 bg-blue-50;
+}
+
+.ui-toast--info .ui-toast__icon {
+  @apply text-blue-600 font-bold text-lg;
+}
+
+.ui-toast--info .ui-toast__message {
+  @apply text-blue-800;
+}
+
+.ui-toast__icon {
+  @apply flex-shrink-0 w-5 h-5 flex items-center justify-center;
+}
+
+.ui-toast__message {
+  @apply flex-1 text-sm font-medium;
+}
+
+.ui-toast__dismiss {
+  @apply flex-shrink-0 ml-auto text-gray-400 hover:text-gray-600 focus:outline-none focus:text-gray-600 text-lg font-bold cursor-pointer;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Menu Items - Clean Solution */
+.menu-item {
+  margin: 0 12px 4px 12px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.menu-item a,
+.menu-item a:visited,
+.menu-item a:link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.menu-item svg {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateX(4px);
+}
+
+.menu-item:hover a,
+.menu-item:hover svg {
+  color: white;
+}
+
+.menu-item.active {
+  background-color: #fbbf24;
+}
+
+.menu-item.active a,
+.menu-item.active svg {
+  color: #000000;
+  font-weight: 500;
+}

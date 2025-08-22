@@ -30,7 +30,254 @@
 en:
   hello: "Hello world"
   
-  plannings:
-    create_first_strategy: "Create your first AI-powered strategy to see weekly plans here"
-    strategy_not_found: "No strategy found for month"
-    invalid_month: "Invalid Month"
+  # Navigation and Common
+  nav:
+    my_brand: "My Brand"
+    smart_planning: "Smart Planning"
+    viral_ideas: "Viral Ideas"
+    auto_creation: "Auto Creation"
+    analytics: "Analytics"
+    community: "Community"
+    settings: "Settings"
+    new_viral_idea: "New Viral Idea"
+    logout: "Logout"
+    language: "Language"
+    english: "English"
+    spanish: "Spanish"
+
+  # Settings
+  settings:
+    title: "Settings"
+    subtitle: "Manage your account preferences and API integrations"
+    account_preferences: "Account Preferences"
+    account_subtitle: "Manage your account settings and language preferences"
+    language_settings: "Language Settings"
+    language_subtitle: "Choose your preferred language for the interface"
+
+  # Brands
+  brands:
+    title: "My Brand"
+    subtitle: "Define and manage your brand identity"
+    brand_profile: "Brand Profile"
+    brand_kit: "Brand Kit"
+    brand_name: "Brand Name"
+    brand_name_placeholder: "Enter your brand name"
+    audience_question: "Who is your audience?"
+    audience_placeholder: "Describe your target audience... What are their dreams, fears, and pain points?"
+    products_question: "What do you sell or offer?"
+    products_placeholder: "Describe your products or services..."
+    mission_question: "Brand purpose or mission"
+    mission_placeholder: "What's your brand's mission and purpose..."
+    save_profile: "Save Profile"
+    
+    # Edit page specific
+    page_title: "My Brand"
+    edit_title: "Brand Profile"
+    edit_subtitle: "Define your brand identity and content preferences"
+    managing_label: "Managing:"
+    add_new_brand: "Add New Brand"
+    untitled_brand: "Untitled Brand"
+    fix_errors: "Please fix the following errors:"
+    brand_identity: "Brand Identity"
+    brand_identity_desc: "Core information about your brand"
+    brand_handle: "Brand Handle/Slug"
+    brand_handle_placeholder: "e.g. creative-brand"
+    industry_label: "Industry"
+    select_industry: "Select Industry"
+    brand_voice_label: "Brand Voice"
+    select_voice: "Select Voice"
+    audience_offer: "Audience & Offer"
+    audience_offer_desc: "Define your target audience and value proposition"
+    value_proposition: "What do you sell or offer?"
+    value_proposition_placeholder: "Describe your products or services..."
+    mission_purpose: "Brand purpose or mission"
+    mission_purpose_placeholder: "What's your brand's mission and purpose..."
+    content_preferences: "Content Preferences"
+    content_preferences_desc: "Language and regional settings for your content"
+    content_language: "Content Language"
+    primary_region: "Primary Region"
+    content_guidelines: "Content Guidelines"
+    tones_to_avoid: "Tones to Avoid"
+    tones_to_avoid_placeholder: "e.g., aggressive, overly formal, sarcastic"
+    separate_commas: "Separate with commas"
+    banned_words: "Banned Words"
+    banned_words_placeholder: "e.g., competitor names, inappropriate terms"
+    claims_rules: "Claims & Legal Rules"
+    claims_rules_placeholder: "Any legal restrictions, claim substantiation requirements, or compliance guidelines..."
+    brand_assets: "Brand Assets & Resources"
+    strategy_ready: "Ready for strategy creation!"
+    target_audiences: "Target Audiences"
+    target_audiences_desc: "Define who your content is targeting"
+    current_summary: "Current summary:"
+    no_audiences: "No audiences defined yet."
+    add_audience: "Add Audience"
+    products_services: "Products & Services"
+    products_services_desc: "What you offer to your audience"
+    current_products: "Current products:"
+    no_products: "No products defined yet."
+    add_product: "Add Product"
+    social_channels: "Social Media Channels"
+    social_channels_desc: "Platforms where you publish content"
+    active_channels: "Active channels:"
+    no_channels: "No channels configured yet."
+    add_channel: "Add Channel"
+
+  # Viral Ideas
+  viral_ideas:
+    title: "Viral Ideas"
+    subtitle: "Auto-detect high-performing content from reference accounts"
+    viral_ideas_tab: "Viral Ideas"
+    reference_accounts_tab: "Reference Accounts"
+    search_placeholder: "Search viral ideas..."
+    all_categories: "All Categories"
+    business: "Business"
+    marketing: "Marketing"
+    entertainment: "Entertainment"
+    analyze: "Analyze"
+    add_to_plan: "Add to Plan"
+
+  # Analytics
+  analytics:
+    title: "Analytics"
+    subtitle: "Track your content performance and growth"
+    last_30_days: "Last 30 days"
+    all_platforms: "All platforms"
+
+  # Auto Creation
+  auto_creation:
+    title: "Auto Creation"
+    subtitle: "Generate content automatically with AI"
+
+  # Community
+  community:
+    title: "Community"
+    subtitle: "Connect and engage with your community"
+  
+  # Common buttons and actions
+  buttons:
+    cancel: "Cancel"
+    save: "Save"
+    submit: "Submit"
+    generate: "Generate"
+    close: "Close"
+    add: "Add"
+    edit: "Edit"
+    delete: "Delete"
+    back: "Back"
+    next: "Next"
+    
+  # Planning module
+  planning:
+    title: "Smart Planning"
+    subtitle: "Plan your content strategy with AI-powered insights"
+    see_general_strategy: "See general content strategy"
+    see_content_strategy: "See content strategy"
+    see_brand_overview: "See brand overview"
+    refine_with_voxa: "Refine with Voxa"
+    add_content: "Add Content"
+    add_new_content: "Add New Content"
+    
+    # Strategy form
+    strategy_form:
+      title: "🧠 Generate New Content Strategy"
+      objective_label: "Objective of the Month"
+      objective_placeholder: "e.g., Increase brand awareness and engagement"
+      monthly_themes_label: "Monthly Themes"
+      monthly_themes_placeholder: "Brand awareness, Product showcase, Community engagement"
+      monthly_themes_help: "Separate with commas"
+      frequency_label: "Frequency per Week"
+      frequency_placeholder: "3"
+      
+      # Resources override section
+      resources_title: "Resources Override"
+      resources_subtitle: "Configure additional resources and constraints for content creation"
+      
+      budget_label: "Budget Range"
+      budget_options:
+        none: "No specific budget"
+        low: "Low budget ($500)"
+        medium: "Medium budget ($1,000)"
+        high: "High budget ($2,500)"
+        premium: "Premium budget ($5,000)"
+        
+      team_size_label: "Team Size"
+      team_size_options:
+        none: "No specific team size"
+        solo: "Solo creator (1 person)"
+        small: "Small team (2 people)"
+        medium: "Medium team (3 people)"
+        large: "Large team (5+ people)"
+        
+      design_tools_label: "Design Tools"
+      design_tools_help: "Hold Ctrl/Cmd to select multiple tools"
+      
+      content_resources_label: "Content Resources"
+      use_ai_avatars: "Use AI avatars"
+      use_stock_photos: "Use stock photos"
+      create_custom_graphics: "Create custom graphics"
+      
+      generate_strategy: "Generate Strategy"
+      generating: "Generating..."
+    
+    # Strategy results
+    strategy_result:
+      title: "Strategy Generated Successfully!"
+      content_themes_title: "Content Themes"
+      strategy_name_label: "Strategy Name"
+      content_strategy_label: "Content Strategy"
+      posts_per_week_label: "Posts per Week"
+      total_posts_label: "Total Posts"
+      posts_unit: "posts"
+      monthly_objective_label: "Monthly Objective"
+      no_themes: "No themes defined"
+      
+    # Brand overview
+    brand_overview:
+      title: "Brand Overview - Ready to create content strategy!"
+      no_strategy: "No strategy created yet"
+      get_started: "Click \"Add Content\" to get started"
+      create_first: "Create your first content strategy to see objectives and themes here."
+      themes_placeholder: "Themes will appear when you generate a strategy"
+    
+    # Week planning
+    weeks:
+      week: "Week"
+      week_details: "Week %{number} - Content Details"
+      goal_label: "Goal:"
+      goals:
+        awareness: "Awareness"
+        engagement: "Engagement"
+        conversion: "Conversion"
+      days:
+        mon: "Mon"
+        tue: "Tue"
+        wed: "Wed"
+        thu: "Thu"
+        fri: "Fri"
+        sat: "Sat"
+        sun: "Sun"
+        
+    # Content details
+    content:
+      hook: "Hook"
+      cta: "Call to Action"
+      description: "Description"
+      visual_notes: "Visual Notes"
+      content_pillar: "Content Pillar"
+      content_draft: "Content Draft"
+      new_content: "New Content"
+      remove: "Remove"
+      refining: "Refining..."
+      
+    # Messages and errors
+    messages:
+      create_first_strategy: "Create your first AI-powered strategy to see weekly plans here"
+      strategy_not_found: "No strategy found for month"
+      invalid_month: "Invalid Month"
+      error_generating: "Error generating strategy"
+      generation_timeout: "Generation is taking longer than expected. Checking for completed strategy..."
+      network_error: "Network error occurred. Please try again."
+      failed_to_load: "Failed to load strategy plan"
+      no_strategy_to_refine: "No strategy plan found to refine"
+      generation_timeout: "Generation is taking longer than expected. Checking for completed strategy..."
+      network_error: "Network error occurred. Please try again."

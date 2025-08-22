@@ -13,7 +13,7 @@ RSpec.describe PlanningsController, type: :controller do
       before { brand.destroy }
 
       it "handles missing brand gracefully" do
-        get :show, params: {}
+        get :show
         expect(response).to have_http_status(:success)
         expect(assigns(:brand)).to be_nil
         expect(assigns(:plans)).to be_present
