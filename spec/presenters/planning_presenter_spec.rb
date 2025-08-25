@@ -285,6 +285,190 @@ RSpec.describe PlanningPresenter do
         expect(content_item_data['publish_date']).to be_nil
       end
     end
+
+    context 'with production content items missing meta hook/cta' do
+      let!(:plan) { create(:creas_strategy_plan, brand: brand, month: '2025-08') }
+      let!(:content_item) do
+        create(:creas_content_item,
+               creas_strategy_plan: plan,
+               user: user,
+               brand: brand,
+               content_id: 'prod-content-1',
+               content_name: 'Production Content',
+               status: 'in_production',
+               platform: 'instagram',
+               content_type: 'reel',
+               week: 1,
+               pilar: 'C',
+               post_description: 'Production description',
+               text_base: 'Production text base',
+               publish_date: Date.new(2025, 8, 15),
+               meta: {
+                 'hook' => 'Production hook',
+                 'cta' => 'Production CTA',
+                 'visual_notes' => 'Production visuals'
+               })
+      end
+      let(:params) { { month: '2025-08' } }
+
+      it 'includes hook and cta from meta field for production content' do
+        json_result = presenter.current_plan_json
+        parsed_result = JSON.parse(json_result)
+
+        expect(parsed_result['content_items']).to be_an(Array)
+        content_item_data = parsed_result['content_items'].first
+
+        # Should get hook and cta from meta field
+        expect(content_item_data['hook']).to eq('Production hook')
+        expect(content_item_data['cta']).to eq('Production CTA')
+        expect(content_item_data['visual_notes']).to eq('Production visuals')
+      end
+
+      it 'includes hook and cta in weekly plan format' do
+        json_result = presenter.current_plan_json
+        parsed_result = JSON.parse(json_result)
+
+        week1 = parsed_result['weekly_plan'].first
+        idea = week1['ideas'].first
+
+        expect(idea['hook']).to eq('Production hook')
+        expect(idea['cta']).to eq('Production CTA')
+      end
+    end
+
+    context 'with content item where model methods return nil but meta has data' do
+      let!(:plan) { create(:creas_strategy_plan, brand: brand, month: '2025-08') }
+      let!(:content_item) do
+        create(:creas_content_item,
+               creas_strategy_plan: plan,
+               user: user,
+               brand: brand,
+               content_id: 'fallback-content-1',
+               status: 'in_production',
+               meta: {
+                 'hook' => 'Fallback hook',
+                 'cta' => 'Fallback CTA'
+               })
+      end
+      let(:params) { { month: '2025-08' } }
+
+      before do
+        # Mock the model methods to return nil to test fallback to meta
+        allow(content_item).to receive(:hook).and_return(nil)
+        allow(content_item).to receive(:cta).and_return(nil)
+      end
+
+      it 'falls back to meta field when model methods return nil' do
+        json_result = presenter.current_plan_json
+        parsed_result = JSON.parse(json_result)
+
+        content_item_data = parsed_result['content_items'].first
+        expect(content_item_data['hook']).to eq('Fallback hook')
+        expect(content_item_data['cta']).to eq('Fallback CTA')
+      end
+    end
+
+    context 'with content item containing shot_plan scenes and beats' do
+      let!(:plan) { create(:creas_strategy_plan, brand: brand, month: '2025-08') }
+      let!(:content_item) do
+        create(:creas_content_item,
+               creas_strategy_plan: plan,
+               user: user,
+               brand: brand,
+               content_id: 'shotplan-content-1',
+               status: 'in_production',
+               shotplan: {
+                 'scenes' => [
+                   {
+                     'id' => 1,
+                     'scene_number' => 1,
+                     'role' => 'Hook',
+                     'type' => 'avatar',
+                     'visual' => 'Close-up shot',
+                     'on_screen_text' => 'Hook text',
+                     'voiceover' => 'Hook voiceover',
+                     'avatar_id' => 'avatar_123',
+                     'voice_id' => 'voice_123',
+                     'duration' => '3s',
+                     'description' => 'Opening scene with hook',
+                     'visual_elements' => [ 'background', 'logo' ]
+                   },
+                   {
+                     'id' => 2,
+                     'scene_number' => 2,
+                     'role' => 'Main Content',
+                     'description' => 'Main content explanation'
+                   }
+                 ],
+                 'beats' => [
+                   {
+                     'beat_number' => 1,
+                     'description' => 'First beat',
+                     'duration' => '3-5s',
+                     'image_prompt' => 'Image for beat 1',
+                     'voiceover' => 'Beat 1 voiceover'
+                   },
+                   {
+                     'idx' => 2,
+                     'description' => 'Second beat',
+                     'voiceover' => 'Beat 2 voiceover'
+                   }
+                 ]
+               })
+      end
+      let(:params) { { month: '2025-08' } }
+
+      it 'includes scenes and beats in content items JSON' do
+        json_result = presenter.current_plan_json
+        parsed_result = JSON.parse(json_result)
+
+        expect(parsed_result['content_items']).to be_an(Array)
+        content_item_data = parsed_result['content_items'].first
+
+        # Should include scenes data
+        expect(content_item_data['scenes']).to be_an(Array)
+        expect(content_item_data['scenes'].length).to eq(2)
+
+        first_scene = content_item_data['scenes'].first
+        expect(first_scene['scene_number']).to eq(1)
+        expect(first_scene['role']).to eq('Hook')
+        expect(first_scene['visual']).to eq('Close-up shot')
+        expect(first_scene['voiceover']).to eq('Hook voiceover')
+        expect(first_scene['avatar_id']).to eq('avatar_123')
+        expect(first_scene['visual_elements']).to eq([ 'background', 'logo' ])
+
+        # Should include beats data
+        expect(content_item_data['beats']).to be_an(Array)
+        expect(content_item_data['beats'].length).to eq(2)
+
+        first_beat = content_item_data['beats'].first
+        expect(first_beat['beat_number']).to eq(1)
+        expect(first_beat['description']).to eq('First beat')
+        expect(first_beat['duration']).to eq('3-5s')
+        expect(first_beat['image_prompt']).to eq('Image for beat 1')
+
+        # Should include full shotplan
+        expect(content_item_data['shotplan']).to be_a(Hash)
+        expect(content_item_data['shotplan']['scenes']).to be_an(Array)
+        expect(content_item_data['shotplan']['beats']).to be_an(Array)
+      end
+
+      it 'includes scenes and beats in weekly plan format' do
+        json_result = presenter.current_plan_json
+        parsed_result = JSON.parse(json_result)
+
+        week1 = parsed_result['weekly_plan'].first
+        idea = week1['ideas'].first
+
+        expect(idea['scenes']).to be_an(Array)
+        expect(idea['scenes'].length).to eq(2)
+        expect(idea['scenes'].first['role']).to eq('Hook')
+
+        expect(idea['beats']).to be_an(Array)
+        expect(idea['beats'].length).to eq(2)
+        expect(idea['beats'].first['beat_number']).to eq(1)
+      end
+    end
   end
 
   describe '#current_plan (private method)' do

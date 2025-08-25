@@ -920,6 +920,61 @@
             </div>
           </div>
         ` : ''}
+        
+        ${contentPiece.scenes && contentPiece.scenes.length > 0 ? `
+          <div class="mt-4 p-3 bg-purple-50 rounded border-l-4 border-purple-500">
+            <h5 class="font-medium text-gray-900 mb-3">🎬 Shot Plan - Scenes</h5>
+            <div class="space-y-3">
+              ${contentPiece.scenes.map(scene => `
+                <div class="bg-white p-3 rounded border-l-2 border-purple-300">
+                  <div class="flex items-start justify-between mb-2">
+                    <h6 class="font-semibold text-sm text-purple-800">
+                      ${scene.scene_number ? `Scene ${scene.scene_number}` : 'Scene'}
+                      ${scene.role ? ` - ${scene.role}` : ''}
+                    </h6>
+                    ${scene.duration ? `<span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">${scene.duration}</span>` : ''}
+                  </div>
+                  ${scene.description ? `<p class="text-sm text-gray-700 mb-2">${scene.description}</p>` : ''}
+                  ${scene.visual ? `<p class="text-xs text-gray-600"><strong>Visual:</strong> ${scene.visual}</p>` : ''}
+                  ${scene.on_screen_text ? `<p class="text-xs text-gray-600"><strong>On-screen text:</strong> ${scene.on_screen_text}</p>` : ''}
+                  ${scene.voiceover ? `<p class="text-xs text-gray-600"><strong>Voiceover:</strong> ${scene.voiceover}</p>` : ''}
+                  ${scene.visual_elements && scene.visual_elements.length > 0 ? `
+                    <div class="mt-2">
+                      <p class="text-xs font-medium text-gray-600 mb-1">Visual Elements:</p>
+                      <div class="flex flex-wrap gap-1">
+                        ${scene.visual_elements.map(element => `<span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">${element}</span>`).join('')}
+                      </div>
+                    </div>
+                  ` : ''}
+                  ${scene.avatar_id ? `<p class="text-xs text-gray-600 mt-1"><strong>Avatar:</strong> ${scene.avatar_id}</p>` : ''}
+                  ${scene.voice_id ? `<p class="text-xs text-gray-600"><strong>Voice:</strong> ${scene.voice_id}</p>` : ''}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+        
+        ${contentPiece.beats && contentPiece.beats.length > 0 ? `
+          <div class="mt-4 p-3 bg-amber-50 rounded border-l-4 border-amber-500">
+            <h5 class="font-medium text-gray-900 mb-3">📋 Shot Plan - Beats</h5>
+            <div class="space-y-2">
+              ${contentPiece.beats.map(beat => `
+                <div class="bg-white p-2 rounded border-l-2 border-amber-300">
+                  <div class="flex items-center justify-between">
+                    <span class="font-medium text-sm text-amber-800">
+                      ${beat.beat_number ? `Beat ${beat.beat_number}` : 'Beat'}
+                      ${beat.idx ? ` (${beat.idx})` : ''}
+                    </span>
+                    ${beat.duration ? `<span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">${beat.duration}</span>` : ''}
+                  </div>
+                  ${beat.description ? `<p class="text-sm text-gray-700 mt-1">${beat.description}</p>` : ''}
+                  ${beat.image_prompt ? `<p class="text-xs text-gray-600 mt-1"><strong>Image:</strong> ${beat.image_prompt}</p>` : ''}
+                  ${beat.voiceover ? `<p class="text-xs text-gray-600"><strong>Voiceover:</strong> ${beat.voiceover}</p>` : ''}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
       </div>
     `;
 

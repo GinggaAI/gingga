@@ -49,8 +49,8 @@ class PlanningPresenter
         week: item.week,
         pilar: item.pilar,
         description: item.post_description,
-        hook: item.hook,
-        cta: item.cta,
+        hook: item.hook || item.meta&.dig("hook"),
+        cta: item.cta || item.meta&.dig("cta"),
         visual_notes: item.meta&.dig("visual_notes"),
         kpi_focus: item.kpi_focus,
         success_criteria: item.success_criteria,
@@ -58,7 +58,10 @@ class PlanningPresenter
         scheduled_day: item.scheduled_day,
         template: item.template,
         text_base: item.text_base,
-        hashtags: item.hashtags
+        hashtags: item.hashtags,
+        scenes: item.scenes,
+        beats: item.beats,
+        shotplan: item.shotplan
       }
     end
   end
@@ -83,8 +86,8 @@ class PlanningPresenter
             status: item.status,
             platform: item.platform.capitalize,
             type: item.content_type.capitalize,
-            hook: item.hook,
-            cta: item.cta,
+            hook: item.hook || item.meta&.dig("hook"),
+            cta: item.cta || item.meta&.dig("cta"),
             description: item.post_description,
             visual_notes: item.meta&.dig("visual_notes"),
             kpi_focus: item.kpi_focus,
@@ -94,7 +97,10 @@ class PlanningPresenter
             publish_date: item.publish_date&.strftime("%Y-%m-%d"),
             template: item.template,
             text_base: item.text_base,
-            hashtags: item.hashtags
+            hashtags: item.hashtags,
+            scenes: item.scenes,
+            beats: item.beats,
+            shotplan: item.shotplan
           }
         end
       }
