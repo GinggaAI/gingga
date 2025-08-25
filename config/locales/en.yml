@@ -219,6 +219,12 @@ en:
       generate_strategy: "Generate Strategy"
       generating: "Generating..."
     
+    # Strategy status
+    strategy:
+      processing: "Processing..."
+      generating_strategy: "Generating your content strategy..."
+      please_wait: "This may take a few moments. Please wait."
+    
     # Strategy results
     strategy_result:
       title: "Strategy Generated Successfully!"
@@ -275,9 +281,8 @@ en:
       strategy_not_found: "No strategy found for month"
       invalid_month: "Invalid Month"
       error_generating: "Error generating strategy"
+      generation_failed: "Strategy generation failed. Please try again."
       generation_timeout: "Generation is taking longer than expected. Checking for completed strategy..."
       network_error: "Network error occurred. Please try again."
       failed_to_load: "Failed to load strategy plan"
       no_strategy_to_refine: "No strategy plan found to refine"
-      generation_timeout: "Generation is taking longer than expected. Checking for completed strategy..."
-      network_error: "Network error occurred. Please try again."

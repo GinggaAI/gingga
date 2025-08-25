@@ -4,7 +4,17 @@ RSpec.describe Creas::VoxaContentService, type: :service do
   include ActiveSupport::Testing::TimeHelpers
   let(:user) { create(:user) }
   let(:brand) { create(:brand, user: user) }
-  let(:strategy_plan) { create(:creas_strategy_plan, user: user, brand: brand, raw_payload: sample_noctua_payload) }
+  let(:strategy_plan) do
+    create(:creas_strategy_plan,
+      user: user,
+      brand: brand,
+      raw_payload: sample_noctua_payload,
+      content_distribution: sample_noctua_payload["content_distribution"],
+      weekly_plan: sample_noctua_payload["weekly_plan"],
+      objective_of_the_month: sample_noctua_payload["objective_of_the_month"],
+      frequency_per_week: sample_noctua_payload["frequency_per_week"]
+    )
+  end
   let(:service) { described_class.new(strategy_plan: strategy_plan) }
 
   let(:sample_noctua_payload) do
@@ -14,6 +24,40 @@ RSpec.describe Creas::VoxaContentService, type: :service do
       "objective_of_the_month" => "awareness",
       "frequency_per_week" => 2,
       "post_types" => [ "Video", "Image" ],
+      "content_distribution" => {
+        "C" => {
+          "goal" => "Increase brand awareness",
+          "formats" => [ "Video", "Carousel" ],
+          "ideas" => [
+            {
+              "id" => "202508-testbrand-C-w1-i1",
+              "title" => "Test Content 1",
+              "hook" => "Amazing hook",
+              "description" => "Test description",
+              "platform" => "Instagram Reels",
+              "pilar" => "C",
+              "recommended_template" => "solo_avatars",
+              "video_source" => "none"
+            }
+          ]
+        },
+        "R" => {
+          "goal" => "Build relationships",
+          "formats" => [ "Video" ],
+          "ideas" => [
+            {
+              "id" => "202508-testbrand-R-w1-i1",
+              "title" => "Test Content 2",
+              "hook" => "Another hook",
+              "description" => "Another description",
+              "platform" => "Instagram Reels",
+              "pilar" => "R",
+              "recommended_template" => "narration_over_7_images",
+              "video_source" => "none"
+            }
+          ]
+        }
+      },
       "weekly_plan" => [
         {
           "week" => 1,
@@ -49,7 +93,7 @@ RSpec.describe Creas::VoxaContentService, type: :service do
       "items" => [
         {
           "id" => "20250819-w1-i1",
-          "origin_id" => "202508-testbrand-w1-i1-C",
+          "origin_id" => "202508-testbrand-C-w1-i1",
           "origin_source" => "weekly_plan",
           "week" => 1,
           "week_index" => 1,
@@ -109,19 +153,32 @@ RSpec.describe Creas::VoxaContentService, type: :service do
       allow(mock_chat_client).to receive(:chat!).and_return(sample_voxa_response.to_json)
     end
 
-    it "creates content items successfully" do
-      expect { service.call }.to change(CreasContentItem, :count).by(1)
+    it "updates existing content items successfully" do
+      # First create initial draft content items using ContentItemInitializerService
+      initial_items = Creas::ContentItemInitializerService.new(strategy_plan: strategy_plan).call
+      expect(initial_items.length).to eq(2)
 
-      created_item = CreasContentItem.last
-      expect(created_item.content_id).to eq("20250819-w1-i1")
-      expect(created_item.origin_id).to eq("202508-testbrand-w1-i1-C")
-      expect(created_item.content_name).to eq("Test Content Item 1")
-      expect(created_item.status).to eq("in_production")
-      expect(created_item.pilar).to eq("C")
-      expect(created_item.template).to eq("solo_avatars")
-      expect(created_item.user).to eq(user)
-      expect(created_item.brand).to eq(brand)
-      expect(created_item.creas_strategy_plan).to eq(strategy_plan)
+      initial_item = initial_items.first
+      expect(initial_item.content_id).to eq("202508-testbrand-C-w1-i1")
+      expect(initial_item.status).to eq("draft")
+
+      # Now test that VoxaContentService updates the existing item
+      expect { service.call }.not_to change(CreasContentItem, :count)
+
+      updated_item = CreasContentItem.find_by(content_id: "202508-testbrand-C-w1-i1")
+      expect(updated_item.content_id).to eq("202508-testbrand-C-w1-i1") # Preserved
+      expect(updated_item.origin_id).to eq("202508-testbrand-C-w1-i1") # Preserved
+      expect(updated_item.content_name).to eq("Test Content Item 1") # Updated by Voxa
+      expect(updated_item.status).to eq("in_production") # Updated by Voxa
+      expect(updated_item.pilar).to eq("C")
+      expect(updated_item.template).to eq("solo_avatars")
+      expect(updated_item.user).to eq(user)
+      expect(updated_item.brand).to eq(brand)
+      expect(updated_item.creas_strategy_plan).to eq(strategy_plan)
+
+      # Verify day_of_the_week is extracted and assigned
+      expect(updated_item.day_of_the_week).to be_present
+      expect(%w[Monday Tuesday Wednesday Thursday Friday Saturday Sunday]).to include(updated_item.day_of_the_week)
     end
 
     it "calls OpenAI with correct parameters" do
@@ -140,6 +197,10 @@ RSpec.describe Creas::VoxaContentService, type: :service do
     end
 
     it "handles idempotency - doesn't create duplicates on second run" do
+      # First create initial draft content items
+      Creas::ContentItemInitializerService.new(strategy_plan: strategy_plan).call
+
+      # Run Voxa service first time
       service.call
       initial_count = CreasContentItem.count
 
@@ -148,7 +209,7 @@ RSpec.describe Creas::VoxaContentService, type: :service do
       service.call
 
       expect(CreasContentItem.count).to eq(initial_count)
-      expect(CreasContentItem.where(content_id: "20250819-w1-i1").count).to eq(1)
+      expect(CreasContentItem.where(content_id: "202508-testbrand-C-w1-i1").count).to eq(1)
     end
 
     it "updates existing items on second run" do

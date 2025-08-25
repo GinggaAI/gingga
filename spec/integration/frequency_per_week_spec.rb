@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Frequency Per Week Content Generation', type: :integration do
+  include ActiveJob::TestHelper
   let(:user) { create(:user) }
   let(:brand) { create(:brand, user: user) }
   let!(:audience) { create(:audience, brand: brand) }
@@ -87,7 +88,8 @@ RSpec.describe 'Frequency Per Week Content Generation', type: :integration do
 
           expect(result.success?).to be true
 
-          strategy = result.plan
+          # Reload the strategy plan to get the completed data after job execution
+          strategy = result.plan.reload
           expect(strategy.frequency_per_week).to eq(frequency)
 
           # Count total ideas across all weeks
@@ -117,7 +119,7 @@ RSpec.describe 'Frequency Per Week Content Generation', type: :integration do
       expect(system_prompt).to include('frequency_per_week × 4 weeks')
       expect(system_prompt).to include('3/week = 12 total')
       expect(system_prompt).to include('4/week = 16 total')
-      expect(system_prompt).to include('CRITICAL: total ideas across all 4 weeks MUST equal exactly frequency_per_week × 4')
+      expect(system_prompt).to include('CRITICAL: weekly_plan must contain exactly 4 weeks, each with exactly frequency_per_week ideas')
     end
   end
 end

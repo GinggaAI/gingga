@@ -5,12 +5,54 @@ module Creas
     end
 
     def call
+      # Create strategy plan record immediately with pending status
+      strategy_plan = CreasStrategyPlan.create!(
+        user: @user,
+        brand: @brand,
+        month: @month,
+        status: :pending,
+        brand_snapshot: brand_snapshot(@brand)
+      )
+
+      # Queue background job for AI processing
+      GenerateNoctuaStrategyJob.perform_later(strategy_plan.id, @brief)
+
+      # Return the plan immediately (status: pending)
+      strategy_plan
+    end
+
+    # Legacy method for backwards compatibility / testing
+    def call_sync
       system_prompt = Creas::Prompts.noctua_system
       user_prompt   = Creas::Prompts.noctua_user(@brief)
       json = GinggaOpenAI::ChatClient.new(user: @user, model: "gpt-4o", temperature: 0.4)
                                .chat!(system: system_prompt, user: user_prompt)
+
+      # Save raw AI response for debugging
+      AiResponse.create!(
+        user: @user,
+        service_name: "noctua",
+        ai_model: "gpt-4o",
+        prompt_version: "noctua-v1",
+        raw_request: {
+          system: system_prompt,
+          user: user_prompt,
+          temperature: 0.4
+        },
+        raw_response: json,
+        metadata: {
+          brand_id: @brand&.id,
+          month: @month,
+          brief: @brief
+        }
+      )
+
       parsed = JSON.parse(json)
-      persist!(parsed)
+
+      # Validate and potentially fix weekly distribution
+      validated_payload = Creas::WeeklyDistributionValidator.validate_weekly_distribution!(parsed)
+
+      persist!(validated_payload)
     rescue JSON::ParserError
       raise "Model returned non-JSON content"
     end
@@ -33,7 +75,8 @@ module Creas
         publish_windows_local: payload["publish_windows_local"] || {},
         brand_snapshot: brand_snapshot(@brand),
         raw_payload: payload,
-        meta: { model: "gpt-4o", prompt_version: "noctua-v1" }
+        meta: { model: "gpt-4o", prompt_version: "noctua-v1" },
+        status: :completed
       )
       plan
     end

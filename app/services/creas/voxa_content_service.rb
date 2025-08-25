@@ -43,6 +43,25 @@ module Creas
     def openai_chat!(system_msg:, user_msg:)
       client = GinggaOpenAI::ChatClient.new(user: @user, model: "gpt-4o-mini", temperature: 0.5)
       response = client.chat!(system: system_msg, user: user_msg)
+
+      # Save raw AI response for debugging
+      AiResponse.create!(
+        user: @user,
+        service_name: "voxa",
+        ai_model: "gpt-4o-mini",
+        prompt_version: "voxa-2025-08-19",
+        raw_request: {
+          system: system_msg,
+          user: user_msg,
+          temperature: 0.5
+        },
+        raw_response: response,
+        metadata: {
+          strategy_plan_id: @plan.id,
+          brand_id: @brand&.id
+        }
+      )
+
       JSON.parse(response)
     end
 
@@ -54,15 +73,36 @@ module Creas
 
     def upsert_item!(item)
       attrs = map_voxa_item_to_attrs(item)
-      rec = CreasContentItem.find_or_initialize_by(content_id: attrs[:content_id])
+      # Use origin_id to find existing records created by ContentItemInitializerService
+      origin_id = item["origin_id"]
+
+      # First try to find by origin_id (preferred method)
+      rec = nil
+      if origin_id.present?
+        rec = CreasContentItem.find_by(content_id: origin_id) ||
+              CreasContentItem.find_by(origin_id: origin_id)
+      end
+
+      # If not found, try the new content_id
+      rec ||= CreasContentItem.find_by(content_id: attrs[:content_id])
+
+      # Initialize new record if still not found
+      rec ||= CreasContentItem.new
 
       # Preserve existing draft data while updating with Voxa refinements
-      if rec.persisted? && rec.status == "draft"
-        # Update status to in_production and merge new data
+      if rec.persisted?
+        # Update existing record with Voxa refinements
         attrs[:status] = "in_production"
+        # Preserve the original content_id and origin_id when updating existing records
+        attrs[:content_id] = rec.content_id
+        attrs[:origin_id] = rec.origin_id
+        # Preserve day_of_the_week assignment from original item
+        attrs[:day_of_the_week] = rec.day_of_the_week if rec.day_of_the_week.present?
         rec.assign_attributes(attrs)
       else
-        # New record or already processed
+        # New record - this should not happen if origin_id matching works correctly
+        attrs[:content_id] = attrs[:content_id]
+        attrs[:origin_id] = origin_id || attrs[:content_id]
         rec.assign_attributes(attrs)
       end
 
@@ -81,6 +121,7 @@ module Creas
         week: item.fetch("week"),
         week_index: item["week_index"],
         scheduled_day: item.dig("meta", "scheduled_day"),
+        day_of_the_week: extract_day_of_week(item),
         publish_date: parse_date(item.fetch("publish_date")),
         publish_datetime_local: parse_datetime(item["publish_datetime_local"]),
         timezone: item["timezone"],
@@ -136,6 +177,51 @@ module Creas
 
       platforms = brand.brand_channels.pluck(:platform).map { |p| platform_mapping[p] || p.capitalize }.uniq
       platforms.any? ? platforms : [ "Instagram", "TikTok" ]
+    end
+
+    def extract_day_of_week(item)
+      # Check various possible sources for day information
+      days_of_week = %w[Monday Tuesday Wednesday Thursday Friday Saturday Sunday]
+
+      # 1. Check if Voxa specifies a day directly
+      day_from_voxa = item["day_of_the_week"] || item.dig("meta", "day_of_the_week")
+      return day_from_voxa if day_from_voxa.in?(days_of_week)
+
+      # 2. Check scheduled_day field
+      scheduled_day = item.dig("meta", "scheduled_day") || item["scheduled_day"]
+      return scheduled_day if scheduled_day.in?(days_of_week)
+
+      # 3. Try to extract from publish_date if available
+      publish_date = item["publish_date"]
+      if publish_date.present?
+        begin
+          date = Date.parse(publish_date)
+          return date.strftime("%A") # Returns full day name like "Monday"
+        rescue Date::Error
+          # Fall through to default logic
+        end
+      end
+
+      # 4. Default: Use strategic distribution based on content pilar
+      pilar = item["pilar"]
+      week = item["week"] || 1
+
+      case pilar
+      when "C" # Content - Educational content performs well mid-week
+        [ "Tuesday", "Wednesday", "Thursday" ].sample
+      when "R" # Relationship - Community building content for weekends
+        [ "Friday", "Saturday", "Sunday" ].sample
+      when "E" # Entertainment - Fun content for peak engagement times
+        [ "Monday", "Friday", "Saturday" ].sample
+      when "A" # Advertising - Promotional content early in week
+        [ "Monday", "Tuesday", "Wednesday" ].sample
+      when "S" # Sales - Direct sales content mid-week when users are active
+        [ "Tuesday", "Wednesday", "Thursday" ].sample
+      else
+        # Even distribution as fallback
+        day_index = (week + (pilar&.ord || 0)) % 7
+        days_of_week[day_index]
+      end
     end
   end
 end

@@ -84,6 +84,29 @@ RSpec.describe CreasContentItem, type: :model do
       end
     end
 
+    describe "day_of_the_week validation" do
+      it "allows valid day_of_the_week values" do
+        %w[Monday Tuesday Wednesday Thursday Friday Saturday Sunday].each do |day|
+          content_item = build(:creas_content_item, day_of_the_week: day)
+          expect(content_item).to be_valid, "Expected '#{day}' to be valid"
+        end
+      end
+
+      it "rejects invalid day_of_the_week values" do
+        content_item = build(:creas_content_item, day_of_the_week: "Funday")
+        expect(content_item).not_to be_valid
+        expect(content_item.errors[:day_of_the_week]).to include("Funday is not a valid day of the week")
+      end
+
+      it "allows blank day_of_the_week" do
+        content_item = build(:creas_content_item, day_of_the_week: nil)
+        expect(content_item).to be_valid
+
+        content_item = build(:creas_content_item, day_of_the_week: "")
+        expect(content_item).to be_valid
+      end
+    end
+
     describe "hashtags validation" do
       it "allows valid hashtag formats" do
         valid_hashtags = [
@@ -144,6 +167,18 @@ RSpec.describe CreasContentItem, type: :model do
         result = CreasContentItem.ready_to_publish
         expect(result).to include(ready_item, approved_item)
         expect(result).not_to include(in_production_item)
+      end
+    end
+
+    describe ".by_day_of_week" do
+      let!(:monday_item) { create(:creas_content_item, day_of_the_week: "Monday") }
+      let!(:tuesday_item) { create(:creas_content_item, day_of_the_week: "Tuesday") }
+      let!(:wednesday_item) { create(:creas_content_item, day_of_the_week: "Wednesday") }
+
+      it "returns items for specified day of week" do
+        expect(CreasContentItem.by_day_of_week("Monday")).to contain_exactly(monday_item)
+        expect(CreasContentItem.by_day_of_week("Tuesday")).to contain_exactly(tuesday_item)
+        expect(CreasContentItem.by_day_of_week("Wednesday")).to contain_exactly(wednesday_item)
       end
     end
 

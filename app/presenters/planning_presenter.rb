@@ -56,6 +56,7 @@ class PlanningPresenter
         success_criteria: item.success_criteria,
         publish_date: item.publish_date&.strftime("%Y-%m-%d"),
         scheduled_day: item.scheduled_day,
+        day_of_the_week: item.day_of_the_week,
         template: item.template,
         text_base: item.text_base,
         hashtags: item.hashtags,
@@ -74,7 +75,7 @@ class PlanningPresenter
 
     # Create a new weekly plan structure using content items
     weekly_plan = []
-    (1..5).each do |week_num|
+    (1..4).each do |week_num|
       week_items = items_by_week[week_num] || []
 
       weekly_plan << {
@@ -176,5 +177,15 @@ class PlanningPresenter
     else
       "#{year}-#{month_num.to_i}"
     end
+  end
+
+  # View logic encapsulation per CLAUDE.md line 84
+  # Business logic for whether to show beats section
+  def show_beats_for_content?(content_piece)
+    return false unless content_piece.is_a?(Hash)
+    return false unless content_piece["beats"]&.any?
+    return false if content_piece["status"] == "draft"
+
+    true
   end
 end

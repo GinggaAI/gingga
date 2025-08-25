@@ -231,7 +231,7 @@ RSpec.describe PlanningPresenter do
         parsed_result = JSON.parse(json_result)
 
         expect(parsed_result['weekly_plan']).to be_an(Array)
-        expect(parsed_result['weekly_plan'].length).to eq(5) # Always 5 weeks
+        expect(parsed_result['weekly_plan'].length).to eq(4) # Always 4 weeks
 
         week1 = parsed_result['weekly_plan'].first
         expect(week1['week']).to eq(1)

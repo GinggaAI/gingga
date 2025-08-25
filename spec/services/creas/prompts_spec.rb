@@ -75,9 +75,9 @@ RSpec.describe Creas::Prompts do
 
     it 'includes validation rules' do
       expect(subject).to include('VALIDATION')
-      expect(subject).to include('brief complete')
-      expect(subject).to include('all IDs valid/unique')
-      expect(subject).to include('respect brand_guardrails')
+      expect(subject).to include('Brief complete; else ask')
+      expect(subject).to include('All IDs valid/unique')
+      expect(subject).to include('Respect brand_guardrails')
     end
 
     it 'includes ID generation rules' do

@@ -183,7 +183,7 @@ RSpec.describe 'Brand Nested Fields', type: :request do
 
         # The request should fail due to validation errors
         expect(final_count).to eq(initial_count)
-        expect(response).to have_http_status(:unprocessable_content)
+        expect(response).to have_http_status(:unprocessable_entity)
       end
     end
 
@@ -206,7 +206,7 @@ RSpec.describe 'Brand Nested Fields', type: :request do
           patch brand_path, params: { brand: duplicate_params }
         }.not_to change(brand.brand_channels, :count)
 
-        expect(response).to have_http_status(:unprocessable_content)
+        expect(response).to have_http_status(:unprocessable_entity)
       end
     end
   end

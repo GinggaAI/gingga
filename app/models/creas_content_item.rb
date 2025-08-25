@@ -28,6 +28,11 @@ class CreasContentItem < ApplicationRecord
     message: "%{value} is not a valid pilar"
   }
 
+  validates :day_of_the_week, inclusion: {
+    in: %w[Monday Tuesday Wednesday Thursday Friday Saturday Sunday],
+    message: "%{value} is not a valid day of the week"
+  }, allow_blank: true
+
   validates :hashtags, format: {
     with: /\A(?:#\w+(?:\s+#\w+)*|\s*)\z/m,
     message: "must be space-separated hashtags like '#tag1 #tag2 #tag3'"
@@ -37,6 +42,7 @@ class CreasContentItem < ApplicationRecord
 
   scope :by_week, ->(week) { where(week: week) }
   scope :by_status, ->(status) { where(status: status) }
+  scope :by_day_of_week, ->(day) { where(day_of_the_week: day) }
   scope :ready_to_publish, -> { where(status: %w[ready_for_review approved]) }
   scope :for_month, ->(month) {
     joins(:creas_strategy_plan).where(creas_strategy_plans: { month: month })

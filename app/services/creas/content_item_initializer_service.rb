@@ -20,7 +20,8 @@ module Creas
       content_items = []
 
       @plan.content_distribution.each do |pilar, pilar_data|
-        next unless pilar_data["ideas"].present?
+        # Skip non-pilar keys like weekly_plan, remix_duet_plan, etc.
+        next unless pilar_data.is_a?(Hash) && pilar_data["ideas"].present?
 
         pilar_data["ideas"].each do |idea|
           item = create_content_item_from_idea(idea, pilar)
@@ -53,6 +54,7 @@ module Creas
         aspect_ratio: determine_aspect_ratio(idea["platform"]),
         language: @brand.content_language || "en",
         pilar: pilar,
+        day_of_the_week: determine_day_of_week(idea, pilar, week_number),
         template: idea["recommended_template"] || "solo_avatars",
         video_source: idea["video_source"] || "kling",
         post_description: idea["description"] || "",
@@ -124,6 +126,32 @@ module Creas
         "16:9" # Horizontal
       else
         "1:1" # Square
+      end
+    end
+
+    def determine_day_of_week(idea, pilar, week_number)
+      # Strategy: Distribute content strategically across the week based on pilar type and frequency
+      days_of_week = %w[Monday Tuesday Wednesday Thursday Friday Saturday Sunday]
+
+      # If the idea specifies a day, use it
+      return idea["suggested_day"] if idea["suggested_day"].in?(days_of_week)
+
+      # Smart distribution based on content pillars and best posting times
+      case pilar
+      when "C" # Content - Educational content performs well mid-week
+        [ "Tuesday", "Wednesday", "Thursday" ].sample
+      when "R" # Relationship - Community building content for weekends
+        [ "Friday", "Saturday", "Sunday" ].sample
+      when "E" # Entertainment - Fun content for peak engagement times
+        [ "Monday", "Friday", "Saturday" ].sample
+      when "A" # Advertising - Promotional content early in week
+        [ "Monday", "Tuesday", "Wednesday" ].sample
+      when "S" # Sales - Direct sales content mid-week when users are active
+        [ "Tuesday", "Wednesday", "Thursday" ].sample
+      else
+        # Default even distribution
+        day_index = (week_number + pilar.ord) % 7
+        days_of_week[day_index]
       end
     end
 

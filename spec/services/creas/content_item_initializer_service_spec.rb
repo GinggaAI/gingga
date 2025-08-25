@@ -127,6 +127,10 @@ RSpec.describe Creas::ContentItemInitializerService do
           creas_strategy_plan: strategy_plan
         )
 
+        # Verify day_of_the_week is assigned
+        expect(first_item.day_of_the_week).to be_present
+        expect(%w[Monday Tuesday Wednesday Thursday Friday Saturday Sunday]).to include(first_item.day_of_the_week)
+
         expect(first_item.text_base).to eq("Amazing hook\n\nTest description\n\nFollow us!")
         expect(first_item.shotplan['beats']).to eq([
           { 'beat_number' => 1, 'description' => 'Beat 1', 'duration' => '3-5s' },

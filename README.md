@@ -110,8 +110,9 @@ open coverage/index.html
 - **Ruby on Rails 8.0** with modern conventions
 - **Service-oriented architecture** for business logic
 - **PostgreSQL** with JSONB for flexible data storage
-- **API integrations** with OpenAI, Heygen, and Kling
-- **Comprehensive test coverage** with RSpec
+- **AI integrations** with OpenAI GPT-4o, Heygen, and Kling
+- **Asynchronous processing** with Active Job and SolidQueue
+- **Comprehensive test coverage** with RSpec (request specs)
 
 ### Frontend  
 - **Server-rendered HTML** with Rails views
@@ -122,12 +123,13 @@ open coverage/index.html
 
 ### Key Technologies
 - **Authentication**: Devise
-- **Background Jobs**: Sidekiq (configured)
+- **Background Jobs**: Active Job with SolidQueue
 - **Caching**: Redis (configured) 
 - **File Storage**: Active Storage
-- **Testing**: RSpec, FactoryBot, Capybara
+- **Testing**: RSpec (request specs), FactoryBot, Capybara
 - **Code Quality**: RuboCop, Brakeman
 - **CSS Processing**: Tailwind CSS with npm
+- **AI Integrations**: OpenAI GPT-4o, Heygen, Kling
 
 ---
 
@@ -154,6 +156,13 @@ bash bin/shot             # Run all quality checks
 rails db:migrate          # Run migrations
 rails db:seed             # Seed database
 rails db:reset            # Reset database
+```
+
+### Background Jobs
+```bash
+# SolidQueue is configured to run automatically in development
+# Job status can be monitored through the web interface
+rails solid_queue:start   # Start job processing (if needed manually)
 ```
 
 ---
@@ -212,11 +221,18 @@ The application is configured for deployment with:
 
 Gingga is an AI-powered platform for creating comprehensive content strategies. It leverages cutting-edge AI services to help brands develop, manage, and optimize their content across multiple channels with data-driven insights and automated workflows.
 
+### Core Features
+- **Smart Planning**: AI-generated content strategies with monthly themes
+- **Content Refinement**: Voxa AI service for content enhancement and optimization  
+- **Visual Planning**: Interactive calendar with scene and beat breakdowns
+- **Real-time Processing**: Asynchronous strategy generation with live status updates
+- **Multi-platform Support**: Content optimization for Instagram, TikTok, YouTube, and more
+
 ---
 
 **Ready to contribute?** Start with [CLAUDE.md](./CLAUDE.md) to understand our development standards and practices.
 
-**Last Updated**: August 19, 2025
+**Last Updated**: August 26, 2025
 
 ## Before any PR
 Run rubocop to autorrect offenses, and commit any changes.
