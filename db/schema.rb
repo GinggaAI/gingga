@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_19_155146) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_25_190740) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -157,8 +157,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_19_155146) do
     t.uuid "brand_id", null: false
     t.string "strategy_name"
     t.string "month", null: false
-    t.string "objective_of_the_month", null: false
-    t.integer "frequency_per_week", null: false
+    t.string "objective_of_the_month"
+    t.integer "frequency_per_week"
     t.jsonb "monthly_themes", default: [], null: false
     t.jsonb "resources_override", default: {}, null: false
     t.jsonb "content_distribution", default: {}, null: false
@@ -170,8 +170,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_19_155146) do
     t.jsonb "meta", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "status", default: "pending"
+    t.text "error_message"
     t.index ["brand_id", "month"], name: "index_creas_strategy_plans_on_brand_id_and_month"
     t.index ["brand_id"], name: "index_creas_strategy_plans_on_brand_id"
+    t.index ["status"], name: "index_creas_strategy_plans_on_status"
     t.index ["user_id"], name: "index_creas_strategy_plans_on_user_id"
   end
 

@@ -190,6 +190,12 @@ es:
       generate_strategy: "Generar Estrategia"
       generating: "Generando..."
     
+    # Strategy status
+    strategy:
+      processing: "Procesando..."
+      generating_strategy: "Generando tu estrategia de contenido..."
+      please_wait: "Esto puede tomar unos momentos. Por favor espera."
+    
     # Strategy results
     strategy_result:
       title: "¡Estrategia Generada Exitosamente!"
@@ -246,9 +252,8 @@ es:
       strategy_not_found: "No se encontró estrategia para el mes"
       invalid_month: "Mes Inválido"
       error_generating: "Error generando estrategia"
+      generation_failed: "La generación de estrategia falló. Por favor intenta de nuevo."
       generation_timeout: "La generación está tomando más tiempo del esperado. Verificando estrategia completada..."
       network_error: "Ocurrió un error de red. Por favor intenta de nuevo."
       failed_to_load: "Error al cargar el plan de estrategia"
       no_strategy_to_refine: "No se encontró plan de estrategia para refinar"
-      generation_timeout: "La generación está tomando más tiempo del esperado. Verificando estrategia completada..."
-      network_error: "Ocurrió un error de red. Por favor intenta de nuevo."

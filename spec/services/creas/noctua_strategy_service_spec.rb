@@ -38,40 +38,30 @@ RSpec.describe Creas::NoctuaStrategyService do
 
   subject { described_class.new(user: user, brief: brief, brand: brand, month: month) }
 
-  describe '#call' do
-    let(:mock_chat_client) { instance_double(GinggaOpenAI::ChatClient) }
-
+  describe '#call (async version)' do
     before do
-      allow(GinggaOpenAI::ChatClient).to receive(:new).and_return(mock_chat_client)
-      allow(mock_chat_client).to receive(:chat!).and_return(mock_openai_response)
+      # Mock the background job to prevent it from being enqueued in tests
+      allow(GenerateNoctuaStrategyJob).to receive(:perform_later)
     end
 
-    it 'creates a new strategy plan' do
+    it 'creates a new strategy plan with pending status' do
       expect {
         subject.call
       }.to change(CreasStrategyPlan, :count).by(1)
     end
 
-    it 'returns the created strategy plan' do
+    it 'returns the created strategy plan with pending status' do
       plan = subject.call
       expect(plan).to be_a(CreasStrategyPlan)
       expect(plan.user).to eq(user)
       expect(plan.brand).to eq(brand)
       expect(plan.month).to eq(month)
-      expect(plan.objective_of_the_month).to eq("awareness")
-      expect(plan.frequency_per_week).to eq(4)
+      expect(plan.pending?).to be true
+      expect(plan.objective_of_the_month).to be_nil # Not filled yet
+      expect(plan.frequency_per_week).to be_nil # Not filled yet
     end
 
-    it 'stores the raw payload from OpenAI' do
-      plan = subject.call
-      expect(plan.raw_payload).to include(
-        "brand_name" => brand.name,
-        "month" => month,
-        "objective_of_the_month" => "awareness"
-      )
-    end
-
-    it 'creates a brand snapshot' do
+    it 'creates a brand snapshot immediately' do
       plan = subject.call
       expect(plan.brand_snapshot).to include(
         "name" => brand.name,
@@ -83,8 +73,64 @@ RSpec.describe Creas::NoctuaStrategyService do
       expect(plan.brand_snapshot["channels"]).to be_an(Array)
     end
 
+    it 'queues a background job for processing' do
+      expect(GenerateNoctuaStrategyJob).to receive(:perform_later).with(
+        instance_of(String), # strategy_plan.id
+        brief
+      )
+
+      subject.call
+    end
+  end
+
+  describe '#call_sync (legacy synchronous method)' do
+    let(:mock_chat_client) { instance_double(GinggaOpenAI::ChatClient) }
+
+    before do
+      allow(GinggaOpenAI::ChatClient).to receive(:new).and_return(mock_chat_client)
+      allow(mock_chat_client).to receive(:chat!).and_return(mock_openai_response)
+    end
+
+    it 'creates a new strategy plan with completed status' do
+      expect {
+        subject.call_sync
+      }.to change(CreasStrategyPlan, :count).by(1)
+    end
+
+    it 'returns the created strategy plan with all fields filled' do
+      plan = subject.call_sync
+      expect(plan).to be_a(CreasStrategyPlan)
+      expect(plan.user).to eq(user)
+      expect(plan.brand).to eq(brand)
+      expect(plan.month).to eq(month)
+      expect(plan.objective_of_the_month).to eq("awareness")
+      expect(plan.frequency_per_week).to eq(4)
+      expect(plan.completed?).to be true
+    end
+
+    it 'stores the raw payload from OpenAI' do
+      plan = subject.call_sync
+      expect(plan.raw_payload).to include(
+        "brand_name" => brand.name,
+        "month" => month,
+        "objective_of_the_month" => "awareness"
+      )
+    end
+
+    it 'creates a brand snapshot' do
+      plan = subject.call_sync
+      expect(plan.brand_snapshot).to include(
+        "name" => brand.name,
+        "slug" => brand.slug,
+        "industry" => brand.industry
+      )
+      expect(plan.brand_snapshot["audiences"]).to be_an(Array)
+      expect(plan.brand_snapshot["products"]).to be_an(Array)
+      expect(plan.brand_snapshot["channels"]).to be_an(Array)
+    end
+
     it 'stores meta information' do
-      plan = subject.call
+      plan = subject.call_sync
       expect(plan.meta).to include(
         "model" => "gpt-4o",
         "prompt_version" => "noctua-v1"
@@ -98,7 +144,7 @@ RSpec.describe Creas::NoctuaStrategyService do
 
       it 'raises a JSON parse error' do
         expect {
-          subject.call
+          subject.call_sync
         }.to raise_error("Model returned non-JSON content")
       end
     end
@@ -117,7 +163,7 @@ RSpec.describe Creas::NoctuaStrategyService do
 
       it 'raises an error due to missing required fields' do
         expect {
-          subject.call
+          subject.call_sync
         }.to raise_error(KeyError, /key not found/)
       end
     end

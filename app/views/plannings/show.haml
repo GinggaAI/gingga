@@ -322,6 +322,13 @@
     hideMessages();
 
     const formData = new FormData(form);
+    
+    console.log('Form action URL:', form.action);
+    console.log('Form data entries:');
+    for (let [key, value] of formData.entries()) {
+      console.log(key, ':', value);
+    }
+    console.log('CSRF token:', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'));
 
     // Create AbortController for timeout handling
     const controller = new AbortController();
@@ -331,6 +338,7 @@
       method: 'POST',
       body: formData,
       headers: {
+        'Accept': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
         'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
       },
@@ -344,29 +352,51 @@
       return response.json();
     })
     .then(data => {
+      console.log('Received response data:', data);
+      console.log('Plan status:', data.plan ? data.plan.status : 'No plan in response');
       setLoadingState(false, submitBtn, submitText, loadingSpinner);
 
       if (data.success) {
-        window.currentPlan = data.plan;
-        displayStrategyResult(data.plan, true); // Show result after form submission
-        populateCalendarWithStrategy(data.plan);
-        document.getElementById('strategy-form').style.display = 'none';
-        resetForm();
-        updateButtonText();
-        updateOverviewButton();
-        updateVoxaButton();
+        // Check if the plan is immediately completed (sync) or pending (async)
+        if (data.plan.status === 'completed') {
+          // Handle completed plan immediately
+          window.currentPlan = data.plan;
+          displayStrategyResult(data.plan, true);
+          populateCalendarWithStrategy(data.plan);
+          document.getElementById('strategy-form').style.display = 'none';
+          resetForm();
+          updateButtonText();
+          updateOverviewButton();
+          updateVoxaButton();
 
-        // Update URL with plan_id without page reload
-        if (data.plan && data.plan.id) {
-          const newUrl = new URL(window.location);
-          newUrl.searchParams.set('plan_id', data.plan.id);
-          window.history.pushState({}, '', newUrl);
+          // Update URL with plan_id without page reload
+          if (data.plan && data.plan.id) {
+            const newUrl = new URL(window.location);
+            newUrl.searchParams.set('plan_id', data.plan.id);
+            window.history.pushState({}, '', newUrl);
+          }
+        } else if (data.plan.status === 'pending') {
+          // Handle pending plan - show processing UI and start polling
+          showProcessingStrategy(data.plan);
+          startPollingStrategy(data.plan.id);
+          
+          // Update URL with plan_id
+          if (data.plan && data.plan.id) {
+            const newUrl = new URL(window.location);
+            newUrl.searchParams.set('plan_id', data.plan.id);
+            window.history.pushState({}, '', newUrl);
+          }
+        } else {
+          showError('Strategy generation failed');
         }
       } else {
         showError(data.error || 'Failed to generate strategy');
       }
     })
     .catch(error => {
+      console.error('Form submission error:', error);
+      console.log('Error name:', error.name);
+      console.log('Error message:', error.message);
       clearTimeout(timeoutId);
       setLoadingState(false, submitBtn, submitText, loadingSpinner);
 
@@ -1203,4 +1233,102 @@
     url.searchParams.set('month', newMonth);
     url.searchParams.delete('plan_id'); // Remove plan_id when navigating by month
     window.location.href = url.toString();
+  }
+
+  function showProcessingStrategy(plan) {
+    const strategyCard = document.getElementById('strategy-card');
+    const strategyTitle = document.getElementById('strategy-title');
+    const strategyDescription = document.getElementById('strategy-description');
+    
+    if (strategyCard) {
+      strategyCard.style.display = 'block';
+      strategyCard.className = 'bg-yellow-50 border border-yellow-200 p-6 rounded-xl shadow-sm';
+    }
+    
+    if (strategyTitle) {
+      strategyTitle.innerHTML = '<span class="animate-pulse">🔄 #{t("planning.strategy.processing")}</span>';
+    }
+    
+    if (strategyDescription) {
+      strategyDescription.innerHTML = `
+        <div class="text-center py-8">
+          <div class="animate-spin inline-block w-8 h-8 border-[3px] border-current border-t-transparent text-blue-600 rounded-full mb-4" role="status" aria-label="loading">
+            <span class="sr-only">Loading...</span>
+          </div>
+          <p class="text-gray-600 mb-2">#{t("planning.strategy.generating_strategy")}</p>
+          <p class="text-sm text-gray-500">#{t("planning.strategy.please_wait")}</p>
+        </div>
+      `;
+    }
+
+    // Hide form and show processing state
+    const strategyForm = document.getElementById('strategy-form');
+    if (strategyForm) {
+      strategyForm.style.display = 'none';
+    }
+    
+    // Store current plan for polling
+    window.currentPlan = plan;
+  }
+
+  function startPollingStrategy(planId) {
+    let pollCount = 0;
+    const maxPolls = 60; // Poll for up to 5 minutes (5 second intervals)
+    
+    const pollInterval = setInterval(() => {
+      pollCount++;
+      
+      if (pollCount >= maxPolls) {
+        clearInterval(pollInterval);
+        showError('#{t("planning.messages.generation_timeout")}');
+        return;
+      }
+      
+      fetch(`/strategy_plan_status/${planId}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Polling status:', data);
+        
+        if (data.completed) {
+          clearInterval(pollInterval);
+          
+          // Update current plan with completed data
+          window.currentPlan = data.plan;
+          
+          // Display the completed strategy
+          displayStrategyResult(data.plan, true);
+          populateCalendarWithStrategy(data.plan);
+          
+          // Update UI states
+          updateButtonText();
+          updateOverviewButton();
+          updateVoxaButton();
+          
+          console.log('Strategy generation completed successfully');
+        } else if (data.failed) {
+          clearInterval(pollInterval);
+          showError(data.error_message || '#{t("planning.messages.generation_failed")}');
+        }
+        // If still processing, continue polling
+      })
+      .catch(error => {
+        console.error('Polling error:', error);
+        if (pollCount >= 3) { // Stop polling after 3 consecutive errors
+          clearInterval(pollInterval);
+          showError('#{t("planning.messages.network_error")}');
+        }
+      });
+    }, 5000); // Poll every 5 seconds
   }

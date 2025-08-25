@@ -20,7 +20,8 @@ module Creas
       content_items = []
 
       @plan.content_distribution.each do |pilar, pilar_data|
-        next unless pilar_data["ideas"].present?
+        # Skip non-pilar keys like weekly_plan, remix_duet_plan, etc.
+        next unless pilar_data.is_a?(Hash) && pilar_data["ideas"].present?
 
         pilar_data["ideas"].each do |idea|
           item = create_content_item_from_idea(idea, pilar)
