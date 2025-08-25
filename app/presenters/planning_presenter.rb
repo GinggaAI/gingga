@@ -27,12 +27,12 @@ class PlanningPresenter
   def current_plan_json
     plan = current_plan
     return "null" unless plan
-    
+
     # Enrich plan with CreasContentItem data for unified frontend experience
     plan_hash = plan.as_json
-    plan_hash['content_items'] = format_content_items(plan.creas_content_items)
-    plan_hash['weekly_plan'] = format_weekly_plan_with_items(plan)
-    
+    plan_hash["content_items"] = format_content_items(plan.creas_content_items)
+    plan_hash["weekly_plan"] = format_weekly_plan_with_items(plan)
+
     plan_hash.to_json.html_safe
   end
 
@@ -51,10 +51,10 @@ class PlanningPresenter
         description: item.post_description,
         hook: item.hook,
         cta: item.cta,
-        visual_notes: item.meta&.dig('visual_notes'),
+        visual_notes: item.meta&.dig("visual_notes"),
         kpi_focus: item.kpi_focus,
         success_criteria: item.success_criteria,
-        publish_date: item.publish_date&.strftime('%Y-%m-%d'),
+        publish_date: item.publish_date&.strftime("%Y-%m-%d"),
         scheduled_day: item.scheduled_day,
         template: item.template,
         text_base: item.text_base,
@@ -65,15 +65,15 @@ class PlanningPresenter
 
   def format_weekly_plan_with_items(plan)
     return plan.weekly_plan unless plan.creas_content_items.any?
-    
+
     # Group content items by week
     items_by_week = plan.creas_content_items.group_by(&:week)
-    
+
     # Create a new weekly plan structure using content items
     weekly_plan = []
     (1..5).each do |week_num|
       week_items = items_by_week[week_num] || []
-      
+
       weekly_plan << {
         week: week_num,
         ideas: week_items.map do |item|
@@ -86,12 +86,12 @@ class PlanningPresenter
             hook: item.hook,
             cta: item.cta,
             description: item.post_description,
-            visual_notes: item.meta&.dig('visual_notes'),
+            visual_notes: item.meta&.dig("visual_notes"),
             kpi_focus: item.kpi_focus,
             success_criteria: item.success_criteria,
             pilar: item.pilar,
             scheduled_day: item.scheduled_day,
-            publish_date: item.publish_date&.strftime('%Y-%m-%d'),
+            publish_date: item.publish_date&.strftime("%Y-%m-%d"),
             template: item.template,
             text_base: item.text_base,
             hashtags: item.hashtags
@@ -99,7 +99,7 @@ class PlanningPresenter
         end
       }
     end
-    
+
     weekly_plan
   end
 

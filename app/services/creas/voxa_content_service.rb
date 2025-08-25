@@ -55,17 +55,17 @@ module Creas
     def upsert_item!(item)
       attrs = map_voxa_item_to_attrs(item)
       rec = CreasContentItem.find_or_initialize_by(content_id: attrs[:content_id])
-      
+
       # Preserve existing draft data while updating with Voxa refinements
-      if rec.persisted? && rec.status == 'draft'
+      if rec.persisted? && rec.status == "draft"
         # Update status to in_production and merge new data
-        attrs[:status] = 'in_production'
+        attrs[:status] = "in_production"
         rec.assign_attributes(attrs)
       else
         # New record or already processed
         rec.assign_attributes(attrs)
       end
-      
+
       rec.user = @user
       rec.brand = @brand
       rec.creas_strategy_plan = @plan

@@ -11,7 +11,7 @@ class PlanningsController < ApplicationController
       Creas::ContentItemInitializerService.new(strategy_plan: @current_strategy).call
       @current_strategy.reload
     end
-    
+
     @presenter = build_presenter
     @plans = build_weekly_plans
   end
