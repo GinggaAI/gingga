@@ -6,59 +6,48 @@ RSpec.describe GenerateNoctuaStrategyJob, type: :job do
   let(:strategy_plan) { create(:creas_strategy_plan, user: user, brand: brand, status: :pending) }
   let(:brief) do
     {
-      brand_info: 'Test brand',
-      objective: 'Test objective',
+      brand_info: 'Test eco-friendly skincare brand',
+      objective: 'Increase brand awareness and drive sales',
       frequency: 3
     }
-  end
-
-  let(:mock_ai_response) do
-    {
-      'strategy_name' => 'Test Strategy',
-      'objective_of_the_month' => 'Increase brand awareness',
-      'frequency_per_week' => 3,
-      'monthly_themes' => [ 'Brand awareness', 'Product showcase' ],
-      'resources_override' => {},
-      'content_distribution' => { 'instagram' => 70, 'tiktok' => 30 },
-      'weekly_plan' => [],
-      'remix_duet_plan' => {},
-      'publish_windows_local' => {}
-    }.to_json
   end
 
   describe '#perform' do
     subject { described_class.new }
 
-    before do
-      # Mock the OpenAI chat client
-      allow(GinggaOpenAI::ChatClient).to receive(:new).and_return(
-        double(chat!: mock_ai_response)
-      )
-    end
-
-    context 'when strategy generation succeeds' do
+    context 'when strategy generation succeeds', vcr: { cassette_name: 'noctua_strategy_success' } do
       it 'updates strategy plan status to processing then completed' do
         subject.perform(strategy_plan.id, brief)
 
         strategy_plan.reload
         expect(strategy_plan.completed?).to be true
-        expect(strategy_plan.strategy_name).to eq('Test Strategy')
-        expect(strategy_plan.objective_of_the_month).to eq('Increase brand awareness')
+        expect(strategy_plan.strategy_name).to be_present
+        expect(strategy_plan.objective_of_the_month).to be_present
+        expect(strategy_plan.frequency_per_week).to eq(3)
+        expect(strategy_plan.raw_payload).to be_present
       end
 
-      it 'calls the OpenAI chat client' do
-        chat_client_double = double(chat!: mock_ai_response)
-        expect(GinggaOpenAI::ChatClient).to receive(:new)
-          .with(
-            user: strategy_plan.user,
-            model: "gpt-4o",
-            temperature: 0.4
-          )
-          .and_return(chat_client_double)
+      it 'creates an AiResponse record' do
+        expect {
+          subject.perform(strategy_plan.id, brief)
+        }.to change(AiResponse, :count).by(1)
 
-        expect(chat_client_double).to receive(:chat!)
+        ai_response = AiResponse.last
+        expect(ai_response.user).to eq(strategy_plan.user)
+        expect(ai_response.service_name).to eq('noctua')
+        expect(ai_response.ai_model).to eq('gpt-4o')
+        expect(ai_response.prompt_version).to eq('noctua-v1')
+        expect(ai_response.raw_request).to have_key('system')
+        expect(ai_response.raw_request).to have_key('user')
+        expect(ai_response.raw_response).to be_present
+      end
 
+      it 'validates and processes the weekly distribution' do
         subject.perform(strategy_plan.id, brief)
+
+        strategy_plan.reload
+        expect(strategy_plan.weekly_plan).to be_present
+        expect(strategy_plan.content_distribution).to be_present
       end
     end
 
@@ -66,7 +55,7 @@ RSpec.describe GenerateNoctuaStrategyJob, type: :job do
       let(:error_message) { 'OpenAI API error' }
 
       before do
-        # Override the mock to raise an error
+        # Mock the OpenAI chat client to raise an error
         chat_client_double = double
         allow(chat_client_double).to receive(:chat!).and_raise(StandardError.new(error_message))
         allow(GinggaOpenAI::ChatClient).to receive(:new).and_return(chat_client_double)
@@ -85,6 +74,39 @@ RSpec.describe GenerateNoctuaStrategyJob, type: :job do
         expect(Rails.logger).to receive(:error).with("Strategy plan #{strategy_plan.id} failed: #{error_message}")
 
         subject.perform(strategy_plan.id, brief)
+      end
+    end
+
+    context 'when JSON parsing fails', vcr: { cassette_name: 'noctua_strategy_invalid_json' } do
+      before do
+        # Mock the client to return invalid JSON
+        chat_client_double = double(chat!: 'Invalid JSON response')
+        allow(GinggaOpenAI::ChatClient).to receive(:new).and_return(chat_client_double)
+      end
+
+      it 'updates strategy plan status to failed with JSON parse error' do
+        subject.perform(strategy_plan.id, brief)
+
+        strategy_plan.reload
+        expect(strategy_plan.failed?).to be true
+        expect(strategy_plan.error_message).to include('Model returned non-JSON content')
+      end
+    end
+
+    context 'when OpenAI returns incomplete brief error', vcr: { cassette_name: 'noctua_incomplete_brief_error' } do
+      let(:incomplete_brief) do
+        {
+          brand_info: 'Test brand'  # Only minimal info
+        }
+      end
+
+      it 'updates strategy plan status to failed with incomplete brief error' do
+        subject.perform(strategy_plan.id, incomplete_brief)
+
+        strategy_plan.reload
+        expect(strategy_plan.failed?).to be true
+        expect(strategy_plan.error_message).to include('Incomplete brief')
+        expect(strategy_plan.meta['error_type']).to eq('incomplete_brief')
       end
     end
 

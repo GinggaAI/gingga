@@ -67,6 +67,7 @@ group :development, :test do
   gem "capybara"
   gem "shoulda-matchers", "~> 6.0"
   gem "webmock"
+  gem "vcr"
   gem "faker"
   gem "database_cleaner-active_record"
   gem "dotenv-rails"

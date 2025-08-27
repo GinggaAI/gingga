@@ -6,10 +6,21 @@ class PlanningsController < ApplicationController
 
   # GET /plannings
   def show
-    # Initialize content items from content_distribution if strategy exists but no content items
-    if @current_strategy&.content_distribution.present? && @current_strategy.creas_content_items.empty?
-      Creas::ContentItemInitializerService.new(strategy_plan: @current_strategy).call
+    # Initialize content items from weekly_plan if strategy exists but no content items
+    if @current_strategy&.weekly_plan.present? && @current_strategy.creas_content_items.empty?
+      service = Creas::ContentItemInitializerService.new(strategy_plan: @current_strategy)
+      created_items = service.call
       @current_strategy.reload
+      
+      # Validate quantity guarantee
+      expected_count = @current_strategy.weekly_plan.sum { |week| week["ideas"]&.count || 0 }
+      actual_count = @current_strategy.creas_content_items.count
+      
+      if actual_count < expected_count
+        Rails.logger.warn "PlanningsController: Expected #{expected_count} content items but only #{actual_count} were created"
+      else
+        Rails.logger.info "PlanningsController: Successfully created #{actual_count}/#{expected_count} content items"
+      end
     end
 
     @presenter = build_presenter

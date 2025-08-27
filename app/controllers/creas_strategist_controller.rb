@@ -72,6 +72,7 @@ class CreasStrategistController < ApplicationController
     return {} unless params[:strategy_form]
 
     params.require(:strategy_form).permit(
+      :primary_objective,
       :objective_of_the_month,
       :frequency_per_week,
       :monthly_themes,

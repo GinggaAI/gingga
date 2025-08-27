@@ -40,16 +40,12 @@ class CreateStrategyService
 
   def build_strategy_form
     {
-      objective_of_the_month: parsed_objective,
+      primary_objective: @strategy_params[:primary_objective].presence || "awareness",
+      objective_of_the_month: @strategy_params[:objective_of_the_month],
       frequency_per_week: parsed_frequency,
       monthly_themes: parsed_themes,
       resources_override: parsed_resources
     }
-  end
-
-  def parsed_objective
-    @strategy_params[:objective_of_the_month].presence ||
-    "Increase brand awareness and engagement"
   end
 
   def parsed_frequency

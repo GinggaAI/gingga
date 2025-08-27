@@ -38,6 +38,12 @@ class GenerateNoctuaStrategyJob < ApplicationJob
 
       parsed = JSON.parse(json)
 
+      # Check if the response contains an error indicating incomplete brief
+      if parsed.is_a?(Hash) && parsed["error"]&.include?("Incomplete brief")
+        handle_incomplete_brief_error(strategy_plan, parsed["error"])
+        return
+      end
+
       # Validate and potentially fix weekly distribution
       validated_payload = Creas::WeeklyDistributionValidator.validate_weekly_distribution!(parsed)
 
@@ -82,5 +88,15 @@ class GenerateNoctuaStrategyJob < ApplicationJob
     )
 
     Rails.logger.error "Strategy plan #{strategy_plan.id} failed: #{error_message}"
+  end
+
+  def handle_incomplete_brief_error(strategy_plan, error_message)
+    strategy_plan.update!(
+      status: :failed,
+      error_message: error_message,
+      meta: { error_type: "incomplete_brief" }
+    )
+
+    Rails.logger.error "Strategy plan #{strategy_plan.id} failed due to incomplete brief: #{error_message}"
   end
 end

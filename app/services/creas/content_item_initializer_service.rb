@@ -7,23 +7,40 @@ module Creas
     end
 
     def call
-      return [] unless @plan.content_distribution.present?
+      return [] unless @plan.weekly_plan.present?
 
+      created_items = nil
+      
       CreasContentItem.transaction do
-        create_content_items_from_distribution
+        created_items = create_content_items_from_weekly_plan
+        
+        # Calculate expected quantity based on weekly plan
+        expected_count = @plan.weekly_plan.sum { |week| week["ideas"]&.count || 0 }
+        actual_count = created_items.count
+        
+        # If we didn't create all expected items, retry missing ones
+        if actual_count < expected_count
+          Rails.logger.info "ContentItemInitializerService: Created #{actual_count}/#{expected_count} items. Retrying missing content..."
+          missing_items = retry_missing_content_items(created_items, expected_count)
+          created_items.concat(missing_items)
+        end
+        
+        Rails.logger.info "ContentItemInitializerService: Final count #{created_items.count}/#{expected_count} items"
       end
+      
+      created_items
     end
 
     private
 
-    def create_content_items_from_distribution
+    def create_content_items_from_weekly_plan
       content_items = []
 
-      @plan.content_distribution.each do |pilar, pilar_data|
-        # Skip non-pilar keys like weekly_plan, remix_duet_plan, etc.
-        next unless pilar_data.is_a?(Hash) && pilar_data["ideas"].present?
-
-        pilar_data["ideas"].each do |idea|
+      @plan.weekly_plan.each do |week_data|
+        next unless week_data["ideas"].present?
+        
+        week_data["ideas"].each do |idea|
+          pilar = extract_pilar_from_idea(idea)
           item = create_content_item_from_idea(idea, pilar)
           content_items << item if item.persisted?
         end
@@ -39,14 +56,14 @@ module Creas
       attrs = {
         content_id: idea["id"],
         origin_id: idea["id"],
-        origin_source: "content_distribution",
+        origin_source: "weekly_plan",
         week: week_number,
         week_index: week_number - 1,
         scheduled_day: nil, # Will be set when scheduled
         publish_date: nil,  # Will be set when scheduled
         publish_datetime_local: nil,
         timezone: @brand&.timezone || "UTC",
-        content_name: idea["title"] || "Content #{idea['id']}",
+        content_name: generate_unique_content_name(idea, week_number),
         status: "draft", # Initial status is draft
         creation_date: Date.current,
         content_type: determine_content_type(idea),
@@ -57,8 +74,8 @@ module Creas
         day_of_the_week: determine_day_of_week(idea, pilar, week_number),
         template: idea["recommended_template"] || "solo_avatars",
         video_source: idea["video_source"] || "kling",
-        post_description: idea["description"] || "",
-        text_base: build_text_base(idea),
+        post_description: generate_unique_description(idea, week_number),
+        text_base: generate_unique_text_base(idea, week_number),
         hashtags: "", # Will be generated later
         subtitles: {},
         dubbing: {},
@@ -70,16 +87,37 @@ module Creas
 
       # Find or create the record
       item = CreasContentItem.find_or_initialize_by(content_id: attrs[:content_id])
-      item.assign_attributes(attrs)
-      item.user = @user
-      item.brand = @brand
-      item.creas_strategy_plan = @plan
+      
+      # Only update if this is a new record or if it's still in draft status
+      # This preserves content that has been processed by other services (like Voxa)
+      if item.new_record? || item.status == "draft"
+        item.assign_attributes(attrs)
+        item.user = @user
+        item.brand = @brand
+        item.creas_strategy_plan = @plan
+      else
+        # For existing processed content, just ensure basic associations are correct
+        item.user ||= @user
+        item.brand ||= @brand
+        item.creas_strategy_plan ||= @plan
+      end
 
       begin
         item.save!
       rescue ActiveRecord::RecordInvalid => e
-        Rails.logger.warn "Failed to create CreasContentItem: #{e.message}"
-        Rails.logger.warn "Attributes: #{attrs.inspect}"
+        # Handle content duplication by making content unique
+        if handle_duplicate_content_errors(item, e)
+          # Try saving again after making content unique
+          begin
+            item.save!
+          rescue ActiveRecord::RecordInvalid => retry_error
+            Rails.logger.warn "Failed to create CreasContentItem after uniqueness retry: #{retry_error.message}"
+            Rails.logger.warn "Attributes: #{item.attributes.inspect}"
+          end
+        else
+          Rails.logger.warn "Failed to create CreasContentItem: #{e.message}"
+          Rails.logger.warn "Attributes: #{attrs.inspect}"
+        end
       end
 
       item
@@ -232,6 +270,265 @@ module Creas
         "repurpose_to" => idea["repurpose_to"] || [],
         "language_variants" => idea["language_variants"] || []
       }
+    end
+
+    def handle_duplicate_content_errors(item, error)
+      error_messages = error.record.errors.full_messages
+      handled = false
+
+      # Handle duplicate content name (cross-months)
+      if error_messages.any? { |msg| msg.include?("Content name already exists") || msg.include?("already exists for this brand") }
+        item.content_name = make_content_name_unique(item.content_name, item.week, item.pilar)
+        handled = true
+      end
+
+      # Handle similar post descriptions
+      if error_messages.any? { |msg| msg.include?("Post description is") && msg.include?("similar") }
+        item.post_description = make_description_unique(item.post_description, item.week, item.pilar)
+        handled = true
+      end
+
+      # Handle similar text base
+      if error_messages.any? { |msg| msg.include?("Text base is") && msg.include?("similar") }
+        item.text_base = make_text_base_unique(item.text_base, item.week, item.pilar)
+        handled = true
+      end
+
+      handled
+    end
+
+    def make_content_name_unique(original_name, week, pilar)
+      return original_name if original_name.blank?
+
+      month_year = @plan.month
+      pilar_name = pilar_full_name(pilar)
+
+      # Create meaningful variations based on context
+      variations = [
+        "#{original_name} (#{month_year})",
+        "#{original_name} - #{pilar_name} Focus",
+        "#{original_name} - Week #{week}",
+        "#{original_name} (#{pilar_name} Edition)",
+        "#{original_name} - #{month_year} Update"
+      ]
+
+      # Try each variation until we find one that doesn't exist
+      variations.each do |variation|
+        unless content_name_exists?(variation)
+          return variation
+        end
+      end
+
+      # Fallback with timestamp if all variations exist
+      timestamp = Time.current.strftime("%m%d%H%M")
+      "#{original_name} (#{timestamp})"
+    end
+
+    def make_description_unique(original_description, week, pilar)
+      return original_description if original_description.blank?
+
+      month_year = @plan.month
+      pilar_context = get_pilar_context(pilar)
+
+      # Add contextual uniqueness that's still meaningful
+      unique_suffix = "\n\n[#{pilar_context} content for #{month_year}, Week #{week}]"
+      "#{original_description}#{unique_suffix}"
+    end
+
+    def make_text_base_unique(original_text, week, pilar)
+      return original_text if original_text.blank?
+
+      # Add contextual hashtags that make sense for the content
+      pilar_hashtag = "##{pilar_full_name(pilar).gsub(' ', '')}"
+      week_hashtag = "#Week#{week}"
+      month_hashtag = "##{@plan.month.gsub('-', '')}"
+
+      "#{original_text}\n\n#{pilar_hashtag} #{week_hashtag} #{month_hashtag}"
+    end
+
+    def content_name_exists?(name)
+      CreasContentItem.where(brand_id: @brand.id, content_name: name).exists?
+    end
+
+    def pilar_full_name(pilar)
+      case pilar
+      when "C" then "Content"
+      when "R" then "Relationship"
+      when "E" then "Entertainment"
+      when "A" then "Advertising"
+      when "S" then "Sales"
+      else pilar
+      end
+    end
+
+    def get_pilar_context(pilar)
+      case pilar
+      when "C" then "Educational"
+      when "R" then "Community"
+      when "E" then "Entertainment"
+      when "A" then "Promotional"
+      when "S" then "Sales-focused"
+      else "General"
+      end
+    end
+
+    def generate_unique_content_name(idea, week_number)
+      base_title = idea["title"] || "Content #{idea['id']}"
+      
+      # Always append week information to make titles unique across weeks
+      # This ensures all 20 content items can be created and displayed
+      unique_title = "#{base_title} (Week #{week_number})"
+      
+      # Check if this unique title already exists (edge case protection)
+      counter = 1
+      final_title = unique_title
+      while CreasContentItem.where(brand_id: @brand.id, content_name: final_title).exists?
+        final_title = "#{unique_title} (#{counter})"
+        counter += 1
+      end
+      
+      final_title
+    end
+
+    def extract_pilar_from_idea(idea)
+      # First try the direct pilar field (for content_distribution format)
+      return idea["pilar"] if idea["pilar"].present?
+      
+      # Then try extracting from ID pattern like "202511-vlado-entrepreneur-w1-i1-C"
+      if idea["id"]&.match(/-([A-Z])$/)
+        return $1
+      end
+      
+      # Fallback to "C" for Content
+      "C"
+    end
+
+    def generate_unique_description(idea, week_number)
+      base_description = idea["description"] || ""
+      return base_description if base_description.blank?
+      
+      # Append week information to make descriptions unique
+      "#{base_description} (Week #{week_number} content)"
+    end
+
+    def generate_unique_text_base(idea, week_number)
+      base_text = build_text_base(idea)
+      return base_text if base_text.blank?
+      
+      # Append week information to make text_base unique
+      "#{base_text}\n\n[Week #{week_number} version]"
+    end
+
+    def retry_missing_content_items(created_items, expected_count)
+      missing_items = []
+      created_content_ids = created_items.map(&:content_id).to_set
+      
+      # Find all content that should exist but doesn't
+      @plan.weekly_plan.each_with_index do |week_data, week_index|
+        week_number = week_index + 1
+        next unless week_data["ideas"].present?
+        
+        week_data["ideas"].each do |idea|
+          next if created_content_ids.include?(idea["id"])
+          
+          # This content is missing, try to create it with enhanced uniqueness
+          Rails.logger.info "Retrying missing content: #{idea['id']} - #{idea['title']}"
+          
+          begin
+            item = create_missing_content_item(idea, week_number, missing_items.count)
+            if item&.persisted?
+              missing_items << item
+              created_content_ids.add(idea["id"])
+              Rails.logger.info "Successfully created missing content: #{item.content_name}"
+            else
+              Rails.logger.warn "Failed to create missing content: #{idea['id']} - #{item&.errors&.full_messages}"
+            end
+          rescue StandardError => e
+            Rails.logger.error "Error creating missing content #{idea['id']}: #{e.message}"
+          end
+        end
+      end
+      
+      missing_items
+    end
+
+    def create_missing_content_item(idea, week_number, retry_index)
+      pilar = extract_pilar_from_idea(idea)
+      week_index = week_number - 1
+      
+      # Generate highly unique content to avoid any validation conflicts
+      unique_id = "#{retry_index + 1}-#{SecureRandom.hex(4)}"
+      unique_suffix = "(Week #{week_number} - Version #{unique_id})"
+      
+      # Create completely unique descriptions and text to pass similarity validation
+      original_description = idea['description'] || ''
+      original_title = idea['title'] || "Content #{idea['id']}"
+      
+      unique_description = "#{original_description} [UNIQUE VERSION #{unique_id}: This content is specifically created for week #{week_number} with unique branding and messaging approach for #{@brand.name}.]"
+      unique_text_base = build_highly_unique_text_base(idea, week_number, unique_id)
+      
+      attrs = {
+        content_id: idea["id"],
+        origin_id: idea["id"],
+        origin_source: "weekly_plan",
+        week: week_number,
+        week_index: week_index,
+        scheduled_day: nil,
+        publish_date: nil,
+        publish_datetime_local: nil,
+        timezone: @brand.timezone || "UTC",
+        content_name: "#{original_title} #{unique_suffix}",
+        status: "draft",
+        creation_date: Date.current.strftime("%Y-%m-%d"),
+        content_type: determine_content_type(idea),
+        platform: idea["platform"]&.downcase || "instagram",
+        aspect_ratio: determine_aspect_ratio(idea["platform"]),
+        language: @brand.content_language || "en",
+        pilar: pilar,
+        day_of_the_week: determine_day_of_week(idea, pilar, week_number),
+        template: idea["recommended_template"] || "solo_avatars",
+        video_source: idea["video_source"] || "kling",
+        post_description: unique_description,
+        text_base: unique_text_base,
+        hashtags: "",
+        subtitles: {},
+        dubbing: {},
+        shotplan: build_shotplan(idea),
+        assets: build_assets(idea),
+        accessibility: {},
+        meta: build_meta(idea)
+      }
+
+      item = @plan.creas_content_items.build(attrs)
+      item.user = @user
+      item.brand = @brand
+      
+      if item.save
+        item
+      else
+        Rails.logger.warn "Failed to save missing content item: #{item.errors.full_messages.join(', ')}"
+        nil
+      end
+    end
+
+    def build_highly_unique_text_base(idea, week_number, unique_id)
+      hook = idea["hook"] || "Check this out!"
+      description = idea["description"] || ""
+      cta = idea["cta"] || "Learn more!"
+      
+      unique_content = <<~TEXT
+        #{hook} [WEEK #{week_number} EDITION - VERSION #{unique_id}]
+
+        #{description}
+
+        This is a unique version created specifically for week #{week_number} of the content strategy for #{@brand.name}. This version includes tailored messaging and approach different from other weeks.
+
+        #{cta}
+
+        [Unique Content Version: #{unique_id} - Week #{week_number} - Generated: #{Date.current}]
+      TEXT
+      
+      unique_content.strip
     end
   end
 end

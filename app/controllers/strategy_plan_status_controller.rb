@@ -16,6 +16,7 @@ class StrategyPlanStatusController < ApplicationController
           id: @strategy_plan.id,
           status: @strategy_plan.status,
           error_message: @strategy_plan.error_message,
+          meta: @strategy_plan.meta,
           completed: @strategy_plan.completed?,
           failed: @strategy_plan.failed?,
           plan: @strategy_plan.completed? ? strategy_plan_data(@strategy_plan) : nil

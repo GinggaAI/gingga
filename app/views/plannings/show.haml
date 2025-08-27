@@ -28,17 +28,22 @@
           #form-status.text-sm.text-gray-500{style: "display: none;"}
 
         = form_with url: creas_strategist_index_path, method: :post, local: false,
-            id: "strategy-creation-form", class: "strategy-form" do |form|
+                    id: "strategy-creation-form", class: "strategy-form" do |form|
           = form.hidden_field :month, value: @presenter.safe_month_for_js
 
           .grid.grid-cols-1.md:grid-cols-2.gap-4.mb-4
-            .col-span-1.md:col-span-2
-              = form.label "strategy_form[objective_of_the_month]", t('planning.strategy_form.objective_label'),
-                  class: "block text-sm font-medium mb-1 text-gray-700"
+            .col-span-1
+              = form.label "strategy_form[primary_objective]", "Primary Objective", class: "block text-sm font-medium mb-1 text-gray-700"
+              - options = options_for_select([['Awareness - Build brand recognition', 'awareness'], ['Engagement - Foster community interaction', 'engagement'], ['Sales - Drive conversions and revenue', 'sales'], ['Community - Strengthen customer relationships', 'community']], 'awareness')
+              = form.select "strategy_form[primary_objective]", options, {}, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+
+            .col-span-1
+              = form.label "strategy_form[objective_of_the_month]", "Specific Objective Details",
+                           class: "block text-sm font-medium mb-1 text-gray-700"
               = form.text_area "strategy_form[objective_of_the_month]",
-                  placeholder: t('planning.strategy_form.objective_placeholder'),
-                  rows: 3, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
-                  required: true
+                               placeholder: "e.g., Launch new product line with 25% increase in brand mentions",
+                               rows: 3, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              %p.text-xs.text-gray-500.mt-1 Optional: Add specific details about your objective
 
             .col-span-1
               = form.label "strategy_form[monthly_themes]", t('planning.strategy_form.monthly_themes_label'),
@@ -159,6 +164,18 @@
           %svg.w-5.h-5{fill: "currentColor", viewBox: "0 0 20 20"}
             %path{"fill-rule": "evenodd", d: "M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z", "clip-rule": "evenodd"}
           %span#error-text= t('planning.messages.error_generating')
+
+      #incomplete-brief-alert.bg-amber-50.border.border-amber-200.rounded-2xl.p-4.mb-6{style: "display: none;"}
+        .flex.items-start.gap-3.text-amber-800
+          %svg.w-5.h-5.flex-shrink-0.mt-0.5{fill: "currentColor", viewBox: "0 0 20 20"}
+            %path{"fill-rule": "evenodd", d: "M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z", "clip-rule": "evenodd"}
+          .flex-1
+            %div#incomplete-brief-text
+          .flex-shrink-0
+            = link_to brand_path(@brand), class: "inline-flex items-center px-3 py-2 text-sm font-medium text-amber-700 bg-amber-100 border border-amber-300 rounded-lg hover:bg-amber-200 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-colors" do
+              Complete Brand Setup
+              %svg.w-4.h-4.ml-2{fill: "none", stroke: "currentColor", viewBox: "0 0 24 24"}
+                %path{"stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "2", d: "M13 7l5 5m0 0l-5 5m5-5H6"}
 
       - unless @current_strategy
         #no-strategy-message.bg-gray-50.border.border-gray-200.rounded-2xl.p-8.mb-6.text-center
@@ -514,12 +531,30 @@
     }
   }
 
+  function showIncompleteBriefAlert(message) {
+    const alertDiv = document.getElementById('incomplete-brief-alert');
+    const alertText = document.getElementById('incomplete-brief-text');
+
+    if (alertDiv && alertText) {
+      alertText.innerHTML = `
+        <strong>Missing Information Required</strong><br>
+        Your brand profile is missing some critical information needed to generate the strategy. 
+        Please complete your brand setup to proceed.<br><br>
+        <em>Details: ${message}</em>
+      `;
+      alertDiv.style.display = 'block';
+      alertDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
   function hideMessages() {
     const resultDiv = document.getElementById('strategy-result');
     const errorDiv = document.getElementById('error-message');
+    const incompleteBriefAlert = document.getElementById('incomplete-brief-alert');
 
     if (resultDiv) resultDiv.style.display = 'none';
     if (errorDiv) errorDiv.style.display = 'none';
+    if (incompleteBriefAlert) incompleteBriefAlert.style.display = 'none';
   }
 
   function updateNoStrategyMessage(isProcessing) {
@@ -1353,7 +1388,13 @@
           console.log('Strategy generation completed successfully');
         } else if (data.failed) {
           clearInterval(pollInterval);
-          showError(data.error_message || '#{t("planning.messages.generation_failed")}');
+          
+          // Check if this is an incomplete brief error
+          if (data.meta && data.meta.error_type === 'incomplete_brief') {
+            showIncompleteBriefAlert(data.error_message);
+          } else {
+            showError(data.error_message || '#{t("planning.messages.generation_failed")}');
+          }
         }
         // If still processing, continue polling
       })
