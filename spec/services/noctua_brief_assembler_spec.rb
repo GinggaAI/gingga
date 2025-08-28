@@ -11,7 +11,8 @@ RSpec.describe NoctuaBriefAssembler do
     let(:strategy_form) do
       {
         primary_objective: 'sales',
-        objective_of_the_month: 'Launch new product line with 25% increase in revenue',
+        objective_of_the_month: 'Increase overall product awareness',
+        objective_details: 'Launch new product line with 25% increase in revenue',
         monthly_themes: [ 'product launch', 'customer success' ],
         frequency_per_week: 4,
         resources_override: { ai_avatars: true, stock: false }

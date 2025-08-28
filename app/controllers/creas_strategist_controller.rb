@@ -74,6 +74,7 @@ class CreasStrategistController < ApplicationController
     params.require(:strategy_form).permit(
       :primary_objective,
       :objective_of_the_month,
+      :objective_details,
       :frequency_per_week,
       :monthly_themes,
       :resources_override

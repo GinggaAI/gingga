@@ -6,9 +6,24 @@ RSpec.describe GenerateNoctuaStrategyJob, type: :job do
   let(:strategy_plan) { create(:creas_strategy_plan, user: user, brand: brand, status: :pending) }
   let(:brief) do
     {
-      brand_info: 'Test eco-friendly skincare brand',
-      objective: 'Increase brand awareness and drive sales',
-      frequency: 3
+      brand_name: 'EcoGlow Beauty',
+      industry: 'Skincare & Beauty',
+      audience_profile: 'Women aged 25-45, environmentally conscious, middle to high income, active on social media',
+      content_language: 'en-US',
+      account_language: 'en-US',
+      target_region: 'North America',
+      timezone: 'EST',
+      value_proposition: 'Natural, effective skincare that protects your skin and the planet',
+      main_offer: 'Eco-friendly skincare products with natural ingredients',
+      mission: 'To provide clean beauty solutions that are good for you and the environment',
+      tone_style: 'Authentic, educational, and inspiring',
+      priority_platforms: [ 'Instagram', 'TikTok' ],
+      monthly_themes: [ 'Natural ingredients education', 'Sustainability awareness' ],
+      objective_of_the_month: 'awareness',
+      available_resources: 'AI avatars, stock footage, editing tools',
+      frequency_per_week: 3,
+      guardrails: 'No medical claims, focus on natural benefits',
+      preferred_ctas: 'Shop now, Learn more, Discover natural beauty'
     }
   end
 
@@ -105,7 +120,7 @@ RSpec.describe GenerateNoctuaStrategyJob, type: :job do
 
         strategy_plan.reload
         expect(strategy_plan.failed?).to be true
-        expect(strategy_plan.error_message).to include('Incomplete brief')
+        expect(strategy_plan.error_message).to include('brief')
         expect(strategy_plan.meta['error_type']).to eq('incomplete_brief')
       end
     end

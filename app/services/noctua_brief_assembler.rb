@@ -41,7 +41,7 @@ class NoctuaBriefAssembler
       # Monthly form fields:
       month: month,
       objective_of_the_month: strategy_form[:primary_objective] || "awareness",
-      objective_details: strategy_form[:objective_of_the_month], # User's specific objective
+      objective_details: strategy_form[:objective_details], # User's specific objective details
       monthly_themes: strategy_form[:monthly_themes] || [],
       frequency_per_week: strategy_form[:frequency_per_week],
       resources_override: strategy_form[:resources_override] || {}

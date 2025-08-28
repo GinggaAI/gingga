@@ -16,7 +16,7 @@ RSpec.describe 'Planning Presenter Integration', type: :request do
   describe 'Strategy plan display via presenter' do
     context 'when user has existing strategy for current month' do
       let!(:strategy_plan) do
-        create(:creas_strategy_plan,
+        plan = create(:creas_strategy_plan,
                user: user,
                brand: brand,
                month: Date.current.strftime("%Y-%-m"),
@@ -35,6 +35,10 @@ RSpec.describe 'Planning Presenter Integration', type: :request do
                    ]
                  }
                ])
+
+        # Create content items using the service (simulating what happens after Noctua completion)
+        Creas::ContentItemInitializerService.new(strategy_plan: plan).call
+        plan
       end
 
       it 'displays the strategy plan via presenter' do
@@ -48,7 +52,7 @@ RSpec.describe 'Planning Presenter Integration', type: :request do
         # Should include plan data via presenter currentPlan JSON
         expect(response.body).to include('"strategy_name":"Test Strategy"')
         expect(response.body).to include('"objective_of_the_month":"Test Objective"')
-        expect(response.body).to include('"Test Content"')
+        expect(response.body).to include('"Test Content (Week 1)"')
 
         # Should not contain null for currentPlan
         expect(response.body).not_to include('window.currentPlan = null;')

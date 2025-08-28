@@ -20,7 +20,8 @@ class CreateStrategyService
       user: @user,
       brief: brief,
       brand: @brand,
-      month: @month
+      month: @month,
+      strategy_form: strategy_form
     ).call
 
     Result.new(success?: true, plan: plan)
@@ -42,6 +43,7 @@ class CreateStrategyService
     {
       primary_objective: @strategy_params[:primary_objective].presence || "awareness",
       objective_of_the_month: @strategy_params[:objective_of_the_month],
+      objective_details: @strategy_params[:objective_details],
       frequency_per_week: parsed_frequency,
       monthly_themes: parsed_themes,
       resources_override: parsed_resources

@@ -36,7 +36,8 @@ RSpec.describe Creas::NoctuaStrategyService do
     }.to_json
   end
 
-  subject { described_class.new(user: user, brief: brief, brand: brand, month: month) }
+  subject { described_class.new(user: user, brief: brief, brand: brand, month: month, strategy_form: strategy_form) }
+  let(:strategy_form) { {} }
 
   describe '#call (async version)' do
     before do
@@ -73,13 +74,51 @@ RSpec.describe Creas::NoctuaStrategyService do
       expect(plan.brand_snapshot["channels"]).to be_an(Array)
     end
 
-    it 'queues a background job for processing' do
-      expect(GenerateNoctuaStrategyJob).to receive(:perform_later).with(
+    it 'queues a batch job for processing' do
+      expect(GenerateNoctuaStrategyBatchJob).to receive(:perform_later).with(
         instance_of(String), # strategy_plan.id
-        brief
+        brief,
+        1,                   # batch_number
+        4,                   # total_batches
+        instance_of(String)  # batch_id
       )
 
       subject.call
+    end
+
+    context 'with strategy_form provided' do
+      let(:strategy_form) do
+        {
+          objective_of_the_month: 'sales',
+          primary_objective: 'awareness',
+          frequency_per_week: 5,
+          monthly_themes: [ 'theme1', 'theme2' ],
+          resources_override: { ai_avatars: true, stock: false }
+        }
+      end
+
+      it 'sets strategy form attributes on the plan' do
+        plan = subject.call
+
+        expect(plan.objective_of_the_month).to eq('sales') # Uses objective_of_the_month first
+        expect(plan.frequency_per_week).to eq(5)
+        expect(plan.monthly_themes).to eq([ 'theme1', 'theme2' ])
+        expect(plan.resources_override).to eq({ 'ai_avatars' => true, 'stock' => false })
+      end
+
+      context 'when objective_of_the_month is nil but primary_objective is present' do
+        let(:strategy_form) do
+          {
+            primary_objective: 'engagement',
+            frequency_per_week: 3
+          }
+        end
+
+        it 'falls back to primary_objective' do
+          plan = subject.call
+          expect(plan.objective_of_the_month).to eq('engagement')
+        end
+      end
     end
   end
 end

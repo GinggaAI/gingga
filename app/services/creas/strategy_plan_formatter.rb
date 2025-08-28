@@ -41,6 +41,22 @@ module Creas
       }
     end
 
+    def for_voxa_batch(content_items)
+      return { error: "Plan not found" } unless @plan
+      return { error: "No content items provided" } if content_items.empty?
+
+      {
+        strategy: {
+          brand_name: @plan.brand_snapshot.dig("name") || @plan.brand&.name || "Unknown",
+          month: @plan.month,
+          objective_of_the_month: @plan.objective_of_the_month,
+          frequency_per_week: @plan.frequency_per_week,
+          post_types: extract_post_types
+        },
+        batch_content: format_content_items_for_voxa_batch(content_items)
+      }
+    end
+
     private
 
     def format_weekly_plan
@@ -145,6 +161,27 @@ module Creas
           pilar: idea["pilar"],
           recommended_template: idea["recommended_template"],
           video_source: idea["video_source"]
+        }
+      end
+    end
+
+    def format_content_items_for_voxa_batch(content_items)
+      content_items.map do |item|
+        {
+          id: item.content_id,
+          origin_id: item.origin_id,
+          content_name: item.content_name || "Unnamed Content",
+          week: item.week,
+          pilar: item.pilar,
+          platform: item.platform,
+          template: item.template,
+          video_source: item.video_source,
+          status: item.status,
+          day_of_the_week: item.day_of_the_week,
+          post_description: item.post_description,
+          text_base: item.text_base,
+          hashtags: item.hashtags,
+          meta: item.meta || {}
         }
       end
     end

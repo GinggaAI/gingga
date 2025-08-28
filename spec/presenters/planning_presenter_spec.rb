@@ -611,4 +611,71 @@ RSpec.describe PlanningPresenter do
       end
     end
   end
+
+  describe '#show_beats_for_content?' do
+    let(:presenter) { described_class.new({}) }
+
+    context 'with valid content piece having beats' do
+      let(:content_piece) do
+        {
+          'beats' => [
+            { 'description' => 'Beat 1' },
+            { 'description' => 'Beat 2' }
+          ],
+          'status' => 'in_production'
+        }
+      end
+
+      it 'returns true when content has beats and is not draft' do
+        expect(presenter.send(:show_beats_for_content?, content_piece)).to be true
+      end
+    end
+
+    context 'with draft status content' do
+      let(:content_piece) do
+        {
+          'beats' => [ { 'description' => 'Beat 1' } ],
+          'status' => 'draft'
+        }
+      end
+
+      it 'returns false for draft status' do
+        expect(presenter.send(:show_beats_for_content?, content_piece)).to be false
+      end
+    end
+
+    context 'with content having no beats' do
+      let(:content_piece) do
+        {
+          'beats' => [],
+          'status' => 'in_production'
+        }
+      end
+
+      it 'returns false when beats array is empty' do
+        expect(presenter.send(:show_beats_for_content?, content_piece)).to be false
+      end
+    end
+
+    context 'with content having nil beats' do
+      let(:content_piece) do
+        {
+          'beats' => nil,
+          'status' => 'in_production'
+        }
+      end
+
+      it 'returns false when beats is nil' do
+        expect(presenter.send(:show_beats_for_content?, content_piece)).to be false
+      end
+    end
+
+    context 'with non-hash content piece' do
+      it 'returns false for non-hash input' do
+        expect(presenter.send(:show_beats_for_content?, 'invalid')).to be false
+        expect(presenter.send(:show_beats_for_content?, nil)).to be false
+        expect(presenter.send(:show_beats_for_content?, [])).to be false
+      end
+    end
+  end
 end

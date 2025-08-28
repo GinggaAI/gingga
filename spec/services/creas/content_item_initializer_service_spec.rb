@@ -108,10 +108,10 @@ RSpec.describe Creas::ContentItemInitializerService do
         expect(first_item).to have_attributes(
           content_id: '202508-gingga-C-w1-i1',
           origin_id: '202508-gingga-C-w1-i1',
-          origin_source: 'content_distribution',
+          origin_source: 'weekly_plan',
           week: 1,
           week_index: 0,
-          content_name: 'Test Content',
+          content_name: 'Test Content (Week 1)',
           status: 'draft',
           content_type: 'reel',
           platform: 'instagram',
@@ -120,7 +120,7 @@ RSpec.describe Creas::ContentItemInitializerService do
           pilar: 'C',
           template: 'solo_avatars',
           video_source: 'kling',
-          post_description: 'Test description',
+          post_description: 'Test description (Week 1 content)',
           timezone: 'Europe/Madrid',
           user: user,
           brand: brand,
@@ -131,7 +131,7 @@ RSpec.describe Creas::ContentItemInitializerService do
         expect(first_item.day_of_the_week).to be_present
         expect(%w[Monday Tuesday Wednesday Thursday Friday Saturday Sunday]).to include(first_item.day_of_the_week)
 
-        expect(first_item.text_base).to eq("Amazing hook\n\nTest description\n\nFollow us!")
+        expect(first_item.text_base).to eq("Amazing hook\n\nTest description\n\nFollow us!\n\n[Week 1 version]")
         expect(first_item.shotplan['beats']).to eq([
           { 'beat_number' => 1, 'description' => 'Beat 1', 'duration' => '3-5s' },
           { 'beat_number' => 2, 'description' => 'Beat 2', 'duration' => '3-5s' }
@@ -177,20 +177,31 @@ RSpec.describe Creas::ContentItemInitializerService do
               {
                 'id' => 'existing-content-id',
                 'title' => 'Updated Content',
-                'platform' => 'Instagram'
+                'platform' => 'Instagram',
+                'pilar' => 'C'
               }
             ]
           }
         }
       end
+      let(:weekly_plan) do
+        [
+          {
+            'ideas' => [
+              { 'id' => 'existing-content-id' }
+            ]
+          }
+        ]
+      end
       let(:strategy_plan) do
-        create(:creas_strategy_plan, user: user, brand: brand, content_distribution: content_distribution)
+        create(:creas_strategy_plan, user: user, brand: brand, content_distribution: content_distribution, weekly_plan: weekly_plan)
       end
 
       before do
         create(:creas_content_item,
                content_id: 'existing-content-id',
                content_name: 'Original Content',
+               status: 'draft',
                user: user,
                brand: brand,
                creas_strategy_plan: strategy_plan)
@@ -200,7 +211,7 @@ RSpec.describe Creas::ContentItemInitializerService do
         expect { service.call }.not_to change { CreasContentItem.count }
 
         item = CreasContentItem.find_by(content_id: 'existing-content-id')
-        expect(item.content_name).to eq('Updated Content')
+        expect(item.content_name).to eq('Updated Content (Week 1)')
       end
     end
 
@@ -209,13 +220,22 @@ RSpec.describe Creas::ContentItemInitializerService do
         {
           'C' => {
             'ideas' => [
-              { 'id' => 'test-id', 'title' => 'Test Content', 'platform' => 'Instagram' }
+              { 'id' => 'test-id', 'title' => 'Test Content', 'platform' => 'Instagram', 'pilar' => 'C' }
             ]
           }
         }
       end
+      let(:weekly_plan) do
+        [
+          {
+            'ideas' => [
+              { 'id' => 'test-id' }
+            ]
+          }
+        ]
+      end
       let(:strategy_plan) do
-        create(:creas_strategy_plan, user: user, brand: brand, content_distribution: content_distribution)
+        create(:creas_strategy_plan, user: user, brand: brand, content_distribution: content_distribution, weekly_plan: weekly_plan)
       end
 
       before do
@@ -501,17 +521,17 @@ RSpec.describe Creas::ContentItemInitializerService do
   context 'edge cases' do
     context 'when brand has no timezone' do
       let(:brand) { create(:brand, user: user, timezone: nil) }
-      let(:content_distribution) do
-        {
-          'C' => {
+      let(:weekly_plan) do
+        [
+          {
             'ideas' => [
-              { 'id' => 'test-id', 'title' => 'Test', 'platform' => 'Instagram' }
+              { 'id' => 'test-id', 'title' => 'Test', 'platform' => 'Instagram', 'pilar' => 'C' }
             ]
           }
-        }
+        ]
       end
       let(:strategy_plan) do
-        create(:creas_strategy_plan, user: user, brand: brand, content_distribution: content_distribution)
+        create(:creas_strategy_plan, user: user, brand: brand, weekly_plan: weekly_plan)
       end
 
       it 'defaults to UTC timezone' do
@@ -522,17 +542,17 @@ RSpec.describe Creas::ContentItemInitializerService do
 
     context 'when brand has no content_language' do
       let(:brand) { create(:brand, user: user, content_language: nil) }
-      let(:content_distribution) do
-        {
-          'C' => {
+      let(:weekly_plan) do
+        [
+          {
             'ideas' => [
-              { 'id' => 'test-id', 'title' => 'Test', 'platform' => 'Instagram' }
+              { 'id' => 'test-id', 'title' => 'Test', 'platform' => 'Instagram', 'pilar' => 'C' }
             ]
           }
-        }
+        ]
       end
       let(:strategy_plan) do
-        create(:creas_strategy_plan, user: user, brand: brand, content_distribution: content_distribution)
+        create(:creas_strategy_plan, user: user, brand: brand, weekly_plan: weekly_plan)
       end
 
       it 'defaults to en language' do
@@ -542,22 +562,22 @@ RSpec.describe Creas::ContentItemInitializerService do
     end
 
     context 'when idea has missing title' do
-      let(:content_distribution) do
-        {
-          'C' => {
+      let(:weekly_plan) do
+        [
+          {
             'ideas' => [
-              { 'id' => 'test-id', 'platform' => 'Instagram' }
+              { 'id' => 'test-id', 'platform' => 'Instagram', 'pilar' => 'C' }
             ]
           }
-        }
+        ]
       end
       let(:strategy_plan) do
-        create(:creas_strategy_plan, user: user, brand: brand, content_distribution: content_distribution)
+        create(:creas_strategy_plan, user: user, brand: brand, weekly_plan: weekly_plan)
       end
 
       it 'generates default content name' do
         items = service.call
-        expect(items.first.content_name).to eq('Content test-id')
+        expect(items.first.content_name).to eq('Content test-id (Week 1)')
       end
     end
   end

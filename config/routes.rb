@@ -11,6 +11,7 @@ Rails.application.routes.draw do
       member do
         get :strategy_for_month
         post :voxa_refine
+        post :voxa_refine_week
       end
     end
     get "/smart-planning", to: "plannings#smart_planning", as: "smart_planning"

@@ -14,7 +14,7 @@ class GenerateNoctuaStrategyJob < ApplicationJob
 
       json = GinggaOpenAI::ChatClient.new(
         user: strategy_plan.user,
-        model: "gpt-4o",
+        model: Rails.application.config.openai_model,
         temperature: 0.4
       ).chat!(system: system_prompt, user: user_prompt)
 
@@ -22,7 +22,7 @@ class GenerateNoctuaStrategyJob < ApplicationJob
       AiResponse.create!(
         user: strategy_plan.user,
         service_name: "noctua",
-        ai_model: "gpt-4o",
+        ai_model: Rails.application.config.openai_model,
         prompt_version: "noctua-v1",
         raw_request: {
           system: system_prompt,
@@ -39,7 +39,10 @@ class GenerateNoctuaStrategyJob < ApplicationJob
       parsed = JSON.parse(json)
 
       # Check if the response contains an error indicating incomplete brief
-      if parsed.is_a?(Hash) && parsed["error"]&.include?("Incomplete brief")
+      if parsed.is_a?(Hash) && parsed["error"] &&
+         (parsed["error"].include?("Incomplete brief") ||
+          parsed["error"].include?("Missing critical") ||
+          parsed["error"].include?("brief"))
         handle_incomplete_brief_error(strategy_plan, parsed["error"])
         return
       end
@@ -56,11 +59,11 @@ class GenerateNoctuaStrategyJob < ApplicationJob
         monthly_themes: parsed["monthly_themes"] || [],
         resources_override: parsed["resources_override"] || {},
         content_distribution: parsed["content_distribution"] || {},
-        weekly_plan: parsed["weekly_plan"] || [],
+        weekly_plan: validated_payload["weekly_plan"] || [],
         remix_duet_plan: parsed["remix_duet_plan"] || {},
         publish_windows_local: parsed["publish_windows_local"] || {},
         raw_payload: parsed,
-        meta: { model: "gpt-4o", prompt_version: "noctua-v1" }
+        meta: { model: Rails.application.config.openai_model, prompt_version: "noctua-v1" }
       )
 
       # Broadcast completion via Turbo Stream

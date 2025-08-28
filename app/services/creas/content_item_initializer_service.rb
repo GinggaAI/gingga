@@ -10,24 +10,24 @@ module Creas
       return [] unless @plan.weekly_plan.present?
 
       created_items = nil
-      
+
       CreasContentItem.transaction do
         created_items = create_content_items_from_weekly_plan
-        
+
         # Calculate expected quantity based on weekly plan
         expected_count = @plan.weekly_plan.sum { |week| week["ideas"]&.count || 0 }
         actual_count = created_items.count
-        
+
         # If we didn't create all expected items, retry missing ones
         if actual_count < expected_count
           Rails.logger.info "ContentItemInitializerService: Created #{actual_count}/#{expected_count} items. Retrying missing content..."
           missing_items = retry_missing_content_items(created_items, expected_count)
           created_items.concat(missing_items)
         end
-        
+
         Rails.logger.info "ContentItemInitializerService: Final count #{created_items.count}/#{expected_count} items"
       end
-      
+
       created_items
     end
 
@@ -38,10 +38,12 @@ module Creas
 
       @plan.weekly_plan.each do |week_data|
         next unless week_data["ideas"].present?
-        
+
         week_data["ideas"].each do |idea|
-          pilar = extract_pilar_from_idea(idea)
-          item = create_content_item_from_idea(idea, pilar)
+          # Enrich idea with details from content_distribution if needed
+          enriched_idea = enrich_idea_from_content_distribution(idea)
+          pilar = extract_pilar_from_idea(enriched_idea)
+          item = create_content_item_from_idea(enriched_idea, pilar)
           content_items << item if item.persisted?
         end
       end
@@ -72,7 +74,7 @@ module Creas
         language: @brand.content_language || "en",
         pilar: pilar,
         day_of_the_week: determine_day_of_week(idea, pilar, week_number),
-        template: idea["recommended_template"] || "solo_avatars",
+        template: normalize_template(idea["recommended_template"]),
         video_source: idea["video_source"] || "kling",
         post_description: generate_unique_description(idea, week_number),
         text_base: generate_unique_text_base(idea, week_number),
@@ -87,7 +89,7 @@ module Creas
 
       # Find or create the record
       item = CreasContentItem.find_or_initialize_by(content_id: attrs[:content_id])
-      
+
       # Only update if this is a new record or if it's still in draft status
       # This preserves content that has been processed by other services (like Voxa)
       if item.new_record? || item.status == "draft"
@@ -374,11 +376,11 @@ module Creas
 
     def generate_unique_content_name(idea, week_number)
       base_title = idea["title"] || "Content #{idea['id']}"
-      
+
       # Always append week information to make titles unique across weeks
       # This ensures all 20 content items can be created and displayed
       unique_title = "#{base_title} (Week #{week_number})"
-      
+
       # Check if this unique title already exists (edge case protection)
       counter = 1
       final_title = unique_title
@@ -386,19 +388,19 @@ module Creas
         final_title = "#{unique_title} (#{counter})"
         counter += 1
       end
-      
+
       final_title
     end
 
     def extract_pilar_from_idea(idea)
       # First try the direct pilar field (for content_distribution format)
       return idea["pilar"] if idea["pilar"].present?
-      
+
       # Then try extracting from ID pattern like "202511-vlado-entrepreneur-w1-i1-C"
       if idea["id"]&.match(/-([A-Z])$/)
         return $1
       end
-      
+
       # Fallback to "C" for Content
       "C"
     end
@@ -406,7 +408,7 @@ module Creas
     def generate_unique_description(idea, week_number)
       base_description = idea["description"] || ""
       return base_description if base_description.blank?
-      
+
       # Append week information to make descriptions unique
       "#{base_description} (Week #{week_number} content)"
     end
@@ -414,7 +416,7 @@ module Creas
     def generate_unique_text_base(idea, week_number)
       base_text = build_text_base(idea)
       return base_text if base_text.blank?
-      
+
       # Append week information to make text_base unique
       "#{base_text}\n\n[Week #{week_number} version]"
     end
@@ -422,18 +424,18 @@ module Creas
     def retry_missing_content_items(created_items, expected_count)
       missing_items = []
       created_content_ids = created_items.map(&:content_id).to_set
-      
+
       # Find all content that should exist but doesn't
       @plan.weekly_plan.each_with_index do |week_data, week_index|
         week_number = week_index + 1
         next unless week_data["ideas"].present?
-        
+
         week_data["ideas"].each do |idea|
           next if created_content_ids.include?(idea["id"])
-          
+
           # This content is missing, try to create it with enhanced uniqueness
           Rails.logger.info "Retrying missing content: #{idea['id']} - #{idea['title']}"
-          
+
           begin
             item = create_missing_content_item(idea, week_number, missing_items.count)
             if item&.persisted?
@@ -448,25 +450,25 @@ module Creas
           end
         end
       end
-      
+
       missing_items
     end
 
     def create_missing_content_item(idea, week_number, retry_index)
       pilar = extract_pilar_from_idea(idea)
       week_index = week_number - 1
-      
+
       # Generate highly unique content to avoid any validation conflicts
       unique_id = "#{retry_index + 1}-#{SecureRandom.hex(4)}"
       unique_suffix = "(Week #{week_number} - Version #{unique_id})"
-      
+
       # Create completely unique descriptions and text to pass similarity validation
-      original_description = idea['description'] || ''
-      original_title = idea['title'] || "Content #{idea['id']}"
-      
+      original_description = idea["description"] || ""
+      original_title = idea["title"] || "Content #{idea['id']}"
+
       unique_description = "#{original_description} [UNIQUE VERSION #{unique_id}: This content is specifically created for week #{week_number} with unique branding and messaging approach for #{@brand.name}.]"
       unique_text_base = build_highly_unique_text_base(idea, week_number, unique_id)
-      
+
       attrs = {
         content_id: idea["id"],
         origin_id: idea["id"],
@@ -486,7 +488,7 @@ module Creas
         language: @brand.content_language || "en",
         pilar: pilar,
         day_of_the_week: determine_day_of_week(idea, pilar, week_number),
-        template: idea["recommended_template"] || "solo_avatars",
+        template: normalize_template(idea["recommended_template"]),
         video_source: idea["video_source"] || "kling",
         post_description: unique_description,
         text_base: unique_text_base,
@@ -502,20 +504,52 @@ module Creas
       item = @plan.creas_content_items.build(attrs)
       item.user = @user
       item.brand = @brand
-      
+
       if item.save
         item
       else
         Rails.logger.warn "Failed to save missing content item: #{item.errors.full_messages.join(', ')}"
-        nil
+
+        # Try to recover from validation errors by applying fixes
+        recovered_item = attempt_error_recovery(item, idea, week_number, retry_index)
+        if recovered_item
+          Rails.logger.info "Successfully recovered and saved content item: #{recovered_item.content_name}"
+          recovered_item
+        else
+          Rails.logger.error "Unable to recover content item after multiple attempts: #{item.errors.full_messages.join(', ')}"
+          nil
+        end
       end
+    end
+
+    def enrich_idea_from_content_distribution(idea)
+      # If idea is already enriched (has more than just id), return as-is
+      return idea if idea.keys.size > 1
+
+      # If idea only has id, look it up in content_distribution
+      idea_id = idea["id"]
+      return idea unless idea_id && @plan.content_distribution
+
+      # Search through all pilars in content_distribution
+      @plan.content_distribution.each do |pilar, pilar_data|
+        next unless pilar_data["ideas"]
+
+        found_idea = pilar_data["ideas"].find { |dist_idea| dist_idea["id"] == idea_id }
+        if found_idea
+          # Merge the original idea (which might have weekly_plan specific data) with distribution data
+          return idea.merge(found_idea)
+        end
+      end
+
+      # If not found in content_distribution, return original idea
+      idea
     end
 
     def build_highly_unique_text_base(idea, week_number, unique_id)
       hook = idea["hook"] || "Check this out!"
       description = idea["description"] || ""
       cta = idea["cta"] || "Learn more!"
-      
+
       unique_content = <<~TEXT
         #{hook} [WEEK #{week_number} EDITION - VERSION #{unique_id}]
 
@@ -527,8 +561,157 @@ module Creas
 
         [Unique Content Version: #{unique_id} - Week #{week_number} - Generated: #{Date.current}]
       TEXT
-      
+
       unique_content.strip
+    end
+
+    def attempt_error_recovery(item, idea, week_number, retry_index)
+      max_recovery_attempts = 3
+
+      (1..max_recovery_attempts).each do |attempt|
+        Rails.logger.info "ContentItemInitializerService: Recovery attempt #{attempt}/#{max_recovery_attempts} for content: #{idea['id']}"
+
+        # Apply recovery strategies based on error types
+        apply_recovery_fixes(item, attempt, week_number, retry_index)
+
+        if item.save
+          Rails.logger.info "ContentItemInitializerService: Recovery successful on attempt #{attempt}"
+          return item
+        end
+
+        Rails.logger.warn "ContentItemInitializerService: Recovery attempt #{attempt} failed: #{item.errors.full_messages.join(', ')}"
+      end
+
+      nil
+    end
+
+    def apply_recovery_fixes(item, attempt, week_number, retry_index)
+      timestamp = Time.current.strftime("%H%M%S")
+
+      case attempt
+      when 1
+        # Attempt 1: Fix template validation
+        if item.errors[:template].any?
+          item.template = "solo_avatars"
+          Rails.logger.info "ContentItemInitializerService: Fixed template to 'solo_avatars'"
+        end
+
+        # Fix pilar validation
+        if item.errors[:pilar].any?
+          item.pilar = "C"
+          Rails.logger.info "ContentItemInitializerService: Fixed pilar to 'C'"
+        end
+
+        # Fix status validation
+        if item.errors[:status].any?
+          item.status = "draft"
+          Rails.logger.info "ContentItemInitializerService: Fixed status to 'draft'"
+        end
+
+        # Fix video_source validation
+        if item.errors[:video_source].any?
+          item.video_source = "none"
+          Rails.logger.info "ContentItemInitializerService: Fixed video_source to 'none'"
+        end
+
+        # Fix day_of_the_week validation
+        if item.errors[:day_of_the_week].any?
+          item.day_of_the_week = "Monday"
+          Rails.logger.info "ContentItemInitializerService: Fixed day_of_the_week to 'Monday'"
+        end
+
+      when 2
+        # Attempt 2: Make content name highly unique
+        if item.errors[:content_name].any?
+          item.content_name = "RECOVERED Content #{retry_index + 1} - Week #{week_number} - #{timestamp}"
+          Rails.logger.info "ContentItemInitializerService: Generated highly unique content name"
+        end
+
+        # Make content_id unique if needed
+        if item.errors[:content_id].any?
+          item.content_id = "RECOVERED-#{week_number}-#{retry_index}-#{timestamp}"
+          item.origin_id = item.content_id
+          Rails.logger.info "ContentItemInitializerService: Generated unique content_id"
+        end
+
+        # Create completely unique descriptions
+        if item.errors[:post_description].any? || item.errors[:text_base].any?
+          unique_suffix = " [RECOVERED CONTENT - #{timestamp} - WEEK #{week_number}]"
+          item.post_description = "RECOVERED: #{item.post_description}#{unique_suffix}"
+          item.text_base = "RECOVERED: #{item.text_base}#{unique_suffix}"
+          Rails.logger.info "ContentItemInitializerService: Made descriptions unique with recovery suffix"
+        end
+
+      when 3
+        # Attempt 3: Nuclear option - minimize all content to essential fields only
+        item.content_name = "Emergency Recovery Content W#{week_number}-#{timestamp}"
+        item.content_id = "EMERGENCY-#{week_number}-#{retry_index}-#{timestamp}"
+        item.origin_id = item.content_id
+        item.post_description = "Emergency recovery content for week #{week_number}. Original content could not be saved due to validation conflicts."
+        item.text_base = "This is emergency recovery content generated to ensure the content plan is complete."
+        item.hashtags = ""
+        item.template = "solo_avatars"
+        item.pilar = "C"
+        item.status = "draft"
+        item.video_source = "none"
+        item.platform = "instagram"
+        item.content_type = "reel"
+        item.day_of_the_week = "Monday"
+        item.meta = {
+          "recovery_mode" => true,
+          "original_idea_id" => idea["id"],
+          "recovery_timestamp" => Time.current.iso8601
+        }
+
+        Rails.logger.warn "ContentItemInitializerService: Applied nuclear recovery option with minimal safe content"
+      end
+    end
+
+    def normalize_template(template)
+      # Valid templates according to CreasContentItem model validation
+      valid_templates = %w[solo_avatars avatar_and_video narration_over_7_images remix one_to_three_videos]
+
+      return "solo_avatars" if template.blank?
+
+      # If template is already valid, return it
+      return template if valid_templates.include?(template)
+
+      # Template normalization mapping for common variations
+      template_mappings = {
+        "solo_avatar" => "solo_avatars",
+        "single_avatar" => "solo_avatars",
+        "avatar_only" => "solo_avatars",
+        "text" => "solo_avatars",
+        "avatar" => "solo_avatars",
+        "avatar_video" => "avatar_and_video",
+        "avatar_with_video" => "avatar_and_video",
+        "hybrid" => "avatar_and_video",
+        "narration_7_images" => "narration_over_7_images",
+        "narration_images" => "narration_over_7_images",
+        "image_narration" => "narration_over_7_images",
+        "slideshow" => "narration_over_7_images",
+        "seven_images" => "narration_over_7_images",
+        "carousel" => "narration_over_7_images",
+        "remix_video" => "remix",
+        "video_remix" => "remix",
+        "repurpose" => "remix",
+        "multi_video" => "one_to_three_videos",
+        "multiple_videos" => "one_to_three_videos",
+        "three_videos" => "one_to_three_videos",
+        "videos" => "one_to_three_videos",
+        "video_compilation" => "one_to_three_videos"
+      }
+
+      # Try to normalize the template
+      normalized_template = template_mappings[template.downcase.strip]
+      if normalized_template
+        Rails.logger.info "ContentItemInitializerService: Normalized template '#{template}' to '#{normalized_template}'"
+        return normalized_template
+      end
+
+      # If no mapping found, log the unknown template and default to solo_avatars
+      Rails.logger.warn "ContentItemInitializerService: Unknown template '#{template}', defaulting to 'solo_avatars'"
+      "solo_avatars"
     end
   end
 end

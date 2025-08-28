@@ -93,7 +93,7 @@ RSpec.describe Creas::VoxaContentService, type: :service do
       "items" => [
         {
           "id" => "20250819-w1-i1",
-          "origin_id" => "202508-testbrand-C-w1-i1",
+          "origin_id" => "202508-testbrand-w1-i1-C",
           "origin_source" => "weekly_plan",
           "week" => 1,
           "week_index" => 1,
@@ -153,178 +153,65 @@ RSpec.describe Creas::VoxaContentService, type: :service do
       allow(mock_chat_client).to receive(:chat!).and_return(sample_voxa_response.to_json)
     end
 
-    it "updates existing content items successfully" do
-      # First create initial draft content items using ContentItemInitializerService
-      initial_items = Creas::ContentItemInitializerService.new(strategy_plan: strategy_plan).call
-      expect(initial_items.length).to eq(2)
+    it "queues batch job and sets strategy plan status to pending" do
+      initial_status = strategy_plan.status
 
-      initial_item = initial_items.first
-      expect(initial_item.content_id).to eq("202508-testbrand-C-w1-i1")
-      expect(initial_item.status).to eq("draft")
+      # Mock the batch job to track that it's enqueued
+      expect(GenerateVoxaContentBatchJob).to receive(:perform_later)
 
-      # Now test that VoxaContentService updates the existing item
+      result = service.call
+
+      # Should return the strategy plan
+      expect(result).to eq(strategy_plan)
+      expect(result.status).to eq("pending")
+
+      # Should not process content synchronously anymore
+      expect(strategy_plan.creas_content_items.where(status: "in_production").count).to eq(0)
+    end
+
+    it "sets strategy plan to pending status" do
+      # Set initial status to something other than pending
+      strategy_plan.update!(status: "completed")
+      expect(strategy_plan.status).not_to eq("pending")
+
+      # Mock the batch job to prevent actual execution
+      expect(GenerateVoxaContentBatchJob).to receive(:perform_later)
+
+      service.call
+      strategy_plan.reload
+
+      expect(strategy_plan.status).to eq("pending")
+    end
+
+    it "queues GenerateVoxaContentBatchJob with correct parameters" do
+      expect(GenerateVoxaContentBatchJob).to receive(:perform_later)
+
+      service.call
+    end
+
+    it "does not process content synchronously" do
+      # Mock the batch job to prevent actual execution
+      expect(GenerateVoxaContentBatchJob).to receive(:perform_later)
+
       expect { service.call }.not_to change(CreasContentItem, :count)
-
-      updated_item = CreasContentItem.find_by(content_id: "202508-testbrand-C-w1-i1")
-      expect(updated_item.content_id).to eq("202508-testbrand-C-w1-i1") # Preserved
-      expect(updated_item.origin_id).to eq("202508-testbrand-C-w1-i1") # Preserved
-      expect(updated_item.content_name).to eq("Test Content Item 1") # Updated by Voxa
-      expect(updated_item.status).to eq("in_production") # Updated by Voxa
-      expect(updated_item.pilar).to eq("C")
-      expect(updated_item.template).to eq("solo_avatars")
-      expect(updated_item.user).to eq(user)
-      expect(updated_item.brand).to eq(brand)
-      expect(updated_item.creas_strategy_plan).to eq(strategy_plan)
-
-      # Verify day_of_the_week is extracted and assigned
-      expect(updated_item.day_of_the_week).to be_present
-      expect(%w[Monday Tuesday Wednesday Thursday Friday Saturday Sunday]).to include(updated_item.day_of_the_week)
     end
 
-    it "calls OpenAI with correct parameters" do
-      expect(GinggaOpenAI::ChatClient).to receive(:new).with(
-        user: user,
-        model: "gpt-4o-mini",
-        temperature: 0.5
-      ).and_return(mock_chat_client)
+    context "error handling" do
+      it "queues batch job successfully even when OpenAI would fail" do
+        # Service no longer does OpenAI calls directly - errors handled in job
+        expect(GenerateVoxaContentBatchJob).to receive(:perform_later)
 
-      expect(mock_chat_client).to receive(:chat!).with(
-        system: kind_of(String),
-        user: kind_of(String)
-      ).and_return(sample_voxa_response.to_json)
-
-      service.call
-    end
-
-    it "handles idempotency - doesn't create duplicates on second run" do
-      # First create initial draft content items
-      Creas::ContentItemInitializerService.new(strategy_plan: strategy_plan).call
-
-      # Run Voxa service first time
-      service.call
-      initial_count = CreasContentItem.count
-
-      # Run again with same data
-      allow(mock_chat_client).to receive(:chat!).and_return(sample_voxa_response.to_json)
-      service.call
-
-      expect(CreasContentItem.count).to eq(initial_count)
-      expect(CreasContentItem.where(content_id: "202508-testbrand-C-w1-i1").count).to eq(1)
-    end
-
-    it "updates existing items on second run" do
-      service.call
-      original_item = CreasContentItem.last
-      original_updated_at = original_item.updated_at
-
-      # Modify the response for second run
-      modified_response = sample_voxa_response.deep_dup
-      modified_response["items"][0]["content_name"] = "Updated Content Name"
-
-      allow(mock_chat_client).to receive(:chat!).and_return(modified_response.to_json)
-
-      travel_to(1.minute.from_now) do
-        service.call
+        expect { service.call }.not_to raise_error
+        expect(strategy_plan.reload.status).to eq("pending")
       end
 
-      updated_item = CreasContentItem.find(original_item.id)
-      expect(updated_item.content_name).to eq("Updated Content Name")
-      expect(updated_item.updated_at).to be > original_updated_at
-    end
+      it "raises error when strategy is already processing" do
+        # Set strategy to processing status
+        strategy_plan.update!(status: :processing)
 
-    context "when OpenAI returns non-JSON" do
-      before do
-        allow(mock_chat_client).to receive(:chat!).and_return("This is not JSON")
+        expect { service.call }.to raise_error(StandardError, /already in progress/)
+        expect(strategy_plan.reload.status).to eq("processing") # Status unchanged
       end
-
-      it "raises an error" do
-        expect { service.call }.to raise_error("Voxa returned non-JSON content")
-      end
-
-      it "doesn't create any content items" do
-        expect { service.call rescue nil }.not_to change(CreasContentItem, :count)
-      end
-    end
-
-    context "when Voxa response is missing items key" do
-      before do
-        allow(mock_chat_client).to receive(:chat!).and_return('{"no_items": []}')
-      end
-
-      it "raises a descriptive error" do
-        expect { service.call }.to raise_error("Voxa response missing expected key: key not found: \"items\"")
-      end
-    end
-
-    context "when individual item has invalid data" do
-      let(:invalid_response) do
-        invalid_item = sample_voxa_response["items"][0].except("id")
-        { "items" => [ invalid_item ] }
-      end
-
-      before do
-        allow(mock_chat_client).to receive(:chat!).and_return(invalid_response.to_json)
-      end
-
-      it "raises an error during persistence" do
-        expect { service.call }.to raise_error(/missing expected key|key not found/)
-      end
-
-      it "doesn't create partial records due to transaction" do
-        expect { service.call rescue nil }.not_to change(CreasContentItem, :count)
-      end
-    end
-  end
-
-  describe "#build_brand_context" do
-    let(:brand_with_full_data) do
-      brand = create(:brand,
-        user: user,
-        industry: "Technology",
-        value_proposition: "Making tech accessible",
-        mission: "Democratize technology",
-        voice: "friendly",
-        content_language: "en-US",
-        banned_words_list: "inappropriate",
-        guardrails: {}
-      )
-      create(:brand_channel, brand: brand, platform: :instagram, handle: "@test_insta")
-      create(:brand_channel, brand: brand, platform: :tiktok, handle: "@test_tiktok")
-      brand
-    end
-
-    it "builds correct brand context structure" do
-      service_with_full_brand = described_class.new(strategy_plan: strategy_plan)
-      service_with_full_brand.instance_variable_set(:@brand, brand_with_full_data)
-
-      context = service_with_full_brand.send(:build_brand_context, brand_with_full_data)
-
-      expected_context = {
-        "brand" => {
-          "industry" => "Technology",
-          "value_proposition" => "Making tech accessible",
-          "mission" => "Democratize technology",
-          "voice" => "friendly",
-          "priority_platforms" => [ "Instagram", "TikTok" ],
-          "languages" => {
-            "content_language" => "en-US",
-            "account_language" => "en-US"
-          },
-          "guardrails" => brand_with_full_data.guardrails
-        }
-      }
-
-      expect(context).to eq(expected_context)
-    end
-
-    it "handles empty guardrails" do
-      brand_with_empty_guardrails = create(:brand, user: user, guardrails: {})
-      service_with_empty_guardrails = described_class.new(strategy_plan: strategy_plan)
-      service_with_empty_guardrails.instance_variable_set(:@brand, brand_with_empty_guardrails)
-
-      context = service_with_empty_guardrails.send(:build_brand_context, brand_with_empty_guardrails)
-
-      expect(context.dig("brand", "guardrails")).to eq(brand_with_empty_guardrails.guardrails)
     end
   end
 end

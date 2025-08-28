@@ -12,7 +12,7 @@ class CreasContentItem < ApplicationRecord
   validates :publish_date, presence: true, unless: -> { status == "draft" }
 
   validates :status, inclusion: {
-    in: %w[draft in_production ready_for_review approved],
+    in: %w[draft in_progress in_production ready_for_review approved],
     message: "%{value} is not a valid status"
   }
 

@@ -33,14 +33,14 @@
 
           .grid.grid-cols-1.md:grid-cols-2.gap-4.mb-4
             .col-span-1
-              = form.label "strategy_form[primary_objective]", "Primary Objective", class: "block text-sm font-medium mb-1 text-gray-700"
+              = form.label "strategy_form[objective_of_the_month]", t('planning.strategy_form.objective_label'), class: "block text-sm font-medium mb-1 text-gray-700"
               - options = options_for_select([['Awareness - Build brand recognition', 'awareness'], ['Engagement - Foster community interaction', 'engagement'], ['Sales - Drive conversions and revenue', 'sales'], ['Community - Strengthen customer relationships', 'community']], 'awareness')
-              = form.select "strategy_form[primary_objective]", options, {}, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              = form.select "strategy_form[objective_of_the_month]", options, {}, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
 
             .col-span-1
-              = form.label "strategy_form[objective_of_the_month]", "Specific Objective Details",
+              = form.label "strategy_form[objective_details]", "Specific Objective Details",
                            class: "block text-sm font-medium mb-1 text-gray-700"
-              = form.text_area "strategy_form[objective_of_the_month]",
+              = form.text_area "strategy_form[objective_details]",
                                placeholder: "e.g., Launch new product line with 25% increase in brand mentions",
                                rows: 3, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               %p.text-xs.text-gray-500.mt-1 Optional: Add specific details about your objective
@@ -195,6 +195,8 @@
             .flex.items-center.justify-between.p-4.border-b
               %h3.font-semibold.text-gray-900= "#{t('planning.weeks.week')} #{week_number}"
               .flex.items-center.gap-2
+                %button.voxa-refine-week.inline-flex.items-center.justify-center.gap-1.whitespace-nowrap.text-xs.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.bg-primary.h-8.px-3.bg-gradient-to-r.text-white.rounded-lg{class: "[&_svg]:pointer-events-none [&_svg]:size-3 [&_svg]:shrink-0 hover:bg-primary/90 from-[#A37FFF] to-[#3AC8FF] hover:from-[#3AC8FF] hover:to-[#A37FFF]", "data-week": week_number, style: "display: none;"}
+                  %span.text-xs= "Refine Week #{week_number}"
                 %span.text-sm= t('planning.weeks.goal_label')
                 %select.p-1.border.rounded.text-sm
                   %option= t('planning.weeks.goals.awareness')
@@ -293,6 +295,12 @@
     if (voxaBtn) {
       voxaBtn.addEventListener('click', handleVoxaRefine);
     }
+
+    // Week-specific Voxa refine buttons
+    const weekRefineButtons = document.querySelectorAll('.voxa-refine-week');
+    weekRefineButtons.forEach(button => {
+      button.addEventListener('click', handleVoxaRefineWeek);
+    });
 
     // Resources Override form handling
     setupResourcesOverrideHandlers();
@@ -1230,13 +1238,19 @@
 
   function updateVoxaButton() {
     const voxaBtn = document.getElementById('voxa-refine');
+    const weekRefineButtons = document.querySelectorAll('.voxa-refine-week');
+    
+    const shouldShow = window.currentPlan && window.currentPlan.id;
+    
+    // Update main Voxa button
     if (voxaBtn) {
-      if (window.currentPlan && window.currentPlan.id) {
-        voxaBtn.style.display = 'inline-block';
-      } else {
-        voxaBtn.style.display = 'none';
-      }
+      voxaBtn.style.display = shouldShow ? 'inline-block' : 'none';
     }
+    
+    // Update week-specific Voxa buttons
+    weekRefineButtons.forEach(button => {
+      button.style.display = shouldShow ? 'inline-flex' : 'none';
+    });
   }
 
   function handleVoxaRefine(e) {
@@ -1277,6 +1291,64 @@
     planIdInput.name = 'plan_id';
     planIdInput.value = window.currentPlan.id;
     form.appendChild(planIdInput);
+
+    // Submit form
+    document.body.appendChild(form);
+    form.submit();
+  }
+
+  function handleVoxaRefineWeek(e) {
+    e.preventDefault();
+
+    if (!window.currentPlan || !window.currentPlan.id) {
+      showError('#{t('planning.messages.no_strategy_to_refine')}');
+      return;
+    }
+
+    const weekNumber = e.target.closest('button').getAttribute('data-week');
+    
+    if (!weekNumber) {
+      showError('Invalid week number');
+      return;
+    }
+
+    const button = e.target.closest('button');
+    const originalText = button.textContent;
+
+    // Show loading state
+    button.disabled = true;
+    button.textContent = `Refining Week ${weekNumber}...`;
+
+    hideMessages();
+
+    // Create form and submit
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/planning/voxa_refine_week';
+
+    // Add CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (csrfToken) {
+      const csrfInput = document.createElement('input');
+      csrfInput.type = 'hidden';
+      csrfInput.name = 'authenticity_token';
+      csrfInput.value = csrfToken.getAttribute('content');
+      form.appendChild(csrfInput);
+    }
+
+    // Add plan_id
+    const planIdInput = document.createElement('input');
+    planIdInput.type = 'hidden';
+    planIdInput.name = 'plan_id';
+    planIdInput.value = window.currentPlan.id;
+    form.appendChild(planIdInput);
+
+    // Add week_number
+    const weekInput = document.createElement('input');
+    weekInput.type = 'hidden';
+    weekInput.name = 'week_number';
+    weekInput.value = weekNumber;
+    form.appendChild(weekInput);
 
     // Submit form
     document.body.appendChild(form);
