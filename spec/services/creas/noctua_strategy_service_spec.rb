@@ -73,10 +73,13 @@ RSpec.describe Creas::NoctuaStrategyService do
       expect(plan.brand_snapshot["channels"]).to be_an(Array)
     end
 
-    it 'queues a background job for processing' do
-      expect(GenerateNoctuaStrategyJob).to receive(:perform_later).with(
+    it 'queues a batch job for processing' do
+      expect(GenerateNoctuaStrategyBatchJob).to receive(:perform_later).with(
         instance_of(String), # strategy_plan.id
-        brief
+        brief,
+        1,                   # batch_number
+        4,                   # total_batches
+        instance_of(String)  # batch_id
       )
 
       subject.call

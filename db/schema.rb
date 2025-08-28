@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_26_210623) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_28_113515) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -26,6 +26,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_26_210623) do
     t.jsonb "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "batch_number"
+    t.integer "total_batches"
+    t.string "batch_id"
     t.index ["ai_model"], name: "index_ai_responses_on_ai_model"
     t.index ["created_at"], name: "index_ai_responses_on_created_at"
     t.index ["prompt_version"], name: "index_ai_responses_on_prompt_version"
@@ -124,6 +127,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_26_210623) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "day_of_the_week", comment: "Suggested day of the week for publishing (Monday, Tuesday, etc.)"
+    t.integer "batch_number"
+    t.integer "batch_total"
     t.index ["brand_id"], name: "index_creas_content_items_on_brand_id"
     t.index ["content_id"], name: "index_creas_content_items_on_content_id", unique: true
     t.index ["creas_strategy_plan_id", "origin_id"], name: "index_creas_content_items_on_strategy_plan_and_origin_id"

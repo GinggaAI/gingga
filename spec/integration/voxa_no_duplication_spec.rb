@@ -20,7 +20,14 @@ RSpec.describe 'Voxa Content Refinement - No Duplication', type: :integration do
                  }
                ]
              }
-           })
+           },
+           weekly_plan: [
+             {
+               "ideas" => [
+                 { "id" => "202508-testbrand-w1-i1-C" }
+               ]
+             }
+           ])
   end
 
   let(:sample_voxa_response) do
@@ -60,7 +67,7 @@ RSpec.describe 'Voxa Content Refinement - No Duplication', type: :integration do
     original_item = content_items.first
     expect(original_item.content_id).to eq("202508-testbrand-w1-i1-C")
     expect(original_item.status).to eq("draft")
-    expect(original_item.content_name).to eq("Original Content")
+    expect(original_item.content_name).to eq("Original Content (Week 1)")
 
     # Step 2: Mock OpenAI to return refined content
     mock_chat_client = instance_double(GinggaOpenAI::ChatClient)
@@ -86,6 +93,15 @@ RSpec.describe 'Voxa Content Refinement - No Duplication', type: :integration do
   end
 
   it 'creates new items when no existing match is found' do
+    # First create initial draft content so ContentItemInitializerService doesn't create new ones
+    create(:creas_content_item,
+           creas_strategy_plan: strategy_plan,
+           user: user,
+           brand: brand,
+           content_id: "202508-testbrand-w1-i1-C",
+           content_name: "Initial Content",
+           status: "draft")
+
     # Mock OpenAI to return content with no origin_id match
     different_voxa_response = {
       "items" => [ {
@@ -115,7 +131,8 @@ RSpec.describe 'Voxa Content Refinement - No Duplication', type: :integration do
       Creas::VoxaContentService.new(strategy_plan: strategy_plan).call
     }.to change(CreasContentItem, :count).by(1)
 
-    new_item = CreasContentItem.last
+    new_item = CreasContentItem.find_by(content_id: "voxa-new-item")
+    expect(new_item).to be_present
     expect(new_item.content_id).to eq("voxa-new-item")
     expect(new_item.origin_id).to eq("nonexistent-origin-id")
     expect(new_item.content_name).to eq("New Content")

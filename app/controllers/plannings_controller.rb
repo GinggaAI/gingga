@@ -6,23 +6,6 @@ class PlanningsController < ApplicationController
 
   # GET /plannings
   def show
-    # Initialize content items from weekly_plan if strategy exists but no content items
-    if @current_strategy&.weekly_plan.present? && @current_strategy.creas_content_items.empty?
-      service = Creas::ContentItemInitializerService.new(strategy_plan: @current_strategy)
-      created_items = service.call
-      @current_strategy.reload
-      
-      # Validate quantity guarantee
-      expected_count = @current_strategy.weekly_plan.sum { |week| week["ideas"]&.count || 0 }
-      actual_count = @current_strategy.creas_content_items.count
-      
-      if actual_count < expected_count
-        Rails.logger.warn "PlanningsController: Expected #{expected_count} content items but only #{actual_count} were created"
-      else
-        Rails.logger.info "PlanningsController: Successfully created #{actual_count}/#{expected_count} content items"
-      end
-    end
-
     @presenter = build_presenter
     @plans = build_weekly_plans
   end
@@ -49,15 +32,26 @@ class PlanningsController < ApplicationController
     strategy = find_strategy_by_id_or_current
 
     unless strategy
+      Rails.logger.warn "PlanningsController: No strategy found for Voxa refinement (user: #{current_user.id})"
       redirect_to planning_path, alert: "No strategy found to refine." and return
     end
 
+    Rails.logger.info "PlanningsController: Starting Voxa refinement for strategy #{strategy.id} (user: #{current_user.id})"
+
     begin
       Creas::VoxaContentService.new(strategy_plan: strategy).call
-      redirect_to planning_path(plan_id: strategy.id), notice: "Content items refined successfully with Voxa!"
+      Rails.logger.info "PlanningsController: Voxa refinement started successfully for strategy #{strategy.id}"
+      redirect_to planning_path(plan_id: strategy.id), notice: "Content refinement has been started! Please come back to this page in a few minutes to see your refined content."
     rescue StandardError => e
-      Rails.logger.error "Voxa refinement failed: #{e.message}"
-      redirect_to planning_path(plan_id: strategy.id), alert: "Failed to refine content: #{e.message}"
+      Rails.logger.error "PlanningsController: Voxa refinement failed for strategy #{strategy.id}: #{e.message}"
+      Rails.logger.error "PlanningsController: Error details: #{e.backtrace.first(5).join(', ')}" if e.backtrace
+
+      # Handle specific case of already processing
+      if e.message.include?("already in progress")
+        redirect_to planning_path(plan_id: strategy.id), alert: "Content refinement is already in progress! Please wait a few minutes and refresh the page to see your refined content."
+      else
+        redirect_to planning_path(plan_id: strategy.id), alert: "Failed to refine content: #{e.message}"
+      end
     end
   end
 

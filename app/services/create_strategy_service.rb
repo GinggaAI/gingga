@@ -20,7 +20,8 @@ class CreateStrategyService
       user: @user,
       brief: brief,
       brand: @brand,
-      month: @month
+      month: @month,
+      strategy_form: strategy_form
     ).call
 
     Result.new(success?: true, plan: plan)

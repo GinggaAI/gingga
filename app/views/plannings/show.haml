@@ -33,14 +33,14 @@
 
           .grid.grid-cols-1.md:grid-cols-2.gap-4.mb-4
             .col-span-1
-              = form.label "strategy_form[primary_objective]", "Primary Objective", class: "block text-sm font-medium mb-1 text-gray-700"
+              = form.label "strategy_form[objective_of_the_month]", t('planning.strategy_form.objective_label'), class: "block text-sm font-medium mb-1 text-gray-700"
               - options = options_for_select([['Awareness - Build brand recognition', 'awareness'], ['Engagement - Foster community interaction', 'engagement'], ['Sales - Drive conversions and revenue', 'sales'], ['Community - Strengthen customer relationships', 'community']], 'awareness')
-              = form.select "strategy_form[primary_objective]", options, {}, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              = form.select "strategy_form[objective_of_the_month]", options, {}, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
 
             .col-span-1
-              = form.label "strategy_form[objective_of_the_month]", "Specific Objective Details",
+              = form.label "strategy_form[objective_details]", "Specific Objective Details",
                            class: "block text-sm font-medium mb-1 text-gray-700"
-              = form.text_area "strategy_form[objective_of_the_month]",
+              = form.text_area "strategy_form[objective_details]",
                                placeholder: "e.g., Launch new product line with 25% increase in brand mentions",
                                rows: 3, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               %p.text-xs.text-gray-500.mt-1 Optional: Add specific details about your objective
