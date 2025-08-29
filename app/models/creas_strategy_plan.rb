@@ -4,7 +4,19 @@ class CreasStrategyPlan < ApplicationRecord
   has_many :creas_posts, dependent: :destroy
   has_many :creas_content_items, dependent: :destroy
 
-  validates :month, :objective_of_the_month, :frequency_per_week, presence: true
+  attribute :status, :string, default: "pending"
+
+  enum :status, {
+    pending: "pending",
+    processing: "processing",
+    completed: "completed",
+    failed: "failed"
+  }
+
+  validates :month, presence: true
+  validates :objective_of_the_month, :frequency_per_week, presence: true, if: :completed?
+
+  scope :recent, -> { order(created_at: :desc) }
 
   def content_stats
     creas_content_items.group(:status, :template, :video_source).count

@@ -10,8 +10,48 @@ RSpec.describe CreasStrategyPlan, type: :model do
 
   describe 'validations' do
     it { should validate_presence_of(:month) }
-    it { should validate_presence_of(:objective_of_the_month) }
-    it { should validate_presence_of(:frequency_per_week) }
+
+    context 'when status is completed' do
+      subject { build(:creas_strategy_plan, status: :completed) }
+      it { should validate_presence_of(:objective_of_the_month) }
+      it { should validate_presence_of(:frequency_per_week) }
+    end
+
+    context 'when status is not completed' do
+      subject { build(:creas_strategy_plan, status: :pending) }
+      it { should_not validate_presence_of(:objective_of_the_month) }
+      it { should_not validate_presence_of(:frequency_per_week) }
+    end
+  end
+
+  describe 'status enum' do
+    it 'has the correct status values' do
+      expect(CreasStrategyPlan.statuses).to eq({
+        'pending' => 'pending',
+        'processing' => 'processing',
+        'completed' => 'completed',
+        'failed' => 'failed'
+      })
+    end
+
+    it 'defaults to pending status' do
+      plan = build(:creas_strategy_plan)
+      expect(plan.status).to eq('pending')
+      expect(plan.pending?).to be true
+    end
+
+    it 'can be set to different statuses' do
+      plan = build(:creas_strategy_plan)
+
+      plan.processing!
+      expect(plan.processing?).to be true
+
+      plan.completed!
+      expect(plan.completed?).to be true
+
+      plan.failed!
+      expect(plan.failed?).to be true
+    end
   end
 
   describe 'JSONB defaults' do

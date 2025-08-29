@@ -7,93 +7,10 @@ document.addEventListener('DOMContentLoaded', function() {
     fetchAndDisplayStrategy(planId);
   }
 
-  // Initialize collapsible form functionality
-  initializeStrategyForm();
+  // Form functionality is handled by inline JavaScript in the view
+  // No need to initialize form functionality here anymore
 });
 
-function initializeStrategyForm() {
-  const addContentBtn = document.getElementById('add-content-btn');
-  const formContainer = document.getElementById('strategy-form-container');
-  const cancelBtn = document.getElementById('cancel-form-btn');
-  const cancelBtnFooter = document.getElementById('cancel-form-btn-footer');
-
-  if (!addContentBtn || !formContainer) return;
-
-  // Show form when Add Content button is clicked
-  addContentBtn.addEventListener('click', function() {
-    showStrategyForm();
-  });
-
-  // Hide form when Cancel buttons are clicked
-  if (cancelBtn) {
-    cancelBtn.addEventListener('click', function() {
-      hideStrategyForm();
-    });
-  }
-
-  if (cancelBtnFooter) {
-    cancelBtnFooter.addEventListener('click', function() {
-      hideStrategyForm();
-    });
-  }
-}
-
-function showStrategyForm() {
-  const addContentBtn = document.getElementById('add-content-btn');
-  const formContainer = document.getElementById('strategy-form-container');
-
-  if (addContentBtn && formContainer) {
-    // Hide the Add Content button
-    addContentBtn.style.display = 'none';
-    
-    // Show the form with smooth transition
-    formContainer.style.display = 'block';
-    
-    // Force reflow to ensure display change takes effect before animation
-    formContainer.offsetHeight;
-    
-    // Add smooth entrance animation
-    formContainer.style.opacity = '0';
-    formContainer.style.transform = 'translateY(-10px)';
-    
-    // Trigger animation
-    requestAnimationFrame(function() {
-      formContainer.style.transition = 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out';
-      formContainer.style.opacity = '1';
-      formContainer.style.transform = 'translateY(0)';
-    });
-
-    // Focus on first input
-    const firstInput = formContainer.querySelector('textarea, input');
-    if (firstInput) {
-      setTimeout(() => firstInput.focus(), 300);
-    }
-  }
-}
-
-function hideStrategyForm() {
-  const addContentBtn = document.getElementById('add-content-btn');
-  const formContainer = document.getElementById('strategy-form-container');
-
-  if (addContentBtn && formContainer) {
-    // Animate form out
-    formContainer.style.transition = 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out';
-    formContainer.style.opacity = '0';
-    formContainer.style.transform = 'translateY(-10px)';
-
-    // Hide form and show button after animation
-    setTimeout(function() {
-      formContainer.style.display = 'none';
-      addContentBtn.style.display = 'inline-flex';
-      
-      // Reset form values
-      const form = formContainer.querySelector('form');
-      if (form) {
-        form.reset();
-      }
-    }, 300);
-  }
-}
 
 function fetchAndDisplayStrategy(planId) {
   fetch(`/creas_strategy_plans/${planId}`)

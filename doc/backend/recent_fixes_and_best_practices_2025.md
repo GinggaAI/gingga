@@ -410,6 +410,31 @@ This represents a **world-class Rails application** following industry best prac
 
 ---
 
-**Last Updated:** 2025-08-19  
-**Document Version:** 1.0  
-**Status:** ✅ All Issues Resolved - Production Ready
+---
+
+## 🆕 Latest Updates - August 2025
+
+### Recent Major Improvements (August 26, 2025)
+For detailed analysis of the latest 6 commits including toast UI fixes, Rails 8 testing improvements, and Voxa content service enhancements, see:
+
+**📖 [Toast UI Fixes and Testing Improvements - August 2025](./toast_ui_fixes_and_testing_improvements_august_2025.md)**
+
+#### Key Updates Summary:
+- ✅ **Toast Component Fixes** - Fully functional notifications with auto-dismiss
+- ✅ **Rails 8 Testing Compatibility** - Converted to modern request specs  
+- ✅ **Voxa Content Service** - Fixed duplication issues, now properly updates existing content
+- ✅ **CLAUDE.md Compliance** - Extracted view logic per guidelines
+- ✅ **Background Job Processing** - Async strategy generation with SolidQueue
+- ✅ **Enhanced Planning UI** - Rich scene and beat visualization
+
+### Updated Architecture Components:
+- **Background Jobs**: Now using Active Job with SolidQueue instead of Sidekiq
+- **Testing Strategy**: Modern request specs instead of deprecated controller specs
+- **AI Integration**: Enhanced Voxa content refinement without duplication
+- **UI Components**: Fully functional toast notifications with proper Stimulus integration
+
+---
+
+**Last Updated:** 2025-08-26  
+**Document Version:** 2.0  
+**Status:** ✅ All Issues Resolved - Production Ready with Latest Enhancements

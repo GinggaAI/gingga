@@ -2,6 +2,8 @@ require 'rails_helper'
 require Rails.root.join('app/services/gingga_openai/chat_client')
 
 RSpec.describe CreasStrategistController, type: :request do
+  include ActiveJob::TestHelper
+
   let!(:user) { create(:user) }
   let!(:brand) { create(:brand, user: user) }
 
@@ -57,10 +59,16 @@ RSpec.describe CreasStrategistController, type: :request do
 
         json_response = JSON.parse(response.body)
         expect(json_response["success"]).to be true
-        expect(json_response["plan"]).to include(
-          "month" => "2025-08",
-          "objective_of_the_month" => "awareness",
-          "frequency_per_week" => 4
+
+        # Since jobs run inline, reload the plan to get the updated data
+        plan_id = json_response["plan"]["id"]
+        completed_plan = CreasStrategyPlan.find(plan_id)
+
+        expect(completed_plan).to have_attributes(
+          month: "2025-08",
+          objective_of_the_month: "awareness",
+          frequency_per_week: 4,
+          status: "completed"
         )
       end
     end
@@ -92,7 +100,7 @@ RSpec.describe CreasStrategistController, type: :request do
 
       it 'returns 422' do
         post '/creas_strategist', params: valid_params, headers: { 'Accept' => 'application/json' }
-        expect(response).to have_http_status(:unprocessable_content)
+        expect(response).to have_http_status(:unprocessable_entity)
 
         json_response = JSON.parse(response.body)
         expect(json_response).to have_key('error')
@@ -106,7 +114,7 @@ RSpec.describe CreasStrategistController, type: :request do
 
       it 'returns 422 with error message' do
         post '/creas_strategist', params: valid_params, headers: { 'Accept' => 'application/json' }
-        expect(response).to have_http_status(:unprocessable_content)
+        expect(response).to have_http_status(:unprocessable_entity)
 
         json_response = JSON.parse(response.body)
         expect(json_response).to include('error' => 'OpenAI API Error')

@@ -18,3 +18,6 @@ application.register("tabs", TabsController)
 
 import DropdownController from "./dropdown_controller"
 application.register("dropdown", DropdownController)
+
+import ToastController from "./toast_controller"
+application.register("toast", ToastController)

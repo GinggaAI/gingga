@@ -30,6 +30,7 @@ gem "solid_cache"
 gem "solid_queue"
 gem "solid_cable"
 
+
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
 
@@ -66,6 +67,7 @@ group :development, :test do
   gem "capybara"
   gem "shoulda-matchers", "~> 6.0"
   gem "webmock"
+  gem "vcr"
   gem "faker"
   gem "database_cleaner-active_record"
   gem "dotenv-rails"

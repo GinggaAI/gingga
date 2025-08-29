@@ -24,7 +24,7 @@ class ReelsController < ApplicationController
       redirect_to @reel, notice: "Scene-based reel created successfully! Your reel is being generated."
     else
       3.times { |i| @reel.reel_scenes.build(scene_number: i + 1) if @reel.reel_scenes.find_by(scene_number: i + 1).nil? }
-      render :scene_based, status: :unprocessable_content
+      render :scene_based, status: :unprocessable_entity
     end
   end
 
@@ -40,7 +40,7 @@ class ReelsController < ApplicationController
     if @reel.save
       redirect_to @reel, notice: "Narrative reel created successfully! Your reel is being generated."
     else
-      render :narrative, status: :unprocessable_content
+      render :narrative, status: :unprocessable_entity
     end
   end
 

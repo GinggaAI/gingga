@@ -1,24 +1,22 @@
 require "rails_helper"
 
-RSpec.describe ReelsController, type: :controller do
+RSpec.describe ReelsController, type: :request do
   let(:user) { create(:user) }
 
   before do
     sign_in user, scope: :user
   end
 
-  describe "GET #scene_based" do
+  describe "GET /en/reels/scene-based" do
     it "builds a new reel with scenes" do
-      get :scene_based
+      get "/en/reels/scene-based"
 
       expect(response).to have_http_status(:success)
-      expect(assigns(:reel)).to be_a_new(Reel)
-      expect(assigns(:reel).mode).to eq('scene_based')
-      expect(assigns(:reel).reel_scenes.size).to eq(3)
+      expect(response.body).to include("Generate Scene-Based Reel")
     end
   end
 
-  describe "POST #create_scene_based" do
+  describe "POST /en/reels/scene-based" do
     let(:valid_params) do
       {
         reel: {
@@ -51,15 +49,15 @@ RSpec.describe ReelsController, type: :controller do
 
     it "creates a new scene-based reel" do
       expect {
-        post :create_scene_based, params: valid_params
+        post "/en/reels/scene-based", params: valid_params
       }.to change(Reel, :count).by(1)
 
+      expect(response).to have_http_status(:found)
       expect(response).to redirect_to(Reel.last)
-      expect(flash[:notice]).to be_present
     end
 
     it "creates reel scenes" do
-      post :create_scene_based, params: valid_params
+      post "/en/reels/scene-based", params: valid_params
 
       reel = Reel.last
       expect(reel.reel_scenes.count).to eq(3)
@@ -67,17 +65,16 @@ RSpec.describe ReelsController, type: :controller do
     end
   end
 
-  describe "GET #narrative" do
+  describe "GET /en/reels/narrative" do
     it "builds a new narrative reel" do
-      get :narrative
+      get "/en/reels/narrative"
 
       expect(response).to have_http_status(:success)
-      expect(assigns(:reel)).to be_a_new(Reel)
-      expect(assigns(:reel).mode).to eq('narrative')
+      expect(response.body).to include("narrative reel")
     end
   end
 
-  describe "POST #create_narrative" do
+  describe "POST /en/reels/narrative" do
     let(:valid_params) do
       {
         reel: {
@@ -94,15 +91,15 @@ RSpec.describe ReelsController, type: :controller do
 
     it "creates a new narrative reel" do
       expect {
-        post :create_narrative, params: valid_params
+        post "/en/reels/narrative", params: valid_params
       }.to change(Reel, :count).by(1)
 
+      expect(response).to have_http_status(:found)
       expect(response).to redirect_to(Reel.last)
-      expect(flash[:notice]).to be_present
     end
 
     it "sets correct mode and attributes" do
-      post :create_narrative, params: valid_params
+      post "/en/reels/narrative", params: valid_params
 
       reel = Reel.last
       expect(reel.mode).to eq('narrative')

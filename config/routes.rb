@@ -53,6 +53,7 @@ Rails.application.routes.draw do
   # CREAS endpoints
   resources :creas_strategist, only: [ :create ]
   resources :creas_strategy_plans, only: [ :show ], path: "creas_strategy_plans"
+  resources :strategy_plan_status, only: [ :show ]
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest

@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Frequency Per Week Content Generation', type: :integration do
+  include ActiveJob::TestHelper
   let(:user) { create(:user) }
   let(:brand) { create(:brand, user: user) }
   let!(:audience) { create(:audience, brand: brand) }
@@ -59,6 +60,36 @@ RSpec.describe 'Frequency Per Week Content Generation', type: :integration do
     }.to_json
   end
 
+  def mock_batch_response_for_week(week, frequency, brand)
+    ideas = []
+    frequency.times do |idx|
+      ideas << {
+        "id" => "202508-#{brand.slug}-w#{week}-i#{idx + 1}-C",
+        "status" => "draft",
+        "title" => "Content idea #{week}-#{idx + 1}",
+        "hook" => "Hook for week #{week}, idea #{idx + 1}",
+        "description" => "Description for content",
+        "platform" => "Instagram Reels",
+        "pilar" => "C",
+        "recommended_template" => "solo_avatars",
+        "video_source" => "none",
+        "visual_notes" => "Visual notes",
+        "assets_hints" => {},
+        "kpi_focus" => "reach",
+        "success_criteria" => "≥1000 views",
+        "beats_outline" => [ "Hook", "Value", "CTA" ],
+        "cta" => "Follow for more",
+        "repurpose_to" => [],
+        "language_variants" => []
+      }
+    end
+
+    {
+      "week" => week,
+      "ideas" => ideas
+    }.to_json
+  end
+
   describe 'with different frequencies' do
     [ 3, 4, 5, 7 ].each do |frequency|
       context "when frequency_per_week is #{frequency}" do
@@ -71,10 +102,14 @@ RSpec.describe 'Frequency Per Week Content Generation', type: :integration do
         end
 
         before do
-          # Mock OpenAI to return the correct number of ideas
+          # Mock OpenAI to return the correct response for each batch call
+          # Since batch processing calls OpenAI once per week, we need to mock each call
+          call_count = 0
           allow_any_instance_of(GinggaOpenAI::ChatClient)
-            .to receive(:chat!)
-            .and_return(mock_openai_response_for_frequency(frequency))
+            .to receive(:chat!) do
+              call_count += 1
+              mock_batch_response_for_week(call_count, frequency, brand)
+            end
         end
 
         it "generates exactly #{frequency * 4} content ideas (#{frequency} per week × 4 weeks)" do
@@ -87,7 +122,8 @@ RSpec.describe 'Frequency Per Week Content Generation', type: :integration do
 
           expect(result.success?).to be true
 
-          strategy = result.plan
+          # Reload the strategy plan to get the completed data after job execution
+          strategy = result.plan.reload
           expect(strategy.frequency_per_week).to eq(frequency)
 
           # Count total ideas across all weeks
@@ -117,7 +153,7 @@ RSpec.describe 'Frequency Per Week Content Generation', type: :integration do
       expect(system_prompt).to include('frequency_per_week × 4 weeks')
       expect(system_prompt).to include('3/week = 12 total')
       expect(system_prompt).to include('4/week = 16 total')
-      expect(system_prompt).to include('CRITICAL: total ideas across all 4 weeks MUST equal exactly frequency_per_week × 4')
+      expect(system_prompt).to include('CRITICAL: weekly_plan must contain exactly 4 weeks, each with exactly frequency_per_week ideas')
     end
   end
 end

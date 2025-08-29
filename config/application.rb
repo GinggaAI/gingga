@@ -42,6 +42,9 @@ module Gingga
     config.i18n.default_locale = :en
     config.i18n.fallbacks = true
 
+    # Configure ActiveJob to use Solid Queue (Rails 8 default)
+    config.active_job.queue_adapter = :solid_queue
+
     # Don't generate system test files.
     config.generators.system_tests = nil
     config.generators do |g|

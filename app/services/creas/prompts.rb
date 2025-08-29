@@ -24,6 +24,7 @@ module Creas
       If a critical item is missing, ask before generating.
 
       STRATEGY RULES
+      • CRITICAL: weekly_plan must contain exactly 4 weeks, each with exactly frequency_per_week ideas in the ideas array.
       • Generate exactly frequency_per_week × 4 weeks of content ideas (e.g., 3/week = 12 total, 4/week = 16 total).
       • Distribute weekly posting volume strategically across platforms/pillars.
       • Map clear goals & formats to each pillar.
@@ -39,7 +40,7 @@ module Creas
         "brand_name":"...", "brand_slug":"...", "strategy_name":"...",
         "month":"YYYY-MM", "general_theme":"...",
         "objective_of_the_month":"awareness | engagement | sales | community",
-        "frequency_per_week":4,
+        "frequency_per_week":[frecuency_per_week],
         "platforms":["Instagram","TikTok"],
         "tone_style":"...",
         "content_language":"en-US", "account_language":"en-US",
@@ -57,11 +58,16 @@ module Creas
         },
 
         "weekly_plan":[
-          {"week":1,"publish_cadence":"use frequency_per_week value","ideas":"exactly frequency_per_week number of WEEK_IDEA_OBJ"},
-          {"week":2,"publish_cadence":"use frequency_per_week value","ideas":"exactly frequency_per_week number of WEEK_IDEA_OBJ"},
-          {"week":3,"publish_cadence":"use frequency_per_week value","ideas":"exactly frequency_per_week number of WEEK_IDEA_OBJ"},
-          {"week":4,"publish_cadence":"use frequency_per_week value","ideas":"exactly frequency_per_week number of WEEK_IDEA_OBJ"}
+          {"week":1,"publish_cadence":frequency_per_week,"ideas":[WEEK_IDEA_OBJ,WEEK_IDEA_OBJ,WEEK_IDEA_OBJ]},
+          {"week":2,"publish_cadence":frequency_per_week,"ideas":[WEEK_IDEA_OBJ,WEEK_IDEA_OBJ,WEEK_IDEA_OBJ]},
+          {"week":3,"publish_cadence":frequency_per_week,"ideas":[WEEK_IDEA_OBJ,WEEK_IDEA_OBJ,WEEK_IDEA_OBJ]},
+          {"week":4,"publish_cadence":frequency_per_week,"ideas":[WEEK_IDEA_OBJ,WEEK_IDEA_OBJ,WEEK_IDEA_OBJ]}
         ]
+      #{'  '}
+        CRITICAL: Each week MUST have exactly frequency_per_week items in the ideas array.#{' '}
+        If frequency_per_week=3, each week needs exactly 3 items.
+        If frequency_per_week=4, each week needs exactly 4 items.
+        NO EXCEPTIONS. COUNT THE ITEMS BEFORE RESPONDING.
       }
 
       PILLAR_OBJ (use for each key C/R/E/A/S):
@@ -118,9 +124,23 @@ module Creas
       kpi_focus: reach | saves | comments | CTR | DM
       status: draft | in_production | ready_for_review | approved
 
-      VALIDATION (auto-check before output)
-      1 brief complete; else ask. 2 CRITICAL: total ideas across all 4 weeks MUST equal exactly frequency_per_week × 4. 3 primary pillar 40–50%; others 50–60% total. 4 language guidance aligns with content_language/splits.
-      5 each idea has recommended_template + correct video_source. 6 all IDs valid/unique; month = YYYY-MM. 7 respect brand_guardrails. 8 return a single JSON object; no prose/markdown.
+      FINAL VALIDATION CHECKLIST (MANDATORY - auto-check before output):
+      ✓ 1. Brief complete; else ask
+      ✓ 2. CRITICAL MATH CHECK: weekly_plan has exactly 4 weeks
+      ✓ 3. CRITICAL COUNT CHECK: Each week has EXACTLY frequency_per_week ideas (count them!)
+         - Week 1 ideas array length = frequency_per_week ✓
+         - Week 2 ideas array length = frequency_per_week ✓#{'  '}
+         - Week 3 ideas array length = frequency_per_week ✓
+         - Week 4 ideas array length = frequency_per_week ✓
+      ✓ 4. CRITICAL TOTAL CHECK: Total ideas = frequency_per_week × 4
+      ✓ 5. Primary pillar 40–50%; others 50–60% total
+      ✓ 6. Language guidance aligns with content_language/splits
+      ✓ 7. Each idea has recommended_template + correct video_source
+      ✓ 8. All IDs valid/unique; month = YYYY-MM
+      ✓ 9. Respect brand_guardrails
+      ✓ 10. Return single JSON object; no prose/markdown
+
+      STOP AND COUNT THE IDEAS IN EACH WEEK BEFORE RESPONDING!
       SYS
     end
 
@@ -148,7 +168,7 @@ module Creas
             "brand_name": "acme",
             "month": "YYYY-MM",#{' '}
             "objective_of_the_month": "awareness | engagement | sales | community",
-            "frequency_per_week": 4,
+            "frequency_per_week": [frecuency_per_week],
             "post_types": ["Video","Image","Carousel","Text"],
             "weekly_plan": [
               {

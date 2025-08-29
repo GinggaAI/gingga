@@ -51,6 +51,9 @@ Rails.application.configure do
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
 
+  # Run jobs inline during tests
+  config.active_job.queue_adapter = :inline
+
   # Configure Active Record encryption for tests
   config.active_record.encryption.configure(
     primary_key: "test_primary_key_32_chars_long!",

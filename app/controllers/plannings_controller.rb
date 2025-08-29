@@ -32,15 +32,26 @@ class PlanningsController < ApplicationController
     strategy = find_strategy_by_id_or_current
 
     unless strategy
+      Rails.logger.warn "PlanningsController: No strategy found for Voxa refinement (user: #{current_user.id})"
       redirect_to planning_path, alert: "No strategy found to refine." and return
     end
 
+    Rails.logger.info "PlanningsController: Starting Voxa refinement for strategy #{strategy.id} (user: #{current_user.id})"
+
     begin
       Creas::VoxaContentService.new(strategy_plan: strategy).call
-      redirect_to planning_path(plan_id: strategy.id), notice: "Content items refined successfully with Voxa!"
+      Rails.logger.info "PlanningsController: Voxa refinement started successfully for strategy #{strategy.id}"
+      redirect_to planning_path(plan_id: strategy.id), notice: "Content refinement has been started! Please come back to this page in a few minutes to see your refined content."
     rescue StandardError => e
-      Rails.logger.error "Voxa refinement failed: #{e.message}"
-      redirect_to planning_path(plan_id: strategy.id), alert: "Failed to refine content: #{e.message}"
+      Rails.logger.error "PlanningsController: Voxa refinement failed for strategy #{strategy.id}: #{e.message}"
+      Rails.logger.error "PlanningsController: Error details: #{e.backtrace.first(5).join(', ')}" if e.backtrace
+
+      # Handle specific case of already processing
+      if e.message.include?("already in progress")
+        redirect_to planning_path(plan_id: strategy.id), alert: "Content refinement is already in progress! Please wait a few minutes and refresh the page to see your refined content."
+      else
+        redirect_to planning_path(plan_id: strategy.id), alert: "Failed to refine content: #{e.message}"
+      end
     end
   end
 
