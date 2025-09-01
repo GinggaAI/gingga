@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const planId = urlParams.get('plan_id');
   
   if (planId) {
-    console.log('Loading strategy plan:', planId);
     fetchAndDisplayStrategy(planId);
   }
 
@@ -21,18 +20,15 @@ function fetchAndDisplayStrategy(planId) {
       return response.json();
     })
     .then(plan => {
-      console.log('Strategy plan loaded:', plan);
       displayStrategyData(plan);
     })
     .catch(error => {
-      console.error('Error loading strategy plan:', error);
       showErrorMessage('Failed to load strategy plan. Please try again.');
     });
 }
 
 function displayStrategyData(plan) {
   if (!plan || !plan.weeks) {
-    console.warn('No weeks data found in plan');
     return;
   }
 
@@ -59,11 +55,8 @@ function updateWeekDisplay(weekData, weekIndex) {
   const weekCard = weekCards[weekIndex];
   
   if (!weekCard) {
-    console.warn(`Week card ${weekIndex + 1} not found`);
     return;
   }
-
-  console.log(`Updating week ${weekIndex + 1}:`, weekData);
 
   // Update goal dropdown
   updateWeekGoal(weekCard, weekData.goal);
@@ -78,7 +71,6 @@ function updateWeekGoal(weekCard, goal) {
   const goalSpan = weekCard.querySelector('span[style*="pointer-events"]');
   if (goalSpan) {
     goalSpan.textContent = goal;
-    console.log(`Updated goal to: ${goal}`);
   }
 }
 
@@ -97,8 +89,6 @@ function updateWeekDays(weekCard, daysData) {
 function updateDayContent(dayColumn, dayData) {
   const dayContainer = dayColumn.querySelector('.bg-gray-50');
   if (!dayContainer) return;
-
-  console.log(`Updating ${dayData.day}:`, dayData.contents);
 
   // Clear existing dynamic content (keep + button)
   const existingContent = dayContainer.querySelectorAll('.p-2.rounded-lg:not(.add-button)');
@@ -178,11 +168,9 @@ function createContentIcon(contentType) {
 }
 
 function showSuccessMessage(message) {
-  console.log('✅', message);
   // Could add toast notification here
 }
 
 function showErrorMessage(message) {
-  console.error('❌', message);
   // Could add error toast notification here
 }

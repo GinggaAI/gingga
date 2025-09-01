@@ -366,8 +366,9 @@ class GenerateVoxaContentJob < ApplicationJob
       begin
         date = Date.parse(publish_date)
         return date.strftime("%A")
-      rescue Date::Error
-        # Fall through
+      rescue Date::Error => e
+        Rails.logger.warn "GenerateVoxaContentJob: Failed to parse publish_date '#{publish_date}': #{e.message}"
+        # Fall through to pilar-based assignment
       end
     end
 
@@ -387,14 +388,16 @@ class GenerateVoxaContentJob < ApplicationJob
   def parse_date(date_string)
     return nil if date_string.blank?
     Date.iso8601(date_string)
-  rescue Date::Error
+  rescue Date::Error => e
+    Rails.logger.warn "GenerateVoxaContentJob: Failed to parse date '#{date_string}': #{e.message}"
     nil
   end
 
   def parse_datetime(datetime_string)
     return nil if datetime_string.blank?
     Time.zone.parse(datetime_string)
-  rescue ArgumentError
+  rescue ArgumentError => e
+    Rails.logger.warn "GenerateVoxaContentJob: Failed to parse datetime '#{datetime_string}': #{e.message}"
     nil
   end
 

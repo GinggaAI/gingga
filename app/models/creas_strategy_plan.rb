@@ -41,7 +41,8 @@ class CreasStrategyPlan < ApplicationRecord
       return nil if current_date < month_start || current_date > month_start.end_of_month
 
       ((current_date - month_start).to_i / 7) + 1
-    rescue Date::Error
+    rescue Date::Error => e
+      Rails.logger.warn "CreasStrategyPlan #{id}: Failed to calculate current week from month '#{month}': #{e.message}"
       nil
     end
   end

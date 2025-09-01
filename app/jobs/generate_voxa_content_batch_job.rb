@@ -131,18 +131,17 @@ class GenerateVoxaContentBatchJob < ApplicationJob
   def get_content_items_for_batch(strategy_plan, batch_number, total_batches)
     # Organize content items by week - each batch processes content from one specific week
     # batch_number corresponds to the week number (1-4)
-    target_week = batch_number
 
-    Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Selecting content items for week #{target_week} (batch #{batch_number})"
+    Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Selecting content items for week #{batch_number} (batch #{batch_number})"
 
     # Get all available content items for the specific week that haven't been processed
     available_items = strategy_plan.creas_content_items.where(
       status: [ "draft", "in_progress" ],
       batch_number: [ nil, batch_number ],
-      week: target_week
+      week: batch_number
     ).order(:created_at)
 
-    Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Found #{available_items.count} content items for week #{target_week}"
+    Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Found #{available_items.count} content items for week #{batch_number}"
 
     available_items
   end
@@ -150,13 +149,17 @@ class GenerateVoxaContentBatchJob < ApplicationJob
   def build_batch_system_prompt(strategy_plan_data, batch_number, total_batches)
     base_prompt = Creas::Prompts.voxa_system(strategy_plan_data: strategy_plan_data)
 
-    batch_context = "\n\nIMPORTANT BATCH CONTEXT:\n"
-    batch_context += "- You are processing WEEK #{batch_number} content items (batch #{batch_number} of #{total_batches})\n"
-    batch_context += "- This batch contains all content items scheduled for week #{batch_number}\n"
-    batch_context += "- Focus on high-quality refinement of ONLY the provided week #{batch_number} content items\n"
-    batch_context += "- Ensure each item is unique and follows the brand guidelines for this week\n"
-    batch_context += "- Return ALL items that were provided in the input, refined and enhanced\n"
-    batch_context += "- Maintain thematic consistency within week #{batch_number} while ensuring variety\n"
+    batch_context = %{
+
+IMPORTANT BATCH CONTEXT:
+
+- You are processing WEEK #{batch_number} content items (batch #{batch_number} of #{total_batches})
+- This batch contains all content items scheduled for week #{batch_number}
+- Focus on high-quality refinement of ONLY the provided week #{batch_number} content items
+- Ensure each item is unique and follows the brand guidelines for this week
+- Return ALL items that were provided in the input, refined and enhanced
+- Maintain thematic consistency within week #{batch_number} while ensuring variety
+}
 
     base_prompt + batch_context
   end
@@ -164,15 +167,21 @@ class GenerateVoxaContentBatchJob < ApplicationJob
   def build_batch_user_prompt(strategy_plan_data, brand_context, existing_content_context, batch_number)
     base_prompt = Creas::Prompts.voxa_user(strategy_plan_data: strategy_plan_data, brand_context: brand_context)
 
-    batch_context = "\n\nWEEK #{batch_number} BATCH INSTRUCTIONS:\n"
-    batch_context += "- Refine and enhance ONLY the week #{batch_number} content items provided in this batch\n"
-    batch_context += "- Ensure content variety within the week while maintaining weekly thematic coherence\n"
-    batch_context += "- Each item must be production-ready with complete details for week #{batch_number}\n"
-    batch_context += "- Consider the weekly narrative flow and content progression\n"
+    batch_context = %(
+
+WEEK #{batch_number} BATCH INSTRUCTIONS:
+
+- Refine and enhance ONLY the week #{batch_number} content items provided in this batch
+- Ensure content variety within the week while maintaining weekly thematic coherence
+- Each item must be production-ready with complete details for week #{batch_number}
+- Consider the weekly narrative flow and content progression
+)
 
     if existing_content_context.present?
-      batch_context += "\nEXISTING CONTENT FROM PREVIOUS BATCHES (avoid duplication):\n"
-      batch_context += existing_content_context
+      batch_context += %{
+EXISTING CONTENT FROM PREVIOUS BATCHES (avoid duplication):
+#{existing_content_context}
+}
     end
 
     base_prompt + batch_context
@@ -629,8 +638,9 @@ class GenerateVoxaContentBatchJob < ApplicationJob
       begin
         date = Date.parse(publish_date)
         return date.strftime("%A")
-      rescue Date::Error
-        # Fall through
+      rescue Date::Error => e
+        Rails.logger.warn "Voxa GenerateVoxaContentBatchJob: Failed to parse publish_date '#{publish_date}': #{e.message}"
+        # Fall through to pilar-based assignment
       end
     end
 
@@ -649,14 +659,16 @@ class GenerateVoxaContentBatchJob < ApplicationJob
   def parse_date(date_string)
     return nil if date_string.blank?
     Date.iso8601(date_string)
-  rescue Date::Error
+  rescue Date::Error => e
+    Rails.logger.warn "Voxa GenerateVoxaContentBatchJob: Failed to parse date '#{date_string}': #{e.message}"
     nil
   end
 
   def parse_datetime(datetime_string)
     return nil if datetime_string.blank?
     Time.zone.parse(datetime_string)
-  rescue ArgumentError
+  rescue ArgumentError => e
+    Rails.logger.warn "Voxa GenerateVoxaContentBatchJob: Failed to parse datetime '#{datetime_string}': #{e.message}"
     nil
   end
 

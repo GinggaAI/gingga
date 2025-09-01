@@ -95,7 +95,9 @@ RSpec.describe PlanningPresenter do
       let(:params) { { month: "2025-08'; alert('xss'); //" } }
 
       it 'returns sanitized safe value' do
-        expect(presenter.safe_month_for_js).to eq('2025-8') # current fallback
+        # When malicious input is provided, it should fall back to current month
+        expected_month = Date.current.strftime("%Y-%-m")
+        expect(presenter.safe_month_for_js).to eq(expected_month)
       end
     end
 

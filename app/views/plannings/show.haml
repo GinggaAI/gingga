@@ -360,12 +360,7 @@
 
     const formData = new FormData(form);
     
-    console.log('Form action URL:', form.action);
-    console.log('Form data entries:');
-    for (let [key, value] of formData.entries()) {
-      console.log(key, ':', value);
-    }
-    console.log('CSRF token:', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'));
+    // Form data prepared for submission
 
     // Create AbortController for timeout handling
     const controller = new AbortController();
@@ -389,8 +384,6 @@
       return response.json();
     })
     .then(data => {
-      console.log('Received response data:', data);
-      console.log('Plan status:', data.plan ? data.plan.status : 'No plan in response');
       setLoadingState(false, submitBtn, submitText, loadingSpinner);
 
       if (data.success) {
@@ -434,9 +427,6 @@
       }
     })
     .catch(error => {
-      console.error('Form submission error:', error);
-      console.log('Error name:', error.name);
-      console.log('Error message:', error.message);
       clearTimeout(timeoutId);
       setLoadingState(false, submitBtn, submitText, loadingSpinner);
 
@@ -446,7 +436,6 @@
         setTimeout(() => checkExistingStrategy(currentMonth), 5000);
       } else {
         showError('#{t('planning.messages.network_error')}');
-        console.error('Error:', error);
       }
     });
   }
@@ -608,7 +597,6 @@
     fetch(`/creas_strategy_plans/${planId}`)
       .then(response => response.json())
       .then(plan => {
-        console.log('Strategy plan loaded:', plan);
         window.currentPlan = plan;
         displayStrategyResult(plan, false); // Just populate content, don't show
         populateCalendarWithStrategy(plan);
@@ -617,7 +605,6 @@
         updateVoxaButton();
       })
       .catch(error => {
-        console.error('Error loading strategy:', error);
         showError('#{t('planning.messages.failed_to_load')}');
       });
   }
@@ -645,7 +632,6 @@
         }
       })
       .catch(error => {
-        console.log('No existing strategy found for month:', month);
         // Keep form closed by default but ready to use
         document.getElementById('strategy-form').style.display = 'none';
       });
@@ -684,13 +670,9 @@
       slot.innerHTML = '<button class="w-full h-8 border-2 border-dashed border-gray-300 rounded text-gray-400 hover:border-gray-400 hover:text-gray-600">+</button>';
     });
 
-    // Debug: log the weekly plan structure
-    console.log('Weekly plan structure:', plan.weekly_plan);
-
     // Populate with new content from weekly_plan structure
     const weeklyPlan = plan.weekly_plan || [];
     weeklyPlan.forEach((week, weekIndex) => {
-      console.log(`Processing week ${weekIndex + 1}:`, week);
 
       // Handle different possible structures in weekly_plan
       // Look for content in various possible fields
@@ -706,10 +688,7 @@
         contentPieces = week;
       }
 
-      console.log(`Found ${contentPieces.length} content pieces for week ${weekIndex + 1}`);
-
       contentPieces.forEach((piece, pieceIndex) => {
-        console.log(`Processing piece ${pieceIndex}:`, piece);
         addContentToCalendar(weekIndex, pieceIndex % 7, piece); // Distribute across days
       });
     });
@@ -746,7 +725,6 @@
   function addContentToCalendar(weekIndex, dayIndex, contentPiece) {
     // Use a more specific selector to avoid form/result sections
     const weekElements = document.querySelectorAll('.space-y-6 > .bg-card.text-card-foreground.border-0.shadow-lg.rounded-2xl');
-    console.log(`Found ${weekElements.length} week elements`);
     // Count correctly: skip form and result sections, find actual week containers
     let actualWeekIndex = 0;
     let weekElement = null;
@@ -755,7 +733,6 @@
       const element = weekElements[i];
       // Look for elements that contain week content (have the week structure)
       if (element.querySelector('.week-content-slot')) {
-        console.log(`Week container found at index ${i}, actualWeekIndex: ${actualWeekIndex}`);
         if (actualWeekIndex === weekIndex) {
           weekElement = element;
           break;
@@ -765,8 +742,6 @@
     }
 
     if (!weekElement) {
-      console.log(`Week element not found for weekIndex: ${weekIndex}`);
-      console.log('Available week elements:', weekElements);
       return;
     }
 
@@ -774,7 +749,6 @@
     const dayElement = dayElements[dayIndex];
 
     if (!dayElement) {
-      console.log(`Day element not found for dayIndex: ${dayIndex}`);
       return;
     }
 
@@ -784,13 +758,6 @@
     const title = contentPiece.title || contentPiece.hook || contentPiece.cta || 'Draft';
     const status = contentPiece.status || 'draft';
     const icon = getContentIcon(platform, contentType);
-
-    console.log(`Adding content to week ${weekIndex + 1}, day ${dayIndex + 1}:`, {
-      platform,
-      contentType,
-      title: title.substring(0, 30) + '...',
-      status
-    });
 
     // Different styling based on status
     const statusStyles = {
@@ -1440,8 +1407,6 @@
         return response.json();
       })
       .then(data => {
-        console.log('Polling status:', data);
-        
         if (data.completed) {
           clearInterval(pollInterval);
           
@@ -1456,8 +1421,6 @@
           updateButtonText();
           updateOverviewButton();
           updateVoxaButton();
-          
-          console.log('Strategy generation completed successfully');
         } else if (data.failed) {
           clearInterval(pollInterval);
           
@@ -1471,7 +1434,6 @@
         // If still processing, continue polling
       })
       .catch(error => {
-        console.error('Polling error:', error);
         if (pollCount >= 3) { // Stop polling after 3 consecutive errors
           clearInterval(pollInterval);
           showError('#{t("planning.messages.network_error")}');

@@ -1,5 +1,15 @@
 module Creas
   class VoxaContentService
+    class ServiceError < StandardError
+      attr_reader :type, :user_message
+
+      def initialize(message, type: :generic, user_message: nil)
+        super(message)
+        @type = type
+        @user_message = user_message || message
+      end
+    end
+
     def initialize(strategy_plan:, target_week: nil)
       @plan = strategy_plan
       @user = @plan.user
@@ -19,7 +29,11 @@ module Creas
       # Check if strategy is already being processed
       if @plan.status == "processing"
         Rails.logger.warn "Voxa VoxaContentService: Strategy plan #{@plan.id} is already in processing status"
-        raise StandardError, "Content refinement is already in progress. Please wait a few minutes and refresh the page."
+        raise ServiceError.new(
+          "Strategy plan #{@plan.id} is already processing",
+          type: :already_processing,
+          user_message: "Content refinement is already in progress! Please wait a few minutes and refresh the page to see your refined content."
+        )
       end
 
       # Log current content state
@@ -53,10 +67,19 @@ module Creas
 
       # Return the plan immediately (status: pending)
       @plan
+    rescue ServiceError => e
+      Rails.logger.error "Voxa VoxaContentService: #{e.message}"
+      raise e  # Re-raise ServiceError to be handled by controller
     rescue StandardError => e
       Rails.logger.error "Voxa VoxaContentService: Failed to start content refinement for strategy plan #{@plan.id}: #{e.message}"
       Rails.logger.error "Voxa VoxaContentService: Error backtrace: #{e.backtrace.join("\n")}" if e.backtrace
-      raise
+
+      error_message = if @target_week
+                        "Failed to refine week #{@target_week} content: #{e.message}"
+      else
+                        "Failed to refine content: #{e.message}"
+      end
+      raise ServiceError.new(e.message, type: :processing_error, user_message: error_message)
     end
 
     private

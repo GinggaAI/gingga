@@ -32,7 +32,8 @@ class Reel < ApplicationRecord
 
     incomplete_scenes = reel_scenes.reject(&:complete?)
     if incomplete_scenes.any?
-      errors.add(:reel_scenes, "scenes #{incomplete_scenes.map(&:scene_number).join(', ')} are incomplete")
+      scene_numbers = incomplete_scenes.map(&:scene_number).sort.join(", ")
+      errors.add(:reel_scenes, "scenes #{scene_numbers} are incomplete")
     end
   end
 end

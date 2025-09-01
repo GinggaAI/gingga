@@ -14,7 +14,8 @@ module Planning
       return FALLBACK_TEXT unless @month_string.present?
 
       parse_and_format
-    rescue ArgumentError, NoMethodError
+    rescue ArgumentError, NoMethodError => e
+      Rails.logger.warn "MonthFormatter: Failed to format month '#{@month_string}': #{e.message}"
       @month_string
     end
 

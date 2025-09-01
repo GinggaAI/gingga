@@ -38,21 +38,15 @@ class PlanningsController < ApplicationController
 
     Rails.logger.info "PlanningsController: Starting Voxa refinement for strategy #{strategy.id} (user: #{current_user.id})"
 
-    begin
-      Creas::VoxaContentService.new(strategy_plan: strategy).call
-      Rails.logger.info "PlanningsController: Voxa refinement started successfully for strategy #{strategy.id}"
-      redirect_to planning_path(plan_id: strategy.id), notice: "Content refinement has been started! Please come back to this page in a few minutes to see your refined content."
-    rescue StandardError => e
-      Rails.logger.error "PlanningsController: Voxa refinement failed for strategy #{strategy.id}: #{e.message}"
-      Rails.logger.error "PlanningsController: Error details: #{e.backtrace.first(5).join(', ')}" if e.backtrace
-
-      # Handle specific case of already processing
-      if e.message.include?("already in progress")
-        redirect_to planning_path(plan_id: strategy.id), alert: "Content refinement is already in progress! Please wait a few minutes and refresh the page to see your refined content."
-      else
-        redirect_to planning_path(plan_id: strategy.id), alert: "Failed to refine content: #{e.message}"
-      end
-    end
+    Creas::VoxaContentService.new(strategy_plan: strategy).call
+    Rails.logger.info "PlanningsController: Voxa refinement started successfully for strategy #{strategy.id}"
+    redirect_to planning_path(plan_id: strategy.id), notice: "Content refinement has been started! Please come back to this page in a few minutes to see your refined content."
+  rescue Creas::VoxaContentService::ServiceError => e
+    Rails.logger.error "PlanningsController: Voxa refinement failed for strategy #{strategy.id}: #{e.message}"
+    redirect_to planning_path(plan_id: strategy.id), alert: e.user_message
+  rescue StandardError => e
+    Rails.logger.error "PlanningsController: Unexpected error during Voxa refinement for strategy #{strategy.id}: #{e.message}"
+    redirect_to planning_path(plan_id: strategy.id), alert: "Failed to refine content: #{e.message}"
   end
 
   # POST /planning/voxa_refine_week
@@ -72,21 +66,15 @@ class PlanningsController < ApplicationController
 
     Rails.logger.info "PlanningsController: Starting week #{week_number} Voxa refinement for strategy #{strategy.id} (user: #{current_user.id})"
 
-    begin
-      Creas::VoxaContentService.new(strategy_plan: strategy, target_week: week_number).call
-      Rails.logger.info "PlanningsController: Week #{week_number} Voxa refinement started successfully for strategy #{strategy.id}"
-      redirect_to planning_path(plan_id: strategy.id), notice: "Week #{week_number} content refinement has been started! Please come back to this page in a few minutes to see your refined content."
-    rescue StandardError => e
-      Rails.logger.error "PlanningsController: Week #{week_number} Voxa refinement failed for strategy #{strategy.id}: #{e.message}"
-      Rails.logger.error "PlanningsController: Error details: #{e.backtrace.first(5).join(', ')}" if e.backtrace
-
-      # Handle specific case of already processing
-      if e.message.include?("already in progress")
-        redirect_to planning_path(plan_id: strategy.id), alert: "Content refinement is already in progress! Please wait a few minutes and refresh the page to see your refined content."
-      else
-        redirect_to planning_path(plan_id: strategy.id), alert: "Failed to refine week #{week_number} content: #{e.message}"
-      end
-    end
+    Creas::VoxaContentService.new(strategy_plan: strategy, target_week: week_number).call
+    Rails.logger.info "PlanningsController: Week #{week_number} Voxa refinement started successfully for strategy #{strategy.id}"
+    redirect_to planning_path(plan_id: strategy.id), notice: "Week #{week_number} content refinement has been started! Please come back to this page in a few minutes to see your refined content."
+  rescue Creas::VoxaContentService::ServiceError => e
+    Rails.logger.error "PlanningsController: Week #{week_number} Voxa refinement failed for strategy #{strategy.id}: #{e.message}"
+    redirect_to planning_path(plan_id: strategy.id), alert: e.user_message
+  rescue StandardError => e
+    Rails.logger.error "PlanningsController: Unexpected error during week #{week_number} Voxa refinement for strategy #{strategy.id}: #{e.message}"
+    redirect_to planning_path(plan_id: strategy.id), alert: "Failed to refine week #{week_number} content: #{e.message}"
   end
 
   private

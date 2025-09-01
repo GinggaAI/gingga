@@ -26,7 +26,7 @@ class CreasStrategistController < ApplicationController
     else
       respond_to do |format|
         format.html { redirect_to planning_path, alert: result.error }
-        format.json { render json: { success: false, error: result.error }, status: :unprocessable_entity }
+        format.json { render json: { success: false, error: result.error }, status: 422 }
       end
     end
   end
@@ -34,24 +34,24 @@ class CreasStrategistController < ApplicationController
   private
 
   def find_brand
-    Rails.logger.info "=== DEBUG find_brand ==="
-    Rails.logger.info "current_user: #{current_user.inspect}"
-    Rails.logger.info "current_user.id: #{current_user&.id}"
-    Rails.logger.info "current_user.brands.count: #{current_user&.brands&.count}"
+    Rails.logger.debug "=== DEBUG find_brand ==="
+    Rails.logger.debug "current_user: #{current_user.inspect}"
+    Rails.logger.debug "current_user.id: #{current_user&.id}"
+    Rails.logger.debug "current_user.brands.count: #{current_user&.brands&.count}"
 
     @brand = current_user.brands.first
-    Rails.logger.info "@brand: #{@brand.inspect}"
+    Rails.logger.debug "@brand: #{@brand.inspect}"
 
     unless @brand
-      Rails.logger.info "No brand found - responding with error"
+      Rails.logger.debug "No brand found - responding with error"
       respond_to do |format|
         format.html { redirect_to planning_path, alert: "Please create a brand profile first" }
-        format.json { render json: { success: false, error: "Please create a brand profile first" }, status: :unprocessable_entity }
+        format.json { render json: { success: false, error: "Please create a brand profile first" }, status: 422 }
       end
       return # Important: stop execution here
     end
 
-    Rails.logger.info "Brand found: #{@brand.name}"
+    Rails.logger.debug "Brand found: #{@brand.name}"
   end
 
   def serialize_plan(plan)

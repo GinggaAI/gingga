@@ -14,7 +14,9 @@ class AiResponse < ApplicationRecord
     @parsed_response ||= JSON.parse(raw_response) if raw_response.is_a?(String)
     @parsed_response ||= raw_response if raw_response.is_a?(Hash)
     @parsed_response
-  rescue JSON::ParserError
+  rescue JSON::ParserError => e
+    Rails.logger.warn "AiResponse #{id}: Failed to parse raw_response JSON for #{service_name}/#{ai_model}: #{e.message}"
+    Rails.logger.debug "AiResponse #{id}: Invalid JSON content: #{raw_response.to_s.truncate(200)}"
     nil
   end
 

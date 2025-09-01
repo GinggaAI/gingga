@@ -209,7 +209,10 @@ RSpec.describe Creas::VoxaContentService, type: :service do
         # Set strategy to processing status
         strategy_plan.update!(status: :processing)
 
-        expect { service.call }.to raise_error(StandardError, /already in progress/)
+        expect { service.call }.to raise_error(Creas::VoxaContentService::ServiceError) do |error|
+          expect(error.type).to eq(:already_processing)
+          expect(error.user_message).to include("already in progress")
+        end
         expect(strategy_plan.reload.status).to eq("processing") # Status unchanged
       end
     end
