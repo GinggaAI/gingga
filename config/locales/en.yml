@@ -177,11 +177,29 @@ en:
     add_content: "Add Content"
     add_new_content: "Add New Content"
     
+    # Navigation
+    navigation:
+      previous_month: "Previous month"
+      next_month: "Next month"
+      
+    # No strategy messages
+    no_strategy:
+      title: "No Strategy for %{month}"
+      description: "There is no content strategy for this month yet."
+      create_button: "Create Strategy for %{month}"
+      
+    # Incomplete brief
+    incomplete_brief:
+      complete_setup: "Complete Brand Setup"
+    
     # Strategy form
     strategy_form:
       title: "🧠 Generate New Content Strategy"
       objective_label: "Objective of the Month"
       objective_placeholder: "e.g., Increase brand awareness and engagement"
+      objective_details_label: "Specific Objective Details"
+      objective_details_placeholder: "e.g., Launch new product line with 25% increase in brand mentions"
+      objective_details_help: "Optional: Add specific details about your objective"
       monthly_themes_label: "Monthly Themes"
       monthly_themes_placeholder: "Brand awareness, Product showcase, Community engagement"
       monthly_themes_help: "Separate with commas"
@@ -249,6 +267,7 @@ en:
     weeks:
       week: "Week"
       week_details: "Week %{number} - Content Details"
+      refine_week: "Refine Week %{number}"
       goal_label: "Goal:"
       goals:
         awareness: "Awareness"

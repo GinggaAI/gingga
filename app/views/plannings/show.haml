@@ -8,10 +8,10 @@
       .bg-card.text-card-foreground.border-0.shadow-lg.rounded-2xl.mb-6
         .flex.items-center.justify-between.p-6
           .flex.items-center.gap-4
-            %button#prev-month.px-3.py-1.text-gray-600.hover:text-gray-800.transition-colors{title: "Previous month"}
+            %button#prev-month.px-3.py-1.text-gray-600.hover:text-gray-800.transition-colors{title: t('planning.navigation.previous_month')}
               %span ←
             %h2.text-2xl.font-bold.text-gray-900= @presenter.display_month
-            %button#next-month.px-3.py-1.text-gray-600.hover:text-gray-800.transition-colors{title: "Next month"}
+            %button#next-month.px-3.py-1.text-gray-600.hover:text-gray-800.transition-colors{title: t('planning.navigation.next_month')}
               %span →
 
           .flex.items-center.gap-3
@@ -38,12 +38,12 @@
               = form.select "strategy_form[objective_of_the_month]", options, {}, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
 
             .col-span-1
-              = form.label "strategy_form[objective_details]", "Specific Objective Details",
+              = form.label "strategy_form[objective_details]", t('planning.strategy_form.objective_details_label'),
                            class: "block text-sm font-medium mb-1 text-gray-700"
               = form.text_area "strategy_form[objective_details]",
-                               placeholder: "e.g., Launch new product line with 25% increase in brand mentions",
+                               placeholder: t('planning.strategy_form.objective_details_placeholder'),
                                rows: 3, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              %p.text-xs.text-gray-500.mt-1 Optional: Add specific details about your objective
+              %p.text-xs.text-gray-500.mt-1= t('planning.strategy_form.objective_details_help')
 
             .col-span-1
               = form.label "strategy_form[monthly_themes]", t('planning.strategy_form.monthly_themes_label'),
@@ -173,7 +173,7 @@
             %div#incomplete-brief-text
           .flex-shrink-0
             = link_to brand_path(@brand), class: "inline-flex items-center px-3 py-2 text-sm font-medium text-amber-700 bg-amber-100 border border-amber-300 rounded-lg hover:bg-amber-200 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-colors" do
-              Complete Brand Setup
+              = t('planning.incomplete_brief.complete_setup')
               %svg.w-4.h-4.ml-2{fill: "none", stroke: "currentColor", viewBox: "0 0 24 24"}
                 %path{"stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "2", d: "M13 7l5 5m0 0l-5 5m5-5H6"}
 
@@ -182,12 +182,12 @@
           .mb-4
             %svg.w-16.h-16.mx-auto.text-gray-400{fill: "none", stroke: "currentColor", viewBox: "0 0 24 24"}
               %path{"stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "1.5", d: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"}
-          %h3#no-strategy-title.text-xl.font-semibold.text-gray-700.mb-2 No Strategy for #{@presenter.display_month}
-          %p#no-strategy-description.text-gray-600.mb-4 There is no content strategy for this month yet.
+          %h3#no-strategy-title.text-xl.font-semibold.text-gray-700.mb-2= t('planning.no_strategy.title', month: @presenter.display_month)
+          %p#no-strategy-description.text-gray-600.mb-4= t('planning.no_strategy.description')
           %button#create-strategy-btn.inline-flex.items-center.justify-center.gap-2.bg-gradient-to-r.from-yellow-400.to-orange-500.text-gray-900.font-bold.py-4.px-8.rounded-xl.shadow-lg.hover:from-yellow-500.hover:to-orange-600.hover:shadow-xl.transform.hover:scale-105.transition-all.duration-300{onclick: "document.getElementById('toggle-form').click()"}
             %svg.w-6.h-6{fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", "stroke-width": "2.5"}
               %path{"stroke-linecap": "round", "stroke-linejoin": "round", d: "M12 6v6m0 0v6m0-6h6m-6 0H6"}
-            Create Strategy for #{@presenter.display_month}
+            = t('planning.no_strategy.create_button', month: @presenter.display_month)
 
       .space-y-6
         - (1..4).each do |week_number|
@@ -196,7 +196,7 @@
               %h3.font-semibold.text-gray-900= "#{t('planning.weeks.week')} #{week_number}"
               .flex.items-center.gap-2
                 %button.voxa-refine-week.inline-flex.items-center.justify-center.gap-1.whitespace-nowrap.text-xs.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.bg-primary.h-8.px-3.bg-gradient-to-r.text-white.rounded-lg{class: "[&_svg]:pointer-events-none [&_svg]:size-3 [&_svg]:shrink-0 hover:bg-primary/90 from-[#A37FFF] to-[#3AC8FF] hover:from-[#3AC8FF] hover:to-[#A37FFF]", "data-week": week_number, style: "display: none;"}
-                  %span.text-xs= "Refine Week #{week_number}"
+                  %span.text-xs= t('planning.weeks.refine_week', number: week_number)
                 %span.text-sm= t('planning.weeks.goal_label')
                 %select.p-1.border.rounded.text-sm
                   %option= t('planning.weeks.goals.awareness')
