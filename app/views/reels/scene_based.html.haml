@@ -1,0 +1,57 @@
+- content_for :page_title, @presenter.page_title
+
+.container.mx-auto.px-4.py-8.max-w-4xl
+  .mb-8
+    %h1.text-3xl.font-bold.mb-2.text-gray-900= @presenter.main_title
+    %p.text-base.text-gray-600= @presenter.main_description
+
+  .mb-8
+    .flex.bg-gray-100.rounded-lg.p-1.max-w-md
+      = link_to scene_based_reels_path, class: @presenter.scene_based_tab_classes, style: @presenter.scene_based_tab_style do
+        = t('reels.tabs.scene_based')
+      = link_to narrative_reels_path, class: @presenter.narrative_tab_classes do
+        = t('reels.tabs.narrative')
+
+  = form_with model: @reel, url: scene_based_reels_path, local: true, data: @presenter.form_data_attributes, class: "space-y-8" do |form|
+
+    - if @presenter.has_errors?
+      .bg-red-50.border.border-red-200.rounded-lg.p-4
+        %h4.text-red-800.font-medium= @presenter.error_title
+        %ul.mt-2.text-red-600.text-sm.space-y-1
+          - @presenter.error_messages.each do |message|
+            %li= message
+
+    = render Ui::FormSectionComponent.new(title: @presenter.basic_info_title, description: @presenter.basic_info_description) do
+      .space-y-6
+        .space-y-2
+          = form.label :title, @presenter.title_label, class: "block text-sm font-medium text-gray-700"
+          = form.text_field :title, placeholder: @presenter.title_placeholder, class: "form-input w-full"
+
+        .space-y-2
+          = form.label :description, @presenter.description_label, class: "block text-sm font-medium text-gray-700"
+          = form.text_area :description, placeholder: @presenter.description_placeholder, rows: 3, class: "form-input w-full"
+
+    = render Ui::FormSectionComponent.new(title: @presenter.ai_avatar_title, description: @presenter.ai_avatar_description) do
+      = render Ui::ToggleComponent.new(name: "reel[use_ai_avatar]", label: @presenter.use_ai_avatars_label, description: @presenter.use_ai_avatars_description, checked: @reel.use_ai_avatar)
+
+    = render Ui::FormSectionComponent.new(title: @presenter.scene_breakdown_title, description: @presenter.scene_breakdown_description) do
+      .mb-4.flex.items-center.justify-between
+        %span.text-sm.font-medium.text-gray-700
+          %span{ data: { scene_list_target: "sceneCounter" } }= @presenter.scene_count
+          = @presenter.scenes_label
+        .flex.gap-2
+          = render Ui::ButtonComponent.new(label: @presenter.add_scene_label, variant: :ghost, size: :sm) do
+            %button.ui-button.ui-button--ghost.ui-button--sm{ type: "button", data: { action: "click->scene-list#addScene" } }
+              %span.ui-button__label= @presenter.add_scene_label
+
+      .space-y-6{ data: { scene_list_target: "scenesContainer" } }
+        - @presenter.scene_count.times do |i|
+          = render Ui::SceneFieldsComponent.new(form: form, scene_number: i + 1, scene_data: @presenter.scene_data_for(i))
+
+    = render Ui::FormSectionComponent.new(title: @presenter.additional_instructions_title, description: @presenter.additional_instructions_description) do
+      .space-y-2
+        = form.label :additional_instructions, @presenter.style_direction_label, class: "block text-sm font-medium text-gray-700"
+        = form.text_area :additional_instructions, placeholder: @presenter.style_direction_placeholder, rows: 4, class: "form-input w-full"
+
+    .flex.justify-end.pt-6
+      = render Ui::ButtonComponent.new(label: @presenter.submit_button_label, variant: :primary, type: :submit, size: :lg)

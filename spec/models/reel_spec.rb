@@ -9,13 +9,17 @@ RSpec.describe Reel, type: :model do
   end
 
   describe 'validations' do
-    it { should validate_presence_of(:mode) }
-    it { should validate_inclusion_of(:mode).in_array(%w[scene_based narrative]) }
+    it { should validate_presence_of(:template) }
+    it 'validates template inclusion with custom message' do
+      reel = build(:reel, user: user, template: 'invalid_template')
+      expect(reel).to be_invalid
+      expect(reel.errors[:template]).to include('invalid_template is not a valid template')
+    end
     it { should validate_inclusion_of(:status).in_array(%w[draft processing completed failed]) }
 
-    describe 'scene validations for scene_based mode' do
-      context 'when mode is scene_based' do
-        let(:reel) { create(:reel, user: user, mode: 'scene_based') }
+    describe 'scene validations for template-based reels' do
+      context 'when template requires scenes' do
+        let(:reel) { create(:reel, user: user, template: 'solo_avatars') }
 
         it 'validates exactly 3 scenes are present' do
           create(:reel_scene, reel: reel, scene_number: 1)
@@ -23,7 +27,7 @@ RSpec.describe Reel, type: :model do
 
           expect(reel.reload.valid?).to be false
           reel.reload.valid?
-          expect(reel.errors[:reel_scenes]).to include('must have exactly 3 scenes for scene_based mode')
+          expect(reel.errors[:reel_scenes]).to include('must have exactly 3 scenes for solo_avatars template')
         end
 
         it 'is valid with exactly 3 scenes' do
@@ -49,13 +53,13 @@ RSpec.describe Reel, type: :model do
         end
 
         it 'skips validation for new records' do
-          new_reel = build(:reel, user: user, mode: 'scene_based')
+          new_reel = build(:reel, user: user, template: 'solo_avatars')
           expect(new_reel).to be_valid
         end
       end
 
-      context 'when mode is narrative' do
-        let(:reel) { create(:reel, user: user, mode: 'narrative') }
+      context 'when template does not require scenes' do
+        let(:reel) { create(:reel, user: user, template: 'narration_over_7_images') }
 
         it 'does not validate scene count' do
           expect(reel.reload.valid?).to be true
@@ -65,13 +69,13 @@ RSpec.describe Reel, type: :model do
   end
 
   describe 'scopes' do
-    let!(:scene_reel) { create(:reel, user: user, mode: 'scene_based') }
+    let!(:solo_avatars_reel) { create(:reel, user: user, template: 'solo_avatars') }
     let!(:draft_reel) { create(:reel, user: user, status: 'draft') }
     let!(:processing_reel) { create(:reel, user: user, status: 'processing') }
 
-    describe '.scene_based' do
-      it 'returns only scene_based reels' do
-        expect(Reel.scene_based).to include(scene_reel)
+    describe '.by_template' do
+      it 'returns reels with specified template' do
+        expect(Reel.where(template: 'solo_avatars')).to include(solo_avatars_reel)
       end
     end
 
@@ -85,7 +89,7 @@ RSpec.describe Reel, type: :model do
   end
 
   describe '#ready_for_generation?' do
-    let(:reel) { create(:reel, user: user, mode: 'scene_based') }
+    let(:reel) { create(:reel, user: user, template: 'solo_avatars') }
 
     context 'when reel has exactly 3 complete scenes' do
       before do
@@ -123,11 +127,11 @@ RSpec.describe Reel, type: :model do
       end
     end
 
-    context 'when mode is not scene_based' do
-      let(:reel) { create(:reel, user: user, mode: 'narrative') }
+    context 'when template does not require scenes' do
+      let(:reel) { create(:reel, user: user, template: 'narration_over_7_images') }
 
-      it 'returns false' do
-        expect(reel.ready_for_generation?).to be false
+      it 'returns true' do
+        expect(reel.ready_for_generation?).to be true
       end
     end
   end
@@ -137,7 +141,7 @@ RSpec.describe Reel, type: :model do
       reel = create(:reel, user: user)
       expect(reel).to be_persisted
       expect(reel.user).to eq(user)
-      expect(reel.mode).to eq('scene_based')
+      expect(reel.template).to eq('solo_avatars')
       expect(reel.status).to eq('draft')
     end
   end

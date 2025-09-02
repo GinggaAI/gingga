@@ -1,0 +1,51 @@
+- content_for :page_title, @presenter.page_title
+
+.container.mx-auto.px-4.py-8.max-w-4xl
+  .mb-8
+    %h1.text-3xl.font-bold.mb-2.text-gray-900= @presenter.main_title
+    %p.text-base.text-gray-600= @presenter.main_description
+
+  .mb-8
+    .flex.bg-gray-100.rounded-lg.p-1.max-w-md
+      = link_to scene_based_reels_path, class: @presenter.scene_based_tab_classes do
+        = t('reels.tabs.scene_based')
+      = link_to narrative_reels_path, class: @presenter.narrative_tab_classes, style: @presenter.narrative_tab_style do
+        = t('reels.tabs.narrative')
+
+  = form_with model: @reel, url: narrative_reels_path, local: true, class: "space-y-8" do |form|
+
+    - if @presenter.has_errors?
+      .bg-red-50.border.border-red-200.rounded-lg.p-4
+        %h4.text-red-800.font-medium= @presenter.error_title
+        %ul.mt-2.text-red-600.text-sm.space-y-1
+          - @presenter.error_messages.each do |message|
+            %li= message
+
+    = render Ui::FormSectionComponent.new(title: @presenter.basic_info_title, description: @presenter.basic_info_description) do
+      .space-y-6
+        .space-y-2
+          = form.label :title, @presenter.title_label, class: "block text-sm font-medium text-gray-700"
+          = form.text_field :title, placeholder: @presenter.title_placeholder, class: "form-input w-full"
+
+        .space-y-2
+          = form.label :description, @presenter.description_label, class: "block text-sm font-medium text-gray-700"
+          = form.text_area :description, placeholder: @presenter.description_placeholder, rows: 3, class: "form-input w-full"
+
+    = render Ui::FormSectionComponent.new(title: @presenter.narrative_content_title, description: @presenter.narrative_content_description) do
+      .space-y-6
+        .space-y-2
+          = form.label :narration_text, @presenter.narration_text_label, class: "block text-sm font-medium text-gray-700"
+          = form.text_area :narration_text, placeholder: @presenter.narration_text_placeholder, rows: 6, class: "form-input w-full"
+
+    = render Ui::FormSectionComponent.new(title: @presenter.image_themes_title, description: @presenter.image_themes_description) do
+      .space-y-2
+        = form.label :image_themes, @presenter.image_themes_label, class: "block text-sm font-medium text-gray-700"
+        = form.text_area :image_themes, placeholder: @presenter.image_themes_placeholder, rows: 3, class: "form-input w-full"
+
+    = render Ui::FormSectionComponent.new(title: @presenter.additional_instructions_title, description: @presenter.additional_instructions_description) do
+      .space-y-2
+        = form.label :additional_instructions, @presenter.style_direction_label, class: "block text-sm font-medium text-gray-700"
+        = form.text_area :additional_instructions, placeholder: @presenter.style_direction_placeholder, rows: 4, class: "form-input w-full"
+
+    .flex.justify-end.pt-6
+      = render Ui::ButtonComponent.new(label: @presenter.submit_button_label, variant: :primary, type: :submit, size: :lg)

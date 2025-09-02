@@ -305,3 +305,76 @@ en:
       network_error: "Network error occurred. Please try again."
       failed_to_load: "Failed to load strategy plan"
       no_strategy_to_refine: "No strategy plan found to refine"
+
+  # Reels
+  reels:
+    create_reel: "Create Reel"
+    description: "Choose your preferred creation method and generate engaging video content"
+    
+    # Tabs
+    tabs:
+      scene_based: "Scene-Based"
+      narrative: "Narrative"
+      
+    # Scene-Based
+    scene_based:
+      page_title: "Create Scene-Based Reel"
+      
+    # Narrative
+    narrative:
+      page_title: "Create Narrative Reel"
+      content_title: "Narrative Content"
+      content_description: "Define the narration and visual themes for your reel"
+      narration_text: "Narration Text"
+      image_themes_title: "Visual Themes"
+      image_themes_description: "Define the visual style and themes for your images"
+      image_themes: "Image Themes"
+      
+    # Common Fields
+    fields:
+      title: "Reel Title"
+      description: "Description"
+      
+    # Placeholders
+    placeholders:
+      title: "Enter the title for your reel..."
+      description: "Briefly describe what your reel will be about..."
+      narration_text: "Enter the narration text that will be spoken in your reel..."
+      image_themes: "e.g., modern office, creative workspace, professional photography"
+      additional_instructions: "Add any specific style preferences, mood, pacing, or technical requirements..."
+      
+    # Basic Info
+    basic_info:
+      title: "Basic Reel Info"
+      description: "Essential information about your reel"
+      
+    # AI Avatar
+    ai_avatar:
+      title: "AI Avatar"
+      description: "Choose whether to use AI avatars for your scenes"
+      use_ai_avatars: "Use AI Avatars"
+      enable_description: "Enable AI-generated human avatars for talking head scenes"
+      
+    # Scene Breakdown
+    scene_breakdown:
+      title: "Scene Breakdown"
+      description: "Create individual scenes for your reel. Each scene will have its own script and settings."
+      scenes_count:
+        one: "%{count} scene"
+        other: "%{count} scenes"
+      add_scene: "Add Scene"
+      
+    # Additional Instructions
+    additional_instructions:
+      title: "Additional Instructions"
+      description: "Any specific requirements or creative direction"
+      style_direction: "Style & Direction Notes"
+      
+    # Submit Buttons
+    submit:
+      scene_based: "Generate Scene-Based Reel"
+      narrative: "Generate Narrative Reel"
+      
+    # Errors
+    errors:
+      fix_following: "Please fix the following errors:"

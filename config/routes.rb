@@ -18,10 +18,11 @@ Rails.application.routes.draw do
 
     resources :reels, only: [ :index, :new, :create, :show ] do
       collection do
-        get "scene-based", to: "reels#scene_based"
-        post "scene-based", to: "reels#create_scene_based"
-        get "narrative", to: "reels#narrative"
-        post "narrative", to: "reels#create_narrative"
+        get "scene-based", to: "reels#new", defaults: { template: "solo_avatars" }, as: :scene_based
+        get "narrative", to: "reels#new", defaults: { template: "narration_over_7_images" }, as: :narrative
+        post "scene-based", to: "reels#create", defaults: { template: "solo_avatars" }
+        post "narrative", to: "reels#create", defaults: { template: "narration_over_7_images" }
+        get "new/:template", to: "reels#new", as: :new_template
       end
     end
 

@@ -276,3 +276,76 @@ es:
       network_error: "Ocurrió un error de red. Por favor intenta de nuevo."
       failed_to_load: "Error al cargar el plan de estrategia"
       no_strategy_to_refine: "No se encontró plan de estrategia para refinar"
+
+  # Reels
+  reels:
+    create_reel: "Crear Reel"
+    description: "Elige tu método de creación preferido y genera contenido de video atractivo"
+    
+    # Tabs
+    tabs:
+      scene_based: "Basado en Escenas"
+      narrative: "Narrativo"
+      
+    # Scene-Based
+    scene_based:
+      page_title: "Crear Reel Basado en Escenas"
+      
+    # Narrative
+    narrative:
+      page_title: "Crear Reel Narrativo"
+      content_title: "Contenido Narrativo"
+      content_description: "Define la narración y temas visuales para tu reel"
+      narration_text: "Texto de Narración"
+      image_themes_title: "Temas Visuales"
+      image_themes_description: "Define el estilo visual y temas para tus imágenes"
+      image_themes: "Temas de Imagen"
+      
+    # Common Fields
+    fields:
+      title: "Título del Reel"
+      description: "Descripción"
+      
+    # Placeholders
+    placeholders:
+      title: "Ingresa el título para tu reel..."
+      description: "Describe brevemente de qué tratará tu reel..."
+      narration_text: "Ingresa el texto de narración que será hablado en tu reel..."
+      image_themes: "ej., oficina moderna, espacio de trabajo creativo, fotografía profesional"
+      additional_instructions: "Agrega cualquier preferencia de estilo específica, estado de ánimo, ritmo, o requisitos técnicos..."
+      
+    # Basic Info
+    basic_info:
+      title: "Información Básica del Reel"
+      description: "Información esencial sobre tu reel"
+      
+    # AI Avatar
+    ai_avatar:
+      title: "Avatar IA"
+      description: "Elige si usar avatares IA para tus escenas"
+      use_ai_avatars: "Usar Avatares IA"
+      enable_description: "Habilita avatares humanos generados por IA para escenas de cabeza parlante"
+      
+    # Scene Breakdown
+    scene_breakdown:
+      title: "Desglose de Escenas"
+      description: "Crea escenas individuales para tu reel. Cada escena tendrá su propio guión y configuración."
+      scenes_count:
+        one: "%{count} escena"
+        other: "%{count} escenas"
+      add_scene: "Agregar Escena"
+      
+    # Additional Instructions
+    additional_instructions:
+      title: "Instrucciones Adicionales"
+      description: "Cualquier requisito específico o dirección creativa"
+      style_direction: "Notas de Estilo y Dirección"
+      
+    # Submit Buttons
+    submit:
+      scene_based: "Generar Reel Basado en Escenas"
+      narrative: "Generar Reel Narrativo"
+      
+    # Errors
+    errors:
+      fix_following: "Por favor corrige los siguientes errores:"
