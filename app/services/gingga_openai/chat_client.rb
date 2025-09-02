@@ -1,6 +1,6 @@
 module GinggaOpenAI
   class ChatClient
-    def initialize(user:, model: "gpt-4o", temperature: 0.4, timeout: 60)
+    def initialize(user:, model: Rails.application.config.openai_model, temperature: 0.4, timeout: 60)
       @client = ::OpenAI::Client.new(
         access_token: GinggaOpenAI::ClientForUser.access_token_for(user),
         request_timeout: timeout

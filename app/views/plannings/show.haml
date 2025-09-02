@@ -8,10 +8,10 @@
       .bg-card.text-card-foreground.border-0.shadow-lg.rounded-2xl.mb-6
         .flex.items-center.justify-between.p-6
           .flex.items-center.gap-4
-            %button.px-3.py-1.text-gray-600.hover:text-gray-800
+            %button#prev-month.px-3.py-1.text-gray-600.hover:text-gray-800.transition-colors{title: t('planning.navigation.previous_month')}
               %span ←
             %h2.text-2xl.font-bold.text-gray-900= @presenter.display_month
-            %button.px-3.py-1.text-gray-600.hover:text-gray-800
+            %button#next-month.px-3.py-1.text-gray-600.hover:text-gray-800.transition-colors{title: t('planning.navigation.next_month')}
               %span →
 
           .flex.items-center.gap-3
@@ -28,17 +28,22 @@
           #form-status.text-sm.text-gray-500{style: "display: none;"}
 
         = form_with url: creas_strategist_index_path, method: :post, local: false,
-            id: "strategy-creation-form", class: "strategy-form" do |form|
+                    id: "strategy-creation-form", class: "strategy-form" do |form|
           = form.hidden_field :month, value: @presenter.safe_month_for_js
 
           .grid.grid-cols-1.md:grid-cols-2.gap-4.mb-4
-            .col-span-1.md:col-span-2
-              = form.label "strategy_form[objective_of_the_month]", t('planning.strategy_form.objective_label'),
-                  class: "block text-sm font-medium mb-1 text-gray-700"
-              = form.text_area "strategy_form[objective_of_the_month]",
-                  placeholder: t('planning.strategy_form.objective_placeholder'),
-                  rows: 3, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
-                  required: true
+            .col-span-1
+              = form.label "strategy_form[objective_of_the_month]", t('planning.strategy_form.objective_label'), class: "block text-sm font-medium mb-1 text-gray-700"
+              - options = options_for_select([['Awareness - Build brand recognition', 'awareness'], ['Engagement - Foster community interaction', 'engagement'], ['Sales - Drive conversions and revenue', 'sales'], ['Community - Strengthen customer relationships', 'community']], 'awareness')
+              = form.select "strategy_form[objective_of_the_month]", options, {}, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+
+            .col-span-1
+              = form.label "strategy_form[objective_details]", t('planning.strategy_form.objective_details_label'),
+                           class: "block text-sm font-medium mb-1 text-gray-700"
+              = form.text_area "strategy_form[objective_details]",
+                               placeholder: t('planning.strategy_form.objective_details_placeholder'),
+                               rows: 3, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              %p.text-xs.text-gray-500.mt-1= t('planning.strategy_form.objective_details_help')
 
             .col-span-1
               = form.label "strategy_form[monthly_themes]", t('planning.strategy_form.monthly_themes_label'),
@@ -160,12 +165,38 @@
             %path{"fill-rule": "evenodd", d: "M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z", "clip-rule": "evenodd"}
           %span#error-text= t('planning.messages.error_generating')
 
+      #incomplete-brief-alert.bg-amber-50.border.border-amber-200.rounded-2xl.p-4.mb-6{style: "display: none;"}
+        .flex.items-start.gap-3.text-amber-800
+          %svg.w-5.h-5.flex-shrink-0.mt-0.5{fill: "currentColor", viewBox: "0 0 20 20"}
+            %path{"fill-rule": "evenodd", d: "M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z", "clip-rule": "evenodd"}
+          .flex-1
+            %div#incomplete-brief-text
+          .flex-shrink-0
+            = link_to brand_path(@brand), class: "inline-flex items-center px-3 py-2 text-sm font-medium text-amber-700 bg-amber-100 border border-amber-300 rounded-lg hover:bg-amber-200 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-colors" do
+              = t('planning.incomplete_brief.complete_setup')
+              %svg.w-4.h-4.ml-2{fill: "none", stroke: "currentColor", viewBox: "0 0 24 24"}
+                %path{"stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "2", d: "M13 7l5 5m0 0l-5 5m5-5H6"}
+
+      - unless @current_strategy
+        #no-strategy-message.bg-gray-50.border.border-gray-200.rounded-2xl.p-8.mb-6.text-center
+          .mb-4
+            %svg.w-16.h-16.mx-auto.text-gray-400{fill: "none", stroke: "currentColor", viewBox: "0 0 24 24"}
+              %path{"stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "1.5", d: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"}
+          %h3#no-strategy-title.text-xl.font-semibold.text-gray-700.mb-2= t('planning.no_strategy.title', month: @presenter.display_month)
+          %p#no-strategy-description.text-gray-600.mb-4= t('planning.no_strategy.description')
+          %button#create-strategy-btn.inline-flex.items-center.justify-center.gap-2.bg-gradient-to-r.from-yellow-400.to-orange-500.text-gray-900.font-bold.py-4.px-8.rounded-xl.shadow-lg.hover:from-yellow-500.hover:to-orange-600.hover:shadow-xl.transform.hover:scale-105.transition-all.duration-300{onclick: "document.getElementById('toggle-form').click()"}
+            %svg.w-6.h-6{fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", "stroke-width": "2.5"}
+              %path{"stroke-linecap": "round", "stroke-linejoin": "round", d: "M12 6v6m0 0v6m0-6h6m-6 0H6"}
+            = t('planning.no_strategy.create_button', month: @presenter.display_month)
+
       .space-y-6
         - (1..4).each do |week_number|
           .bg-card.text-card-foreground.border-0.shadow-lg.rounded-2xl
             .flex.items-center.justify-between.p-4.border-b
               %h3.font-semibold.text-gray-900= "#{t('planning.weeks.week')} #{week_number}"
               .flex.items-center.gap-2
+                %button.voxa-refine-week.inline-flex.items-center.justify-center.gap-1.whitespace-nowrap.text-xs.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.bg-primary.h-8.px-3.bg-gradient-to-r.text-white.rounded-lg{class: "[&_svg]:pointer-events-none [&_svg]:size-3 [&_svg]:shrink-0 hover:bg-primary/90 from-[#A37FFF] to-[#3AC8FF] hover:from-[#3AC8FF] hover:to-[#A37FFF]", "data-week": week_number, style: "display: none;"}
+                  %span.text-xs= t('planning.weeks.refine_week', number: week_number)
                 %span.text-sm= t('planning.weeks.goal_label')
                 %select.p-1.border.rounded.text-sm
                   %option= t('planning.weeks.goals.awareness')
@@ -186,6 +217,15 @@
             .content-details-grid.grid.grid-cols-1.gap-3
 
 :javascript
+  // Business logic encapsulation per CLAUDE.md line 84
+  // Determines whether to show beats section for content piece
+  function shouldShowBeatsSection(contentPiece) {
+    if (!contentPiece || typeof contentPiece !== 'object') return false;
+    if (!contentPiece.beats || contentPiece.beats.length === 0) return false;
+    if (contentPiece.status === 'draft') return false;
+    return true;
+  }
+
   document.addEventListener('turbo:load', function() {
     // Initialize page variables
     window.currentMonth = '#{@presenter.safe_month_for_js}';
@@ -199,6 +239,8 @@
     const strategyForm = document.getElementById('strategy-creation-form');
     const submitBtn = document.getElementById('submit-strategy');
     const errorDiv = document.getElementById('error-message');
+    const prevMonthBtn = document.getElementById('prev-month');
+    const nextMonthBtn = document.getElementById('next-month');
 
     // Form toggle button
     if (toggleBtn && form) {
@@ -254,6 +296,12 @@
       voxaBtn.addEventListener('click', handleVoxaRefine);
     }
 
+    // Week-specific Voxa refine buttons
+    const weekRefineButtons = document.querySelectorAll('.voxa-refine-week');
+    weekRefineButtons.forEach(button => {
+      button.addEventListener('click', handleVoxaRefineWeek);
+    });
+
     // Resources Override form handling
     setupResourcesOverrideHandlers();
 
@@ -270,6 +318,21 @@
       // Hide overview button when no plan
       updateOverviewButton();
       updateVoxaButton();
+    }
+
+    // Month navigation
+    if (prevMonthBtn) {
+      prevMonthBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        navigateToMonth(getPreviousMonth(window.currentMonth));
+      });
+    }
+
+    if (nextMonthBtn) {
+      nextMonthBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        navigateToMonth(getNextMonth(window.currentMonth));
+      });
     }
 
     // Also check for plan_id parameter for direct access
@@ -291,8 +354,13 @@
     // Show loading state
     setLoadingState(true, submitBtn, submitText, loadingSpinner);
     hideMessages();
+    
+    // Update no-strategy message to indicate process started
+    updateNoStrategyMessage(true);
 
     const formData = new FormData(form);
+    
+    // Form data prepared for submission
 
     // Create AbortController for timeout handling
     const controller = new AbortController();
@@ -302,6 +370,7 @@
       method: 'POST',
       body: formData,
       headers: {
+        'Accept': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
         'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
       },
@@ -318,20 +387,40 @@
       setLoadingState(false, submitBtn, submitText, loadingSpinner);
 
       if (data.success) {
-        window.currentPlan = data.plan;
-        displayStrategyResult(data.plan, true); // Show result after form submission
-        populateCalendarWithStrategy(data.plan);
-        document.getElementById('strategy-form').style.display = 'none';
-        resetForm();
-        updateButtonText();
-        updateOverviewButton();
-        updateVoxaButton();
+        // Show immediate feedback to user
+        alert('Strategy is being created! This may take a few moments. The page will update automatically when ready.');
+        
+        // Check if the plan is immediately completed (sync) or pending (async)
+        if (data.plan.status === 'completed') {
+          // Handle completed plan immediately
+          window.currentPlan = data.plan;
+          displayStrategyResult(data.plan, true);
+          populateCalendarWithStrategy(data.plan);
+          document.getElementById('strategy-form').style.display = 'none';
+          resetForm();
+          updateButtonText();
+          updateOverviewButton();
+          updateVoxaButton();
 
-        // Update URL with plan_id without page reload
-        if (data.plan && data.plan.id) {
-          const newUrl = new URL(window.location);
-          newUrl.searchParams.set('plan_id', data.plan.id);
-          window.history.pushState({}, '', newUrl);
+          // Update URL with plan_id without page reload
+          if (data.plan && data.plan.id) {
+            const newUrl = new URL(window.location);
+            newUrl.searchParams.set('plan_id', data.plan.id);
+            window.history.pushState({}, '', newUrl);
+          }
+        } else if (data.plan.status === 'pending') {
+          // Handle pending plan - show processing UI and start polling
+          showProcessingStrategy(data.plan);
+          startPollingStrategy(data.plan.id);
+          
+          // Update URL with plan_id
+          if (data.plan && data.plan.id) {
+            const newUrl = new URL(window.location);
+            newUrl.searchParams.set('plan_id', data.plan.id);
+            window.history.pushState({}, '', newUrl);
+          }
+        } else {
+          showError('Strategy generation failed');
         }
       } else {
         showError(data.error || 'Failed to generate strategy');
@@ -347,7 +436,6 @@
         setTimeout(() => checkExistingStrategy(currentMonth), 5000);
       } else {
         showError('#{t('planning.messages.network_error')}');
-        console.error('Error:', error);
       }
     });
   }
@@ -440,12 +528,49 @@
     }
   }
 
+  function showIncompleteBriefAlert(message) {
+    const alertDiv = document.getElementById('incomplete-brief-alert');
+    const alertText = document.getElementById('incomplete-brief-text');
+
+    if (alertDiv && alertText) {
+      alertText.innerHTML = `
+        <strong>Missing Information Required</strong><br>
+        Your brand profile is missing some critical information needed to generate the strategy. 
+        Please complete your brand setup to proceed.<br><br>
+        <em>Details: ${message}</em>
+      `;
+      alertDiv.style.display = 'block';
+      alertDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
   function hideMessages() {
     const resultDiv = document.getElementById('strategy-result');
     const errorDiv = document.getElementById('error-message');
+    const incompleteBriefAlert = document.getElementById('incomplete-brief-alert');
 
     if (resultDiv) resultDiv.style.display = 'none';
     if (errorDiv) errorDiv.style.display = 'none';
+    if (incompleteBriefAlert) incompleteBriefAlert.style.display = 'none';
+  }
+
+  function updateNoStrategyMessage(isProcessing) {
+    const titleElement = document.getElementById('no-strategy-title');
+    const descriptionElement = document.getElementById('no-strategy-description');
+    const buttonElement = document.getElementById('create-strategy-btn');
+    
+    if (!titleElement || !descriptionElement || !buttonElement) return;
+    
+    if (isProcessing) {
+      titleElement.textContent = 'Strategy Generation In Progress';
+      descriptionElement.textContent = 'Your content strategy is being created. This may take a few moments.';
+      buttonElement.style.display = 'none';
+    } else {
+      // Restore original text (this will be handled by page refresh in practice)  
+      titleElement.textContent = `No Strategy for ${window.currentMonth || 'this month'}`;
+      descriptionElement.textContent = 'There is no content strategy for this month yet.';
+      buttonElement.style.display = 'inline-flex';
+    }
   }
 
   function hideErrorMessage() {
@@ -472,7 +597,6 @@
     fetch(`/creas_strategy_plans/${planId}`)
       .then(response => response.json())
       .then(plan => {
-        console.log('Strategy plan loaded:', plan);
         window.currentPlan = plan;
         displayStrategyResult(plan, false); // Just populate content, don't show
         populateCalendarWithStrategy(plan);
@@ -481,7 +605,6 @@
         updateVoxaButton();
       })
       .catch(error => {
-        console.error('Error loading strategy:', error);
         showError('#{t('planning.messages.failed_to_load')}');
       });
   }
@@ -509,7 +632,6 @@
         }
       })
       .catch(error => {
-        console.log('No existing strategy found for month:', month);
         // Keep form closed by default but ready to use
         document.getElementById('strategy-form').style.display = 'none';
       });
@@ -548,13 +670,9 @@
       slot.innerHTML = '<button class="w-full h-8 border-2 border-dashed border-gray-300 rounded text-gray-400 hover:border-gray-400 hover:text-gray-600">+</button>';
     });
 
-    // Debug: log the weekly plan structure
-    console.log('Weekly plan structure:', plan.weekly_plan);
-
     // Populate with new content from weekly_plan structure
     const weeklyPlan = plan.weekly_plan || [];
     weeklyPlan.forEach((week, weekIndex) => {
-      console.log(`Processing week ${weekIndex + 1}:`, week);
 
       // Handle different possible structures in weekly_plan
       // Look for content in various possible fields
@@ -570,10 +688,7 @@
         contentPieces = week;
       }
 
-      console.log(`Found ${contentPieces.length} content pieces for week ${weekIndex + 1}`);
-
       contentPieces.forEach((piece, pieceIndex) => {
-        console.log(`Processing piece ${pieceIndex}:`, piece);
         addContentToCalendar(weekIndex, pieceIndex % 7, piece); // Distribute across days
       });
     });
@@ -610,7 +725,6 @@
   function addContentToCalendar(weekIndex, dayIndex, contentPiece) {
     // Use a more specific selector to avoid form/result sections
     const weekElements = document.querySelectorAll('.space-y-6 > .bg-card.text-card-foreground.border-0.shadow-lg.rounded-2xl');
-    console.log(`Found ${weekElements.length} week elements`);
     // Count correctly: skip form and result sections, find actual week containers
     let actualWeekIndex = 0;
     let weekElement = null;
@@ -619,7 +733,6 @@
       const element = weekElements[i];
       // Look for elements that contain week content (have the week structure)
       if (element.querySelector('.week-content-slot')) {
-        console.log(`Week container found at index ${i}, actualWeekIndex: ${actualWeekIndex}`);
         if (actualWeekIndex === weekIndex) {
           weekElement = element;
           break;
@@ -629,8 +742,6 @@
     }
 
     if (!weekElement) {
-      console.log(`Week element not found for weekIndex: ${weekIndex}`);
-      console.log('Available week elements:', weekElements);
       return;
     }
 
@@ -638,26 +749,58 @@
     const dayElement = dayElements[dayIndex];
 
     if (!dayElement) {
-      console.log(`Day element not found for dayIndex: ${dayIndex}`);
       return;
     }
 
     // Extract content information from the piece
     const platform = contentPiece.platform || 'Instagram';
-    const contentType = contentPiece.type || contentPiece.title || 'Post';
+    const contentType = contentPiece.type || contentPiece.content_type || 'Post';
     const title = contentPiece.title || contentPiece.hook || contentPiece.cta || 'Draft';
+    const status = contentPiece.status || 'draft';
     const icon = getContentIcon(platform, contentType);
 
-    console.log(`Adding content to week ${weekIndex + 1}, day ${dayIndex + 1}:`, {
-      platform,
-      contentType,
-      title: title.substring(0, 30) + '...'
-    });
+    // Different styling based on status
+    const statusStyles = {
+      'draft': 'bg-gray-100 text-gray-700 border-l-4 border-gray-400',
+      'in_production': 'bg-blue-100 text-blue-700 border-l-4 border-blue-500', 
+      'ready_for_review': 'bg-yellow-100 text-yellow-700 border-l-4 border-yellow-500',
+      'approved': 'bg-green-100 text-green-700 border-l-4 border-green-500'
+    };
+
+    const statusStyle = statusStyles[status] || statusStyles['draft'];
+    const statusBadge = status !== 'draft' ? `<span class="inline-block w-2 h-2 rounded-full bg-current opacity-60 mr-1"></span>` : '';
 
     const contentDiv = document.createElement('div');
-    contentDiv.className = 'bg-blue-500 text-white text-xs p-2 rounded mb-2 cursor-pointer hover:bg-blue-600 transition-colors';
-    contentDiv.innerHTML = `${icon} ${title.length > 20 ? title.substring(0, 20) + '...' : title}`;
-    contentDiv.title = title; // Full title on hover
+    contentDiv.className = `${statusStyle} text-xs p-2 rounded mb-2 cursor-pointer hover:opacity-80 transition-all`;
+    
+    // For in_production posts, show hook and CTA if available
+    let cardContent = `${statusBadge}${icon} ${title.length > 18 ? title.substring(0, 18) + '...' : title}`;
+    if (status === 'in_production') {
+      let extraInfo = [];
+      if (contentPiece.hook) {
+        extraInfo.push(`🎣 ${contentPiece.hook.length > 15 ? contentPiece.hook.substring(0, 15) + '...' : contentPiece.hook}`);
+      }
+      if (contentPiece.cta) {
+        extraInfo.push(`📢 ${contentPiece.cta.length > 15 ? contentPiece.cta.substring(0, 15) + '...' : contentPiece.cta}`);
+      }
+      if (extraInfo.length > 0) {
+        cardContent += `<div class="mt-1 text-[10px] opacity-75">${extraInfo.join('<br>')}</div>`;
+      }
+    }
+    
+    contentDiv.innerHTML = cardContent;
+    
+    // Enhanced tooltip for in_production posts
+    let tooltipText = `${title} (${status.replace('_', ' ')})`;
+    if (status === 'in_production') {
+      if (contentPiece.hook) {
+        tooltipText += `\n🎣 Hook: ${contentPiece.hook}`;
+      }
+      if (contentPiece.cta) {
+        tooltipText += `\n📢 CTA: ${contentPiece.cta}`;
+      }
+    }
+    contentDiv.title = tooltipText;
     contentDiv.onclick = () => showContentDetails(weekIndex, contentPiece);
 
     // Insert before the + button
@@ -743,58 +886,169 @@
 
     const title = contentPiece.title || 'Content Draft';
     const platform = contentPiece.platform || 'Instagram';
-    const type = contentPiece.type || 'Post';
+    const type = contentPiece.type || contentPiece.content_type || 'Post';
+    const status = contentPiece.status || 'draft';
+    const pilar = contentPiece.pilar || contentPiece.pillar || '';
+    
+    // Status styling
+    const statusColors = {
+      'draft': 'bg-gray-100 text-gray-700',
+      'in_production': 'bg-blue-100 text-blue-800', 
+      'ready_for_review': 'bg-yellow-100 text-yellow-800',
+      'approved': 'bg-green-100 text-green-800'
+    };
+    const statusColor = statusColors[status] || statusColors['draft'];
+    const borderColor = status === 'draft' ? 'border-gray-500' : status === 'in_production' ? 'border-blue-500' : status === 'ready_for_review' ? 'border-yellow-500' : 'border-green-500';
 
     const contentDetailHTML = `
-      <div id="${contentId}" class="bg-white p-4 rounded border-l-4 border-blue-500 shadow-sm">
+      <div id="${contentId}" class="bg-white p-4 rounded border-l-4 ${borderColor} shadow-sm">
         <div class="flex justify-between items-start mb-3">
-          <h4 class="text-lg font-semibold text-gray-900">${title}</h4>
-          <div class="flex items-center gap-2">
-            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">${platform} ${type}</span>
-            <button onclick="removeContentDetail('${contentId}')" class="text-gray-400 hover:text-gray-600 text-lg font-bold">&times;</button>
+          <div>
+            <h4 class="text-lg font-semibold text-gray-900">${title}</h4>
+            <div class="flex items-center gap-2 mt-1">
+              <span class="${statusColor} text-xs px-2 py-1 rounded font-medium">${status.replace('_', ' ').toUpperCase()}</span>
+              <span class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">${platform} ${type}</span>
+              ${pilar ? `<span class="bg-indigo-100 text-indigo-700 text-xs px-2 py-1 rounded">Pillar ${pilar}</span>` : ''}
+            </div>
           </div>
+          <button onclick="removeContentDetail('${contentId}')" class="text-gray-400 hover:text-gray-600 text-lg font-bold">&times;</button>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Left Column: Core Content -->
           <div class="space-y-3">
             ${contentPiece.hook ? `
               <div class="bg-blue-50 p-3 rounded">
-                <h5 class="font-medium text-gray-900 mb-1">#{t('planning.content.hook')}</h5>
+                <h5 class="font-medium text-gray-900 mb-1">🎣 Hook</h5>
                 <p class="text-sm text-gray-700">${contentPiece.hook}</p>
+              </div>
+            ` : ''}
+
+            ${contentPiece.description ? `
+              <div class="bg-yellow-50 p-3 rounded">
+                <h5 class="font-medium text-gray-900 mb-1">📝 Description</h5>
+                <p class="text-sm text-gray-700">${contentPiece.description}</p>
               </div>
             ` : ''}
 
             ${contentPiece.cta ? `
               <div class="bg-green-50 p-3 rounded">
-                <h5 class="font-medium text-gray-900 mb-1">#{t('planning.content.cta')}</h5>
+                <h5 class="font-medium text-gray-900 mb-1">📢 Call to Action</h5>
                 <p class="text-sm text-gray-700">${contentPiece.cta}</p>
+              </div>
+            ` : ''}
+
+            ${contentPiece.text_base ? `
+              <div class="bg-slate-50 p-3 rounded">
+                <h5 class="font-medium text-gray-900 mb-1">📄 Text Base</h5>
+                <p class="text-sm text-gray-700 whitespace-pre-line">${contentPiece.text_base}</p>
               </div>
             ` : ''}
           </div>
 
+          <!-- Right Column: Production Details -->
           <div class="space-y-3">
-            ${contentPiece.description ? `
-              <div class="bg-yellow-50 p-3 rounded">
-                <h5 class="font-medium text-gray-900 mb-1">#{t('planning.content.description')}</h5>
-                <p class="text-sm text-gray-700">${contentPiece.description}</p>
-              </div>
-            ` : ''}
-
             ${contentPiece.visual_notes ? `
               <div class="bg-purple-50 p-3 rounded">
-                <h5 class="font-medium text-gray-900 mb-1">#{t('planning.content.visual_notes')}</h5>
+                <h5 class="font-medium text-gray-900 mb-1">🎨 Visual Notes</h5>
                 <p class="text-sm text-gray-700">${contentPiece.visual_notes}</p>
               </div>
             ` : ''}
 
-            ${contentPiece.pillar ? `
+            ${contentPiece.template ? `
               <div class="bg-indigo-50 p-3 rounded">
-                <h5 class="font-medium text-gray-900 mb-1">#{t('planning.content.content_pillar')}</h5>
-                <p class="text-sm text-gray-700">${contentPiece.pillar}</p>
+                <h5 class="font-medium text-gray-900 mb-1">🎬 Template</h5>
+                <p class="text-sm text-gray-700">${contentPiece.template.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>
+              </div>
+            ` : ''}
+
+            ${contentPiece.hashtags ? `
+              <div class="bg-cyan-50 p-3 rounded">
+                <h5 class="font-medium text-gray-900 mb-1">#️⃣ Hashtags</h5>
+                <p class="text-sm text-gray-700">${contentPiece.hashtags}</p>
+              </div>
+            ` : ''}
+
+            ${contentPiece.kpi_focus ? `
+              <div class="bg-orange-50 p-3 rounded">
+                <h5 class="font-medium text-gray-900 mb-1">🎯 KPI Focus</h5>
+                <p class="text-sm text-gray-700">${contentPiece.kpi_focus}</p>
+              </div>
+            ` : ''}
+
+            ${contentPiece.success_criteria ? `
+              <div class="bg-teal-50 p-3 rounded">
+                <h5 class="font-medium text-gray-900 mb-1">📊 Success Criteria</h5>
+                <p class="text-sm text-gray-700">${contentPiece.success_criteria}</p>
               </div>
             ` : ''}
           </div>
         </div>
+        
+        ${contentPiece.publish_date || contentPiece.scheduled_day ? `
+          <div class="mt-4 p-3 bg-blue-50 rounded">
+            <h5 class="font-medium text-gray-900 mb-2">📅 Scheduling</h5>
+            <div class="flex gap-4 text-sm">
+              ${contentPiece.publish_date ? `<span class="text-gray-700"><strong>Publish Date:</strong> ${contentPiece.publish_date}</span>` : ''}
+              ${contentPiece.scheduled_day ? `<span class="text-gray-700"><strong>Day:</strong> ${contentPiece.scheduled_day}</span>` : ''}
+            </div>
+          </div>
+        ` : ''}
+        
+        ${contentPiece.scenes && contentPiece.scenes.length > 0 ? `
+          <div class="mt-4 p-3 bg-purple-50 rounded border-l-4 border-purple-500">
+            <h5 class="font-medium text-gray-900 mb-3">🎬 Shot Plan - Scenes</h5>
+            <div class="space-y-3">
+              ${contentPiece.scenes.map(scene => `
+                <div class="bg-white p-3 rounded border-l-2 border-purple-300">
+                  <div class="flex items-start justify-between mb-2">
+                    <h6 class="font-semibold text-sm text-purple-800">
+                      ${scene.scene_number ? `Scene ${scene.scene_number}` : 'Scene'}
+                      ${scene.role ? ` - ${scene.role}` : ''}
+                    </h6>
+                    ${scene.duration ? `<span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">${scene.duration}</span>` : ''}
+                  </div>
+                  ${scene.description ? `<p class="text-sm text-gray-700 mb-2">${scene.description}</p>` : ''}
+                  ${scene.visual ? `<p class="text-xs text-gray-600"><strong>Visual:</strong> ${scene.visual}</p>` : ''}
+                  ${scene.on_screen_text ? `<p class="text-xs text-gray-600"><strong>On-screen text:</strong> ${scene.on_screen_text}</p>` : ''}
+                  ${scene.voiceover ? `<p class="text-xs text-gray-600"><strong>Voiceover:</strong> ${scene.voiceover}</p>` : ''}
+                  ${scene.visual_elements && scene.visual_elements.length > 0 ? `
+                    <div class="mt-2">
+                      <p class="text-xs font-medium text-gray-600 mb-1">Visual Elements:</p>
+                      <div class="flex flex-wrap gap-1">
+                        ${scene.visual_elements.map(element => `<span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">${element}</span>`).join('')}
+                      </div>
+                    </div>
+                  ` : ''}
+                  ${scene.avatar_id ? `<p class="text-xs text-gray-600 mt-1"><strong>Avatar:</strong> ${scene.avatar_id}</p>` : ''}
+                  ${scene.voice_id ? `<p class="text-xs text-gray-600"><strong>Voice:</strong> ${scene.voice_id}</p>` : ''}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+        
+        ${shouldShowBeatsSection(contentPiece) ? `
+          <div class="mt-4 p-3 bg-amber-50 rounded border-l-4 border-amber-500">
+            <h5 class="font-medium text-gray-900 mb-3">📋 Shot Plan - Beats</h5>
+            <div class="space-y-2">
+              ${contentPiece.beats.map(beat => `
+                <div class="bg-white p-2 rounded border-l-2 border-amber-300">
+                  <div class="flex items-center justify-between">
+                    <span class="font-medium text-sm text-amber-800">
+                      ${beat.beat_number ? `Beat ${beat.beat_number}` : 'Beat'}
+                      ${beat.idx ? ` (${beat.idx})` : ''}
+                    </span>
+                    ${beat.duration ? `<span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">${beat.duration}</span>` : ''}
+                  </div>
+                  ${beat.description ? `<p class="text-sm text-gray-700 mt-1">${beat.description}</p>` : ''}
+                  ${beat.image_prompt ? `<p class="text-xs text-gray-600 mt-1"><strong>Image:</strong> ${beat.image_prompt}</p>` : ''}
+                  ${beat.voiceover ? `<p class="text-xs text-gray-600"><strong>Voiceover:</strong> ${beat.voiceover}</p>` : ''}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
       </div>
     `;
 
@@ -951,13 +1205,19 @@
 
   function updateVoxaButton() {
     const voxaBtn = document.getElementById('voxa-refine');
+    const weekRefineButtons = document.querySelectorAll('.voxa-refine-week');
+    
+    const shouldShow = window.currentPlan && window.currentPlan.id;
+    
+    // Update main Voxa button
     if (voxaBtn) {
-      if (window.currentPlan && window.currentPlan.id) {
-        voxaBtn.style.display = 'inline-block';
-      } else {
-        voxaBtn.style.display = 'none';
-      }
+      voxaBtn.style.display = shouldShow ? 'inline-block' : 'none';
     }
+    
+    // Update week-specific Voxa buttons
+    weekRefineButtons.forEach(button => {
+      button.style.display = shouldShow ? 'inline-flex' : 'none';
+    });
   }
 
   function handleVoxaRefine(e) {
@@ -1002,4 +1262,182 @@
     // Submit form
     document.body.appendChild(form);
     form.submit();
+  }
+
+  function handleVoxaRefineWeek(e) {
+    e.preventDefault();
+
+    if (!window.currentPlan || !window.currentPlan.id) {
+      showError('#{t('planning.messages.no_strategy_to_refine')}');
+      return;
+    }
+
+    const weekNumber = e.target.closest('button').getAttribute('data-week');
+    
+    if (!weekNumber) {
+      showError('Invalid week number');
+      return;
+    }
+
+    const button = e.target.closest('button');
+    const originalText = button.textContent;
+
+    // Show loading state
+    button.disabled = true;
+    button.textContent = `Refining Week ${weekNumber}...`;
+
+    hideMessages();
+
+    // Create form and submit
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/planning/voxa_refine_week';
+
+    // Add CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (csrfToken) {
+      const csrfInput = document.createElement('input');
+      csrfInput.type = 'hidden';
+      csrfInput.name = 'authenticity_token';
+      csrfInput.value = csrfToken.getAttribute('content');
+      form.appendChild(csrfInput);
+    }
+
+    // Add plan_id
+    const planIdInput = document.createElement('input');
+    planIdInput.type = 'hidden';
+    planIdInput.name = 'plan_id';
+    planIdInput.value = window.currentPlan.id;
+    form.appendChild(planIdInput);
+
+    // Add week_number
+    const weekInput = document.createElement('input');
+    weekInput.type = 'hidden';
+    weekInput.name = 'week_number';
+    weekInput.value = weekNumber;
+    form.appendChild(weekInput);
+
+    // Submit form
+    document.body.appendChild(form);
+    form.submit();
+  }
+
+  // Month navigation helper functions
+  function getPreviousMonth(currentMonth) {
+    const [year, month] = currentMonth.split('-').map(Number);
+    const date = new Date(year, month - 2); // month - 1 for 0-based, -1 more for previous
+    return `${date.getFullYear()}-${date.getMonth() + 1}`;
+  }
+
+  function getNextMonth(currentMonth) {
+    const [year, month] = currentMonth.split('-').map(Number);
+    const date = new Date(year, month); // month - 1 for 0-based, +1 for next = month
+    return `${date.getFullYear()}-${date.getMonth() + 1}`;
+  }
+
+  function navigateToMonth(newMonth) {
+    // Update URL and reload page with new month
+    const url = new URL(window.location);
+    url.searchParams.set('month', newMonth);
+    url.searchParams.delete('plan_id'); // Remove plan_id when navigating by month
+    window.location.href = url.toString();
+  }
+
+  function showProcessingStrategy(plan) {
+    const strategyCard = document.getElementById('strategy-card');
+    const strategyTitle = document.getElementById('strategy-title');
+    const strategyDescription = document.getElementById('strategy-description');
+    
+    if (strategyCard) {
+      strategyCard.style.display = 'block';
+      strategyCard.className = 'bg-yellow-50 border border-yellow-200 p-6 rounded-xl shadow-sm';
+    }
+    
+    if (strategyTitle) {
+      strategyTitle.innerHTML = '<span class="animate-pulse">🔄 #{t("planning.strategy.processing")}</span>';
+    }
+    
+    if (strategyDescription) {
+      strategyDescription.innerHTML = `
+        <div class="text-center py-8">
+          <div class="animate-spin inline-block w-8 h-8 border-[3px] border-current border-t-transparent text-blue-600 rounded-full mb-4" role="status" aria-label="loading">
+            <span class="sr-only">Loading...</span>
+          </div>
+          <p class="text-gray-600 mb-2">#{t("planning.strategy.generating_strategy")}</p>
+          <p class="text-sm text-gray-500">#{t("planning.strategy.please_wait")}</p>
+        </div>
+      `;
+    }
+
+    // Hide form and show processing state
+    const strategyForm = document.getElementById('strategy-form');
+    if (strategyForm) {
+      strategyForm.style.display = 'none';
+    }
+    
+    // Store current plan for polling
+    window.currentPlan = plan;
+  }
+
+  function startPollingStrategy(planId) {
+    let pollCount = 0;
+    const maxPolls = 60; // Poll for up to 5 minutes (5 second intervals)
+    
+    const pollInterval = setInterval(() => {
+      pollCount++;
+      
+      if (pollCount >= maxPolls) {
+        clearInterval(pollInterval);
+        showError('#{t("planning.messages.generation_timeout")}');
+        return;
+      }
+      
+      fetch(`/strategy_plan_status/${planId}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.completed) {
+          clearInterval(pollInterval);
+          
+          // Update current plan with completed data
+          window.currentPlan = data.plan;
+          
+          // Display the completed strategy
+          displayStrategyResult(data.plan, true);
+          populateCalendarWithStrategy(data.plan);
+          
+          // Update UI states
+          updateButtonText();
+          updateOverviewButton();
+          updateVoxaButton();
+        } else if (data.failed) {
+          clearInterval(pollInterval);
+          
+          // Check if this is an incomplete brief error
+          if (data.meta && data.meta.error_type === 'incomplete_brief') {
+            showIncompleteBriefAlert(data.error_message);
+          } else {
+            showError(data.error_message || '#{t("planning.messages.generation_failed")}');
+          }
+        }
+        // If still processing, continue polling
+      })
+      .catch(error => {
+        if (pollCount >= 3) { // Stop polling after 3 consecutive errors
+          clearInterval(pollInterval);
+          showError('#{t("planning.messages.network_error")}');
+        }
+      });
+    }, 5000); // Poll every 5 seconds
   }

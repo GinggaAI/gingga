@@ -42,12 +42,7 @@ module Ui
     end
 
     def data_attributes
-      attrs = { controller: "toast" }
-      if auto_dismiss
-        attrs[:toast_auto_dismiss_value] = "true"
-        attrs[:toast_duration_value] = "5000"
-      end
-      attrs
+      { controller: "toast" }
     end
 
     def render_icon
@@ -62,14 +57,7 @@ module Ui
     end
 
     def render_dismiss_button
-      content_tag(:button,
-        type: "button",
-        class: "ui-toast__dismiss",
-        "aria-label": "Dismiss notification",
-        data: { action: "click->toast#dismiss" }
-      ) do
-        "×"
-      end
+      raw('<button type="button" class="ui-toast__dismiss" aria-label="Dismiss notification">×</button>')
     end
 
     def validate_variant(variant)

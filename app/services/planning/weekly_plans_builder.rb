@@ -87,7 +87,8 @@ module Planning
       return current_month_start unless year && month
 
       Date.new(year.to_i, month.to_i, 1)
-    rescue ArgumentError, NoMethodError, TypeError
+    rescue ArgumentError, NoMethodError, TypeError => e
+      Rails.logger.warn "WeeklyPlansBuilder: Failed to parse month '#{month}': #{e.message}"
       current_month_start
     end
 

@@ -16,7 +16,6 @@ module Creas
         origin_id: @item.origin_id,
         origin_source: @item.origin_source,
         week: @item.week,
-        week_index: @item.week_index,
         scheduled_day: @item.scheduled_day,
         content_name: @item.content_name,
         status: @item.status,

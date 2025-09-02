@@ -36,42 +36,33 @@ RSpec.describe Creas::NoctuaStrategyService do
     }.to_json
   end
 
-  subject { described_class.new(user: user, brief: brief, brand: brand, month: month) }
+  subject { described_class.new(user: user, brief: brief, brand: brand, month: month, strategy_form: strategy_form) }
+  let(:strategy_form) { {} }
 
-  describe '#call' do
-    let(:mock_chat_client) { instance_double(GinggaOpenAI::ChatClient) }
-
+  describe '#call (async version)' do
     before do
-      allow(GinggaOpenAI::ChatClient).to receive(:new).and_return(mock_chat_client)
-      allow(mock_chat_client).to receive(:chat!).and_return(mock_openai_response)
+      # Mock the background job to prevent it from being enqueued in tests
+      allow(GenerateNoctuaStrategyJob).to receive(:perform_later)
     end
 
-    it 'creates a new strategy plan' do
+    it 'creates a new strategy plan with pending status' do
       expect {
         subject.call
       }.to change(CreasStrategyPlan, :count).by(1)
     end
 
-    it 'returns the created strategy plan' do
+    it 'returns the created strategy plan with pending status' do
       plan = subject.call
       expect(plan).to be_a(CreasStrategyPlan)
       expect(plan.user).to eq(user)
       expect(plan.brand).to eq(brand)
       expect(plan.month).to eq(month)
-      expect(plan.objective_of_the_month).to eq("awareness")
-      expect(plan.frequency_per_week).to eq(4)
+      expect(plan.pending?).to be true
+      expect(plan.objective_of_the_month).to be_nil # Not filled yet
+      expect(plan.frequency_per_week).to be_nil # Not filled yet
     end
 
-    it 'stores the raw payload from OpenAI' do
-      plan = subject.call
-      expect(plan.raw_payload).to include(
-        "brand_name" => brand.name,
-        "month" => month,
-        "objective_of_the_month" => "awareness"
-      )
-    end
-
-    it 'creates a brand snapshot' do
+    it 'creates a brand snapshot immediately' do
       plan = subject.call
       expect(plan.brand_snapshot).to include(
         "name" => brand.name,
@@ -83,42 +74,50 @@ RSpec.describe Creas::NoctuaStrategyService do
       expect(plan.brand_snapshot["channels"]).to be_an(Array)
     end
 
-    it 'stores meta information' do
-      plan = subject.call
-      expect(plan.meta).to include(
-        "model" => "gpt-4o",
-        "prompt_version" => "noctua-v1"
+    it 'queues a batch job for processing' do
+      expect(GenerateNoctuaStrategyBatchJob).to receive(:perform_later).with(
+        instance_of(String), # strategy_plan.id
+        brief,
+        1,                   # batch_number
+        4,                   # total_batches
+        instance_of(String)  # batch_id
       )
+
+      subject.call
     end
 
-    context 'when OpenAI returns non-JSON' do
-      before do
-        allow(mock_chat_client).to receive(:chat!).and_return("This is not JSON")
-      end
-
-      it 'raises a JSON parse error' do
-        expect {
-          subject.call
-        }.to raise_error("Model returned non-JSON content")
-      end
-    end
-
-    context 'when required fields are missing' do
-      let(:invalid_response) do
+    context 'with strategy_form provided' do
+      let(:strategy_form) do
         {
-          "brand_name" => brand.name
-          # missing required fields
-        }.to_json
+          objective_of_the_month: 'sales',
+          primary_objective: 'awareness',
+          frequency_per_week: 5,
+          monthly_themes: [ 'theme1', 'theme2' ],
+          resources_override: { ai_avatars: true, stock: false }
+        }
       end
 
-      before do
-        allow(mock_chat_client).to receive(:chat!).and_return(invalid_response)
+      it 'sets strategy form attributes on the plan' do
+        plan = subject.call
+
+        expect(plan.objective_of_the_month).to eq('sales') # Uses objective_of_the_month first
+        expect(plan.frequency_per_week).to eq(5)
+        expect(plan.monthly_themes).to eq([ 'theme1', 'theme2' ])
+        expect(plan.resources_override).to eq({ 'ai_avatars' => true, 'stock' => false })
       end
 
-      it 'raises an error due to missing required fields' do
-        expect {
-          subject.call
-        }.to raise_error(KeyError, /key not found/)
+      context 'when objective_of_the_month is nil but primary_objective is present' do
+        let(:strategy_form) do
+          {
+            primary_objective: 'engagement',
+            frequency_per_week: 3
+          }
+        end
+
+        it 'falls back to primary_objective' do
+          plan = subject.call
+          expect(plan.objective_of_the_month).to eq('engagement')
+        end
       end
     end
   end

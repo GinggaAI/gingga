@@ -24,7 +24,8 @@ RSpec.describe "Planning UI Components", type: :request do
     end
 
     it "displays the month navigation controls" do
-      expect(response.body).to include("August 2025")
+      current_month_display = Date.current.strftime("%B %Y")
+      expect(response.body).to include(current_month_display)
     end
 
     it "shows the Overview and Add Content buttons" do

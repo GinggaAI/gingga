@@ -3,6 +3,15 @@ require 'rails_helper'
 RSpec.describe User, type: :model do
   describe 'associations' do
     it { is_expected.to have_many(:api_tokens).dependent(:destroy) }
+    it { is_expected.to have_many(:reels).dependent(:destroy) }
+    it { is_expected.to have_many(:brands).dependent(:destroy) }
+  end
+
+  describe 'validations' do
+    it { is_expected.to validate_presence_of(:email) }
+    it { is_expected.to validate_uniqueness_of(:email).case_insensitive }
+    it { is_expected.to allow_value('user@example.com').for(:email) }
+    it { is_expected.not_to allow_value('invalid-email').for(:email) }
   end
 
   describe '#active_token_for' do

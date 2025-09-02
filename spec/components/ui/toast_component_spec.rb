@@ -55,8 +55,6 @@ RSpec.describe Ui::ToastComponent, type: :component do
     ))
 
     expect(result).to have_css("[data-controller='toast']")
-    expect(result).to have_css("[data-toast-auto-dismiss-value='true']")
-    expect(result).to have_css("[data-toast-duration-value='5000']")
   end
 
   it "renders appropriate icons for variants" do

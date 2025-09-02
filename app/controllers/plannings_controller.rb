@@ -32,16 +32,49 @@ class PlanningsController < ApplicationController
     strategy = find_strategy_by_id_or_current
 
     unless strategy
+      Rails.logger.warn "PlanningsController: No strategy found for Voxa refinement (user: #{current_user.id})"
       redirect_to planning_path, alert: "No strategy found to refine." and return
     end
 
-    begin
-      Creas::VoxaContentService.new(strategy_plan: strategy).call
-      redirect_to planning_path(plan_id: strategy.id), notice: "Content items refined successfully with Voxa!"
-    rescue StandardError => e
-      Rails.logger.error "Voxa refinement failed: #{e.message}"
-      redirect_to planning_path(plan_id: strategy.id), alert: "Failed to refine content: #{e.message}"
+    Rails.logger.info "PlanningsController: Starting Voxa refinement for strategy #{strategy.id} (user: #{current_user.id})"
+
+    Creas::VoxaContentService.new(strategy_plan: strategy).call
+    Rails.logger.info "PlanningsController: Voxa refinement started successfully for strategy #{strategy.id}"
+    redirect_to planning_path(plan_id: strategy.id), notice: "Content refinement has been started! Please come back to this page in a few minutes to see your refined content."
+  rescue Creas::VoxaContentService::ServiceError => e
+    Rails.logger.error "PlanningsController: Voxa refinement failed for strategy #{strategy.id}: #{e.message}"
+    redirect_to planning_path(plan_id: strategy.id), alert: e.user_message
+  rescue StandardError => e
+    Rails.logger.error "PlanningsController: Unexpected error during Voxa refinement for strategy #{strategy.id}: #{e.message}"
+    redirect_to planning_path(plan_id: strategy.id), alert: "Failed to refine content: #{e.message}"
+  end
+
+  # POST /planning/voxa_refine_week
+  def voxa_refine_week
+    strategy = find_strategy_by_id_or_current
+    week_number = params[:week_number]&.to_i
+
+    unless strategy
+      Rails.logger.warn "PlanningsController: No strategy found for week-specific Voxa refinement (user: #{current_user.id})"
+      redirect_to planning_path, alert: "No strategy found to refine." and return
     end
+
+    unless week_number && (1..4).include?(week_number)
+      Rails.logger.warn "PlanningsController: Invalid week number #{week_number} for Voxa refinement (user: #{current_user.id})"
+      redirect_to planning_path(plan_id: strategy.id), alert: "Invalid week number. Please select a week between 1 and 4." and return
+    end
+
+    Rails.logger.info "PlanningsController: Starting week #{week_number} Voxa refinement for strategy #{strategy.id} (user: #{current_user.id})"
+
+    Creas::VoxaContentService.new(strategy_plan: strategy, target_week: week_number).call
+    Rails.logger.info "PlanningsController: Week #{week_number} Voxa refinement started successfully for strategy #{strategy.id}"
+    redirect_to planning_path(plan_id: strategy.id), notice: "Week #{week_number} content refinement has been started! Please come back to this page in a few minutes to see your refined content."
+  rescue Creas::VoxaContentService::ServiceError => e
+    Rails.logger.error "PlanningsController: Week #{week_number} Voxa refinement failed for strategy #{strategy.id}: #{e.message}"
+    redirect_to planning_path(plan_id: strategy.id), alert: e.user_message
+  rescue StandardError => e
+    Rails.logger.error "PlanningsController: Unexpected error during week #{week_number} Voxa refinement for strategy #{strategy.id}: #{e.message}"
+    redirect_to planning_path(plan_id: strategy.id), alert: "Failed to refine week #{week_number} content: #{e.message}"
   end
 
   private

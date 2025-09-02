@@ -148,11 +148,29 @@ es:
     add_content: "Agregar Contenido"
     add_new_content: "Agregar Nuevo Contenido"
     
+    # Navigation
+    navigation:
+      previous_month: "Mes anterior"
+      next_month: "Mes siguiente"
+      
+    # No strategy messages
+    no_strategy:
+      title: "No hay Estrategia para %{month}"
+      description: "Aún no existe una estrategia de contenido para este mes."
+      create_button: "Crear Estrategia para %{month}"
+      
+    # Incomplete brief
+    incomplete_brief:
+      complete_setup: "Completar Configuración de Marca"
+    
     # Strategy form
     strategy_form:
       title: "🧠 Generar Nueva Estrategia de Contenido"
       objective_label: "Objetivo del Mes"
       objective_placeholder: "ej., Aumentar el reconocimiento y engagement de la marca"
+      objective_details_label: "Detalles Específicos del Objetivo"
+      objective_details_placeholder: "ej., Lanzar nueva línea de productos con 25% de aumento en menciones de marca"
+      objective_details_help: "Opcional: Agregar detalles específicos sobre tu objetivo"
       monthly_themes_label: "Temas Mensuales"
       monthly_themes_placeholder: "Reconocimiento de marca, Exhibición de productos, Engagement comunitario"
       monthly_themes_help: "Separar con comas"
@@ -190,6 +208,12 @@ es:
       generate_strategy: "Generar Estrategia"
       generating: "Generando..."
     
+    # Strategy status
+    strategy:
+      processing: "Procesando..."
+      generating_strategy: "Generando tu estrategia de contenido..."
+      please_wait: "Esto puede tomar unos momentos. Por favor espera."
+    
     # Strategy results
     strategy_result:
       title: "¡Estrategia Generada Exitosamente!"
@@ -214,6 +238,7 @@ es:
     weeks:
       week: "Semana"
       week_details: "Semana %{number} - Detalles del Contenido"
+      refine_week: "Refinar Semana %{number}"
       goal_label: "Objetivo:"
       goals:
         awareness: "Reconocimiento"
@@ -246,9 +271,8 @@ es:
       strategy_not_found: "No se encontró estrategia para el mes"
       invalid_month: "Mes Inválido"
       error_generating: "Error generando estrategia"
+      generation_failed: "La generación de estrategia falló. Por favor intenta de nuevo."
       generation_timeout: "La generación está tomando más tiempo del esperado. Verificando estrategia completada..."
       network_error: "Ocurrió un error de red. Por favor intenta de nuevo."
       failed_to_load: "Error al cargar el plan de estrategia"
       no_strategy_to_refine: "No se encontró plan de estrategia para refinar"
-      generation_timeout: "La generación está tomando más tiempo del esperado. Verificando estrategia completada..."
-      network_error: "Ocurrió un error de red. Por favor intenta de nuevo."

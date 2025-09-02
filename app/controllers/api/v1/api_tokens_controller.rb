@@ -19,7 +19,7 @@ module Api
         if @api_token.save
           render json: ApiTokenSerializer.new(@api_token).as_json, status: :created
         else
-          render json: { errors: @api_token.errors }, status: :unprocessable_content
+          render json: { errors: @api_token.errors }, status: 422
         end
       end
 
@@ -27,7 +27,7 @@ module Api
         if @api_token.update(api_token_params)
           render json: ApiTokenSerializer.new(@api_token).as_json
         else
-          render json: { errors: @api_token.errors }, status: :unprocessable_content
+          render json: { errors: @api_token.errors }, status: 422
         end
       end
 

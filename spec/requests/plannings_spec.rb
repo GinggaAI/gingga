@@ -174,4 +174,65 @@ RSpec.describe PlanningsController, type: :request do
       expect(json_response["strategy_name"]).to eq("Unpadded")
     end
   end
+
+  describe "POST /planning/voxa_refine" do
+    let!(:strategy_plan) do
+      create(:creas_strategy_plan,
+        user: user,
+        brand: brand,
+        month: Date.current.strftime("%Y-%-m"),
+        status: :completed
+      )
+    end
+
+    context "when strategy is not already processing" do
+      it "starts refinement process and shows success message" do
+        # Mock the service to prevent actual job execution
+        allow_any_instance_of(Creas::VoxaContentService).to receive(:call).and_return(strategy_plan)
+
+        post voxa_refine_planning_path, params: { plan_id: strategy_plan.id }
+
+        expect(response).to redirect_to(planning_path(plan_id: strategy_plan.id))
+        expect(flash[:notice]).to include("Content refinement has been started!")
+        expect(flash[:notice]).to include("come back to this page in a few minutes")
+      end
+    end
+
+    context "when strategy is already processing" do
+      before do
+        strategy_plan.update!(status: :processing)
+      end
+
+      it "shows alert about already processing" do
+        post voxa_refine_planning_path, params: { plan_id: strategy_plan.id }
+
+        expect(response).to redirect_to(planning_path(plan_id: strategy_plan.id))
+        expect(flash[:alert]).to include("already in progress")
+        expect(flash[:alert]).to include("wait a few minutes and refresh")
+      end
+    end
+
+    context "when no strategy is found" do
+      it "shows error message" do
+        post voxa_refine_planning_path, params: { plan_id: "nonexistent" }
+
+        expect(response).to redirect_to(planning_path)
+        expect(flash[:alert]).to include("No strategy found")
+      end
+    end
+
+    context "when service raises unexpected error" do
+      before do
+        allow_any_instance_of(Creas::VoxaContentService).to receive(:call).and_raise(StandardError, "Unexpected error")
+      end
+
+      it "shows error message" do
+        post voxa_refine_planning_path, params: { plan_id: strategy_plan.id }
+
+        expect(response).to redirect_to(planning_path(plan_id: strategy_plan.id))
+        expect(flash[:alert]).to include("Failed to refine content")
+        expect(flash[:alert]).to include("Unexpected error")
+      end
+    end
+  end
 end

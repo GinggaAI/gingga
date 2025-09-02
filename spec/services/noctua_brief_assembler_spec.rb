@@ -10,7 +10,9 @@ RSpec.describe NoctuaBriefAssembler do
 
     let(:strategy_form) do
       {
-        objective_of_the_month: 'awareness',
+        primary_objective: 'sales',
+        objective_of_the_month: 'Increase overall product awareness',
+        objective_details: 'Launch new product line with 25% increase in revenue',
         monthly_themes: [ 'product launch', 'customer success' ],
         frequency_per_week: 4,
         resources_override: { ai_avatars: true, stock: false }
@@ -31,7 +33,8 @@ RSpec.describe NoctuaBriefAssembler do
     it 'includes strategy form fields' do
       expect(subject).to include(
         month: '2025-08',
-        objective_of_the_month: 'awareness',
+        objective_of_the_month: 'sales', # Uses primary_objective
+        objective_details: 'Launch new product line with 25% increase in revenue',
         monthly_themes: [ 'product launch', 'customer success' ],
         frequency_per_week: 4,
         resources_override: { ai_avatars: true, stock: false }
@@ -97,7 +100,8 @@ RSpec.describe NoctuaBriefAssembler do
       let(:strategy_form) { {} }
 
       it 'handles missing strategy form fields gracefully' do
-        expect(subject[:objective_of_the_month]).to be_nil
+        expect(subject[:objective_of_the_month]).to eq("awareness") # Default value
+        expect(subject[:objective_details]).to be_nil
         expect(subject[:monthly_themes]).to eq([])
         expect(subject[:frequency_per_week]).to be_nil
         expect(subject[:resources_override]).to eq({})

@@ -10,7 +10,7 @@ RSpec.describe Reel, type: :model do
 
   describe 'validations' do
     it { should validate_presence_of(:mode) }
-    it { should validate_inclusion_of(:mode).in_array(%w[scene_based]) }
+    it { should validate_inclusion_of(:mode).in_array(%w[scene_based narrative]) }
     it { should validate_inclusion_of(:status).in_array(%w[draft processing completed failed]) }
 
     describe 'scene validations for scene_based mode' do
@@ -51,6 +51,14 @@ RSpec.describe Reel, type: :model do
         it 'skips validation for new records' do
           new_reel = build(:reel, user: user, mode: 'scene_based')
           expect(new_reel).to be_valid
+        end
+      end
+
+      context 'when mode is narrative' do
+        let(:reel) { create(:reel, user: user, mode: 'narrative') }
+
+        it 'does not validate scene count' do
+          expect(reel.reload.valid?).to be true
         end
       end
     end
@@ -116,7 +124,7 @@ RSpec.describe Reel, type: :model do
     end
 
     context 'when mode is not scene_based' do
-      let(:reel) { build(:reel, user: user, mode: 'other_mode') }
+      let(:reel) { create(:reel, user: user, mode: 'narrative') }
 
       it 'returns false' do
         expect(reel.ready_for_generation?).to be false

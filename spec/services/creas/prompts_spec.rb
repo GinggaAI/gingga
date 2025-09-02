@@ -75,9 +75,9 @@ RSpec.describe Creas::Prompts do
 
     it 'includes validation rules' do
       expect(subject).to include('VALIDATION')
-      expect(subject).to include('brief complete')
-      expect(subject).to include('all IDs valid/unique')
-      expect(subject).to include('respect brand_guardrails')
+      expect(subject).to include('Brief complete; else ask')
+      expect(subject).to include('All IDs valid/unique')
+      expect(subject).to include('Respect brand_guardrails')
     end
 
     it 'includes ID generation rules' do
@@ -197,7 +197,7 @@ RSpec.describe Creas::Prompts do
     end
 
     it 'defines template rules' do
-      expect(subject).to include('Template rules')
+      expect(subject).to include('CRITICAL TEMPLATE RULES')
       expect(subject).to include('solo_avatars')
       expect(subject).to include('avatar_and_video')
       expect(subject).to include('narration_over_7_images')
@@ -206,10 +206,10 @@ RSpec.describe Creas::Prompts do
     end
 
     it 'includes creative guidelines' do
-      expect(subject).to include('Creative rules')
+      expect(subject).to include('CONTENT QUALITY REQUIREMENTS')
       expect(subject).to include('Hook (0–3s)')
-      expect(subject).to include('Development: tangible value')
-      expect(subject).to include('Close: explicit CTA')
+      expect(subject).to include('Development: Tangible value')
+      expect(subject).to include('Close: Explicit CTA')
     end
 
     it 'specifies scheduling rules' do
@@ -219,9 +219,9 @@ RSpec.describe Creas::Prompts do
     end
 
     it 'includes validation requirements' do
-      expect(subject).to include('Validation')
+      expect(subject).to include('MANDATORY VALIDATION')
       expect(subject).to include('Root keys present')
-      expect(subject).to include('narration_over_7_images → exactly 7 beats')
+      expect(subject).to include('narration_over_7_images → EXACTLY 7 beats')
       expect(subject).to include('hashtags = 3–5 items')
     end
 

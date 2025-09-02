@@ -3,97 +3,13 @@ document.addEventListener('DOMContentLoaded', function() {
   const planId = urlParams.get('plan_id');
   
   if (planId) {
-    console.log('Loading strategy plan:', planId);
     fetchAndDisplayStrategy(planId);
   }
 
-  // Initialize collapsible form functionality
-  initializeStrategyForm();
+  // Form functionality is handled by inline JavaScript in the view
+  // No need to initialize form functionality here anymore
 });
 
-function initializeStrategyForm() {
-  const addContentBtn = document.getElementById('add-content-btn');
-  const formContainer = document.getElementById('strategy-form-container');
-  const cancelBtn = document.getElementById('cancel-form-btn');
-  const cancelBtnFooter = document.getElementById('cancel-form-btn-footer');
-
-  if (!addContentBtn || !formContainer) return;
-
-  // Show form when Add Content button is clicked
-  addContentBtn.addEventListener('click', function() {
-    showStrategyForm();
-  });
-
-  // Hide form when Cancel buttons are clicked
-  if (cancelBtn) {
-    cancelBtn.addEventListener('click', function() {
-      hideStrategyForm();
-    });
-  }
-
-  if (cancelBtnFooter) {
-    cancelBtnFooter.addEventListener('click', function() {
-      hideStrategyForm();
-    });
-  }
-}
-
-function showStrategyForm() {
-  const addContentBtn = document.getElementById('add-content-btn');
-  const formContainer = document.getElementById('strategy-form-container');
-
-  if (addContentBtn && formContainer) {
-    // Hide the Add Content button
-    addContentBtn.style.display = 'none';
-    
-    // Show the form with smooth transition
-    formContainer.style.display = 'block';
-    
-    // Force reflow to ensure display change takes effect before animation
-    formContainer.offsetHeight;
-    
-    // Add smooth entrance animation
-    formContainer.style.opacity = '0';
-    formContainer.style.transform = 'translateY(-10px)';
-    
-    // Trigger animation
-    requestAnimationFrame(function() {
-      formContainer.style.transition = 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out';
-      formContainer.style.opacity = '1';
-      formContainer.style.transform = 'translateY(0)';
-    });
-
-    // Focus on first input
-    const firstInput = formContainer.querySelector('textarea, input');
-    if (firstInput) {
-      setTimeout(() => firstInput.focus(), 300);
-    }
-  }
-}
-
-function hideStrategyForm() {
-  const addContentBtn = document.getElementById('add-content-btn');
-  const formContainer = document.getElementById('strategy-form-container');
-
-  if (addContentBtn && formContainer) {
-    // Animate form out
-    formContainer.style.transition = 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out';
-    formContainer.style.opacity = '0';
-    formContainer.style.transform = 'translateY(-10px)';
-
-    // Hide form and show button after animation
-    setTimeout(function() {
-      formContainer.style.display = 'none';
-      addContentBtn.style.display = 'inline-flex';
-      
-      // Reset form values
-      const form = formContainer.querySelector('form');
-      if (form) {
-        form.reset();
-      }
-    }, 300);
-  }
-}
 
 function fetchAndDisplayStrategy(planId) {
   fetch(`/creas_strategy_plans/${planId}`)
@@ -104,18 +20,15 @@ function fetchAndDisplayStrategy(planId) {
       return response.json();
     })
     .then(plan => {
-      console.log('Strategy plan loaded:', plan);
       displayStrategyData(plan);
     })
     .catch(error => {
-      console.error('Error loading strategy plan:', error);
       showErrorMessage('Failed to load strategy plan. Please try again.');
     });
 }
 
 function displayStrategyData(plan) {
   if (!plan || !plan.weeks) {
-    console.warn('No weeks data found in plan');
     return;
   }
 
@@ -142,11 +55,8 @@ function updateWeekDisplay(weekData, weekIndex) {
   const weekCard = weekCards[weekIndex];
   
   if (!weekCard) {
-    console.warn(`Week card ${weekIndex + 1} not found`);
     return;
   }
-
-  console.log(`Updating week ${weekIndex + 1}:`, weekData);
 
   // Update goal dropdown
   updateWeekGoal(weekCard, weekData.goal);
@@ -161,7 +71,6 @@ function updateWeekGoal(weekCard, goal) {
   const goalSpan = weekCard.querySelector('span[style*="pointer-events"]');
   if (goalSpan) {
     goalSpan.textContent = goal;
-    console.log(`Updated goal to: ${goal}`);
   }
 }
 
@@ -180,8 +89,6 @@ function updateWeekDays(weekCard, daysData) {
 function updateDayContent(dayColumn, dayData) {
   const dayContainer = dayColumn.querySelector('.bg-gray-50');
   if (!dayContainer) return;
-
-  console.log(`Updating ${dayData.day}:`, dayData.contents);
 
   // Clear existing dynamic content (keep + button)
   const existingContent = dayContainer.querySelectorAll('.p-2.rounded-lg:not(.add-button)');
@@ -261,11 +168,9 @@ function createContentIcon(contentType) {
 }
 
 function showSuccessMessage(message) {
-  console.log('✅', message);
   // Could add toast notification here
 }
 
 function showErrorMessage(message) {
-  console.error('❌', message);
   // Could add error toast notification here
 }

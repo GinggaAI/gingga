@@ -47,7 +47,8 @@ class Ui::LanguageSwitcherComponent < ViewComponent::Base
         else
           "/#{locale}/#{current_path}"
         end
-      rescue StandardError
+      rescue StandardError => e
+        Rails.logger.warn "LanguageSwitcherComponent: Failed to generate path for locale #{locale}: #{e.message}"
         # Fallback if path processing fails
         locale == I18n.default_locale.to_s ? "/" : "/#{locale}/"
       end

@@ -177,11 +177,29 @@ en:
     add_content: "Add Content"
     add_new_content: "Add New Content"
     
+    # Navigation
+    navigation:
+      previous_month: "Previous month"
+      next_month: "Next month"
+      
+    # No strategy messages
+    no_strategy:
+      title: "No Strategy for %{month}"
+      description: "There is no content strategy for this month yet."
+      create_button: "Create Strategy for %{month}"
+      
+    # Incomplete brief
+    incomplete_brief:
+      complete_setup: "Complete Brand Setup"
+    
     # Strategy form
     strategy_form:
       title: "🧠 Generate New Content Strategy"
       objective_label: "Objective of the Month"
       objective_placeholder: "e.g., Increase brand awareness and engagement"
+      objective_details_label: "Specific Objective Details"
+      objective_details_placeholder: "e.g., Launch new product line with 25% increase in brand mentions"
+      objective_details_help: "Optional: Add specific details about your objective"
       monthly_themes_label: "Monthly Themes"
       monthly_themes_placeholder: "Brand awareness, Product showcase, Community engagement"
       monthly_themes_help: "Separate with commas"
@@ -219,6 +237,12 @@ en:
       generate_strategy: "Generate Strategy"
       generating: "Generating..."
     
+    # Strategy status
+    strategy:
+      processing: "Processing..."
+      generating_strategy: "Generating your content strategy..."
+      please_wait: "This may take a few moments. Please wait."
+    
     # Strategy results
     strategy_result:
       title: "Strategy Generated Successfully!"
@@ -243,6 +267,7 @@ en:
     weeks:
       week: "Week"
       week_details: "Week %{number} - Content Details"
+      refine_week: "Refine Week %{number}"
       goal_label: "Goal:"
       goals:
         awareness: "Awareness"
@@ -275,9 +300,8 @@ en:
       strategy_not_found: "No strategy found for month"
       invalid_month: "Invalid Month"
       error_generating: "Error generating strategy"
+      generation_failed: "Strategy generation failed. Please try again."
       generation_timeout: "Generation is taking longer than expected. Checking for completed strategy..."
       network_error: "Network error occurred. Please try again."
       failed_to_load: "Failed to load strategy plan"
       no_strategy_to_refine: "No strategy plan found to refine"
-      generation_timeout: "Generation is taking longer than expected. Checking for completed strategy..."
-      network_error: "Network error occurred. Please try again."

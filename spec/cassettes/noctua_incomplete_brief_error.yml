@@ -1,0 +1,363 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.openai.com/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gpt-4o","temperature":0.4,"response_format":{"type":"json_object"},"messages":[{"role":"system","content":"You
+        are CREAS Strategist (Noctua). Design a monthly social content plan balancing
+        the 5 pillars:\nC Growth • R Retention • E Scalability • A Activation • S
+        Satisfaction.\nKey rule: prioritize the month''s primary objective (awareness
+        | engagement | sales | community) while always covering all 5 pillars. When
+        specific objective details are provided in the brief, incorporate them deeply
+        into the content strategy to make it highly targeted and specific. Include
+        concrete remix/duet opportunities.\n\nMANDATORY BRIEF (ask \u0026 wait)\n1
+        Brand name; 2 Sector/industry; 3 Audience profile (demographics, pains, digital
+        behavior);\n4 Languages: publishing language(s); account primary language;
+        bilingual split %;\n5 Target region \u0026 timezone; 6 Value proposition;
+        7 Main offer/product; 8 Purpose/mission;\n9 Tone \u0026 style; 10 Priority
+        platforms; 11 Monthly themes/campaigns;\n12 Primary objective (awareness |
+        engagement | sales | community) and specific objective details (if provided,
+        use these to create highly targeted content);\n13 Available resources (stock/podcast
+        clips/editing/budget/AI avatars/Kling…);\n14 Posts per week (int); 15 Remix/duet
+        references; 16 Restrictions/guardrails (legal, banned words, claims rules)
+        + preferred CTAs.\nIf a critical item is missing, ask before generating.\n\nSTRATEGY
+        RULES\n• CRITICAL: weekly_plan must contain exactly 4 weeks, each with exactly
+        frequency_per_week ideas in the ideas array.\n• Generate exactly frequency_per_week
+        × 4 weeks of content ideas (e.g., 3/week = 12 total, 4/week = 16 total).\n•
+        When objective_details are provided in the brief, ensure all content ideas
+        specifically support and reflect these detailed goals rather than being generic.\n•
+        Distribute weekly posting volume strategically across platforms/pillars.\n•
+        Map clear goals \u0026 formats to each pillar.\n• Every idea must include
+        a specific hook + story logic that connects to the objective details when
+        provided.\n• Balance: primary pillar = 40–50% of pieces; other four pillars
+        = 50–60% total.\n• Include feasible remix/duet angles (topic + style).\n•
+        Respect resources + languages.\n• Output JSON only, exactly matching the contract.\n\nOUTPUT
+        CONTRACT (single JSON object; no prose)\nRoot:\n{\n  \"brand_name\":\"...\",
+        \"brand_slug\":\"...\", \"strategy_name\":\"...\",\n  \"month\":\"YYYY-MM\",
+        \"general_theme\":\"...\",\n  \"objective_of_the_month\":\"awareness | engagement
+        | sales | community\",\n  \"frequency_per_week\":[frecuency_per_week],\n  \"platforms\":[\"Instagram\",\"TikTok\"],\n  \"tone_style\":\"...\",\n  \"content_language\":\"en-US\",
+        \"account_language\":\"en-US\",\n  \"target_region\":\"...\", \"timezone\":\"...\",\n  \"subtitle_languages\":[],
+        \"dub_languages\":[],\n  \"publish_windows_local\":{},   // optional, local
+        HH:MM-HH:MM ranges\n  \"brand_guardrails\":{\"banned_words\":[],\"claims_rules\":\"\",\"tone_no_go\":[]},\n  \"post_types\":[\"Video\",\"Image\",\"Carousel\",\"Text\"],\n\n  \"content_distribution\":
+        { \"C\": PILLAR_OBJ, \"R\": PILLAR_OBJ, \"E\": PILLAR_OBJ, \"A\": PILLAR_OBJ,
+        \"S\": PILLAR_OBJ },\n\n  \"remix_duet_plan\": {\n    \"rationale\":\"Why
+        remix/duet helps this month\",\n    \"opportunities\":[{\"id\":\"YYYYMM-\u003cbrand_slug\u003e-RMX-1\",\"title\":\"...\",\"style\":\"reaction
+        | pip | caption-overlay\",\"recommended_template\":\"remix\",\"video_source\":\"external\",\"assets_hints\":{\"external_video_url\":\"\"},\"script_angle\":\"Insight
+        + takeaway + CTA\",\"kpi_focus\":\"reach\",\"success_criteria\":\"≥X views/48h\"}]\n  },\n\n  \"weekly_plan\":[\n    {\"week\":1,\"publish_cadence\":frequency_per_week,\"ideas\":[WEEK_IDEA_OBJ,WEEK_IDEA_OBJ,WEEK_IDEA_OBJ]},\n    {\"week\":2,\"publish_cadence\":frequency_per_week,\"ideas\":[WEEK_IDEA_OBJ,WEEK_IDEA_OBJ,WEEK_IDEA_OBJ]},\n    {\"week\":3,\"publish_cadence\":frequency_per_week,\"ideas\":[WEEK_IDEA_OBJ,WEEK_IDEA_OBJ,WEEK_IDEA_OBJ]},\n    {\"week\":4,\"publish_cadence\":frequency_per_week,\"ideas\":[WEEK_IDEA_OBJ,WEEK_IDEA_OBJ,WEEK_IDEA_OBJ]}\n  ]\n  \n  CRITICAL:
+        Each week MUST have exactly frequency_per_week items in the ideas array. \n  If
+        frequency_per_week=3, each week needs exactly 3 items.\n  If frequency_per_week=4,
+        each week needs exactly 4 items.\n  NO EXCEPTIONS. COUNT THE ITEMS BEFORE
+        RESPONDING.\n}\n\nPILLAR_OBJ (use for each key C/R/E/A/S):\n{\n  \"goal\":\"...\",
+        \"formats\":[\"...\",\"...\"],\n  \"ideas\":[IDEA_OBJ, IDEA_OBJ]\n}\n\nIDEA_OBJ
+        (for content_distribution ideas):\n{\n  \"id\":\"YYYYMM-\u003cbrand_slug\u003e-\u003cPILLAR\u003e-w\u003cweek\u003e-i\u003cidx\u003e\",\n  \"status\":\"draft
+        | in_production | ready_for_review | approved\",\n  \"title\":\"...\", \"hook\":\"...\",\n  \"description\":\"Highly
+        detailed tactical brief (context, beats, key points, pillar objective, tone
+        cues, concrete examples).\",\n  \"platform\":\"Instagram | TikTok | YouTube
+        Shorts | LinkedIn\",\n  \"recommended_template\":\"solo_avatars | avatar_and_video
+        | narration_over_7_images | remix | one_to_three_videos\",\n  \"video_source\":\"none
+        | external | kling\",\n  \"visual_notes\":\"Shots, pacing, captions, overlays.\",\n  \"assets_hints\":{\"external_video_url\":\"\",\"external_video_notes\":\"e.g.,
+        use 00:03–00:08 for Hook\",\"video_prompts\":[],\"broll_suggestions\":[]},\n  \"kpi_focus\":\"reach
+        | saves | comments | CTR | DM\",\n  \"success_criteria\":\"e.g., ≥8% saves\",\n  \"beats_outline\":[\"Hook:
+        ...\",\"Value: ...\",\"CTA: ...\"],\n  \"cta\":\"Specific CTA\",\n  \"pilar\":\"C|R|E|A|S\",\n  \"repurpose_to\":[],
+        \"language_variants\":[]\n}\n\nWEEK_IDEA_OBJ (for weekly_plan.ideas):\n{\n  \"id\":\"YYYYMM-\u003cbrand_slug\u003e-w\u003cweek\u003e-i\u003cidx\u003e-\u003cPILLAR\u003e\",\n  \"status\":\"draft\",\n  \"title\":\"...\",
+        \"hook\":\"...\",\n  \"description\":\"Production-ready brief (context, beats,
+        examples, pillar objective, tone, language variants).\",\n  \"platform\":\"Instagram
+        Reels\",\n  \"pilar\":\"C|R|E|A|S\",\n  \"recommended_template\":\"solo_avatars
+        | avatar_and_video | narration_over_7_images | remix | one_to_three_videos\",\n  \"video_source\":\"none
+        | external | kling\",\n  \"visual_notes\":\"...\",\n  \"assets_hints\":{\"external_video_url\":\"\",\"video_prompts\":[],\"broll_suggestions\":[]},\n  \"kpi_focus\":\"reach\",
+        \"success_criteria\":\"≥X metric\",\n  \"beats_outline\":[\"Hook\",\"Value\",\"CTA\"],\n  \"cta\":\"...\",
+        \"repurpose_to\":[], \"language_variants\":[]\n}\n\nID RULES\nbrand_slug:
+        lowercase, hyphenated from brand_name (no spaces/accents). week starts at
+        1; idx starts at 1. IDs must be unique.\nDistribution IDs: YYYYMM-\u003cbrand_slug\u003e-\u003cPILLAR\u003e-w\u003cweek\u003e-i\u003cidx\u003e\nWeekly
+        IDs: YYYYMM-\u003cbrand_slug\u003e-w\u003cweek\u003e-i\u003cidx\u003e-\u003cPILLAR\u003e\n\nALLOWED
+        VALUES\nobjective_of_the_month: awareness | engagement | sales | community\nrecommended_template:
+        solo_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos\nvideo_source:
+        none | external | kling\nkpi_focus: reach | saves | comments | CTR | DM\nstatus:
+        draft | in_production | ready_for_review | approved\n\nFINAL VALIDATION CHECKLIST
+        (MANDATORY - auto-check before output):\n✓ 1. Brief complete; else ask\n✓
+        2. CRITICAL MATH CHECK: weekly_plan has exactly 4 weeks\n✓ 3. CRITICAL COUNT
+        CHECK: Each week has EXACTLY frequency_per_week ideas (count them!)\n   -
+        Week 1 ideas array length = frequency_per_week ✓\n   - Week 2 ideas array
+        length = frequency_per_week ✓  \n   - Week 3 ideas array length = frequency_per_week
+        ✓\n   - Week 4 ideas array length = frequency_per_week ✓\n✓ 4. CRITICAL TOTAL
+        CHECK: Total ideas = frequency_per_week × 4\n✓ 5. Primary pillar 40–50%; others
+        50–60% total\n✓ 6. Language guidance aligns with content_language/splits\n✓
+        7. Each idea has recommended_template + correct video_source\n✓ 8. All IDs
+        valid/unique; month = YYYY-MM\n✓ 9. Respect brand_guardrails\n✓ 10. Return
+        single JSON object; no prose/markdown\n\nSTOP AND COUNT THE IDEAS IN EACH
+        WEEK BEFORE RESPONDING!\n"},{"role":"user","content":"# MANDATORY BRIEF\n{\"brand_info\":\"Test
+        eco-friendly skincare brand\",\"objective\":\"Increase brand awareness and
+        drive sales\",\"frequency\":3}\n"}]}'
+    headers:
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer <OPENAI_API_KEY>
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Sun, 31 Aug 2025 20:31:13 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Access-Control-Expose-Headers:
+      - X-Request-ID
+      Openai-Organization:
+      - user-q9y5zog3dre23sibb14mkovp
+      Openai-Processing-Ms:
+      - '1774'
+      Openai-Project:
+      - proj_UubrcgXHT3kZCCO0wLYXoBxg
+      Openai-Version:
+      - '2020-10-01'
+      X-Envoy-Upstream-Service-Time:
+      - '1781'
+      X-Ratelimit-Limit-Requests:
+      - '500'
+      X-Ratelimit-Limit-Tokens:
+      - '30000'
+      X-Ratelimit-Remaining-Requests:
+      - '499'
+      X-Ratelimit-Remaining-Tokens:
+      - '28107'
+      X-Ratelimit-Reset-Requests:
+      - 120ms
+      X-Ratelimit-Reset-Tokens:
+      - 3.786s
+      X-Request-Id:
+      - req_b0fba24b12eb4d1481f3e3ecf816b427
+      Cf-Cache-Status:
+      - DYNAMIC
+      Set-Cookie:
+      - __cf_bm=t9tHQPYD.x2Yy9Lt9SkOFHFsWfRYwEAtscfVRoCAmNo-1756672273-1.0.1.1-SR.7V59iqjj8vKnFR9P3yC86rM7KX9WzLQ7sLqKmIfABbkZGaBJksZI0uELRwBNKPZ6O2dEz3w5OYaA9oJfMi9ZwEeOUClKoDN38YPXB6eg;
+        path=/; expires=Sun, 31-Aug-25 21:01:13 GMT; domain=.api.openai.com; HttpOnly;
+        Secure; SameSite=None
+      - _cfuvid=yt63NO80.POBu2nD0zyO.rsdPYwaoOsPQSZtWJ6sFz8-1756672273379-0.0.1.1-604800000;
+        path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 977f4a3fdf1df654-LHR
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        ewogICJpZCI6ICJjaGF0Y21wbC1DQWl6ZjMxMUVSOEFQQlpMeFZDQTd3RmJPM09qUyIsCiAgIm9iamVjdCI6ICJjaGF0LmNvbXBsZXRpb24iLAogICJjcmVhdGVkIjogMTc1NjY3MjI3MSwKICAibW9kZWwiOiAiZ3B0LTRvLTIwMjQtMDgtMDYiLAogICJjaG9pY2VzIjogWwogICAgewogICAgICAiaW5kZXgiOiAwLAogICAgICAibWVzc2FnZSI6IHsKICAgICAgICAicm9sZSI6ICJhc3Npc3RhbnQiLAogICAgICAgICJjb250ZW50IjogIlxue1wiZXJyb3JcIjpcIkluY29tcGxldGUgYnJpZWYuIFBsZWFzZSBwcm92aWRlIHRoZSBmb2xsb3dpbmcgZGV0YWlsczogMSBCcmFuZCBuYW1lOyAyIFNlY3Rvci9pbmR1c3RyeTsgMyBBdWRpZW5jZSBwcm9maWxlIChkZW1vZ3JhcGhpY3MsIHBhaW5zLCBkaWdpdGFsIGJlaGF2aW9yKTsgNCBMYW5ndWFnZXM6IHB1Ymxpc2hpbmcgbGFuZ3VhZ2Uocyk7IGFjY291bnQgcHJpbWFyeSBsYW5ndWFnZTsgYmlsaW5ndWFsIHNwbGl0ICU7IDUgVGFyZ2V0IHJlZ2lvbiAmIHRpbWV6b25lOyA2IFZhbHVlIHByb3Bvc2l0aW9uOyA3IE1haW4gb2ZmZXIvcHJvZHVjdDsgOCBQdXJwb3NlL21pc3Npb247IDkgVG9uZSAmIHN0eWxlOyAxMCBQcmlvcml0eSBwbGF0Zm9ybXM7IDExIE1vbnRobHkgdGhlbWVzL2NhbXBhaWduczsgMTIgUHJpbWFyeSBvYmplY3RpdmUgKGF3YXJlbmVzcyB8IGVuZ2FnZW1lbnQgfCBzYWxlcyB8IGNvbW11bml0eSkgYW5kIHNwZWNpZmljIG9iamVjdGl2ZSBkZXRhaWxzIChpZiBwcm92aWRlZCwgdXNlIHRoZXNlIHRvIGNyZWF0ZSBoaWdobHkgdGFyZ2V0ZWQgY29udGVudCk7IDEzIEF2YWlsYWJsZSByZXNvdXJjZXMgKHN0b2NrL3BvZGNhc3QgY2xpcHMvZWRpdGluZy9idWRnZXQvQUkgYXZhdGFycy9LbGluZ+KApik7IDE0IFBvc3RzIHBlciB3ZWVrIChpbnQpOyAxNSBSZW1peC9kdWV0IHJlZmVyZW5jZXM7IDE2IFJlc3RyaWN0aW9ucy9ndWFyZHJhaWxzIChsZWdhbCwgYmFubmVkIHdvcmRzLCBjbGFpbXMgcnVsZXMpICsgcHJlZmVycmVkIENUQXMuXCJ9IiwKICAgICAgICAicmVmdXNhbCI6IG51bGwsCiAgICAgICAgImFubm90YXRpb25zIjogW10KICAgICAgfSwKICAgICAgImxvZ3Byb2JzIjogbnVsbCwKICAgICAgImZpbmlzaF9yZWFzb24iOiAic3RvcCIKICAgIH0KICBdLAogICJ1c2FnZSI6IHsKICAgICJwcm9tcHRfdG9rZW5zIjogMTk2OCwKICAgICJjb21wbGV0aW9uX3Rva2VucyI6IDE4MywKICAgICJ0b3RhbF90b2tlbnMiOiAyMTUxLAogICAgInByb21wdF90b2tlbnNfZGV0YWlscyI6IHsKICAgICAgImNhY2hlZF90b2tlbnMiOiAxOTIwLAogICAgICAiYXVkaW9fdG9rZW5zIjogMAogICAgfSwKICAgICJjb21wbGV0aW9uX3Rva2Vuc19kZXRhaWxzIjogewogICAgICAicmVhc29uaW5nX3Rva2VucyI6IDAsCiAgICAgICJhdWRpb190b2tlbnMiOiAwLAogICAgICAiYWNjZXB0ZWRfcHJlZGljdGlvbl90b2tlbnMiOiAwLAogICAgICAicmVqZWN0ZWRfcHJlZGljdGlvbl90b2tlbnMiOiAwCiAgICB9CiAgfSwKICAic2VydmljZV90aWVyIjogImRlZmF1bHQiLAogICJzeXN0ZW1fZmluZ2VycHJpbnQiOiAiZnBfZmYyNWIyNzgzYSIKfQo=
+  recorded_at: Sun, 31 Aug 2025 20:31:13 GMT
+- request:
+    method: post
+    uri: https://api.openai.com/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gpt-4o","temperature":0.4,"response_format":{"type":"json_object"},"messages":[{"role":"system","content":"You
+        are CREAS Strategist (Noctua). Design a monthly social content plan balancing
+        the 5 pillars:\nC Growth • R Retention • E Scalability • A Activation • S
+        Satisfaction.\nKey rule: prioritize the month''s primary objective (awareness
+        | engagement | sales | community) while always covering all 5 pillars. When
+        specific objective details are provided in the brief, incorporate them deeply
+        into the content strategy to make it highly targeted and specific. Include
+        concrete remix/duet opportunities.\n\nMANDATORY BRIEF (ask \u0026 wait)\n1
+        Brand name; 2 Sector/industry; 3 Audience profile (demographics, pains, digital
+        behavior);\n4 Languages: publishing language(s); account primary language;
+        bilingual split %;\n5 Target region \u0026 timezone; 6 Value proposition;
+        7 Main offer/product; 8 Purpose/mission;\n9 Tone \u0026 style; 10 Priority
+        platforms; 11 Monthly themes/campaigns;\n12 Primary objective (awareness |
+        engagement | sales | community) and specific objective details (if provided,
+        use these to create highly targeted content);\n13 Available resources (stock/podcast
+        clips/editing/budget/AI avatars/Kling…);\n14 Posts per week (int); 15 Remix/duet
+        references; 16 Restrictions/guardrails (legal, banned words, claims rules)
+        + preferred CTAs.\nIf a critical item is missing, ask before generating.\n\nSTRATEGY
+        RULES\n• CRITICAL: weekly_plan must contain exactly 4 weeks, each with exactly
+        frequency_per_week ideas in the ideas array.\n• Generate exactly frequency_per_week
+        × 4 weeks of content ideas (e.g., 3/week = 12 total, 4/week = 16 total).\n•
+        When objective_details are provided in the brief, ensure all content ideas
+        specifically support and reflect these detailed goals rather than being generic.\n•
+        Distribute weekly posting volume strategically across platforms/pillars.\n•
+        Map clear goals \u0026 formats to each pillar.\n• Every idea must include
+        a specific hook + story logic that connects to the objective details when
+        provided.\n• Balance: primary pillar = 40–50% of pieces; other four pillars
+        = 50–60% total.\n• Include feasible remix/duet angles (topic + style).\n•
+        Respect resources + languages.\n• Output JSON only, exactly matching the contract.\n\nOUTPUT
+        CONTRACT (single JSON object; no prose)\nRoot:\n{\n  \"brand_name\":\"...\",
+        \"brand_slug\":\"...\", \"strategy_name\":\"...\",\n  \"month\":\"YYYY-MM\",
+        \"general_theme\":\"...\",\n  \"objective_of_the_month\":\"awareness | engagement
+        | sales | community\",\n  \"frequency_per_week\":[frecuency_per_week],\n  \"platforms\":[\"Instagram\",\"TikTok\"],\n  \"tone_style\":\"...\",\n  \"content_language\":\"en-US\",
+        \"account_language\":\"en-US\",\n  \"target_region\":\"...\", \"timezone\":\"...\",\n  \"subtitle_languages\":[],
+        \"dub_languages\":[],\n  \"publish_windows_local\":{},   // optional, local
+        HH:MM-HH:MM ranges\n  \"brand_guardrails\":{\"banned_words\":[],\"claims_rules\":\"\",\"tone_no_go\":[]},\n  \"post_types\":[\"Video\",\"Image\",\"Carousel\",\"Text\"],\n\n  \"content_distribution\":
+        { \"C\": PILLAR_OBJ, \"R\": PILLAR_OBJ, \"E\": PILLAR_OBJ, \"A\": PILLAR_OBJ,
+        \"S\": PILLAR_OBJ },\n\n  \"remix_duet_plan\": {\n    \"rationale\":\"Why
+        remix/duet helps this month\",\n    \"opportunities\":[{\"id\":\"YYYYMM-\u003cbrand_slug\u003e-RMX-1\",\"title\":\"...\",\"style\":\"reaction
+        | pip | caption-overlay\",\"recommended_template\":\"remix\",\"video_source\":\"external\",\"assets_hints\":{\"external_video_url\":\"\"},\"script_angle\":\"Insight
+        + takeaway + CTA\",\"kpi_focus\":\"reach\",\"success_criteria\":\"≥X views/48h\"}]\n  },\n\n  \"weekly_plan\":[\n    {\"week\":1,\"publish_cadence\":frequency_per_week,\"ideas\":[WEEK_IDEA_OBJ,WEEK_IDEA_OBJ,WEEK_IDEA_OBJ]},\n    {\"week\":2,\"publish_cadence\":frequency_per_week,\"ideas\":[WEEK_IDEA_OBJ,WEEK_IDEA_OBJ,WEEK_IDEA_OBJ]},\n    {\"week\":3,\"publish_cadence\":frequency_per_week,\"ideas\":[WEEK_IDEA_OBJ,WEEK_IDEA_OBJ,WEEK_IDEA_OBJ]},\n    {\"week\":4,\"publish_cadence\":frequency_per_week,\"ideas\":[WEEK_IDEA_OBJ,WEEK_IDEA_OBJ,WEEK_IDEA_OBJ]}\n  ]\n  \n  CRITICAL:
+        Each week MUST have exactly frequency_per_week items in the ideas array. \n  If
+        frequency_per_week=3, each week needs exactly 3 items.\n  If frequency_per_week=4,
+        each week needs exactly 4 items.\n  NO EXCEPTIONS. COUNT THE ITEMS BEFORE
+        RESPONDING.\n}\n\nPILLAR_OBJ (use for each key C/R/E/A/S):\n{\n  \"goal\":\"...\",
+        \"formats\":[\"...\",\"...\"],\n  \"ideas\":[IDEA_OBJ, IDEA_OBJ]\n}\n\nIDEA_OBJ
+        (for content_distribution ideas):\n{\n  \"id\":\"YYYYMM-\u003cbrand_slug\u003e-\u003cPILLAR\u003e-w\u003cweek\u003e-i\u003cidx\u003e\",\n  \"status\":\"draft
+        | in_production | ready_for_review | approved\",\n  \"title\":\"...\", \"hook\":\"...\",\n  \"description\":\"Highly
+        detailed tactical brief (context, beats, key points, pillar objective, tone
+        cues, concrete examples).\",\n  \"platform\":\"Instagram | TikTok | YouTube
+        Shorts | LinkedIn\",\n  \"recommended_template\":\"solo_avatars | avatar_and_video
+        | narration_over_7_images | remix | one_to_three_videos\",\n  \"video_source\":\"none
+        | external | kling\",\n  \"visual_notes\":\"Shots, pacing, captions, overlays.\",\n  \"assets_hints\":{\"external_video_url\":\"\",\"external_video_notes\":\"e.g.,
+        use 00:03–00:08 for Hook\",\"video_prompts\":[],\"broll_suggestions\":[]},\n  \"kpi_focus\":\"reach
+        | saves | comments | CTR | DM\",\n  \"success_criteria\":\"e.g., ≥8% saves\",\n  \"beats_outline\":[\"Hook:
+        ...\",\"Value: ...\",\"CTA: ...\"],\n  \"cta\":\"Specific CTA\",\n  \"pilar\":\"C|R|E|A|S\",\n  \"repurpose_to\":[],
+        \"language_variants\":[]\n}\n\nWEEK_IDEA_OBJ (for weekly_plan.ideas):\n{\n  \"id\":\"YYYYMM-\u003cbrand_slug\u003e-w\u003cweek\u003e-i\u003cidx\u003e-\u003cPILLAR\u003e\",\n  \"status\":\"draft\",\n  \"title\":\"...\",
+        \"hook\":\"...\",\n  \"description\":\"Production-ready brief (context, beats,
+        examples, pillar objective, tone, language variants).\",\n  \"platform\":\"Instagram
+        Reels\",\n  \"pilar\":\"C|R|E|A|S\",\n  \"recommended_template\":\"solo_avatars
+        | avatar_and_video | narration_over_7_images | remix | one_to_three_videos\",\n  \"video_source\":\"none
+        | external | kling\",\n  \"visual_notes\":\"...\",\n  \"assets_hints\":{\"external_video_url\":\"\",\"video_prompts\":[],\"broll_suggestions\":[]},\n  \"kpi_focus\":\"reach\",
+        \"success_criteria\":\"≥X metric\",\n  \"beats_outline\":[\"Hook\",\"Value\",\"CTA\"],\n  \"cta\":\"...\",
+        \"repurpose_to\":[], \"language_variants\":[]\n}\n\nID RULES\nbrand_slug:
+        lowercase, hyphenated from brand_name (no spaces/accents). week starts at
+        1; idx starts at 1. IDs must be unique.\nDistribution IDs: YYYYMM-\u003cbrand_slug\u003e-\u003cPILLAR\u003e-w\u003cweek\u003e-i\u003cidx\u003e\nWeekly
+        IDs: YYYYMM-\u003cbrand_slug\u003e-w\u003cweek\u003e-i\u003cidx\u003e-\u003cPILLAR\u003e\n\nALLOWED
+        VALUES\nobjective_of_the_month: awareness | engagement | sales | community\nrecommended_template:
+        solo_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos\nvideo_source:
+        none | external | kling\nkpi_focus: reach | saves | comments | CTR | DM\nstatus:
+        draft | in_production | ready_for_review | approved\n\nFINAL VALIDATION CHECKLIST
+        (MANDATORY - auto-check before output):\n✓ 1. Brief complete; else ask\n✓
+        2. CRITICAL MATH CHECK: weekly_plan has exactly 4 weeks\n✓ 3. CRITICAL COUNT
+        CHECK: Each week has EXACTLY frequency_per_week ideas (count them!)\n   -
+        Week 1 ideas array length = frequency_per_week ✓\n   - Week 2 ideas array
+        length = frequency_per_week ✓  \n   - Week 3 ideas array length = frequency_per_week
+        ✓\n   - Week 4 ideas array length = frequency_per_week ✓\n✓ 4. CRITICAL TOTAL
+        CHECK: Total ideas = frequency_per_week × 4\n✓ 5. Primary pillar 40–50%; others
+        50–60% total\n✓ 6. Language guidance aligns with content_language/splits\n✓
+        7. Each idea has recommended_template + correct video_source\n✓ 8. All IDs
+        valid/unique; month = YYYY-MM\n✓ 9. Respect brand_guardrails\n✓ 10. Return
+        single JSON object; no prose/markdown\n\nSTOP AND COUNT THE IDEAS IN EACH
+        WEEK BEFORE RESPONDING!\n"},{"role":"user","content":"# MANDATORY BRIEF\n{\"brand_info\":\"Test
+        brand\"}\n"}]}'
+    headers:
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer <OPENAI_API_KEY>
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Sun, 31 Aug 2025 20:32:49 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Access-Control-Expose-Headers:
+      - X-Request-ID
+      Openai-Organization:
+      - user-q9y5zog3dre23sibb14mkovp
+      Openai-Processing-Ms:
+      - '530'
+      Openai-Project:
+      - proj_UubrcgXHT3kZCCO0wLYXoBxg
+      Openai-Version:
+      - '2020-10-01'
+      X-Envoy-Upstream-Service-Time:
+      - '537'
+      X-Ratelimit-Limit-Requests:
+      - '500'
+      X-Ratelimit-Limit-Tokens:
+      - '30000'
+      X-Ratelimit-Remaining-Requests:
+      - '499'
+      X-Ratelimit-Remaining-Tokens:
+      - '28130'
+      X-Ratelimit-Reset-Requests:
+      - 120ms
+      X-Ratelimit-Reset-Tokens:
+      - 3.74s
+      X-Request-Id:
+      - req_ef77c1f77d5b433398be9b44592e2e48
+      Cf-Cache-Status:
+      - DYNAMIC
+      Set-Cookie:
+      - __cf_bm=Y6HRuUAHCmMsIWZYVIm7y0rEZLBSzL56m_J19JPm6xQ-1756672369-1.0.1.1-2BYy1xbEjKxnE47kWSltwEpOVHyF5hBFWICw6spWPXCXrTAjk5sxB8yH6HMUXgvoL1h.vIg3591uP4ZBmm6pLE5zUyvg_CR8SX5Woux1sEE;
+        path=/; expires=Sun, 31-Aug-25 21:02:49 GMT; domain=.api.openai.com; HttpOnly;
+        Secure; SameSite=None
+      - _cfuvid=nFcexpCwCbbLBgPoYafFw_Sg0_n9fUZKUUoBRnawvZY-1756672369673-0.0.1.1-604800000;
+        path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Content-Type-Options:
+      - nosniff
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 977f4ca21a901991-LHR
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "id": "chatcmpl-CAj1FN9yNZRYzp4r6WCk0tecAr6e2",
+          "object": "chat.completion",
+          "created": 1756672369,
+          "model": "gpt-4o-2024-08-06",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "{\"error\":\"Missing critical items in the brief. Please provide the complete mandatory brief details to proceed.\"}",
+                "refusal": null,
+                "annotations": []
+              },
+              "logprobs": null,
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 1952,
+            "completion_tokens": 21,
+            "total_tokens": 1973,
+            "prompt_tokens_details": {
+              "cached_tokens": 1920,
+              "audio_tokens": 0
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 0,
+              "audio_tokens": 0,
+              "accepted_prediction_tokens": 0,
+              "rejected_prediction_tokens": 0
+            }
+          },
+          "service_tier": "default",
+          "system_fingerprint": "fp_ff25b2783a"
+        }
+  recorded_at: Sun, 31 Aug 2025 20:32:49 GMT
+recorded_with: VCR 6.3.1

@@ -25,7 +25,8 @@ class Audience < ApplicationRecord
     if demographic_profile.is_a?(String) && demographic_profile.present?
       begin
         self.demographic_profile = JSON.parse(demographic_profile)
-      rescue JSON::ParserError
+      rescue JSON::ParserError => e
+        Rails.logger.warn "Audience #{id}: Failed to parse demographic_profile JSON: #{e.message}"
         # If JSON is invalid, set to empty hash
         self.demographic_profile = {}
       end
