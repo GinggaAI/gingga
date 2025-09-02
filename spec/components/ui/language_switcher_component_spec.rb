@@ -161,6 +161,32 @@ RSpec.describe Ui::LanguageSwitcherComponent, type: :component do
         expect(path_es).to be_a(String)
         expect(path_es).to include('es') unless path_es == '/'
       end
+
+      it 'switch_locale_path handles complex path scenarios with request context' do
+        # Test with existing locale prefix that needs to be replaced
+        mock_request = double(path: '/en/complex/nested/path', present?: true)
+        allow(component).to receive(:request).and_return(mock_request)
+        allow(component).to receive(:respond_to?).with(:request).and_return(true)
+        allow(I18n).to receive(:default_locale).and_return(:en)
+
+        result = component.send(:switch_locale_path, 'es')
+        expect(result).to eq('/es/complex/nested/path')
+
+        # Test with Spanish prefix switching to English
+        allow(mock_request).to receive(:path).and_return('/es/another/path')
+        result = component.send(:switch_locale_path, 'en')
+        expect(result).to eq('/en/another/path')
+
+        # Test with empty path after locale removal
+        allow(mock_request).to receive(:path).and_return('/en/')
+        result = component.send(:switch_locale_path, 'es')
+        expect(result).to eq('/es/')
+
+        # Test default locale with empty path
+        allow(mock_request).to receive(:path).and_return('/es/')
+        result = component.send(:switch_locale_path, 'en')
+        expect(result).to eq('/')
+      end
     end
   end
 
@@ -177,6 +203,32 @@ RSpec.describe Ui::LanguageSwitcherComponent, type: :component do
 
       # This should not raise an error even if URL generation has issues
       expect { render_inline(component) }.not_to raise_error
+    end
+
+    it 'handles path processing errors gracefully' do
+      component = Ui::LanguageSwitcherComponent.new
+      allow(component).to receive(:request).and_return(double(path: '/en/test', present?: true))
+      allow(component).to receive(:respond_to?).with(:request).and_return(true)
+
+      # Mock a StandardError during path processing
+      allow(component.send(:request)).to receive(:path).and_raise(StandardError, 'Path processing failed')
+
+      result = component.send(:switch_locale_path, 'es')
+      expect(result).to eq('/es/')
+    end
+
+    it 'logs warnings when path processing fails' do
+      component = Ui::LanguageSwitcherComponent.new
+      allow(component).to receive(:request).and_return(double(path: '/en/test', present?: true))
+      allow(component).to receive(:respond_to?).with(:request).and_return(true)
+
+      # Mock a StandardError during path processing
+      allow(component.send(:request)).to receive(:path).and_raise(StandardError, 'Path processing failed')
+      allow(Rails.logger).to receive(:warn)
+
+      component.send(:switch_locale_path, 'es')
+
+      expect(Rails.logger).to have_received(:warn).with(/LanguageSwitcherComponent: Failed to generate path for locale es/)
     end
   end
 

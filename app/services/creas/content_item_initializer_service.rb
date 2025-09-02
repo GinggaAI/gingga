@@ -60,7 +60,6 @@ module Creas
         origin_id: idea["id"],
         origin_source: "weekly_plan",
         week: week_number,
-        week_index: week_number - 1,
         scheduled_day: nil, # Will be set when scheduled
         publish_date: nil,  # Will be set when scheduled
         publish_datetime_local: nil,

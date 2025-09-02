@@ -301,7 +301,6 @@ class GenerateVoxaContentJob < ApplicationJob
       origin_id: item["origin_id"],
       origin_source: item["origin_source"] || "voxa_refinement",
       week: item.fetch("week"),
-      week_index: item["week_index"],
       scheduled_day: item.dig("meta", "scheduled_day"),
       day_of_the_week: extract_day_of_week(item),
       publish_date: parse_date(item["publish_date"]),

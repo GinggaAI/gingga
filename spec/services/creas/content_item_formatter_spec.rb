@@ -22,7 +22,6 @@ RSpec.describe Creas::ContentItemFormatter, type: :service do
           origin_id: content_item.origin_id,
           origin_source: content_item.origin_source,
           week: content_item.week,
-          week_index: content_item.week_index,
           scheduled_day: content_item.scheduled_day,
           content_name: content_item.content_name,
           status: content_item.status,

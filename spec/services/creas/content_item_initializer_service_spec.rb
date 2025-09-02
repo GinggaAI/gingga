@@ -110,7 +110,6 @@ RSpec.describe Creas::ContentItemInitializerService do
           origin_id: '202508-gingga-C-w1-i1',
           origin_source: 'weekly_plan',
           week: 1,
-          week_index: 0,
           content_name: 'Test Content (Week 1)',
           status: 'draft',
           content_type: 'reel',

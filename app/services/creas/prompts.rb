@@ -219,7 +219,6 @@ module Creas
         "origin_id": "YYYYMM-<brand_slug>-w<week>-i<idx>-<PILLAR>",
         "origin_source": "weekly_plan | content_distribution",
         "week": 1,
-        "week_index": 1,
         "content_name": "...",           // ≤ 7 words
         "status": "in_production",
         "creation_date": "YYYY-MM-DD",
@@ -341,7 +340,7 @@ module Creas
 
       MANDATORY VALIDATION (verify before responding)
         ✅ Root keys present; else ask.
-        ✅ Each item has all required fields: id, origin_id, week, week_index, content_name, status, dates, platform, aspect_ratio, language, pilar, template, video_source, post_description, text_base, hashtags.
+        ✅ Each item has all required fields: id, origin_id, week, content_name, status, dates, platform, aspect_ratio, language, pilar, template, video_source, post_description, text_base, hashtags.
         ✅ TEMPLATE-SPECIFIC VALIDATION:
           • solo_avatars → shotplan.scenes = 3 items, shotplan.beats = []
           • avatar_and_video → shotplan.scenes = 3 items, shotplan.beats = []

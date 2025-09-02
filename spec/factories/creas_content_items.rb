@@ -8,7 +8,6 @@ FactoryBot.define do
     origin_id { "202508-acme-w1-i1-C" }
     origin_source { "weekly_plan" }
     week { 1 }
-    week_index { 1 }
     scheduled_day { "Monday" }
     publish_date { Date.current + 3.days }
     publish_datetime_local { Time.current + 3.days }

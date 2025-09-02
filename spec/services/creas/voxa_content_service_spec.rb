@@ -96,7 +96,6 @@ RSpec.describe Creas::VoxaContentService, type: :service do
           "origin_id" => "202508-testbrand-w1-i1-C",
           "origin_source" => "weekly_plan",
           "week" => 1,
-          "week_index" => 1,
           "content_name" => "Test Content Item 1",
           "status" => "in_production",
           "creation_date" => "2025-08-19",
