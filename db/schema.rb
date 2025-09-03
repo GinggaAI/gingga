@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_02_040043) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_03_151247) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -37,6 +37,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_02_040043) do
     t.index ["user_id"], name: "index_ai_responses_on_user_id"
   end
 
+  create_table "api_responses", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "provider", null: false
+    t.string "endpoint", null: false
+    t.text "request_data"
+    t.text "response_data"
+    t.integer "status_code"
+    t.integer "response_time_ms"
+    t.boolean "success", default: false
+    t.string "error_message"
+    t.uuid "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_api_responses_on_created_at"
+    t.index ["provider", "endpoint"], name: "index_api_responses_on_provider_and_endpoint"
+    t.index ["success"], name: "index_api_responses_on_success"
+    t.index ["user_id", "provider"], name: "index_api_responses_on_user_id_and_provider"
+    t.index ["user_id"], name: "index_api_responses_on_user_id"
+  end
+
   create_table "api_tokens", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "provider"
     t.string "mode"
@@ -57,6 +76,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_02_040043) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["brand_id"], name: "index_audiences_on_brand_id"
+  end
+
+  create_table "avatars", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "avatar_id", null: false
+    t.string "name", null: false
+    t.string "provider", null: false
+    t.string "status", default: "active"
+    t.text "preview_image_url"
+    t.string "gender"
+    t.boolean "is_public", default: false
+    t.text "raw_response"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["avatar_id", "provider", "user_id"], name: "index_avatars_on_unique_avatar_per_user_provider", unique: true
+    t.index ["provider"], name: "index_avatars_on_provider"
+    t.index ["status"], name: "index_avatars_on_status"
+    t.index ["user_id", "provider"], name: "index_avatars_on_user_id_and_provider"
+    t.index ["user_id"], name: "index_avatars_on_user_id"
   end
 
   create_table "brand_channels", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -383,8 +421,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_02_040043) do
   end
 
   add_foreign_key "ai_responses", "users"
+  add_foreign_key "api_responses", "users"
   add_foreign_key "api_tokens", "users"
   add_foreign_key "audiences", "brands"
+  add_foreign_key "avatars", "users"
   add_foreign_key "brand_channels", "brands"
   add_foreign_key "brands", "users"
   add_foreign_key "creas_content_items", "brands"

@@ -30,7 +30,11 @@ Rails.application.routes.draw do
     resource :auto_creation, only: [ :show ]
     resource :analytics, only: [ :show ]
     resource :community, only: [ :show ]
-    resource :settings, only: [ :show ]
+    resource :settings, only: [ :show, :update ] do
+      member do
+        post :validate_heygen_api
+      end
+    end
 
     # Defines the root path route ("/")
     root "home#show"

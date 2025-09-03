@@ -53,6 +53,14 @@ en:
     account_subtitle: "Manage your account settings and language preferences"
     language_settings: "Language Settings"
     language_subtitle: "Choose your preferred language for the interface"
+    heygen:
+      save_success: "HeyGen API key saved successfully!"
+      save_failed: "Failed to save HeyGen API key: %{error}"
+      empty_token: "HeyGen API key cannot be empty."
+      validation_success:
+        one: "HeyGen API validation successful! %{count} avatar synchronized."
+        other: "HeyGen API validation successful! %{count} avatars synchronized."
+      validation_failed: "HeyGen API validation failed: %{error}"
 
   # Brands
   brands:

@@ -24,6 +24,14 @@ es:
     account_subtitle: "Gestiona la configuración de tu cuenta y preferencias de idioma"
     language_settings: "Configuración de Idioma"
     language_subtitle: "Elige tu idioma preferido para la interfaz"
+    heygen:
+      save_success: "¡Clave API de HeyGen guardada exitosamente!"
+      save_failed: "Error al guardar la clave API de HeyGen: %{error}"
+      empty_token: "La clave API de HeyGen no puede estar vacía."
+      validation_success:
+        one: "¡Validación de API HeyGen exitosa! %{count} avatar sincronizado."
+        other: "¡Validación de API HeyGen exitosa! %{count} avatares sincronizados."
+      validation_failed: "Falló la validación de API HeyGen: %{error}"
 
   # Brands
   brands:

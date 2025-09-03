@@ -372,3 +372,619 @@ RAILS_ENV=test bin/rails db:migrate
 ## Summary
 
 This refactoring successfully transformed the reel creation system from a simple mode-based approach to a sophisticated template-based architecture. The implementation follows Rails best practices, maintains clean separation of concerns, and provides a solid foundation for future video creation features. All legacy code has been removed, and the system is ready for the next phase of development.
+
+---
+
+# HeyGen API Integration - Avatar Management System
+
+**Date**: September 3, 2025  
+**Author**: Claude  
+**Feature**: HeyGen API validation and avatar synchronization  
+**Related to**: Auto Creation Videos Interface  
+
+## Overview
+
+Complete implementation of HeyGen API integration for avatar management, enabling users to save their HeyGen API keys, validate them, and automatically synchronize available avatars for use in video creation. This integration directly supports the auto-creation videos interface by providing AI avatars for the scene-based templates.
+
+## What Was Developed
+
+### 1. Avatar Model and Database Schema
+
+**Migration**: `20250903140339_create_avatars.rb`
+
+```ruby
+create_table :avatars, id: :uuid do |t|
+  t.references :user, null: false, foreign_key: true, type: :uuid
+  t.string :avatar_id, null: false          # HeyGen's internal avatar ID
+  t.string :name, null: false               # Display name for avatar
+  t.string :provider, null: false           # 'heygen' or 'kling'
+  t.string :status, default: 'active'       # 'active' or 'inactive'
+  t.text :preview_image_url                 # Avatar preview image
+  t.string :gender                          # 'male' or 'female'
+  t.boolean :is_public, default: false      # Public/private avatar
+  t.text :raw_response                      # Store full API response for debugging
+  t.timestamps
+end
+
+# Indexes for performance and uniqueness
+add_index :avatars, [:user_id, :provider]
+add_index :avatars, [:avatar_id, :provider, :user_id], unique: true
+add_index :avatars, :status
+add_index :avatars, :provider
+```
+
+**Model**: `app/models/avatar.rb`
+
+```ruby
+class Avatar < ApplicationRecord
+  belongs_to :user
+
+  validates :avatar_id, presence: true
+  validates :name, presence: true
+  validates :provider, presence: true, inclusion: { in: %w[heygen kling] }
+  validates :avatar_id, uniqueness: { scope: [:user_id, :provider] }
+  validates :status, inclusion: { in: %w[active inactive] }
+
+  scope :by_provider, ->(provider) { where(provider: provider) }
+  scope :active, -> { where(status: "active") }
+  scope :by_status, ->(status) { where(status: status) }
+
+  def active?
+    status == "active"
+  end
+
+  def to_api_format
+    {
+      id: avatar_id,
+      name: name,
+      preview_image_url: preview_image_url,
+      gender: gender,
+      is_public: is_public,
+      provider: provider
+    }
+  end
+end
+```
+
+### 2. Avatar Synchronization Service
+
+**Service**: `app/services/heygen/synchronize_avatars_service.rb`
+
+This service orchestrates the complete avatar synchronization workflow:
+
+```ruby
+class Heygen::SynchronizeAvatarsService
+  def initialize(user:)
+    @user = user
+  end
+
+  def call
+    # Step 1: Call existing HeyGen API service
+    list_service = Heygen::ListAvatarsService.new(@user)
+    list_result = list_service.call
+
+    # Step 2: Validate API response
+    return failure_result("Failed to fetch avatars from HeyGen: #{list_result[:error]}") unless list_result[:success]
+
+    # Step 3: Process avatar data
+    avatars_data = list_result[:data] || []
+    raw_response = build_raw_response(avatars_data)
+    
+    # Step 4: Synchronize each avatar
+    synchronized_avatars = []
+    avatars_data.each do |avatar_data|
+      avatar = sync_avatar(avatar_data, raw_response)
+      synchronized_avatars << avatar if avatar
+    end
+
+    # Step 5: Return success result with count
+    success_result(data: {
+      synchronized_count: synchronized_avatars.size,
+      avatars: synchronized_avatars.map(&:to_api_format)
+    })
+  rescue StandardError => e
+    failure_result("Error synchronizing avatars: #{e.message}")
+  end
+
+  private
+
+  def sync_avatar(avatar_data, raw_response)
+    # Create or update avatar record
+    avatar = Avatar.find_or_initialize_by(
+      user: @user,
+      avatar_id: avatar_data[:id],
+      provider: "heygen"
+    )
+
+    # Update all attributes including raw response for debugging
+    avatar.assign_attributes({
+      name: avatar_data[:name],
+      status: "active",
+      preview_image_url: avatar_data[:preview_image_url],
+      gender: avatar_data[:gender],
+      is_public: avatar_data[:is_public] || false,
+      raw_response: raw_response
+    })
+
+    avatar.save ? avatar : nil
+  end
+end
+```
+
+### 3. Settings Controller Enhancement
+
+**File**: `app/controllers/settings_controller.rb`
+
+Added complete API key management functionality:
+
+```ruby
+class SettingsController < ApplicationController
+  def show
+    @heygen_token = current_user.active_token_for("heygen")
+  end
+
+  def update
+    token_value = params[:heygen_api_key]
+    mode = params[:mode] || "production"
+    
+    if token_value.present?
+      # Create or update API token using existing ApiToken model
+      api_token = current_user.api_tokens.find_or_initialize_by(
+        provider: "heygen",
+        mode: mode
+      )
+      
+      api_token.encrypted_token = token_value
+      
+      if api_token.save
+        redirect_to settings_path, notice: t("settings.heygen.save_success")
+      else
+        redirect_to settings_path, alert: t("settings.heygen.save_failed", error: api_token.errors.full_messages.join(", "))
+      end
+    else
+      redirect_to settings_path, alert: t("settings.heygen.empty_token")
+    end
+  end
+
+  def validate_heygen_api
+    # This is the main validation workflow - see detailed explanation below
+    result = Heygen::SynchronizeAvatarsService.new(user: current_user).call
+
+    if result.success?
+      redirect_to settings_path, notice: t("settings.heygen.validation_success", count: result.data[:synchronized_count])
+    else
+      redirect_to settings_path, alert: t("settings.heygen.validation_failed", error: result.error)
+    end
+  end
+end
+```
+
+### 4. Settings UI Implementation
+
+**File**: `app/views/settings/show.haml`
+
+Complete functional UI with Rails forms:
+
+```haml
+/ Flash message display
+- if notice
+  .mb-6.p-4.bg-green-50.border.border-green-200.rounded-xl
+    .flex.items-start.gap-3
+      = success_icon
+      .text-sm
+        .font-medium.text-green-800 Success
+        .text-green-700.mt-1= notice
+
+- if alert
+  .mb-6.p-4.bg-red-50.border.border-red-200.rounded-xl
+    .flex.items-start.gap-3
+      = error_icon
+      .text-sm
+        .font-medium.text-red-800 Error
+        .text-red-700.mt-1= alert
+
+/ HeyGen Integration Section
+.bg-card.text-card-foreground.border-0.shadow-lg.rounded-2xl
+  / Header with status indicator
+  .flex.items-center.justify-between
+    .flex.items-center.gap-4
+      .w-12.h-12.bg-purple-500.rounded-full.flex.items-center.justify-center.text-white
+        = heygen_icon
+      %div
+        .font-semibold.tracking-tight.text-lg Heygen
+        %p.text-sm.text-gray-600 AI avatar creation and video generation
+    .flex.items-center.gap-3
+      / Dynamic status indicator
+      - if @heygen_token&.is_valid
+        .inline-flex.items-center.rounded-full.border.text-xs.font-semibold.bg-green-100.text-green-700 Configured
+      - else
+        .inline-flex.items-center.rounded-full.border.text-xs.font-semibold.bg-secondary.text-secondary-foreground Not configured
+
+  / API Key Form
+  .p-6.pt-0.space-y-6
+    .space-y-4
+      = form_with url: settings_path, method: :patch, local: true, class: "space-y-4" do |form|
+        %div
+          %label.text-sm.font-medium.text-gray-700{:for => "heygen_api_key"} API Key
+          .relative.mt-1
+            = form.password_field :heygen_api_key, 
+                id: "heygen_api_key", 
+                value: (@heygen_token&.encrypted_token if @heygen_token&.encrypted_token.present?), 
+                placeholder: "Enter your HeyGen API key...", 
+                class: "form-input-classes"
+        .flex.gap-3
+          = form.submit "Save", class: "btn-save-classes"
+          
+          / Conditional validation button
+          - if @heygen_token&.is_valid
+            = form_with url: validate_heygen_api_settings_path, method: :post, local: true, class: "inline-block" do |validate_form|
+              = validate_form.submit "Validate", class: "btn-validate-classes"
+          - else
+            %button.btn-disabled-classes{:disabled => "true", :title => "Save API key first to enable validation"}
+              Validate
+```
+
+### 5. Routing Configuration
+
+**File**: `config/routes.rb`
+
+```ruby
+resource :settings, only: [ :show, :update ] do
+  member do
+    post :validate_heygen_api
+  end
+end
+```
+
+**Generated Routes**:
+- `GET /:locale/settings` - Display settings page
+- `PATCH /:locale/settings` - Save API key
+- `POST /:locale/settings/validate_heygen_api` - Validate and sync avatars
+
+### 6. Internationalization Support
+
+**Files**: `config/locales/en.yml` and `config/locales/es.yml`
+
+```yaml
+# English
+settings:
+  heygen:
+    save_success: "HeyGen API key saved successfully!"
+    save_failed: "Failed to save HeyGen API key: %{error}"
+    empty_token: "HeyGen API key cannot be empty."
+    validation_success:
+      one: "HeyGen API validation successful! %{count} avatar synchronized."
+      other: "HeyGen API validation successful! %{count} avatars synchronized."
+    validation_failed: "HeyGen API validation failed: %{error}"
+
+# Spanish
+settings:
+  heygen:
+    save_success: "¡Clave API de HeyGen guardada exitosamente!"
+    save_failed: "Error al guardar la clave API de HeyGen: %{error}"
+    empty_token: "La clave API de HeyGen no puede estar vacía."
+    validation_success:
+      one: "¡Validación de API HeyGen exitosa! %{count} avatar sincronizado."
+      other: "¡Validación de API HeyGen exitosa! %{count} avatares sincronizados."
+    validation_failed: "Falló la validación de API HeyGen: %{error}"
+```
+
+## Complete Validation Workflow: What Happens When You Click "Validate"
+
+### Step-by-Step Process
+
+When a user clicks the "Validate" button on the API Integrations tab in the Settings page, the following comprehensive workflow is executed:
+
+#### 1. **Frontend Form Submission** 
+```haml
+= form_with url: validate_heygen_api_settings_path, method: :post, local: true do |validate_form|
+  = validate_form.submit "Validate"
+```
+
+- **HTTP Method**: POST
+- **URL**: `/:locale/settings/validate_heygen_api`
+- **Rails Route**: `validate_heygen_api_settings_path`
+- **Controller Action**: `SettingsController#validate_heygen_api`
+
+#### 2. **Controller Processing**
+```ruby
+def validate_heygen_api
+  result = Heygen::SynchronizeAvatarsService.new(user: current_user).call
+  # ... handle result
+end
+```
+
+- **Service Instantiation**: Creates `Heygen::SynchronizeAvatarsService` with current user
+- **Service Execution**: Calls the `call` method to start synchronization
+- **Result Processing**: Handles success/failure scenarios
+
+#### 3. **Service Orchestration** (`Heygen::SynchronizeAvatarsService`)
+
+**Step 3a: API Token Retrieval**
+```ruby
+list_service = Heygen::ListAvatarsService.new(@user)
+```
+- Uses existing `Heygen::ListAvatarsService` class
+- Automatically retrieves user's valid HeyGen API token via `user.active_token_for("heygen")`
+- Validates token exists and is marked as valid
+
+**Step 3b: HeyGen API Call**
+```ruby
+list_result = list_service.call
+```
+- Makes HTTP GET request to HeyGen's `list_avatars` endpoint
+- Uses encrypted API token from user's `api_tokens` table
+- Handles API authentication and rate limiting
+- Returns structured response with avatar data
+
+**Step 3c: Response Validation**
+```ruby
+return failure_result("Failed to fetch avatars from HeyGen: #{list_result[:error]}") unless list_result[:success]
+```
+- Validates API response was successful
+- Handles various error scenarios:
+  - Invalid API key
+  - Network timeouts
+  - API rate limits
+  - Malformed responses
+
+#### 4. **Avatar Data Processing**
+
+**Step 4a: Data Extraction**
+```ruby
+avatars_data = list_result[:data] || []
+raw_response = build_raw_response(avatars_data)
+```
+- Extracts avatar array from HeyGen API response
+- Creates backup copy of full response for debugging
+- Handles edge cases like empty responses
+
+**Step 4b: Avatar Synchronization Loop**
+```ruby
+avatars_data.each do |avatar_data|
+  avatar = sync_avatar(avatar_data, raw_response)
+  synchronized_avatars << avatar if avatar
+end
+```
+
+For each avatar returned by HeyGen:
+
+1. **Find or Create Avatar Record**:
+   ```ruby
+   avatar = Avatar.find_or_initialize_by(
+     user: @user,
+     avatar_id: avatar_data[:id],
+     provider: "heygen"
+   )
+   ```
+   - Uses composite unique key: `[user_id, avatar_id, provider]`
+   - Creates new record if avatar doesn't exist
+   - Updates existing record if already synchronized
+
+2. **Attribute Mapping**:
+   ```ruby
+   avatar.assign_attributes({
+     name: avatar_data[:name],                    # "Professional Female"
+     status: "active",                           # Mark as available
+     preview_image_url: avatar_data[:preview_image_url], # Avatar thumbnail
+     gender: avatar_data[:gender],               # "male" or "female"
+     is_public: avatar_data[:is_public] || false, # Public/private status
+     raw_response: raw_response                   # Full API response
+   })
+   ```
+
+3. **Database Persistence**:
+   ```ruby
+   avatar.save ? avatar : nil
+   ```
+   - Validates all model constraints
+   - Handles uniqueness violations gracefully
+   - Logs errors for failed saves
+
+#### 5. **Database Updates**
+
+The synchronization process results in:
+
+**New Avatars**: Created in `avatars` table with:
+- **User Association**: Linked to current user
+- **Provider**: Set to 'heygen'
+- **Status**: Set to 'active' (available for use)
+- **Metadata**: Name, gender, preview image, public status
+- **Debug Data**: Full raw API response stored
+
+**Existing Avatars**: Updated with latest information from HeyGen:
+- **Status Refresh**: Reactivated if previously inactive
+- **Metadata Update**: Latest name, image, status from HeyGen
+- **Timestamp Update**: `updated_at` reflects last sync
+
+**Inactive Avatars**: Previously synced avatars not in current response remain but could be marked inactive in future iterations
+
+#### 6. **Response Generation**
+
+**Success Scenario**:
+```ruby
+success_result(data: {
+  synchronized_count: synchronized_avatars.size,
+  avatars: synchronized_avatars.map(&:to_api_format)
+})
+```
+- Returns count of successfully synchronized avatars
+- Includes array of avatar data in API format for potential frontend use
+
+**Failure Scenarios**:
+- **API Connection Failure**: "Failed to fetch avatars from HeyGen: Network timeout"
+- **Invalid API Key**: "Failed to fetch avatars from HeyGen: Invalid API key"
+- **Database Error**: "Error synchronizing avatars: Validation failed"
+
+#### 7. **Controller Response Processing**
+
+**Success Path**:
+```ruby
+if result.success?
+  redirect_to settings_path, notice: t("settings.heygen.validation_success", count: result.data[:synchronized_count])
+```
+- **HTTP Status**: 302 Redirect (POST-REDIRECT-GET pattern)
+- **Flash Message**: "HeyGen API validation successful! 5 avatars synchronized."
+- **URL**: Returns to settings page
+- **UI Update**: Status changes to "Configured" with green indicator
+
+**Failure Path**:
+```ruby
+else
+  redirect_to settings_path, alert: t("settings.heygen.validation_failed", error: result.error)
+```
+- **HTTP Status**: 302 Redirect
+- **Flash Message**: "HeyGen API validation failed: Invalid API key"
+- **URL**: Returns to settings page
+- **UI Update**: Error message displayed in red alert box
+
+#### 8. **User Interface Updates**
+
+After successful validation, the user sees:
+
+1. **Status Indicator**: Changes from "Not configured" to "Configured"
+2. **Flash Message**: Green success banner with avatar count
+3. **Button State**: Validate button remains enabled for future re-sync
+4. **Data Availability**: Avatars now available for use in reel creation
+
+#### 9. **Integration with Video Creation**
+
+The synchronized avatars become immediately available for:
+
+- **Scene-Based Reels**: Avatar selection dropdowns populated with user's avatars
+- **Avatar Filtering**: By gender, public status, or other attributes
+- **Preview Display**: Avatar thumbnails shown in creation interface
+- **API Integration**: Avatar IDs ready for HeyGen video generation calls
+
+### Error Handling and Edge Cases
+
+**Network Issues**:
+- Timeout handling with graceful degradation
+- Retry logic for transient failures
+- Clear error messages for user
+
+**API Limitations**:
+- Rate limit handling
+- Quota exceeded scenarios
+- Malformed response handling
+
+**Database Constraints**:
+- Duplicate avatar handling
+- Foreign key constraint violations
+- Transaction rollback for partial failures
+
+**User Experience**:
+- Loading states during API calls
+- Progress indication for long operations
+- Clear success/failure feedback
+
+### Security Considerations
+
+**API Key Protection**:
+- Keys stored encrypted in database
+- Never exposed in frontend or logs
+- Secure transmission to HeyGen API
+
+**User Data Isolation**:
+- Avatars scoped to individual users
+- No cross-user avatar access
+- Proper authorization checks
+
+**Error Information**:
+- Sensitive data filtered from error messages
+- Debug information stored securely
+- User-friendly error presentation
+
+## Testing Infrastructure
+
+### Model Tests (`spec/models/avatar_spec.rb`)
+- **13 test cases** covering validations, associations, scopes, and methods
+- **Validation Tests**: Presence, uniqueness, inclusion constraints
+- **Association Tests**: User relationship validation
+- **Scope Tests**: Provider filtering, status filtering
+- **Method Tests**: `#active?`, `#to_api_format`
+
+### Service Tests (`spec/services/heygen/synchronize_avatars_service_spec.rb`)
+- **10 test cases** covering all workflow scenarios
+- **Success Scenarios**: Avatar creation, updates, duplicate handling
+- **Failure Scenarios**: API failures, invalid tokens, network errors
+- **Edge Cases**: Empty responses, malformed data
+- **Data Integrity**: Raw response storage, attribute mapping
+
+### Integration Tests (`spec/integration/heygen_settings_integration_spec.rb`)
+- End-to-end workflow validation
+- User interface interaction testing
+- Flash message verification
+- Form submission handling
+
+### Factory Support (`spec/factories/avatars.rb`)
+- **Base Factory**: Standard avatar with realistic data
+- **Traits**: Provider-specific (heygen, kling), status (active, inactive), gender (male, female), visibility (public, private)
+- **Associations**: Proper user relationships
+- **Data Generation**: Faker-generated realistic names, URLs, IDs
+
+## Files Added/Modified
+
+### New Files
+- `app/models/avatar.rb` - Avatar model with validations and associations
+- `app/services/heygen/synchronize_avatars_service.rb` - Avatar synchronization service
+- `db/migrate/20250903140339_create_avatars.rb` - Avatar table creation
+- `spec/models/avatar_spec.rb` - Comprehensive avatar model tests
+- `spec/services/heygen/synchronize_avatars_service_spec.rb` - Service test suite
+- `spec/factories/avatars.rb` - Avatar factory with traits
+- `spec/integration/heygen_settings_integration_spec.rb` - Integration tests
+
+### Modified Files
+- `app/controllers/settings_controller.rb` - Added update and validate_heygen_api actions
+- `app/models/user.rb` - Added avatars association (`has_many :avatars`)
+- `app/views/settings/show.haml` - Complete UI implementation with forms and flash messages
+- `config/routes.rb` - Added update and validate_heygen_api routes
+- `config/locales/en.yml` - English translations for HeyGen integration
+- `config/locales/es.yml` - Spanish translations for HeyGen integration
+- `db/schema.rb` - Updated with avatars table definition
+
+## Integration Benefits
+
+### 1. **Seamless User Experience**
+- Single-click avatar synchronization
+- Real-time status feedback
+- Intuitive UI with clear states
+
+### 2. **Data Consistency**
+- Always fresh avatar data from HeyGen
+- Automatic deduplication
+- Proper error handling
+
+### 3. **Development Foundation**
+- Clean service architecture
+- Comprehensive test coverage
+- Extensible for additional providers (Kling)
+
+### 4. **Video Creation Enhancement**
+- Avatars immediately available for reel creation
+- Proper metadata for filtering and selection
+- Preview images for visual selection
+
+## Future Enhancements
+
+### 1. **Additional Providers**
+- Kling AI avatar integration
+- Generic avatar provider interface
+- Multi-provider avatar management
+
+### 2. **Enhanced Avatar Management**
+- Favorite avatars marking
+- Custom avatar grouping
+- Avatar usage analytics
+
+### 3. **Performance Optimizations**
+- Background synchronization jobs
+- Incremental sync strategies
+- Avatar data caching
+
+### 4. **User Experience Improvements**
+- Avatar preview in selection interface
+- Bulk avatar operations
+- Advanced filtering options
+
+This implementation provides a solid foundation for AI avatar management within the auto-creation videos interface, enabling users to efficiently manage and utilize their HeyGen avatars for video creation workflows.

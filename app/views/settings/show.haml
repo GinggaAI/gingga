@@ -4,6 +4,29 @@
       .mb-8
         %h1.text-3xl.font-bold.text-gray-900.mb-2= t('settings.title')
         %p.text-gray-600= t('settings.subtitle')
+      
+      / Flash messages
+      - if notice
+        .mb-6.p-4.bg-green-50.border.border-green-200.rounded-xl
+          .flex.items-start.gap-3
+            %svg.lucide.lucide-circle-check.w-5.h-5.text-green-600.flex-shrink-0{class: "mt-0.5", fill: "none", height: "24", stroke: "currentColor", "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "2", viewbox: "0 0 24 24", width: "24", xmlns: "http://www.w3.org/2000/svg"}
+              %path{d: "M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"}
+              %path{d: "m9 12 2 2 4-4"}
+            .text-sm
+              .font-medium.text-green-800 Success
+              .text-green-700.mt-1= notice
+      
+      - if alert
+        .mb-6.p-4.bg-red-50.border.border-red-200.rounded-xl
+          .flex.items-start.gap-3
+            %svg.lucide.lucide-circle-x.w-5.h-5.text-red-600.flex-shrink-0{class: "mt-0.5", fill: "none", height: "24", stroke: "currentColor", "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "2", viewbox: "0 0 24 24", width: "24", xmlns: "http://www.w3.org/2000/svg"}
+              %path{d: "M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"}
+              %path{d: "m15 9-6 6"}  
+              %path{d: "m9 9 6 6"}
+            .text-sm
+              .font-medium.text-red-800 Error
+              .text-red-700.mt-1= alert
+
       .space-y-6{"data-controller" => "tabs", "data-orientation" => "horizontal", :dir => "ltr"}
         .h-10.items-center.justify-center.text-muted-foreground.grid.w-full.grid-cols-3.bg-white.border-2.border-gray-200.rounded-xl.p-1{"aria-orientation" => "horizontal", "data-orientation" => "horizontal", :role => "tablist", :style => "outline: none;", :tabindex => "0"}
           %button.inline-flex.items-center.justify-center.whitespace-nowrap.px-3.text-sm.ring-offset-background.transition-all.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.rounded-lg.font-medium{"aria-controls" => "radix-«r72»-content-api-tokens", "aria-selected" => "true", :class => "py-1.5 data-[state=active]:shadow-sm data-[state=active]:bg-[#FFC940] data-[state=active]:text-black", "data-orientation" => "horizontal", "data-radix-collection-item" => "", "data-state" => "active", "data-tabs-target" => "tab", "data-action" => "click->tabs#switchTab", :id => "radix-«r72»-trigger-api-tokens", :role => "tab", :tabindex => "-1", :type => "button"}
@@ -113,7 +136,10 @@
                         .font-semibold.tracking-tight.text-lg Heygen
                         %p.text-sm.text-gray-600 AI avatar creation and video generation
                     .flex.items-center.gap-3
-                      .inline-flex.items-center.rounded-full.border.text-xs.font-semibold.transition-colors.focus:outline-none.focus:ring-2.focus:ring-ring.focus:ring-offset-2.border-transparent.bg-secondary.text-secondary-foreground{:class => "px-2.5 py-0.5 hover:bg-secondary/80"} Not configured
+                      - if @heygen_token&.is_valid
+                        .inline-flex.items-center.rounded-full.border.text-xs.font-semibold.transition-colors.focus:outline-none.focus:ring-2.focus:ring-ring.focus:ring-offset-2.border-transparent.bg-green-100.text-green-700{:class => "px-2.5 py-0.5"} Configured
+                      - else
+                        .inline-flex.items-center.rounded-full.border.text-xs.font-semibold.transition-colors.focus:outline-none.focus:ring-2.focus:ring-ring.focus:ring-offset-2.border-transparent.bg-secondary.text-secondary-foreground{:class => "px-2.5 py-0.5 hover:bg-secondary/80"} Not configured
                       %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.border.border-input.hover:bg-accent.hover:text-accent-foreground.h-9.px-3.rounded-xl.bg-transparent{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
                         %svg.lucide.lucide-external-link.w-4.h-4.mr-1{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}>
                           %path{:d => "M15 3h6v6"}
@@ -133,22 +159,28 @@
                     %button.peer.inline-flex.h-6.w-11.shrink-0.cursor-pointer.items-center.rounded-full.border-2.border-transparent.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.focus-visible:ring-offset-background.disabled:cursor-not-allowed.disabled:opacity-50{"aria-checked" => "false", :class => "data-[state=checked]:bg-primary data-[state=unchecked]:bg-input", "data-state" => "unchecked", :role => "switch", :type => "button", :value => "on"}
                       %span.pointer-events-none.block.h-5.w-5.rounded-full.bg-background.shadow-lg.ring-0.transition-transform{:class => "data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0", "data-state" => "unchecked"}
                   .space-y-4
-                    %div
-                      %label.peer-disabled:cursor-not-allowed.peer-disabled:opacity-70.text-sm.font-medium.text-gray-700{:for => "token-heygen"} API Key
-                      .relative.mt-1
-                        %input#token-heygen.flex.h-10.w-full.bg-background.px-3.py-2.text-base.ring-offset-background.file:border-0.file:bg-transparent.file:text-sm.file:font-medium.file:text-foreground.placeholder:text-muted-foreground.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:cursor-not-allowed.disabled:opacity-50.md:text-sm.pr-20.rounded-xl.border-2.border-gray-200{:class => "focus:border-[#FFC940]", :placeholder => "Enter your Heygen API key...", :type => "password", :value => ""}/
-                        .absolute.right-2.transform.flex.items-center.gap-1{:class => "top-1/2 -translate-y-1/2"}
-                          %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.hover:text-accent-foreground.rounded-md.h-8.w-8.p-0{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0", :type => "button"}
-                            %svg.lucide.lucide-eye.w-4.h-4{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                              %path{:d => "M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"}
-                              %circle{:cx => "12", :cy => "12", :r => "3"}
-                      .mt-2.text-xs.text-gray-500 Example: hg_abc123...
-                    .flex.gap-3
-                      %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.h-10.px-4.py-2.text-white.rounded-xl{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-[#3AC8FF] hover:bg-[#3AC8FF]/90", :disabled => ""}
-                        %svg.lucide.lucide-circle-check-big.w-4.h-4.mr-2{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}>
-                          %path{:d => "M21.801 10A10 10 0 1 1 17 3.335"}
-                          %path{:d => "m9 11 3 3L22 4"}
-                        Validate
+                    = form_with url: settings_path, method: :patch, local: true, class: "space-y-4" do |form|
+                      %div
+                        %label.peer-disabled:cursor-not-allowed.peer-disabled:opacity-70.text-sm.font-medium.text-gray-700{:for => "heygen_api_key"} API Key
+                        .relative.mt-1
+                          = form.password_field :heygen_api_key, id: "heygen_api_key", value: (@heygen_token&.encrypted_token if @heygen_token&.encrypted_token.present?), placeholder: "Enter your HeyGen API key...", class: "flex h-10 w-full bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm pr-20 rounded-xl border-2 border-gray-200 focus:border-[#FFC940]"
+                          .absolute.right-2.transform.flex.items-center.gap-1{:class => "top-1/2 -translate-y-1/2"}
+                            %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.hover:bg-accent.hover:text-accent-foreground.rounded-md.h-8.w-8.p-0{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0", :type => "button", "data-action" => "click->password-toggle#toggle"}
+                              %svg.lucide.lucide-eye.w-4.h-4{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
+                                %path{:d => "M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"}
+                                %circle{:cx => "12", :cy => "12", :r => "3"}
+                        .mt-2.text-xs.text-gray-500 Example: hg_abc123...
+                      .flex.gap-3
+                        = form.submit "Save", class: "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 text-white rounded-xl [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-[#FFC940] hover:bg-[#FFC940]/90"
+                        - if @heygen_token&.is_valid
+                          = form_with url: validate_heygen_api_settings_path, method: :post, local: true, class: "inline-block" do |validate_form|
+                            = validate_form.submit "Validate", class: "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 text-white rounded-xl [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-[#3AC8FF] hover:bg-[#3AC8FF]/90"
+                        - else
+                          %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.h-10.px-4.py-2.text-white.rounded-xl{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-gray-400", :disabled => "true", :title => "Save API key first to enable validation"}
+                            %svg.lucide.lucide-circle-check-big.w-4.h-4.mr-2{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}>
+                              %path{:d => "M21.801 10A10 10 0 1 1 17 3.335"}
+                              %path{:d => "m9 11 3 3L22 4"}
+                            Validate
                   .p-4.bg-amber-50.border.border-amber-200.rounded-xl
                     .flex.items-start.gap-3
                       %svg.lucide.lucide-triangle-alert.w-5.h-5.text-amber-600.flex-shrink-0{:class => "mt-0.5", :fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
