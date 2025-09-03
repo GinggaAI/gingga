@@ -1,51 +1,127 @@
 - content_for :page_title, @presenter.page_title
 
-.container.mx-auto.px-4.py-8.max-w-4xl
-  .mb-8
-    %h1.text-3xl.font-bold.mb-2.text-gray-900= @presenter.main_title
-    %p.text-base.text-gray-600= @presenter.main_description
+%main.flex-1.overflow-y-auto
+  .p-8
+    .max-w-4xl.mx-auto
+      .flex.items-center.gap-2.mb-4
+        = link_to root_path, class: "text-gray-600 hover:text-gray-800 transition-colors" do
+          ←
+        %span.text-gray-400 |
+        %span.text-gray-600= @presenter.main_title
 
-  .mb-8
-    .flex.bg-gray-100.rounded-lg.p-1.max-w-md
-      = link_to scene_based_reels_path, class: @presenter.scene_based_tab_classes do
-        = t('reels.tabs.scene_based')
-      = link_to narrative_reels_path, class: @presenter.narrative_tab_classes, style: @presenter.narrative_tab_style do
-        = t('reels.tabs.narrative')
+      .mb-8
+        %h1.text-3xl.font-bold.mb-2.text-gray-900= @presenter.main_title
+        %p.text-gray-600= @presenter.main_description
 
-  = form_with model: @reel, url: narrative_reels_path, local: true, class: "space-y-8" do |form|
+      .bg-white.border.border-gray-200.shadow-lg.rounded-2xl.mb-6
+        .p-6
+          %h2.text-xl.font-semibold.mb-4.text-center= t('reels.choose_creation_method')
+          .flex.bg-gray-100.rounded-lg.p-1.max-w-md.mx-auto
+            = link_to scene_based_reels_path, class: "flex-1 px-4 py-2 text-center rounded-md font-medium transition-colors text-gray-600 hover:text-gray-900" do
+              %span.flex.items-center.justify-center.gap-2
+                📹
+                = t('reels.tabs.scene_based')
+            = link_to narrative_reels_path, class: "flex-1 px-4 py-2 text-center rounded-md font-medium transition-colors text-white", style: "background-color: #FFC857" do
+              %span.flex.items-center.justify-center.gap-2
+                📝
+                = t('reels.tabs.narrative')
 
-    - if @presenter.has_errors?
-      .bg-red-50.border.border-red-200.rounded-lg.p-4
-        %h4.text-red-800.font-medium= @presenter.error_title
-        %ul.mt-2.text-red-600.text-sm.space-y-1
-          - @presenter.error_messages.each do |message|
-            %li= message
+          .mt-6.p-4.bg-gradient-to-r.from-purple-50.to-blue-50.rounded-xl.border.border-purple-200
+            %h3.text-lg.font-semibold.mb-2.text-center.text-gray-800= t('reels.narrative.title')
+            %p.text-center.text-gray-600= t('reels.narrative.description')
 
-    = render Ui::FormSectionComponent.new(title: @presenter.basic_info_title, description: @presenter.basic_info_description) do
-      .space-y-6
-        .space-y-2
-          = form.label :title, @presenter.title_label, class: "block text-sm font-medium text-gray-700"
-          = form.text_field :title, placeholder: @presenter.title_placeholder, class: "form-input w-full"
+      = form_with model: @reel, url: narrative_reels_path, local: true, data: @presenter.form_data_attributes, class: "space-y-6" do |form|
+        = form.hidden_field :template, value: "narration_over_7_images"
 
-        .space-y-2
-          = form.label :description, @presenter.description_label, class: "block text-sm font-medium text-gray-700"
-          = form.text_area :description, placeholder: @presenter.description_placeholder, rows: 3, class: "form-input w-full"
+        - if @presenter.has_errors?
+          .bg-red-50.border.border-red-200.rounded-2xl.p-4
+            .flex.items-start.gap-3
+              %div.flex-shrink-0.mt-0.5
+                ⚠️
+              %div
+                %h4.text-red-800.font-medium= @presenter.error_title
+                %ul.mt-2.text-red-600.text-sm.space-y-1
+                  - @presenter.error_messages.each do |message|
+                    %li= message
 
-    = render Ui::FormSectionComponent.new(title: @presenter.narrative_content_title, description: @presenter.narrative_content_description) do
-      .space-y-6
-        .space-y-2
-          = form.label :narration_text, @presenter.narration_text_label, class: "block text-sm font-medium text-gray-700"
-          = form.text_area :narration_text, placeholder: @presenter.narration_text_placeholder, rows: 6, class: "form-input w-full"
+        .bg-white.border.border-gray-200.shadow-lg.rounded-2xl
+          .p-6
+            .flex.items-center.gap-3.mb-4
+              %div.w-8.h-8.bg-blue-100.rounded-lg.flex.items-center.justify-center
+                📝
+              %div
+                %h3.text-lg.font-semibold.text-gray-900= @presenter.basic_info_title
+                %p.text-sm.text-gray-600= @presenter.basic_info_description
 
-    = render Ui::FormSectionComponent.new(title: @presenter.image_themes_title, description: @presenter.image_themes_description) do
-      .space-y-2
-        = form.label :image_themes, @presenter.image_themes_label, class: "block text-sm font-medium text-gray-700"
-        = form.text_area :image_themes, placeholder: @presenter.image_themes_placeholder, rows: 3, class: "form-input w-full"
+            .space-y-6
+              %div
+                = form.label :title, @presenter.title_label, class: "block text-sm font-medium text-gray-700 mb-2"
+                = form.text_field :title, placeholder: @presenter.title_placeholder, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
 
-    = render Ui::FormSectionComponent.new(title: @presenter.additional_instructions_title, description: @presenter.additional_instructions_description) do
-      .space-y-2
-        = form.label :additional_instructions, @presenter.style_direction_label, class: "block text-sm font-medium text-gray-700"
-        = form.text_area :additional_instructions, placeholder: @presenter.style_direction_placeholder, rows: 4, class: "form-input w-full"
+              %div
+                = form.label :description, @presenter.description_label, class: "block text-sm font-medium text-gray-700 mb-2"
+                = form.text_area :description, placeholder: @presenter.description_placeholder, rows: 3, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
 
-    .flex.justify-end.pt-6
-      = render Ui::ButtonComponent.new(label: @presenter.submit_button_label, variant: :primary, type: :submit, size: :lg)
+              %div
+                = form.label :category, t('reels.narrative.category'), class: "block text-sm font-medium text-gray-700 mb-2"
+                = form.select :category, options_for_select([[t('reels.narrative.select_category'), ""]], @reel.category), {}, { class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" }
+
+        .bg-white.border.border-gray-200.shadow-lg.rounded-2xl
+          .p-6
+            .flex.items-center.gap-3.mb-4
+              %div.w-8.h-8.bg-purple-100.rounded-lg.flex.items-center.justify-center
+                📖
+              %div
+                %h3.text-lg.font-semibold.text-gray-900= t('reels.narrative.story_content')
+                %p.text-sm.text-gray-600= t('reels.narrative.story_content_description')
+
+            %div
+              %label.block.text-sm.font-medium.text-gray-700.mb-2= t('reels.narrative.your_story')
+              %p.text-sm.text-gray-500.mb-2
+                = t('reels.narrative.story_instructions')
+                %br
+                = t('reels.narrative.story_bullet_1')
+                %br
+                = t('reels.narrative.story_bullet_2')
+                %br
+                = t('reels.narrative.story_bullet_3')
+
+            %div
+              = form.text_area :story_content, placeholder: @presenter.story_content_placeholder, rows: 6, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              %p.text-sm.text-gray-500.mt-2
+                = t('reels.narrative.story_detail_note')
+
+        .bg-white.border.border-gray-200.shadow-lg.rounded-2xl
+          .p-6
+            .flex.items-center.gap-3.mb-4
+              %div.w-8.h-8.bg-orange-100.rounded-lg.flex.items-center.justify-center
+                🎵
+              %div
+                %h3.text-lg.font-semibold.text-gray-900= t('reels.narrative.music_style')
+                %p.text-sm.text-gray-600= t('reels.narrative.music_style_description')
+
+            .grid.grid-cols-1.md:grid-cols-2.gap-6
+              %div
+                = form.label :music_preference, t('reels.narrative.music_preference'), class: "block text-sm font-medium text-gray-700 mb-2"
+                = form.select :music_preference, options_for_select([[t('reels.narrative.select_music_style'), ""]], @reel.music_preference), {}, { class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" }
+              %div
+                = form.label :style_preference, t('reels.narrative.visual_style'), class: "block text-sm font-medium text-gray-700 mb-2"
+                = form.select :style_preference, options_for_select([[t('reels.narrative.select_visual_style'), ""]], @reel.style_preference), {}, { class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" }
+
+        .bg-white.border.border-gray-200.shadow-lg.rounded-2xl
+          .p-6
+            .flex.items-center.gap-3.mb-4
+              %div.w-8.h-8.bg-yellow-100.rounded-lg.flex.items-center.justify-center
+                📋
+              %div
+                %h3.text-lg.font-semibold.text-gray-900= @presenter.additional_instructions_title
+                %p.text-sm.text-gray-600= @presenter.additional_instructions_description
+
+            %div
+              = form.label :additional_instructions, @presenter.style_direction_label, class: "block text-sm font-medium text-gray-700 mb-2"
+              = form.text_area :additional_instructions, placeholder: @presenter.style_direction_placeholder, rows: 4, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+
+        .flex.justify-center.pt-6
+          %button.inline-flex.items-center.justify-center.gap-2.bg-gradient-to-r.from-yellow-400.to-orange-500.text-gray-900.font-bold.py-4.px-8.rounded-xl.shadow-lg.hover:from-purple-500.hover:to-blue-600.hover:shadow-xl.transform.hover:scale-105.transition-all.duration-300{type: "submit"}
+            📖
+            = @presenter.submit_button_label

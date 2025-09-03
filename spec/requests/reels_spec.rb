@@ -31,6 +31,7 @@ RSpec.describe "Reels", type: :request do
     let(:valid_params) do
       {
         reel: {
+          template: "solo_avatars",
           title: "Scene-based Reel",
           description: "Test description",
           use_ai_avatar: true,
@@ -73,7 +74,7 @@ RSpec.describe "Reels", type: :request do
 
       reel = Reel.last
       expect(reel.reel_scenes.count).to eq(3)
-      expect(reel.mode).to eq('scene_based')
+      expect(reel.template).to eq('solo_avatars')
       expect(reel.title).to eq("Scene-based Reel")
     end
   end
@@ -82,10 +83,10 @@ RSpec.describe "Reels", type: :request do
     let(:valid_params) do
       {
         reel: {
+          template: "narration_over_7_images",
           title: "Narrative Reel",
           description: "Story description",
           category: "educational",
-          format: "short_vertical",
           story_content: "This is my story...",
           music_preference: "upbeat",
           style_preference: "modern"
@@ -106,10 +107,9 @@ RSpec.describe "Reels", type: :request do
       post "/en/reels/narrative", params: valid_params
 
       reel = Reel.last
-      expect(reel.mode).to eq('narrative')
+      expect(reel.template).to eq('narration_over_7_images')
       expect(reel.title).to eq("Narrative Reel")
       expect(reel.category).to eq("educational")
-      expect(reel.format).to eq("short_vertical")
     end
   end
 end

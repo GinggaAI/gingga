@@ -13,9 +13,9 @@ class ReelsController < ApplicationController
   def new
     template = params[:template]
     return redirect_to reels_path, alert: "Invalid template" unless valid_template?(template)
-    
+
     result = ReelCreationService.new(user: current_user, template: template).initialize_reel
-    
+
     if result[:success]
       @reel = result[:reel]
       setup_presenter(template)
@@ -27,13 +27,14 @@ class ReelsController < ApplicationController
 
   def create
     result = ReelCreationService.new(user: current_user, params: reel_params).call
-    
+
     if result[:success]
       redirect_to result[:reel], notice: "Reel created successfully! Your reel is being generated."
     else
       @reel = result[:reel]
-      setup_presenter(@reel.template)
-      render template_view(@reel.template), status: :unprocessable_entity
+      template = @reel&.template || reel_params[:template]
+      setup_presenter(template)
+      render template_view(template), status: :unprocessable_entity
     end
   end
 
@@ -45,8 +46,9 @@ class ReelsController < ApplicationController
 
   def reel_params
     params.require(:reel).permit(
-      :template, :title, :description,
-      reel_scenes_attributes: [ :id, :scene_number, :avatar_id, :voice_id, :script, :_destroy ]
+      :template, :title, :description, :category, :use_ai_avatar, :additional_instructions,
+      :story_content, :music_preference, :style_preference,
+      reel_scenes_attributes: [ :id, :scene_number, :avatar_id, :voice_id, :script, :video_type, :_destroy ]
     )
   end
 
@@ -57,9 +59,9 @@ class ReelsController < ApplicationController
   def template_view(template)
     case template
     when "solo_avatars", "avatar_and_video", "one_to_three_videos"
-      :scene_based
+      "reels/scene_based"
     when "narration_over_7_images"
-      :narrative
+      "reels/narrative"
     end
   end
 

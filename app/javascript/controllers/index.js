@@ -7,17 +7,26 @@ import { application } from "./application"
 import CtaPulseController from "./cta_pulse_controller"
 application.register("cta-pulse", CtaPulseController)
 
+import DropdownController from "./dropdown_controller"
+application.register("dropdown", DropdownController)
+
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
+
+import NarrativeFormController from "./narrative_form_controller"
+application.register("narrative-form", NarrativeFormController)
 
 import RevealController from "./reveal_controller"
 application.register("reveal", RevealController)
 
+import SceneCharacterCounterController from "./scene_character_counter_controller"
+application.register("scene-character-counter", SceneCharacterCounterController)
+
+import SceneListController from "./scene_list_controller"
+application.register("scene-list", SceneListController)
+
 import TabsController from "./tabs_controller"
 application.register("tabs", TabsController)
-
-import DropdownController from "./dropdown_controller"
-application.register("dropdown", DropdownController)
 
 import ToastController from "./toast_controller"
 application.register("toast", ToastController)

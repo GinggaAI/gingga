@@ -7,15 +7,15 @@ class ReelSceneBasedPresenter
   end
 
   def page_title
-    I18n.t('reels.scene_based.page_title')
+    I18n.t("reels.scene_based.page_title")
   end
 
   def main_title
-    I18n.t('reels.create_reel')
+    I18n.t("reels.create_reel")
   end
 
   def main_description
-    I18n.t('reels.description')
+    I18n.t("reels.description")
   end
 
   def scene_based_tab_active?
@@ -43,7 +43,7 @@ class ReelSceneBasedPresenter
   end
 
   def error_title
-    I18n.t('reels.errors.fix_following')
+    I18n.t("reels.errors.fix_following")
   end
 
   def error_messages
@@ -51,51 +51,51 @@ class ReelSceneBasedPresenter
   end
 
   def basic_info_title
-    I18n.t('reels.basic_info.title')
+    I18n.t("reels.basic_info.title")
   end
 
   def basic_info_description
-    I18n.t('reels.basic_info.description')
+    I18n.t("reels.basic_info.description")
   end
 
   def title_label
-    I18n.t('reels.fields.title')
+    I18n.t("reels.fields.title")
   end
 
   def title_placeholder
-    I18n.t('reels.placeholders.title')
+    I18n.t("reels.placeholders.title")
   end
 
   def description_label
-    I18n.t('reels.fields.description')
+    I18n.t("reels.fields.description")
   end
 
   def description_placeholder
-    I18n.t('reels.placeholders.description')
+    I18n.t("reels.placeholders.description")
   end
 
   def ai_avatar_title
-    I18n.t('reels.ai_avatar.title')
+    I18n.t("reels.ai_avatar.title")
   end
 
   def ai_avatar_description
-    I18n.t('reels.ai_avatar.description')
+    I18n.t("reels.ai_avatar.description")
   end
 
   def use_ai_avatars_label
-    I18n.t('reels.ai_avatar.use_ai_avatars')
+    I18n.t("reels.ai_avatar.use_ai_avatars")
   end
 
   def use_ai_avatars_description
-    I18n.t('reels.ai_avatar.enable_description')
+    I18n.t("reels.ai_avatar.enable_description")
   end
 
   def scene_breakdown_title
-    I18n.t('reels.scene_breakdown.title')
+    I18n.t("reels.scene_breakdown.title")
   end
 
   def scene_breakdown_description
-    I18n.t('reels.scene_breakdown.description')
+    I18n.t("reels.scene_breakdown.description")
   end
 
   def scene_count
@@ -103,31 +103,31 @@ class ReelSceneBasedPresenter
   end
 
   def scenes_label
-    I18n.t('reels.scene_breakdown.scenes_count', count: scene_count)
+    I18n.t("reels.scene_breakdown.scenes_count", count: scene_count)
   end
 
   def add_scene_label
-    I18n.t('reels.scene_breakdown.add_scene')
+    I18n.t("reels.scene_breakdown.add_scene")
   end
 
   def additional_instructions_title
-    I18n.t('reels.additional_instructions.title')
+    I18n.t("reels.additional_instructions.title")
   end
 
   def additional_instructions_description
-    I18n.t('reels.additional_instructions.description')
+    I18n.t("reels.additional_instructions.description")
   end
 
   def style_direction_label
-    I18n.t('reels.additional_instructions.style_direction')
+    I18n.t("reels.additional_instructions.style_direction")
   end
 
   def style_direction_placeholder
-    I18n.t('reels.placeholders.additional_instructions')
+    I18n.t("reels.placeholders.additional_instructions")
   end
 
   def submit_button_label
-    I18n.t('reels.submit.scene_based')
+    I18n.t("reels.submit.scene_based")
   end
 
   def form_data_attributes

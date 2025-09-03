@@ -7,15 +7,15 @@ class ReelNarrativePresenter
   end
 
   def page_title
-    I18n.t('reels.narrative.page_title')
+    I18n.t("reels.narrative.page_title")
   end
 
   def main_title
-    I18n.t('reels.create_reel')
+    I18n.t("reels.create_reel")
   end
 
   def main_description
-    I18n.t('reels.description')
+    I18n.t("reels.description")
   end
 
   def scene_based_tab_active?
@@ -43,7 +43,7 @@ class ReelNarrativePresenter
   end
 
   def error_title
-    I18n.t('reels.errors.fix_following')
+    I18n.t("reels.errors.fix_following")
   end
 
   def error_messages
@@ -51,78 +51,82 @@ class ReelNarrativePresenter
   end
 
   def basic_info_title
-    I18n.t('reels.basic_info.title')
+    I18n.t("reels.basic_info.title")
   end
 
   def basic_info_description
-    I18n.t('reels.basic_info.description')
+    I18n.t("reels.basic_info.description")
   end
 
   def title_label
-    I18n.t('reels.fields.title')
+    I18n.t("reels.fields.title")
   end
 
   def title_placeholder
-    I18n.t('reels.placeholders.title')
+    I18n.t("reels.placeholders.title")
   end
 
   def description_label
-    I18n.t('reels.fields.description')
+    I18n.t("reels.fields.description")
   end
 
   def description_placeholder
-    I18n.t('reels.placeholders.description')
+    I18n.t("reels.placeholders.description")
   end
 
   def narrative_content_title
-    I18n.t('reels.narrative.content_title')
+    I18n.t("reels.narrative.content_title")
   end
 
   def narrative_content_description
-    I18n.t('reels.narrative.content_description')
+    I18n.t("reels.narrative.content_description")
   end
 
-  def narration_text_label
-    I18n.t('reels.narrative.narration_text')
+  def story_content_label
+    I18n.t("reels.narrative.your_story")
   end
 
-  def narration_text_placeholder
-    I18n.t('reels.placeholders.narration_text')
+  def story_content_placeholder
+    I18n.t("reels.placeholders.narration_text")
   end
 
   def image_themes_title
-    I18n.t('reels.narrative.image_themes_title')
+    I18n.t("reels.narrative.image_themes_title")
   end
 
   def image_themes_description
-    I18n.t('reels.narrative.image_themes_description')
+    I18n.t("reels.narrative.image_themes_description")
   end
 
   def image_themes_label
-    I18n.t('reels.narrative.image_themes')
+    I18n.t("reels.narrative.image_themes")
   end
 
   def image_themes_placeholder
-    I18n.t('reels.placeholders.image_themes')
+    I18n.t("reels.placeholders.image_themes")
   end
 
   def additional_instructions_title
-    I18n.t('reels.additional_instructions.title')
+    I18n.t("reels.additional_instructions.title")
   end
 
   def additional_instructions_description
-    I18n.t('reels.additional_instructions.description')
+    I18n.t("reels.additional_instructions.description")
   end
 
   def style_direction_label
-    I18n.t('reels.additional_instructions.style_direction')
+    I18n.t("reels.additional_instructions.style_direction")
   end
 
   def style_direction_placeholder
-    I18n.t('reels.placeholders.additional_instructions')
+    I18n.t("reels.placeholders.additional_instructions")
   end
 
   def submit_button_label
-    I18n.t('reels.submit.narrative')
+    I18n.t("reels.submit.narrative")
+  end
+
+  def form_data_attributes
+    {}
   end
 end

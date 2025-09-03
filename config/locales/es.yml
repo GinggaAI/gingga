@@ -281,6 +281,7 @@ es:
   reels:
     create_reel: "Crear Reel"
     description: "Elige tu método de creación preferido y genera contenido de video atractivo"
+    choose_creation_method: "Elige Método de Creación"
     
     # Tabs
     tabs:
@@ -290,16 +291,51 @@ es:
     # Scene-Based
     scene_based:
       page_title: "Crear Reel Basado en Escenas"
+      title: "Creación Basada en Escenas"
+      description: "Divide tu reel en escenas individuales para un control preciso sobre cada momento"
+      scene_number: "Escena %{number}"
+      sections_count: "3 secciones"
+      avatar: "Avatar"
+      select_avatar: "Seleccionar avatar"
+      avatar_1: "Avatar 1"
+      voice: "Voz"
+      select_voice: "Seleccionar voz"
+      voice_1: "Voz 1"
+      script: "Guion"
+      script_placeholder: "Describe qué pasa en la escena %{number}..."
+      video_type: "Tipo de Video"
+      avatar_video: "Video Avatar"
+      kling_video: "Video Kling"
       
     # Narrative
     narrative:
       page_title: "Crear Reel Narrativo"
+      title: "Creación Narrativa"
+      description: "Cuenta tu historia y deja que la IA cree un reel narrativo atractivo"
       content_title: "Contenido Narrativo"
       content_description: "Define la narración y temas visuales para tu reel"
       narration_text: "Texto de Narración"
       image_themes_title: "Temas Visuales"
       image_themes_description: "Define el estilo visual y temas para tus imágenes"
       image_themes: "Temas de Imagen"
+      category: "Categoría"
+      select_category: "Seleccionar categoría"
+      target_audience: "Audiencia Objetivo"
+      select_audience: "Seleccionar audiencia"
+      story_content: "Contenido de la Historia"
+      story_content_description: "Cuenta tu historia que será transformada en una narrativa atractiva"
+      your_story: "Tu Historia"
+      story_instructions: "Cuenta tu historia. ¿Qué pasó? ¿Qué aprendiste? ¿Qué mensaje quieres transmitir? Piensa en:"
+      story_bullet_1: "• El comienzo - ¿cómo empezó?"
+      story_bullet_2: "• El desafío o punto de inflexión"
+      story_bullet_3: "• La resolución o lección aprendida"
+      story_detail_note: "Sé lo más detallado posible. La IA usará esto para crear tu estructura narrativa."
+      music_style: "Música y Estilo"
+      music_style_description: "Establece el ambiente y estética para tu reel"
+      music_preference: "Preferencia Musical"
+      select_music_style: "Seleccionar estilo musical"
+      visual_style: "Estilo Visual"
+      select_visual_style: "Seleccionar estilo visual"
       
     # Common Fields
     fields:

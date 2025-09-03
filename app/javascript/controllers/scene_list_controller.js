@@ -1,11 +1,82 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["scenesContainer", "sceneCounter"]
+  static targets = ["scenesContainer", "sceneCounter", "aiToggle", "scene", "avatarFields", "videoTypeSelect"]
   static values = { sceneCount: Number }
 
   connect() {
     this.updateSceneCounter()
+    this.initializeAvatarToggle()
+  }
+
+  initializeAvatarToggle() {
+    // Set initial state based on checkbox value
+    this.toggleAvatarFields()
+  }
+
+  toggleAiAvatars() {
+    this.toggleAvatarFields()
+  }
+
+  toggleAvatarFields() {
+    const isEnabled = this.aiToggleTarget.checked
+    const avatarFieldsTargets = this.avatarFieldsTargets
+    const videoTypeSelects = this.videoTypeSelectTargets
+    
+    // Handle avatar fields visibility
+    avatarFieldsTargets.forEach(fields => {
+      if (isEnabled) {
+        fields.style.display = 'grid'
+        fields.classList.remove('opacity-50')
+        // Enable all inputs
+        const inputs = fields.querySelectorAll('input, select')
+        inputs.forEach(input => input.disabled = false)
+      } else {
+        fields.style.display = 'none'
+        fields.classList.add('opacity-50')
+        // Disable all inputs
+        const inputs = fields.querySelectorAll('input, select')
+        inputs.forEach(input => input.disabled = true)
+      }
+    })
+    
+    // Handle video type select states
+    videoTypeSelects.forEach(select => {
+      if (isEnabled) {
+        // When AI Avatar is enabled, enable select and default to avatar
+        select.disabled = false
+        select.value = 'avatar'
+      } else {
+        // When AI Avatar is disabled, disable select and force to kling
+        select.disabled = true
+        select.value = 'kling'
+      }
+    })
+    
+    // Also update avatar fields visibility based on select changes
+    this.updateAvatarFieldsVisibility()
+  }
+
+  updateAvatarFieldsVisibility() {
+    const videoTypeSelects = this.videoTypeSelectTargets
+    const avatarFieldsTargets = this.avatarFieldsTargets
+    
+    videoTypeSelects.forEach((select, index) => {
+      const avatarFields = avatarFieldsTargets[index]
+      if (avatarFields) {
+        if (select.value === 'avatar') {
+          avatarFields.style.display = 'grid'
+          avatarFields.style.opacity = '1'
+        } else {
+          avatarFields.style.display = 'none'
+          avatarFields.style.opacity = '0.5'
+        }
+      }
+    })
+  }
+
+  handleVideoTypeChange(event) {
+    this.updateAvatarFieldsVisibility()
   }
 
   addScene() {

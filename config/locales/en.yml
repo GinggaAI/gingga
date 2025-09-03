@@ -310,6 +310,7 @@ en:
   reels:
     create_reel: "Create Reel"
     description: "Choose your preferred creation method and generate engaging video content"
+    choose_creation_method: "Choose Creation Method"
     
     # Tabs
     tabs:
@@ -319,16 +320,51 @@ en:
     # Scene-Based
     scene_based:
       page_title: "Create Scene-Based Reel"
+      title: "Scene-Based Creation"
+      description: "Break down your reel into individual scenes for precise control over each moment"
+      scene_number: "Scene %{number}"
+      sections_count: "3 sections"
+      avatar: "Avatar"
+      select_avatar: "Select avatar"
+      avatar_1: "Avatar 1"
+      voice: "Voice"
+      select_voice: "Select voice"
+      voice_1: "Voice 1"
+      script: "Script"
+      script_placeholder: "Describe what happens in scene %{number}..."
+      video_type: "Video Type"
+      avatar_video: "Avatar Video"
+      kling_video: "Kling Video"
       
     # Narrative
     narrative:
       page_title: "Create Narrative Reel"
+      title: "Narrative Creation"
+      description: "Tell your story and let AI create compelling narrative-driven reel"
       content_title: "Narrative Content"
       content_description: "Define the narration and visual themes for your reel"
       narration_text: "Narration Text"
       image_themes_title: "Visual Themes"
       image_themes_description: "Define the visual style and themes for your images"
       image_themes: "Image Themes"
+      category: "Category"
+      select_category: "Select category"
+      target_audience: "Target Audience"
+      select_audience: "Select audience"
+      story_content: "Story Content"
+      story_content_description: "Tell your story that will be transformed into a compelling narrative"
+      your_story: "Your Story"
+      story_instructions: "Tell your story. What happened? What did you learn? What message do you want to convey? Think about:"
+      story_bullet_1: "• The beginning - how did it start?"
+      story_bullet_2: "• The challenge or turning point"
+      story_bullet_3: "• The resolution or lesson learned"
+      story_detail_note: "Be as detailed as possible. The AI will use this to create your narrative structure."
+      music_style: "Music & Style"
+      music_style_description: "Set the mood and aesthetic for your reel"
+      music_preference: "Music Preference"
+      select_music_style: "Select music style"
+      visual_style: "Visual Style"
+      select_visual_style: "Select visual style"
       
     # Common Fields
     fields:

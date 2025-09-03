@@ -28,7 +28,7 @@ class ReelCreationService
     case template
     when "solo_avatars"
       Reels::SoloAvatarsCreationService
-    when "avatar_and_video" 
+    when "avatar_and_video"
       Reels::AvatarAndVideoCreationService
     when "narration_over_7_images"
       Reels::NarrationOver7ImagesCreationService

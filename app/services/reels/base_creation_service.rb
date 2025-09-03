@@ -15,7 +15,7 @@ module Reels
     def call
       reel = @user.reels.build(reel_params)
       setup_template_specific_fields(reel) if reel.new_record?
-      
+
       if reel.save
         success_result(reel)
       else

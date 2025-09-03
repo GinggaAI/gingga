@@ -4,7 +4,7 @@ class Reel < ApplicationRecord
 
   accepts_nested_attributes_for :reel_scenes, allow_destroy: true
 
-  validates :template, presence: true, inclusion: { 
+  validates :template, presence: true, inclusion: {
     in: %w[solo_avatars avatar_and_video narration_over_7_images one_to_three_videos],
     message: "%{value} is not a valid template"
   }
@@ -23,7 +23,7 @@ class Reel < ApplicationRecord
     when "narration_over_7_images"
       # Will need narrative content fields - placeholder for now
       true
-    when "one_to_three_videos" 
+    when "one_to_three_videos"
       # Will need video content fields - placeholder for now
       true
     else
