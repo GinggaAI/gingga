@@ -269,6 +269,7 @@ end
 - **Return objects**: Use consistent result objects for success/failure
 - **Environment-agnostic behavior**: **NEVER** use `Rails.env` conditionals in service logic
 - **Use VCR for testing**: Mock external API calls with VCR, not environment checks
+- **Centralized HTTP clients**: Use `Http::BaseClient` for external API calls, not direct HTTParty/Net::HTTP
 
 ### Service Anti-Patterns (AVOID)
 ```ruby
@@ -282,14 +283,42 @@ class SomeService
   end
 end
 
-# ✅ CORRECT - Consistent behavior
-class SomeService  
+# ❌ FORBIDDEN - Direct HTTP library usage
+class SomeService
+  include HTTParty  # Avoid direct HTTParty usage
+  
   def call
-    response = api_call  # Use VCR for testing
+    self.class.get("/api/endpoint")  # Not centralized
+  end
+end
+
+# ✅ CORRECT - Consistent behavior with centralized HTTP client
+class SomeService < BaseService  
+  def call
+    response = get("/api/endpoint")  # Uses injected Http::BaseClient
+    process_response(response)
+  end
+end
+
+# ✅ CORRECT - Or inject HTTP client explicitly
+class SomeService
+  def initialize(http_client:)
+    @http_client = http_client
+  end
+  
+  def call
+    response = @http_client.get("/api/endpoint")
     process_response(response)
   end
 end
 ```
+
+### HTTP Client Architecture
+For external API calls, use the centralized HTTP client pattern:
+- **`Http::BaseClient`**: Base class with Faraday, retries, instrumentation
+- **Provider-specific clients**: Extend BaseClient (e.g., `Heygen::HttpClient`)
+- **Service integration**: Inject HTTP client into service objects
+- **Testing**: Use VCR for HTTP interaction recording/playback
 
 ---
 

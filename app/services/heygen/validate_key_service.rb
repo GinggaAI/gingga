@@ -1,21 +1,22 @@
 require "ostruct"
 
 class Heygen::ValidateKeyService
-  include HTTParty
-  base_uri "https://api.heygen.com"
-
   def initialize(token:, mode:)
     @token = token
     @mode = mode
+    @base_url = ENV.fetch("HEYGEN_API_BASE", "https://api.heygen.com")
   end
 
   def call
+    return { valid: false, error: "No token provided" } unless @token.present?
+
     response = get_avatars
 
-    if response.success?
+    if response[:success]
       { valid: true }
     else
-      { valid: false, error: "Invalid Heygen API token: #{response.code} - #{response.body}" }
+      error = response[:error]
+      { valid: false, error: "Invalid Heygen API token: #{error[:message]}" }
     end
   rescue StandardError => e
     { valid: false, error: "Token validation failed: #{e.message}" }
@@ -24,11 +25,12 @@ class Heygen::ValidateKeyService
   private
 
   def get_avatars
-    self.class.get(Heygen::Endpoints::VALIDATE_KEY, {
-      headers: {
-        "X-API-KEY" => @token,
-        "Content-Type" => "application/json"
-      }
-    })
+    http_client = Http::BaseClient.new(
+      base_url: @base_url,
+      headers: { "X-Client" => "Gingga/1.0" },
+      api_key: @token
+    )
+    
+    http_client.get(Heygen::Endpoints::VALIDATE_KEY)
   end
 end

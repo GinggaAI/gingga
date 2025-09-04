@@ -7,6 +7,9 @@ VCR.configure do |config|
 
   # Filter out API keys from cassettes
   config.filter_sensitive_data('<OPENAI_API_KEY>') { ENV['OPENAI_API_KEY'] }
+  config.filter_sensitive_data('<HEYGEN_API_KEY>') { |interaction|
+    interaction.request.headers['X-Api-Key']&.first
+  }
 
   # Ignore localhost and test requests
   config.ignore_localhost = true

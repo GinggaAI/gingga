@@ -1,95 +1,62 @@
-require "net/http"
 require "ostruct"
 
 class Heygen::BaseService
-  include HTTParty
-  base_uri "https://api.heygen.com"
-
   def initialize(user, **options)
     @user = user
     @api_token = user.active_token_for("heygen")
     @options = options
+    
+    if @api_token.present?
+      begin
+        @http_client = Heygen::HttpClient.new(user: user)
+      rescue ArgumentError => e
+        @http_client = nil
+        @initialization_error = e.message
+      end
+    else
+      @http_client = nil
+      @initialization_error = "No valid Heygen API token found"
+    end
   end
 
   protected
 
   def api_token_present?
-    @api_token.present?
+    @api_token.present? && @http_client.present?
   end
 
-  def headers
-    {
-      "X-API-KEY" => @api_token.encrypted_token,
-      "Content-Type" => "application/json"
-    }
+  def initialization_error
+    @initialization_error
   end
 
   def get(path, query: {})
-    start_time = Time.current
-    response = self.class.get(path, headers: headers, query: query)
+    return create_error_response(initialization_error) unless @http_client
     
-    # Log API response
-    log_api_response(
-      endpoint: path,
-      request_data: { query: query, headers: headers },
-      response: response,
-      response_time: ((Time.current - start_time) * 1000).to_i
-    )
-    
-    wrap_response(response)
+    result = @http_client.get_with_logging(path, params: query)
+    wrap_faraday_response(result)
   rescue => e
-    # Log failed API response
-    log_api_response(
-      endpoint: path,
-      request_data: { query: query, headers: headers },
-      error: e,
-      response_time: ((Time.current - start_time) * 1000).to_i
-    )
-    
-    # Re-raise the exception so it can be handled by the calling service
-    # but with a more informative message
-    if timeout_error?(e)
-      raise StandardError, "Request timeout: #{e.message}"
-    else
-      raise StandardError, e.message
-    end
+    handle_http_error(e)
   end
 
   def post(path, body: {})
-    start_time = Time.current
-    json_body = body.is_a?(String) ? body : body.to_json
-    response = self.class.post(path, headers: headers, body: json_body)
+    return create_error_response(initialization_error) unless @http_client
     
-    # Log API response
-    log_api_response(
-      endpoint: path,
-      request_data: { body: json_body, headers: headers },
-      response: response,
-      response_time: ((Time.current - start_time) * 1000).to_i
-    )
-    
-    wrap_response(response)
+    result = @http_client.post_with_logging(path, body: body)
+    wrap_faraday_response(result)
   rescue => e
-    # Log failed API response
-    log_api_response(
-      endpoint: path,
-      request_data: { body: json_body, headers: headers },
-      error: e,
-      response_time: ((Time.current - start_time) * 1000).to_i
-    )
-    
-    # Re-raise the exception so it can be handled by the calling service
-    # but with a more informative message
-    if timeout_error?(e)
-      raise StandardError, "Request timeout: #{e.message}"
-    else
-      raise StandardError, e.message
-    end
+    handle_http_error(e)
   end
 
   def parse_json(response)
-    return {} unless response.body
-    JSON.parse(response.body)
+    # With Faraday's json middleware, response data is already parsed
+    case response
+    when Hash
+      response
+    when String
+      JSON.parse(response)
+    else
+      response || {}
+    end
   rescue JSON::ParserError => e
     Rails.logger.warn "JSON parse error for Heygen API response: #{e.message}"
     { error: "Invalid JSON response" }
@@ -109,58 +76,45 @@ class Heygen::BaseService
 
   private
 
-  def timeout_error?(exception)
-    return false unless defined?(Net::TimeoutError) && defined?(Net::ReadTimeout)
-    exception.is_a?(Net::TimeoutError) || exception.is_a?(Net::ReadTimeout)
-  end
-
-  def wrap_response(response)
-    # Return response as-is for compatibility with existing code
-    response
+  def wrap_faraday_response(result)
+    # Create a response object compatible with existing HTTParty-style code
+    if result[:success]
+      OpenStruct.new(
+        success?: true,
+        code: result[:status],
+        status: result[:status],
+        body: result[:data],
+        message: "OK"
+      )
+    else
+      error = result[:error]
+      OpenStruct.new(
+        success?: false,
+        code: error[:code] || 0,
+        status: error[:code] || 0,
+        body: error[:raw] || { error: error[:message] },
+        message: error[:message] || "Request failed"
+      )
+    end
   end
 
   def create_error_response(message)
-    # Create a response object that behaves like HTTParty response but indicates failure
     OpenStruct.new(
       success?: false,
       code: 0,
+      status: 0,
       message: message,
-      body: { error: message }.to_json
+      body: { error: message }
     )
+  end
+
+  def handle_http_error(exception)
+    case exception
+    when ArgumentError
+      create_error_response(exception.message)
+    else
+      create_error_response("HTTP request failed: #{exception.message}")
+    end
   end
   
-  def log_api_response(endpoint:, request_data:, response: nil, error: nil, response_time:)
-    return unless @user # Only log if we have a user context
-    
-    if response
-      status_code = response.respond_to?(:code) ? response.code : nil
-      response_body = response.respond_to?(:body) ? response.body : response.to_s
-      success = response.respond_to?(:success?) ? response.success? : (status_code&.between?(200, 299) || false)
-      error_message = success ? nil : "HTTP #{status_code}: #{response_body}"
-    else
-      status_code = nil
-      response_body = nil
-      success = false
-      error_message = error&.message
-    end
-    
-    # Sanitize request data to remove sensitive information
-    sanitized_request = request_data.dup
-    if sanitized_request.is_a?(Hash) && sanitized_request[:headers]
-      sanitized_request[:headers] = sanitized_request[:headers].dup
-      sanitized_request[:headers]["X-API-KEY"] = "[REDACTED]" if sanitized_request[:headers]["X-API-KEY"]
-    end
-    
-    ApiResponse.log_api_call(
-      provider: "heygen",
-      endpoint: endpoint,
-      user: @user,
-      request_data: sanitized_request,
-      response_data: response_body,
-      status_code: status_code,
-      response_time_ms: response_time,
-      success: success,
-      error_message: error_message
-    )
-  end
 end

@@ -1,17 +1,9 @@
 require 'rails_helper'
-require 'webmock/rspec'
 
 RSpec.describe Heygen::BaseService, type: :service do
   let(:user) { create(:user) }
-
-  before do
-    # Stub Heygen validation endpoint called during token creation
-    stub_request(:get, "https://api.heygen.com/v2/avatars")
-      .to_return(status: 200, body: '{"data": []}')
-  end
-
   let!(:api_token) do
-    token = build(:api_token, user: user, provider: 'heygen', is_valid: true)
+    token = build(:api_token, :heygen, user: user, is_valid: true)
     token.save(validate: false)
     token
   end
@@ -34,6 +26,11 @@ RSpec.describe Heygen::BaseService, type: :service do
       def test_parse_json(response)
         parse_json(response)
       end
+
+      # Expose protected methods for testing
+      def public_api_token_present?
+        api_token_present?
+      end
     end
   end
 
@@ -41,9 +38,9 @@ RSpec.describe Heygen::BaseService, type: :service do
 
   describe '#initialize' do
     context 'when user has valid API token' do
-      it 'initializes successfully' do
+      it 'initializes successfully with HTTP client' do
         expect { subject }.not_to raise_error
-        expect(subject.send(:api_token_present?)).to be true
+        expect(subject.public_api_token_present?).to be true
       end
     end
 
@@ -51,220 +48,89 @@ RSpec.describe Heygen::BaseService, type: :service do
       let(:user_without_token) { create(:user) }
       subject { test_service_class.new(user_without_token) }
 
-      it 'initializes but api_token_present? returns false' do
+      it 'initializes without HTTP client' do
         expect { subject }.not_to raise_error
-        expect(subject.send(:api_token_present?)).to be false
+        expect(subject.public_api_token_present?).to be false
       end
     end
   end
 
-  describe '#api_token_present?' do
-    it 'returns true when token exists' do
-      expect(subject.send(:api_token_present?)).to be true
+  describe 'success and failure methods' do
+    it 'returns success result' do
+      result = subject.call
+      
+      expect(result).to eq({ success: true, data: "test data" })
     end
 
-    context 'when no token' do
-      let(:user_without_token) { create(:user) }
-      subject { test_service_class.new(user_without_token) }
-
-      it 'returns false when token does not exist' do
-        expect(subject.send(:api_token_present?)).to be false
-      end
-    end
-  end
-
-  describe '#headers' do
-    it 'returns correct headers with API token' do
-      headers = subject.send(:headers)
-
-      expect(headers).to eq({
-        "X-API-KEY" => api_token.encrypted_token,
-        "Content-Type" => "application/json"
-      })
-    end
-  end
-
-  describe '#get' do
-    context 'when request is successful' do
-      before do
-        stub_request(:get, "https://api.heygen.com/test/path")
-          .with(
-            query: { param: 'value' },
-            headers: {
-              'X-API-KEY' => api_token.encrypted_token,
-              'Content-Type' => 'application/json'
-            }
-          )
-          .to_return(status: 200, body: '{"success": true}')
-      end
-
-      it 'makes GET request with correct parameters' do
-        response = subject.test_get('/test/path', query: { param: 'value' })
-
-        expect(response.success?).to be true
-        expect(response.body).to eq('{"success": true}')
-      end
-    end
-
-    context 'when request raises StandardError' do
-      before do
-        allow(Heygen::BaseService).to receive(:get).and_raise(StandardError, 'Network error')
-      end
-
-      it 'raises StandardError with original message' do
-        expect {
-          subject.test_get('/test/path')
-        }.to raise_error(StandardError, 'Network error')
-      end
-    end
-
-    context 'when request raises timeout-like error' do
-      before do
-        # Create a mock timeout error
-        timeout_error = StandardError.new('timeout occurred')
-        allow(subject).to receive(:timeout_error?).with(timeout_error).and_return(true)
-        allow(Heygen::BaseService).to receive(:get).and_raise(timeout_error)
-      end
-
-      it 'raises StandardError with timeout message' do
-        expect {
-          subject.test_get('/test/path')
-        }.to raise_error(StandardError, 'Request timeout: timeout occurred')
-      end
-    end
-  end
-
-  describe '#post' do
-    context 'when request is successful' do
-      before do
-        stub_request(:post, "https://api.heygen.com/test/path")
-          .with(
-            body: '{"key":"value"}',
-            headers: {
-              'X-API-KEY' => api_token.encrypted_token,
-              'Content-Type' => 'application/json'
-            }
-          )
-          .to_return(status: 200, body: '{"success": true}')
-      end
-
-      it 'makes POST request with correct parameters' do
-        response = subject.test_post('/test/path', body: { key: 'value' })
-
-        expect(response.success?).to be true
-        expect(response.body).to eq('{"success": true}')
-      end
-    end
-
-    context 'when body is already a string' do
-      before do
-        stub_request(:post, "https://api.heygen.com/test/path")
-          .with(
-            body: '{"key":"value"}',
-            headers: {
-              'X-API-KEY' => api_token.encrypted_token,
-              'Content-Type' => 'application/json'
-            }
-          )
-          .to_return(status: 200, body: '{"success": true}')
-      end
-
-      it 'uses the string body as-is' do
-        response = subject.test_post('/test/path', body: '{"key":"value"}')
-
-        expect(response.success?).to be true
-      end
-    end
-
-    context 'when request raises StandardError' do
-      before do
-        allow(Heygen::BaseService).to receive(:post).and_raise(StandardError, 'Network error')
-      end
-
-      it 'raises StandardError with original message' do
-        expect {
-          subject.test_post('/test/path', body: {})
-        }.to raise_error(StandardError, 'Network error')
-      end
+    it 'returns failure result' do
+      result = subject.send(:failure_result, "error message")
+      
+      expect(result).to eq({ success: false, error: "error message" })
     end
   end
 
   describe '#parse_json' do
-    context 'with valid JSON response' do
-      let(:response) { double(body: '{"key": "value"}') }
+    context 'with valid JSON hash' do
+      it 'returns the hash as-is' do
+        data = { "key" => "value" }
+        result = subject.test_parse_json(data)
+        
+        expect(result).to eq(data)
+      end
+    end
 
+    context 'with valid JSON string' do
       it 'parses JSON correctly' do
-        result = subject.test_parse_json(response)
+        json_string = '{"key": "value"}'
+        result = subject.test_parse_json(json_string)
+        
         expect(result).to eq({ "key" => "value" })
       end
     end
 
-    context 'with invalid JSON response' do
-      let(:response) { double(body: 'invalid json') }
-
-      it 'returns empty hash and logs warning' do
+    context 'with invalid JSON string' do
+      it 'returns error hash and logs warning' do
         expect(Rails.logger).to receive(:warn).with(/JSON parse error/)
-        result = subject.test_parse_json(response)
+        
+        result = subject.test_parse_json('invalid json')
+        
         expect(result).to eq({ error: "Invalid JSON response" })
       end
     end
 
-    context 'with nil body' do
-      let(:response) { double(body: nil) }
-
+    context 'with nil input' do
       it 'returns empty hash' do
-        result = subject.test_parse_json(response)
+        result = subject.test_parse_json(nil)
+        
         expect(result).to eq({})
       end
     end
   end
 
-  describe '#success_result' do
-    it 'returns success format' do
-      result = subject.send(:success_result, { test: 'data' })
-      expect(result).to eq({ success: true, data: { test: 'data' } })
-    end
-  end
-
-  describe '#failure_result' do
-    it 'returns failure format' do
-      result = subject.send(:failure_result, 'Error message')
-      expect(result).to eq({ success: false, error: 'Error message' })
-    end
-  end
-
   describe '#cache_key_for' do
     it 'generates correct cache key' do
-      cache_key = subject.send(:cache_key_for, 'avatars')
-      expected_key = "heygen_avatars_#{user.id}_#{api_token.mode}"
-      expect(cache_key).to eq(expected_key)
+      cache_key = subject.send(:cache_key_for, "avatars")
+      
+      expect(cache_key).to eq("heygen_avatars_#{user.id}_#{api_token.mode}")
     end
   end
 
-  describe 'timeout_error? (private method)' do
-    it 'returns false for regular StandardError' do
-      error = StandardError.new('regular error')
-      result = subject.send(:timeout_error?, error)
-      expect(result).to be false
+  describe 'HTTP methods when no token present' do
+    let(:user_without_token) { create(:user) }
+    subject { test_service_class.new(user_without_token) }
+
+    it '#test_get returns error response' do
+      result = subject.test_get('/test')
+      
+      expect(result.success?).to be false
+      expect(result.message).to include('No valid Heygen API token found')
     end
 
-    context 'when Net::TimeoutError is defined' do
-      before do
-        stub_const('Net::TimeoutError', Class.new(StandardError))
-        stub_const('Net::ReadTimeout', Class.new(StandardError))
-      end
-
-      it 'returns true for Net::TimeoutError' do
-        error = Net::TimeoutError.new('timeout')
-        result = subject.send(:timeout_error?, error)
-        expect(result).to be true
-      end
-
-      it 'returns true for Net::ReadTimeout' do
-        error = Net::ReadTimeout.new('read timeout')
-        result = subject.send(:timeout_error?, error)
-        expect(result).to be true
-      end
+    it '#test_post returns error response' do
+      result = subject.test_post('/test', body: { data: 'test' })
+      
+      expect(result.success?).to be false
+      expect(result.message).to include('No valid Heygen API token found')
     end
   end
 end
