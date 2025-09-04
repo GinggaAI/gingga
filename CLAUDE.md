@@ -267,6 +267,29 @@ end
 - **Consistent interface**: Use `#call` method as entry point
 - **Error handling**: Always handle and communicate errors clearly
 - **Return objects**: Use consistent result objects for success/failure
+- **Environment-agnostic behavior**: **NEVER** use `Rails.env` conditionals in service logic
+- **Use VCR for testing**: Mock external API calls with VCR, not environment checks
+
+### Service Anti-Patterns (AVOID)
+```ruby
+# ❌ FORBIDDEN - Environment-dependent behavior
+class SomeService
+  def call
+    if Rails.env.development?
+      return mock_data  # Wrong approach
+    end
+    real_api_call
+  end
+end
+
+# ✅ CORRECT - Consistent behavior
+class SomeService  
+  def call
+    response = api_call  # Use VCR for testing
+    process_response(response)
+  end
+end
+```
 
 ---
 

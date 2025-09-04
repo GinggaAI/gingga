@@ -327,3 +327,57 @@ video_url = result[:data][:video_url]
 ---
 
 This manual testing guide validates the Heygen flow end-to-end before connecting it to frontend flows or automations (e.g., via n8n).
+
+---
+
+## ⚠️ Anti-Patterns to Avoid
+
+### ❌ Environment-Dependent Behavior in Services
+
+**NEVER** implement different behavior based on `Rails.env` within service objects, especially for API calls:
+
+```ruby
+# ❌ WRONG - Environment-dependent behavior
+def call
+  if Rails.env.development?
+    return mock_data  # Bad practice
+  end
+  
+  make_real_api_call
+end
+```
+
+**Why This Is Bad:**
+- Violates the principle that services should behave consistently across environments
+- Makes testing unreliable and unpredictable
+- Creates hidden behavior that's hard to debug
+- Tests may pass in development but fail in production
+- Breaks the Rails principle of "Convention over Configuration"
+
+**✅ CORRECT Approach:**
+```ruby
+# ✅ GOOD - Consistent behavior, use VCR for testing
+def call
+  response = make_api_call
+  parse_response(response)
+end
+```
+
+**For Testing:** Use VCR (Video Cassette Recorder) to record and replay HTTP interactions:
+```ruby
+# spec/services/heygen/list_avatars_service_spec.rb
+RSpec.describe Heygen::ListAvatarsService do
+  it 'fetches avatars from API', :vcr do
+    service = described_class.new(user)
+    result = service.call
+    expect(result[:success]).to be true
+  end
+end
+```
+
+### Best Practices for Service Objects:
+- **Consistent behavior** across all environments
+- **Use VCR for testing** external API calls
+- **Dependency injection** for better testability
+- **Single responsibility** - each service does one thing well
+- **Proper error handling** without environment-specific logic
