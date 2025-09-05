@@ -1,38 +1,37 @@
 class SettingsController < ApplicationController
+  # Ensure CSRF protection is enabled
+  protect_from_forgery with: :exception
   def show
-    @heygen_token = current_user.active_token_for("heygen")
+    @presenter = SettingsPresenter.new(current_user, {
+      flash: flash
+    })
   end
 
   def update
-    token_value = params[:heygen_api_key]
-    mode = params[:mode] || "production"
-    
-    if token_value.present?
-      # Find or create the API token
-      api_token = current_user.api_tokens.find_or_initialize_by(
-        provider: "heygen",
-        mode: mode
-      )
-      
-      api_token.encrypted_token = token_value
-      
-      if api_token.save
-        redirect_to settings_path, notice: t("settings.heygen.save_success")
-      else
-        redirect_to settings_path, alert: t("settings.heygen.save_failed", error: api_token.errors.full_messages.join(", "))
-      end
+    result = ApiTokenUpdateService.new(
+      user: current_user,
+      provider: "heygen",
+      token_value: params[:heygen_api_key],
+      mode: params[:mode] || "production",
+      group_url: params[:heygen_group_url]
+    ).call
+
+    if result.success?
+      redirect_to settings_path, notice: t("settings.heygen.save_success"), allow_other_host: false
     else
-      redirect_to settings_path, alert: t("settings.heygen.empty_token")
+      redirect_to settings_path, alert: t("settings.heygen.save_failed", error: result.error), allow_other_host: false
     end
   end
 
   def validate_heygen_api
-    result = Heygen::SynchronizeAvatarsService.new(user: current_user).call
+    result = Heygen::ValidateAndSyncService.new(user: current_user).call
 
     if result.success?
-      redirect_to settings_path, notice: t("settings.heygen.validation_success", count: result.data[:synchronized_count])
+      count = result.data[:synchronized_count]
+      message_key = result.data[:message_key]
+      redirect_to settings_path, notice: t(message_key, count: count), allow_other_host: false
     else
-      redirect_to settings_path, alert: t("settings.heygen.validation_failed", error: result.error)
+      redirect_to settings_path, alert: t("settings.heygen.validation_failed", error: result.error), allow_other_host: false
     end
   end
 end

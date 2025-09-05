@@ -1,11 +1,11 @@
 class Heygen::SynchronizeAvatarsService
-  def initialize(user:)
+  def initialize(user:, group_url: nil)
     @user = user
+    @group_url = group_url
   end
 
   def call
-    list_service = Heygen::ListAvatarsService.new(@user)
-    list_result = list_service.call
+    list_result = fetch_avatars
 
     return failure_result("Failed to fetch avatars from HeyGen: #{list_result[:error]}") unless list_result[:success]
 
@@ -28,6 +28,26 @@ class Heygen::SynchronizeAvatarsService
   end
 
   private
+
+  def fetch_avatars
+    if @group_url.present?
+
+      # Parse the group URL to extract group_id
+      url_parser = Heygen::GroupUrlParserService.new(url: @group_url)
+      parse_result = url_parser.call
+
+      return parse_result unless parse_result[:success]
+
+      group_id = parse_result[:data][:group_id]
+      result = Heygen::ListGroupAvatarsService.new(user: @user, group_id: group_id).call
+      result
+    else
+      # Use the original service to fetch all avatars
+      result = Heygen::ListAvatarsService.new(@user).call
+      Rails.logger.info "📊 All avatars result: success=#{result[:success]}, count=#{result[:data]&.size}"
+      result
+    end
+  end
 
   def sync_avatar(avatar_data, raw_response)
     avatar_attributes = {

@@ -3,13 +3,13 @@ class ApiResponse < ApplicationRecord
 
   validates :provider, presence: true, inclusion: { in: %w[openai heygen kling] }
   validates :endpoint, presence: true
-  
+
   scope :successful, -> { where(success: true) }
   scope :failed, -> { where(success: false) }
   scope :by_provider, ->(provider) { where(provider: provider) }
   scope :recent, -> { order(created_at: :desc) }
-  
-  def self.log_api_call(provider:, endpoint:, user:, request_data: nil, response_data: nil, 
+
+  def self.log_api_call(provider:, endpoint:, user:, request_data: nil, response_data: nil,
                        status_code: nil, response_time_ms: nil, success: false, error_message: nil)
     create!(
       provider: provider,
@@ -25,14 +25,14 @@ class ApiResponse < ApplicationRecord
   rescue StandardError => e
     Rails.logger.error "Failed to log API response: #{e.message}"
   end
-  
+
   def parsed_request_data
     return {} unless request_data.present?
     JSON.parse(request_data)
   rescue JSON::ParserError
     {}
   end
-  
+
   def parsed_response_data
     return {} unless response_data.present?
     JSON.parse(response_data)

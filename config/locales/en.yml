@@ -60,6 +60,9 @@ en:
       validation_success:
         one: "HeyGen API validation successful! %{count} avatar synchronized."
         other: "HeyGen API validation successful! %{count} avatars synchronized."
+      group_validation_success:
+        one: "HeyGen group validation successful! %{count} avatar synchronized from specific group."
+        other: "HeyGen group validation successful! %{count} avatars synchronized from specific group."
       validation_failed: "HeyGen API validation failed: %{error}"
 
   # Brands

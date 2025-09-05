@@ -30,7 +30,7 @@ class Heygen::ValidateKeyService
       headers: { "X-Client" => "Gingga/1.0" },
       api_key: @token
     )
-    
+
     http_client.get(Heygen::Endpoints::VALIDATE_KEY)
   end
 end

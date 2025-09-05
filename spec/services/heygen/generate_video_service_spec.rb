@@ -11,8 +11,10 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
   end
 
   let!(:api_token) do
-    token = build(:api_token, user: user, provider: 'heygen', is_valid: true)
-    token.save(validate: false)
+    # Skip the before_save callback to avoid API calls in tests
+    ApiToken.skip_callback(:save, :before, :validate_token_with_provider)
+    token = create(:api_token, :heygen, user: user, is_valid: true)
+    ApiToken.set_callback(:save, :before, :validate_token_with_provider)
     token
   end
   let(:reel) { create(:reel, user: user) }
@@ -37,9 +39,13 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
 
       before do
         allow(reel).to receive(:ready_for_generation?).and_return(true)
-        allow(Heygen::GenerateVideoService).to receive(:post).and_return(
-          double(success?: true, body: mock_response.to_json)
+        mock_response_double = OpenStruct.new(
+          success?: true,
+          body: mock_response.to_json
         )
+
+        allow(subject).to receive(:generate_video).and_return(mock_response_double)
+        allow(subject).to receive(:parse_json).and_return(mock_response)
       end
 
       it 'updates reel status to processing' do
@@ -106,16 +112,7 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
           test: api_token.mode == 'test'
         }
 
-        expect(Heygen::GenerateVideoService).to receive(:post).with(
-          '/v2/video/generate',
-          {
-            headers: {
-              'X-API-KEY' => api_token.encrypted_token,
-              'Content-Type' => 'application/json'
-            },
-            body: expected_payload.to_json
-          }
-        ).and_return(double(success?: true, body: mock_response.to_json))
+        expect(subject).to receive(:generate_video).with(expected_payload).and_return(double(success?: true, body: mock_response.to_json))
 
         subject.call
       end
@@ -137,14 +134,19 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
       end
 
       context 'when API token is in test mode' do
-        let!(:api_token) { create(:api_token, user: user, provider: 'heygen', is_valid: true, mode: 'test') }
+        let!(:api_token) do
+          # Skip the before_save callback to avoid API calls in tests
+          ApiToken.skip_callback(:save, :before, :validate_token_with_provider)
+          token = create(:api_token, :heygen, user: user, is_valid: true, mode: 'test')
+          ApiToken.set_callback(:save, :before, :validate_token_with_provider)
+          token
+        end
 
         it 'includes test: true in payload' do
           expected_test_value = true
 
-          expect(Heygen::GenerateVideoService).to receive(:post) do |_path, options|
-            payload = JSON.parse(options[:body])
-            expect(payload['test']).to eq(expected_test_value)
+          expect(subject).to receive(:generate_video) do |payload|
+            expect(payload[:test]).to eq(expected_test_value)
             double(success?: true, body: mock_response.to_json)
           end
 
@@ -181,9 +183,12 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
     context 'when API call fails' do
       before do
         allow(reel).to receive(:ready_for_generation?).and_return(true)
-        allow(Heygen::GenerateVideoService).to receive(:post).and_return(
-          double(success?: false, message: 'API Error')
+        mock_response_double = OpenStruct.new(
+          success?: false,
+          message: 'API Error'
         )
+
+        allow(subject).to receive(:generate_video).and_return(mock_response_double)
       end
 
       it 'returns failure result' do
@@ -201,7 +206,7 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
     context 'when an exception occurs' do
       before do
         allow(reel).to receive(:ready_for_generation?).and_return(true)
-        allow(Heygen::GenerateVideoService).to receive(:post).and_raise(StandardError, 'Network error')
+        allow(subject).to receive(:generate_video).and_raise(StandardError, 'Network error')
       end
 
       it 'returns failure result with error message' do

@@ -5,7 +5,7 @@ class Heygen::BaseService
     @user = user
     @api_token = user.active_token_for("heygen")
     @options = options
-    
+
     if @api_token.present?
       begin
         @http_client = Heygen::HttpClient.new(user: user)
@@ -31,7 +31,7 @@ class Heygen::BaseService
 
   def get(path, query: {})
     return create_error_response(initialization_error) unless @http_client
-    
+
     result = @http_client.get_with_logging(path, params: query)
     wrap_faraday_response(result)
   rescue => e
@@ -40,7 +40,7 @@ class Heygen::BaseService
 
   def post(path, body: {})
     return create_error_response(initialization_error) unless @http_client
-    
+
     result = @http_client.post_with_logging(path, body: body)
     wrap_faraday_response(result)
   rescue => e
@@ -116,5 +116,4 @@ class Heygen::BaseService
       create_error_response("HTTP request failed: #{exception.message}")
     end
   end
-  
 end

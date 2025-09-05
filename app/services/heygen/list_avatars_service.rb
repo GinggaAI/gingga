@@ -43,5 +43,4 @@ class Heygen::ListAvatarsService < Heygen::BaseService
   def cache_key
     cache_key_for("avatars")
   end
-
 end

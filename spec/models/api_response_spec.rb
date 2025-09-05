@@ -61,7 +61,7 @@ RSpec.describe ApiResponse, type: :model do
     it 'orders by recent first' do
       older_response = create(:api_response, user: user, created_at: 1.day.ago)
       recent_responses = ApiResponse.recent.limit(2)
-      
+
       expect(recent_responses.first.created_at).to be > older_response.created_at
     end
   end
@@ -144,13 +144,13 @@ RSpec.describe ApiResponse, type: :model do
 
     it 'returns empty hash for invalid JSON' do
       api_response = create(:api_response, request_data: 'invalid json')
-      
+
       expect(api_response.parsed_request_data).to eq({})
     end
 
     it 'returns empty hash for nil request data' do
       api_response = create(:api_response, request_data: nil)
-      
+
       expect(api_response.parsed_request_data).to eq({})
     end
   end
@@ -165,13 +165,13 @@ RSpec.describe ApiResponse, type: :model do
 
     it 'returns empty hash for invalid JSON' do
       api_response = create(:api_response, response_data: 'invalid json')
-      
+
       expect(api_response.parsed_response_data).to eq({})
     end
 
     it 'returns empty hash for nil response data' do
       api_response = create(:api_response, response_data: nil)
-      
+
       expect(api_response.parsed_response_data).to eq({})
     end
   end
@@ -199,7 +199,7 @@ RSpec.describe ApiResponse, type: :model do
     it 'creates responses with avatar data' do
       response = create(:api_response, :with_avatar_data)
       parsed_data = response.parsed_response_data
-      
+
       expect(parsed_data['code']).to eq(100)
       expect(parsed_data['data']['avatars']).to be_an(Array)
       expect(parsed_data['data']['avatars'].first['avatar_id']).to eq('avatar_123')
@@ -212,7 +212,7 @@ RSpec.describe ApiResponse, type: :model do
     it 'logs API responses using log_api_call method' do
       # Test the direct logging mechanism rather than full integration
       # since the full service integration requires complex mocking
-      
+
       expect {
         ApiResponse.log_api_call(
           provider: 'heygen',

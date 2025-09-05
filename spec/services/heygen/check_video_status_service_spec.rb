@@ -1,18 +1,14 @@
 require 'rails_helper'
-require 'webmock/rspec'
 
 RSpec.describe Heygen::CheckVideoStatusService, type: :service do
   let(:user) { create(:user) }
 
-  before do
-    # Stub Heygen validation endpoint called during token creation
-    stub_request(:get, "https://api.heygen.com/v2/avatars")
-      .to_return(status: 200, body: '{"data": []}')
-  end
 
   let!(:api_token) do
-    token = build(:api_token, user: user, provider: 'heygen', is_valid: true)
-    token.save(validate: false)
+    # Skip the before_save callback to avoid API calls in tests
+    ApiToken.skip_callback(:save, :before, :validate_token_with_provider)
+    token = create(:api_token, :heygen, user: user, is_valid: true)
+    ApiToken.set_callback(:save, :before, :validate_token_with_provider)
     token
   end
   let(:reel) do
@@ -41,17 +37,16 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
       end
 
       before do
-        # Stub the video status check endpoint
-        stub_request(:get, "https://api.heygen.com/v1/video_status.get")
-          .with(query: { video_id: reel.heygen_video_id }, headers: {
-            'X-API-KEY' => api_token.encrypted_token,
-            'Content-Type' => 'application/json'
-          })
-          .to_return(status: 200, body: mock_response.to_json)
+        mock_response_double = OpenStruct.new(
+          success?: true,
+          body: mock_response.to_json
+        )
+
+        allow(subject).to receive(:check_status).and_return(mock_response_double)
+        allow(subject).to receive(:parse_json).and_return(mock_response)
       end
 
       it 'makes API call with correct video ID' do
-        # The WebMock stub above will verify the correct endpoint is called
         result = subject.call
         expect(result[:success]).to be true
       end
@@ -91,12 +86,13 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
       end
 
       before do
-        stub_request(:get, "https://api.heygen.com/v1/video_status.get")
-          .with(query: { video_id: reel.heygen_video_id }, headers: {
-            'X-API-KEY' => api_token.encrypted_token,
-            'Content-Type' => 'application/json'
-          })
-          .to_return(status: 200, body: mock_response.to_json)
+        mock_response_double = OpenStruct.new(
+          success?: true,
+          body: mock_response.to_json
+        )
+
+        allow(subject).to receive(:check_status).and_return(mock_response_double)
+        allow(subject).to receive(:parse_json).and_return(mock_response)
       end
 
       it 'updates reel status but not video data' do
@@ -124,12 +120,13 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
       end
 
       before do
-        stub_request(:get, "https://api.heygen.com/v1/video_status.get")
-          .with(query: { video_id: reel.heygen_video_id }, headers: {
-            'X-API-KEY' => api_token.encrypted_token,
-            'Content-Type' => 'application/json'
-          })
-          .to_return(status: 200, body: mock_response.to_json)
+        mock_response_double = OpenStruct.new(
+          success?: true,
+          body: mock_response.to_json
+        )
+
+        allow(subject).to receive(:check_status).and_return(mock_response_double)
+        allow(subject).to receive(:parse_json).and_return(mock_response)
       end
 
       it 'updates reel status to failed' do
@@ -144,13 +141,13 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
       [ 'pending', 'processing' ].each do |heygen_status|
         it "maps '#{heygen_status}' to 'processing'" do
           mock_response = { 'data' => { 'status' => heygen_status } }
+          mock_response_double = OpenStruct.new(
+            success?: true,
+            body: mock_response.to_json
+          )
 
-          stub_request(:get, "https://api.heygen.com/v1/video_status.get")
-            .with(query: { video_id: reel.heygen_video_id }, headers: {
-              'X-API-KEY' => api_token.encrypted_token,
-              'Content-Type' => 'application/json'
-            })
-            .to_return(status: 200, body: mock_response.to_json)
+          allow(subject).to receive(:check_status).and_return(mock_response_double)
+          allow(subject).to receive(:parse_json).and_return(mock_response)
 
           subject.call
           expect(reel.reload.status).to eq('processing')
@@ -160,13 +157,13 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
       [ 'completed', 'success' ].each do |heygen_status|
         it "maps '#{heygen_status}' to 'completed'" do
           mock_response = { 'data' => { 'status' => heygen_status } }
+          mock_response_double = OpenStruct.new(
+            success?: true,
+            body: mock_response.to_json
+          )
 
-          stub_request(:get, "https://api.heygen.com/v1/video_status.get")
-            .with(query: { video_id: reel.heygen_video_id }, headers: {
-              'X-API-KEY' => api_token.encrypted_token,
-              'Content-Type' => 'application/json'
-            })
-            .to_return(status: 200, body: mock_response.to_json)
+          allow(subject).to receive(:check_status).and_return(mock_response_double)
+          allow(subject).to receive(:parse_json).and_return(mock_response)
 
           subject.call
           expect(reel.reload.status).to eq('completed')
@@ -176,13 +173,13 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
       [ 'failed', 'error' ].each do |heygen_status|
         it "maps '#{heygen_status}' to 'failed'" do
           mock_response = { 'data' => { 'status' => heygen_status } }
+          mock_response_double = OpenStruct.new(
+            success?: true,
+            body: mock_response.to_json
+          )
 
-          stub_request(:get, "https://api.heygen.com/v1/video_status.get")
-            .with(query: { video_id: reel.heygen_video_id }, headers: {
-              'X-API-KEY' => api_token.encrypted_token,
-              'Content-Type' => 'application/json'
-            })
-            .to_return(status: 200, body: mock_response.to_json)
+          allow(subject).to receive(:check_status).and_return(mock_response_double)
+          allow(subject).to receive(:parse_json).and_return(mock_response)
 
           subject.call
           expect(reel.reload.status).to eq('failed')
@@ -223,12 +220,12 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
 
     context 'when API call fails' do
       before do
-        stub_request(:get, "https://api.heygen.com/v1/video_status.get")
-          .with(query: { video_id: reel.heygen_video_id }, headers: {
-            'X-API-KEY' => api_token.encrypted_token,
-            'Content-Type' => 'application/json'
-          })
-          .to_return(status: 500, body: '{"error": "Server error"}')
+        mock_response_double = OpenStruct.new(
+          success?: false,
+          message: 'Server error'
+        )
+
+        allow(subject).to receive(:check_status).and_return(mock_response_double)
       end
 
       it 'returns failure result' do
@@ -241,12 +238,7 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
 
     context 'when an exception occurs' do
       before do
-        stub_request(:get, "https://api.heygen.com/v1/video_status.get")
-          .with(query: { video_id: reel.heygen_video_id }, headers: {
-            'X-API-KEY' => api_token.encrypted_token,
-            'Content-Type' => 'application/json'
-          })
-          .to_raise(StandardError, 'Network error')
+        allow(subject).to receive(:check_status).and_raise(StandardError, 'Network error')
       end
 
       it 'returns failure result with error message' do

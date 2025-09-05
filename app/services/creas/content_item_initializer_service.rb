@@ -114,10 +114,16 @@ module Creas
           rescue ActiveRecord::RecordInvalid => retry_error
             Rails.logger.warn "Failed to create CreasContentItem after uniqueness retry: #{retry_error.message}"
             Rails.logger.warn "Attributes: #{item.attributes.inspect}"
+            # Try error recovery for validation issues
+            recovered_item = attempt_validation_error_recovery(item, idea, week_number)
+            return recovered_item if recovered_item&.persisted?
           end
         else
           Rails.logger.warn "Failed to create CreasContentItem: #{e.message}"
           Rails.logger.warn "Attributes: #{attrs.inspect}"
+          # Try error recovery for validation issues
+          recovered_item = attempt_validation_error_recovery(item, idea, week_number)
+          return recovered_item if recovered_item&.persisted?
         end
       end
 
@@ -455,7 +461,6 @@ module Creas
 
     def create_missing_content_item(idea, week_number, retry_index)
       pilar = extract_pilar_from_idea(idea)
-      week_index = week_number - 1
 
       # Generate highly unique content to avoid any validation conflicts
       unique_id = "#{retry_index + 1}-#{SecureRandom.hex(4)}"
@@ -473,14 +478,13 @@ module Creas
         origin_id: idea["id"],
         origin_source: "weekly_plan",
         week: week_number,
-        week_index: week_index,
         scheduled_day: nil,
         publish_date: nil,
         publish_datetime_local: nil,
         timezone: @brand.timezone || "UTC",
         content_name: "#{original_title} #{unique_suffix}",
         status: "draft",
-        creation_date: Date.current.strftime("%Y-%m-%d"),
+        creation_date: Date.current,
         content_type: determine_content_type(idea),
         platform: idea["platform"]&.downcase || "instagram",
         aspect_ratio: determine_aspect_ratio(idea["platform"]),
@@ -503,6 +507,9 @@ module Creas
       item = @plan.creas_content_items.build(attrs)
       item.user = @user
       item.brand = @brand
+
+      # Apply basic recovery fixes before saving to prevent common validation errors
+      apply_basic_recovery_fixes(item)
 
       if item.save
         item
@@ -564,6 +571,35 @@ module Creas
       unique_content.strip
     end
 
+    def attempt_validation_error_recovery(item, idea, week_number)
+      Rails.logger.info "ContentItemInitializerService: Attempting validation error recovery for content: #{idea['id']}"
+
+      # Apply basic recovery fixes for common validation errors
+      apply_basic_recovery_fixes(item)
+
+      if item.save
+        Rails.logger.info "ContentItemInitializerService: Basic recovery successful"
+        return item
+      end
+
+      # If basic fixes don't work, try more aggressive recovery
+      max_recovery_attempts = 3
+      (1..max_recovery_attempts).each do |attempt|
+        Rails.logger.info "ContentItemInitializerService: Recovery attempt #{attempt}/#{max_recovery_attempts} for content: #{idea['id']}"
+
+        apply_recovery_fixes(item, attempt, week_number, 0)
+
+        if item.save
+          Rails.logger.info "ContentItemInitializerService: Recovery successful on attempt #{attempt}"
+          return item
+        end
+
+        Rails.logger.warn "ContentItemInitializerService: Recovery attempt #{attempt} failed: #{item.errors.full_messages.join(', ')}"
+      end
+
+      nil
+    end
+
     def attempt_error_recovery(item, idea, week_number, retry_index)
       max_recovery_attempts = 3
 
@@ -582,6 +618,47 @@ module Creas
       end
 
       nil
+    end
+
+    def apply_basic_recovery_fixes(item)
+      Rails.logger.info "ContentItemInitializerService: Applying basic recovery fixes"
+
+      # Fix template validation
+      if item.errors[:template].any? || !%w[solo_avatars avatar_and_video narration_over_7_images remix one_to_three_videos].include?(item.template)
+        item.template = "solo_avatars"
+        Rails.logger.info "ContentItemInitializerService: Fixed template to 'solo_avatars'"
+      end
+
+      # Fix pilar validation
+      if item.errors[:pilar].any? || !%w[C R E A S].include?(item.pilar)
+        item.pilar = "C"
+        Rails.logger.info "ContentItemInitializerService: Fixed pilar to 'C'"
+      end
+
+      # Fix status validation
+      if item.errors[:status].any? || !%w[draft in_progress in_production ready_for_review approved].include?(item.status)
+        item.status = "draft"
+        Rails.logger.info "ContentItemInitializerService: Fixed status to 'draft'"
+      end
+
+      # Fix video_source validation
+      if item.errors[:video_source].any? || !%w[none external kling].include?(item.video_source)
+        item.video_source = "none"
+        Rails.logger.info "ContentItemInitializerService: Fixed video_source to 'none'"
+      end
+
+      # Fix day_of_the_week validation
+      valid_days = %w[Monday Tuesday Wednesday Thursday Friday Saturday Sunday]
+      if item.errors[:day_of_the_week].any? || (item.day_of_the_week.present? && !valid_days.include?(item.day_of_the_week))
+        item.day_of_the_week = "Monday"
+        Rails.logger.info "ContentItemInitializerService: Fixed day_of_the_week to 'Monday'"
+      end
+
+      # Fix platform - normalize to lowercase
+      if item.platform.present?
+        normalized_platform = item.platform.downcase
+        item.platform = normalized_platform
+      end
     end
 
     def apply_recovery_fixes(item, attempt, week_number, retry_index)

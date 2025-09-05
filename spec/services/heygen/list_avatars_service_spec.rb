@@ -3,8 +3,10 @@ require 'rails_helper'
 RSpec.describe Heygen::ListAvatarsService, type: :service do
   let(:user) { create(:user) }
   let!(:api_token) do
-    token = build(:api_token, :heygen, user: user, is_valid: true)
-    token.save(validate: false)
+    # Skip the before_save callback to avoid API calls in tests
+    ApiToken.skip_callback(:save, :before, :validate_token_with_provider)
+    token = create(:api_token, :heygen, user: user, is_valid: true)
+    ApiToken.set_callback(:save, :before, :validate_token_with_provider)
     token
   end
 
@@ -14,11 +16,11 @@ RSpec.describe Heygen::ListAvatarsService, type: :service do
     context 'when user has valid API token', :vcr do
       before do
         allow(subject).to receive(:api_token_present?).and_return(true)
-        
+
         # Ensure @api_token is available for cache_key_for method
         allow(subject.instance_variable_get(:@api_token) || api_token).to receive(:mode).and_return('production')
         subject.instance_variable_set(:@api_token, api_token)
-        
+
         # Mock successful HTTP response using VCR data structure
         mock_body = {
           'data' => {
@@ -33,15 +35,15 @@ RSpec.describe Heygen::ListAvatarsService, type: :service do
             ]
           }
         }
-        
+
         mock_response = OpenStruct.new(
           success?: true,
           body: mock_body
         )
-        
+
         # Mock parse_json to return the body directly since it's already parsed
         allow(subject).to receive(:parse_json).and_return(mock_body)
-        
+
         allow(subject).to receive(:fetch_avatars).and_return(mock_response)
       end
 
@@ -61,7 +63,7 @@ RSpec.describe Heygen::ListAvatarsService, type: :service do
 
       it 'caches the result' do
         cache_key = "heygen_avatars_#{user.id}_#{api_token.mode}"
-        
+
         # Clear cache to ensure fresh request
         Rails.cache.delete(cache_key)
 
@@ -86,16 +88,16 @@ RSpec.describe Heygen::ListAvatarsService, type: :service do
     context 'when API call fails', :vcr do
       before do
         allow(subject).to receive(:api_token_present?).and_return(true)
-        
+
         # Ensure @api_token is available for cache_key_for method
         subject.instance_variable_set(:@api_token, api_token)
-        
+
         # Mock failed HTTP response
         mock_response = OpenStruct.new(
           success?: false,
           message: 'Unauthorized'
         )
-        
+
         allow(subject).to receive(:fetch_avatars).and_return(mock_response)
       end
 

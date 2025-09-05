@@ -11,8 +11,10 @@ RSpec.describe Heygen::ListVoicesService, type: :service do
   end
 
   let!(:api_token) do
-    token = build(:api_token, user: user, provider: 'heygen', is_valid: true)
-    token.save(validate: false)
+    # Skip the before_save callback to avoid API calls in tests
+    ApiToken.skip_callback(:save, :before, :validate_token_with_provider)
+    token = create(:api_token, :heygen, user: user, is_valid: true)
+    ApiToken.set_callback(:save, :before, :validate_token_with_provider)
     token
   end
 
@@ -50,9 +52,13 @@ RSpec.describe Heygen::ListVoicesService, type: :service do
       subject { described_class.new(user) }
 
       before do
-        allow(Heygen::ListVoicesService).to receive(:get).and_return(
-          double(success?: true, body: mock_response.to_json)
+        mock_response_double = OpenStruct.new(
+          success?: true,
+          body: mock_response.to_json
         )
+
+        allow(subject).to receive(:fetch_voices).and_return(mock_response_double)
+        allow(subject).to receive(:parse_json).and_return(mock_response)
       end
 
       it 'returns all voices' do
@@ -85,9 +91,13 @@ RSpec.describe Heygen::ListVoicesService, type: :service do
       subject { described_class.new(user, { language: 'Spanish' }) }
 
       before do
-        allow(Heygen::ListVoicesService).to receive(:get).and_return(
-          double(success?: true, body: mock_response.to_json)
+        mock_response_double = OpenStruct.new(
+          success?: true,
+          body: mock_response.to_json
         )
+
+        allow(subject).to receive(:fetch_voices).and_return(mock_response_double)
+        allow(subject).to receive(:parse_json).and_return(mock_response)
       end
 
       it 'returns filtered voices by language' do
@@ -104,9 +114,13 @@ RSpec.describe Heygen::ListVoicesService, type: :service do
       subject { described_class.new(user, { gender: 'female' }) }
 
       before do
-        allow(Heygen::ListVoicesService).to receive(:get).and_return(
-          double(success?: true, body: mock_response.to_json)
+        mock_response_double = OpenStruct.new(
+          success?: true,
+          body: mock_response.to_json
         )
+
+        allow(subject).to receive(:fetch_voices).and_return(mock_response_double)
+        allow(subject).to receive(:parse_json).and_return(mock_response)
       end
 
       it 'returns filtered voices by gender' do
@@ -123,9 +137,13 @@ RSpec.describe Heygen::ListVoicesService, type: :service do
       subject { described_class.new(user, { language: 'English', gender: 'female' }) }
 
       before do
-        allow(Heygen::ListVoicesService).to receive(:get).and_return(
-          double(success?: true, body: mock_response.to_json)
+        mock_response_double = OpenStruct.new(
+          success?: true,
+          body: mock_response.to_json
         )
+
+        allow(subject).to receive(:fetch_voices).and_return(mock_response_double)
+        allow(subject).to receive(:parse_json).and_return(mock_response)
       end
 
       it 'returns voices matching all filters' do
@@ -148,7 +166,7 @@ RSpec.describe Heygen::ListVoicesService, type: :service do
 
         cache_key = "heygen_voices_#{user.id}_#{api_token.mode}"
         expect(Rails.cache).to receive(:read).with(cache_key).and_return(cached_data)
-        expect(Heygen::ListVoicesService).not_to receive(:get)
+        expect(subject).not_to receive(:fetch_voices)
 
         result = subject.call
         expect(result[:success]).to be true
@@ -173,9 +191,12 @@ RSpec.describe Heygen::ListVoicesService, type: :service do
       subject { described_class.new(user) }
 
       before do
-        allow(Heygen::ListVoicesService).to receive(:get).and_return(
-          double(success?: false, message: 'API Error')
+        mock_response_double = OpenStruct.new(
+          success?: false,
+          message: 'API Error'
         )
+
+        allow(subject).to receive(:fetch_voices).and_return(mock_response_double)
       end
 
       it 'returns failure result' do
@@ -190,7 +211,7 @@ RSpec.describe Heygen::ListVoicesService, type: :service do
       subject { described_class.new(user) }
 
       before do
-        allow(Heygen::ListVoicesService).to receive(:get).and_raise(StandardError, 'Network error')
+        allow(subject).to receive(:fetch_voices).and_raise(StandardError, 'Network error')
       end
 
       it 'returns failure result with error message' do

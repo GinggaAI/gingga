@@ -37,7 +37,7 @@ module Http
 
     def request(verb, path, params: {}, body: nil, headers: {})
       start_time = Time.current
-      
+
       resp = connection.send(verb) do |req|
         req.url(path)
         req.params.update(params) if params.present?
@@ -64,13 +64,23 @@ module Http
         # Request middleware
         f.request :json
 
-        # Retry logic with exponential backoff
-        f.request :retry, 
-                  max: DEFAULT_RETRIES, 
-                  interval: 0.2,
-                  interval_randomness: 0.2, 
-                  backoff_factor: 2,
-                  exceptions: [Faraday::TimeoutError, Faraday::ConnectionFailed]
+        # Ensure retry middleware is available
+        begin
+          require "faraday-retry"
+        rescue LoadError
+          # Retry middleware not available, continue without it
+          Rails.logger.warn "faraday-retry gem not available, skipping retry middleware"
+        end
+
+        # Retry logic with exponential backoff (only if middleware is available)
+        if defined?(Faraday::Retry)
+          f.request :retry,
+                    max: DEFAULT_RETRIES,
+                    interval: 0.2,
+                    interval_randomness: 0.2,
+                    backoff_factor: 2,
+                    exceptions: [ Faraday::TimeoutError, Faraday::ConnectionFailed ]
+        end
 
         # Response middleware
         f.response :json, content_type: /\bjson$/
@@ -92,10 +102,10 @@ module Http
     def apply_default_headers!(conn)
       conn.headers["Content-Type"] = "application/json"
       conn.headers["Accept"] = "application/json"
-      
+
       # Apply custom headers
       @headers.each { |key, value| conn.headers[key] = value }
-      
+
       # Apply authentication headers
       conn.headers["Authorization"] = "Bearer #{@bearer_token}" if @bearer_token.present?
       conn.headers["X-API-KEY"] = @api_key if @api_key.present?
@@ -108,7 +118,7 @@ module Http
       if code.between?(200, 299)
         success(body, code, response_time)
       else
-        failure("http_#{code}", safe_error_message(body, code), 
+        failure("http_#{code}", safe_error_message(body, code),
                 code: code, raw: body, response_time: response_time)
       end
     end

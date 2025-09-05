@@ -4,7 +4,7 @@ module Heygen
   class HttpClient < ::Http::BaseClient
     def initialize(user:)
       api_token = user.active_token_for("heygen")
-      
+
       raise ArgumentError, "No valid Heygen API token found for user" unless api_token&.encrypted_token.present?
 
       super(
@@ -12,7 +12,7 @@ module Heygen
         headers: { "X-Client" => "Gingga/1.0" },
         api_key: api_token.encrypted_token
       )
-      
+
       @user = user
       @api_token = api_token
     end
