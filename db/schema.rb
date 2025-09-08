@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_04_161805) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_08_152753) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -421,6 +421,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_04_161805) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "voices", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "voice_id"
+    t.string "language"
+    t.string "gender"
+    t.string "name"
+    t.string "preview_audio"
+    t.boolean "support_pause"
+    t.boolean "emotion_support"
+    t.boolean "support_interactive_avatar"
+    t.boolean "support_locale"
+    t.boolean "active"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "voice_id"], name: "index_voices_on_user_id_and_voice_id", unique: true
+    t.index ["user_id"], name: "index_voices_on_user_id"
+    t.index ["voice_id"], name: "index_voices_on_voice_id"
+  end
+
   add_foreign_key "ai_responses", "users"
   add_foreign_key "api_responses", "users"
   add_foreign_key "api_tokens", "users"
@@ -444,4 +463,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_04_161805) do
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "voices", "users"
 end
