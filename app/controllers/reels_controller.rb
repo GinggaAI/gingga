@@ -19,7 +19,7 @@ class ReelsController < ApplicationController
     if result[:success]
       @reel = result[:reel]
       setup_presenter(template)
-      render template_view(template)
+      render_template_view(template)
     else
       redirect_to reels_path, alert: result[:error]
     end
@@ -34,7 +34,7 @@ class ReelsController < ApplicationController
       @reel = result[:reel]
       template = @reel&.template || reel_params[:template]
       setup_presenter(template)
-      render template_view(template), status: :unprocessable_entity
+      render_template_view(template, status: :unprocessable_entity)
     end
   end
 
@@ -56,12 +56,15 @@ class ReelsController < ApplicationController
     %w[solo_avatars avatar_and_video narration_over_7_images one_to_three_videos].include?(template)
   end
 
-  def template_view(template)
+  def render_template_view(template, **options)
     case template
     when "solo_avatars", "avatar_and_video", "one_to_three_videos"
-      "reels/scene_based"
+      render "reels/scene_based", **options
     when "narration_over_7_images"
-      "reels/narrative"
+      render "reels/narrative", **options
+    else
+      # This should never happen due to validation, but add safety net
+      redirect_to reels_path, alert: "Invalid template"
     end
   end
 
