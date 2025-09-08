@@ -346,6 +346,7 @@ en:
       video_type: "Video Type"
       avatar_video: "Avatar Video"
       kling_video: "Kling Video"
+      no_avatars_message: "No avatars available. Please sync your avatars from your provider first."
       
     # Narrative
     narrative:

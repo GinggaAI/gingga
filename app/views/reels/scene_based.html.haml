@@ -30,7 +30,7 @@
             %h3.text-lg.font-semibold.mb-2.text-center.text-gray-800= t('reels.scene_based.title')
             %p.text-center.text-gray-600= t('reels.scene_based.description')
 
-      = form_with model: @reel, url: scene_based_reels_path, local: true, data: { controller: "scene-list", scene_list_scene_count_value: 3 }, class: "space-y-6" do |form|
+      = form_with model: @reel, url: scene_based_reels_path, local: true, data: { controller: "scene-list", scene_list_scene_count_value: 3, scene_list_avatars_value: @presenter.avatars_for_select.to_json }, class: "space-y-6" do |form|
         = form.hidden_field :template, value: "solo_avatars"
 
         - if @presenter.has_errors?
@@ -119,7 +119,11 @@
                       %label.block.text-xs.font-medium.text-gray-700.mb-1= t('reels.scene_based.avatar')
                       %select.w-full.p-2.text-sm.border.border-gray-300.rounded-md.focus:ring-2.focus:ring-blue-500.focus:border-blue-500{name: "reel[reel_scenes_attributes][#{i}][avatar_id]"}
                         %option{value: ""}= t('reels.scene_based.select_avatar')
-                        %option{value: "avatar_1"}= t('reels.scene_based.avatar_1')
+                        - if @presenter.has_avatars?
+                          - @presenter.avatars_for_select.each do |avatar_name, avatar_id|
+                            %option{value: avatar_id}= avatar_name
+                        - else
+                          %option{value: "", disabled: true}= @presenter.no_avatars_message
                     %div
                       %label.block.text-xs.font-medium.text-gray-700.mb-1= t('reels.scene_based.voice')
                       %select.w-full.p-2.text-sm.border.border-gray-300.rounded-md.focus:ring-2.focus:ring-blue-500.focus:border-blue-500{name: "reel[reel_scenes_attributes][#{i}][voice_id]"}

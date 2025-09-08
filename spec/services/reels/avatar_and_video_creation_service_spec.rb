@@ -21,7 +21,7 @@ RSpec.describe Reels::AvatarAndVideoCreationService do
   describe '#initialize' do
     it 'initializes with user, template, and params' do
       service = described_class.new(user: user, template: template, params: params)
-      
+
       expect(service.instance_variable_get(:@user)).to eq(user)
       expect(service.instance_variable_get(:@template)).to eq(template)
       expect(service.instance_variable_get(:@params)).to eq(params)
@@ -30,7 +30,7 @@ RSpec.describe Reels::AvatarAndVideoCreationService do
     context 'when template is not provided' do
       it 'allows nil template' do
         service = described_class.new(user: user, template: nil, params: params)
-        
+
         expect(service.instance_variable_get(:@template)).to be_nil
       end
     end
@@ -38,7 +38,7 @@ RSpec.describe Reels::AvatarAndVideoCreationService do
     context 'when params are not provided' do
       it 'allows nil params' do
         service = described_class.new(user: user, template: template, params: nil)
-        
+
         expect(service.instance_variable_get(:@params)).to be_nil
       end
     end
@@ -72,7 +72,7 @@ RSpec.describe Reels::AvatarAndVideoCreationService do
       result = service.initialize_reel
       scene_numbers = result[:reel].reel_scenes.map(&:scene_number).sort
 
-      expect(scene_numbers).to eq([1, 2, 3])
+      expect(scene_numbers).to eq([ 1, 2, 3 ])
     end
 
     it 'creates reel scenes with nil values for required fields' do
@@ -97,7 +97,7 @@ RSpec.describe Reels::AvatarAndVideoCreationService do
         # Focus on testing service behavior rather than specific validation outcomes
         expect(result).to have_key(:success)
         expect(result).to have_key(:reel)
-        
+
         if result[:success]
           expect(result[:reel]).to be_persisted
           expect(result[:reel].template).to eq(template)
@@ -109,7 +109,7 @@ RSpec.describe Reels::AvatarAndVideoCreationService do
 
       it 'sets the status to draft when successful' do
         result = service.call
-        
+
         if result[:success]
           expect(result[:reel].status).to eq("draft")
         end
@@ -125,10 +125,10 @@ RSpec.describe Reels::AvatarAndVideoCreationService do
 
       it 'creates reel scenes with sequential scene numbers when successful' do
         result = service.call
-        
+
         if result[:success]
           scene_numbers = result[:reel].reel_scenes.pluck(:scene_number).sort
-          expect(scene_numbers).to eq([1, 2, 3])
+          expect(scene_numbers).to eq([ 1, 2, 3 ])
         end
       end
     end
@@ -159,7 +159,7 @@ RSpec.describe Reels::AvatarAndVideoCreationService do
       it 'tests the setup method directly rather than full flow' do
         # This tests the core logic without the complex update scenario
         reel = user.reels.build(template: template, status: "draft")
-        
+
         # Add one scene to simulate existing scenes
         reel.reel_scenes.build(
           scene_number: 1,
@@ -167,10 +167,10 @@ RSpec.describe Reels::AvatarAndVideoCreationService do
           voice_id: "existing_voice",
           script: "Existing script"
         )
-        
+
         initial_count = reel.reel_scenes.size
         service.send(:setup_template_specific_fields, reel)
-        
+
         # Should not add more scenes if scenes already exist
         expect(reel.reel_scenes.size).to eq(initial_count)
       end
@@ -192,7 +192,7 @@ RSpec.describe Reels::AvatarAndVideoCreationService do
         service.send(:setup_template_specific_fields, reel)
         scene_numbers = reel.reel_scenes.map(&:scene_number).sort
 
-        expect(scene_numbers).to eq([1, 2, 3])
+        expect(scene_numbers).to eq([ 1, 2, 3 ])
       end
 
       it 'creates scenes with nil values for required fields' do
@@ -266,7 +266,7 @@ RSpec.describe Reels::AvatarAndVideoCreationService do
       expect(result[:reel].template).to eq(template)
       expect(result[:reel].user).to eq(user)
       expect(result[:reel].status).to eq("draft")
-      
+
       if result[:success]
         expect(result[:reel]).to be_persisted
       end

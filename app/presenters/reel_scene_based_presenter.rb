@@ -140,4 +140,18 @@ class ReelSceneBasedPresenter
   def scene_data_for(index)
     reel.reel_scenes[index]&.attributes || {}
   end
+
+  def avatars_for_select
+    current_user.avatars.active.map do |avatar|
+      [ avatar.name, avatar.avatar_id ]
+    end
+  end
+
+  def has_avatars?
+    current_user.avatars.active.exists?
+  end
+
+  def no_avatars_message
+    I18n.t("reels.scene_based.no_avatars_message")
+  end
 end

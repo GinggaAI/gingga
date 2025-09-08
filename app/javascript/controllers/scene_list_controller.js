@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["scenesContainer", "sceneCounter", "aiToggle", "scene", "avatarFields", "videoTypeSelect"]
-  static values = { sceneCount: Number }
+  static values = { sceneCount: Number, avatars: Array }
 
   connect() {
     this.updateSceneCounter()
@@ -113,6 +113,8 @@ export default class extends Controller {
   }
 
   generateSceneHTML(sceneNumber) {
+    const avatarOptions = this.generateAvatarOptions();
+    
     return `
       <div class="ui-scene-fields" data-scene-number="${sceneNumber}">
         <div class="ui-scene-fields__header">
@@ -135,10 +137,7 @@ export default class extends Controller {
                     class="ui-scene-fields__select"
                     aria-describedby="avatar_help_${sceneNumber}">
               <option value="">Select Avatar</option>
-              <option value="avatar_001">Professional Male</option>
-              <option value="avatar_002">Professional Female</option>
-              <option value="avatar_003">Casual Male</option>
-              <option value="avatar_004">Casual Female</option>
+              ${avatarOptions}
             </select>
             <small id="avatar_help_${sceneNumber}" class="ui-scene-fields__help">
               Choose the AI avatar for this scene
@@ -232,5 +231,16 @@ export default class extends Controller {
 
   updateSceneCounter() {
     this.sceneCounterTarget.textContent = this.sceneCountValue
+  }
+
+  generateAvatarOptions() {
+    if (!this.hasAvatarsValue || this.avatarsValue.length === 0) {
+      return '<option value="" disabled>No avatars available. Please sync your avatars from your provider first.</option>';
+    }
+    
+    return this.avatarsValue.map(avatar => {
+      const [name, id] = avatar;
+      return `<option value="${id}">${name}</option>`;
+    }).join('');
   }
 }

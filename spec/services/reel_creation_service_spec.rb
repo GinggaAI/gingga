@@ -125,9 +125,9 @@ RSpec.describe ReelCreationService do
         templates_and_services.each do |template, service_class|
           service = described_class.new(user: user, template: template)
           mock_service_instance = double('service', initialize_reel: { success: true, reel: double, error: nil })
-          
+
           expect(service_class).to receive(:new).with(user: user, template: template).and_return(mock_service_instance)
-          
+
           result = service.initialize_reel
           expect(result[:success]).to be true
         end
@@ -166,7 +166,7 @@ RSpec.describe ReelCreationService do
       it 'extracts template from params and delegates to appropriate service' do
         mock_reel = double('reel')
         mock_service = double('service', call: { success: true, reel: mock_reel, error: nil })
-        
+
         expect(Reels::SoloAvatarsCreationService).to receive(:new)
           .with(user: user, params: valid_params)
           .and_return(mock_service)
@@ -220,9 +220,9 @@ RSpec.describe ReelCreationService do
           params = valid_params.merge(template: template)
           service = described_class.new(user: user, params: params)
           mock_service_instance = double('service', call: { success: true, reel: double, error: nil })
-          
+
           expect(service_class).to receive(:new).with(user: user, params: params).and_return(mock_service_instance)
-          
+
           result = service.call
           expect(result[:success]).to be true
         end
@@ -372,7 +372,7 @@ RSpec.describe ReelCreationService do
         # The service should return a proper result structure
         expect(result).to have_key(:success)
         expect(result).to have_key(:reel)
-        
+
         if result[:success]
           expect(result[:reel]).to be_a(Reel)
           expect(result[:reel]).to be_persisted
@@ -391,7 +391,7 @@ RSpec.describe ReelCreationService do
         expect(reel.user).to eq(user)
         expect(reel.template).to eq(valid_template)
         expect(reel.status).to eq("draft")
-        
+
         if result[:success]
           expect(reel.title).to eq(valid_params[:title])
           expect(reel.description).to eq(valid_params[:description])

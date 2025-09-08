@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Heygen::ValidateAndSyncService, type: :service do
   let(:user) { create(:user) }
   let(:group_url) { "https://api.heygen.com/v1/group/test_group" }
-  
+
   subject { described_class.new(user: user) }
 
   before do
@@ -73,7 +73,7 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
             expect(Rails.logger).to receive(:info).with("🔗 [DEBUG] ValidateAndSyncService - group_url from token: #{group_url.inspect}")
             expect(Rails.logger).to receive(:info).with("📊 Validation result: Success=true, Data=[:synchronized_count], Error=")
             expect(Rails.logger).to receive(:info).with("✅ Successfully synchronized #{synchronized_count} avatars")
-            
+
             subject.call
           end
         end
@@ -123,7 +123,7 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
 
         context 'when sync_result.data is nil' do
           let(:nil_data_sync_result) { double('sync_result', success?: true, data: nil, error: nil) }
-          
+
           before do
             allow(Heygen::SynchronizeAvatarsService).to receive(:new).with(user: user, group_url: group_url).and_return(sync_service_instance)
             allow(sync_service_instance).to receive(:call).and_return(nil_data_sync_result)
@@ -160,7 +160,7 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
         it 'logs error information' do
           expect(Rails.logger).to receive(:info).with("📊 Validation result: Success=false, Data=, Error=#{error_message}")
           expect(Rails.logger).to receive(:error).with("❌ Avatar validation failed: #{error_message}")
-          
+
           subject.call
         end
       end
@@ -185,7 +185,7 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
 
       it 'logs error information' do
         expect(Rails.logger).to receive(:error).with("❌ Avatar validation error: #{exception_message}")
-        
+
         subject.call
       end
     end
@@ -349,7 +349,7 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
 
       it 'handles special characters in group_url' do
         expect(Rails.logger).to receive(:info).with("🔗 [DEBUG] ValidateAndSyncService - group_url from token: #{special_group_url.inspect}")
-        
+
         result = subject.call
         expect(result.success?).to be true
       end

@@ -605,7 +605,7 @@ RSpec.describe Creas::ContentItemInitializerService do
           }
         }
       end
-      
+
       let(:weekly_plan) do
         [
           {
@@ -629,9 +629,9 @@ RSpec.describe Creas::ContentItemInitializerService do
         allow_any_instance_of(CreasContentItem).to receive(:save!).and_raise(ActiveRecord::RecordInvalid.new(CreasContentItem.new))
         allow(Rails.logger).to receive(:info)
         allow(Rails.logger).to receive(:warn)
-        
+
         service.call
-        
+
         expect(Rails.logger).to have_received(:info).with(/Final count/)
       end
     end
@@ -654,7 +654,7 @@ RSpec.describe Creas::ContentItemInitializerService do
         }
       }
     end
-    
+
     let(:weekly_plan) do
       [
         {
@@ -753,9 +753,9 @@ RSpec.describe Creas::ContentItemInitializerService do
 
       it 'applies recovery fixes and saves successfully' do
         allow(item).to receive(:save).and_return(true)
-        
+
         result = service.send(:attempt_validation_error_recovery, item, idea, 1)
-        
+
         expect(result).to eq(item)
       end
 
@@ -768,9 +768,9 @@ RSpec.describe Creas::ContentItemInitializerService do
           item_arg.pilar = "C"
           item_arg.status = "draft"
         end
-        
+
         result = service.send(:attempt_validation_error_recovery, item, idea, 1)
-        
+
         expect(result).to be_nil
       end
     end
@@ -791,9 +791,9 @@ RSpec.describe Creas::ContentItemInitializerService do
         item.errors.add(:template, 'is invalid')
         item.errors.add(:pilar, 'is invalid')
         item.errors.add(:status, 'is invalid')
-        
+
         service.send(:apply_recovery_fixes, item, 1, 1, 0)
-        
+
         expect(item.template).to eq('solo_avatars')
         expect(item.pilar).to eq('C')
         expect(item.status).to eq('draft')
@@ -808,9 +808,9 @@ RSpec.describe Creas::ContentItemInitializerService do
         item.errors.add(:content_id, 'already exists')
         item.errors.add(:post_description, 'is too similar')
         item.errors.add(:text_base, 'is too similar')
-        
+
         service.send(:apply_recovery_fixes, item, 2, 1, 0)
-        
+
         expect(item.content_name).to match(/RECOVERED Content/)
         expect(item.content_id).to match(/RECOVERED-/)
         expect(item.post_description).to include('RECOVERED:')
@@ -836,9 +836,9 @@ RSpec.describe Creas::ContentItemInitializerService do
             end
           end
         end
-        
+
         service.send(:apply_recovery_fixes, item, 3, 1, 0)
-        
+
         expect(item.content_name).to match(/Emergency Recovery Content/)
         expect(item.content_id).to match(/EMERGENCY-/)
         expect(item.template).to eq('solo_avatars')
@@ -901,9 +901,9 @@ RSpec.describe Creas::ContentItemInitializerService do
 
       it 'enriches idea with content_distribution data' do
         minimal_idea = { 'id' => 'lookup-id' }
-        
+
         enriched = service.send(:enrich_idea_from_content_distribution, minimal_idea)
-        
+
         expect(enriched['title']).to eq('Found Content')
         expect(enriched['description']).to eq('Found description')
         expect(enriched['platform']).to eq('Instagram')
@@ -911,9 +911,9 @@ RSpec.describe Creas::ContentItemInitializerService do
 
       it 'returns original idea when not found in distribution' do
         minimal_idea = { 'id' => 'not-found-id' }
-        
+
         enriched = service.send(:enrich_idea_from_content_distribution, minimal_idea)
-        
+
         expect(enriched).to eq(minimal_idea)
       end
 
@@ -923,9 +923,9 @@ RSpec.describe Creas::ContentItemInitializerService do
           'title' => 'Full Title',
           'description' => 'Full description'
         }
-        
+
         enriched = service.send(:enrich_idea_from_content_distribution, full_idea)
-        
+
         expect(enriched).to eq(full_idea)
       end
     end
@@ -937,31 +937,31 @@ RSpec.describe Creas::ContentItemInitializerService do
     describe '#generate_unique_content_name' do
       it 'appends week information to title' do
         idea = { 'title' => 'Base Title', 'id' => 'test-id' }
-        
+
         result = service.send(:generate_unique_content_name, idea, 2)
-        
+
         expect(result).to eq('Base Title (Week 2)')
       end
 
       it 'handles missing title with ID fallback' do
         idea = { 'id' => 'test-id-123' }
-        
+
         result = service.send(:generate_unique_content_name, idea, 1)
-        
+
         expect(result).to eq('Content test-id-123 (Week 1)')
       end
 
       it 'handles duplicate names with counter' do
         idea = { 'title' => 'Popular Title', 'id' => 'test-id' }
-        
+
         create(:creas_content_item,
                user: user,
                brand: brand,
                creas_strategy_plan: strategy_plan,
                content_name: 'Popular Title (Week 1)')
-        
+
         result = service.send(:generate_unique_content_name, idea, 1)
-        
+
         expect(result).to eq('Popular Title (Week 1) (1)')
       end
     end
@@ -969,17 +969,17 @@ RSpec.describe Creas::ContentItemInitializerService do
     describe '#generate_unique_description' do
       it 'appends week information to description' do
         idea = { 'description' => 'Base description' }
-        
+
         result = service.send(:generate_unique_description, idea, 3)
-        
+
         expect(result).to eq('Base description (Week 3 content)')
       end
 
       it 'returns as-is for blank description' do
         idea = { 'description' => '' }
-        
+
         result = service.send(:generate_unique_description, idea, 1)
-        
+
         expect(result).to eq('')
       end
     end
@@ -987,17 +987,17 @@ RSpec.describe Creas::ContentItemInitializerService do
     describe '#generate_unique_text_base' do
       it 'appends week information to text base' do
         idea = { 'hook' => 'Hook', 'description' => 'Description', 'cta' => 'CTA' }
-        
+
         result = service.send(:generate_unique_text_base, idea, 2)
-        
+
         expect(result).to eq("Hook\n\nDescription\n\nCTA\n\n[Week 2 version]")
       end
 
       it 'returns as-is for blank text base' do
         idea = {}
-        
+
         result = service.send(:generate_unique_text_base, idea, 1)
-        
+
         expect(result).to eq('')
       end
     end
@@ -1045,7 +1045,7 @@ RSpec.describe Creas::ContentItemInitializerService do
         }
       }
     end
-    
+
     let(:weekly_plan) do
       [
         {
@@ -1072,12 +1072,12 @@ RSpec.describe Creas::ContentItemInitializerService do
         created_items = [
           create(:creas_content_item, content_id: 'retry-test-1', user: user, brand: brand, creas_strategy_plan: strategy_plan)
         ]
-        
+
         allow(Rails.logger).to receive(:info)
         allow(Rails.logger).to receive(:warn)
-        
+
         missing_items = service.send(:retry_missing_content_items, created_items, 2)
-        
+
         expect(missing_items.length).to be >= 0
         expect(Rails.logger).to have_received(:info).with(/Retrying missing content/)
       end
@@ -1088,9 +1088,9 @@ RSpec.describe Creas::ContentItemInitializerService do
 
       it 'creates highly unique text with brand context' do
         idea = { 'hook' => 'Test Hook', 'description' => 'Test Description', 'cta' => 'Test CTA' }
-        
+
         result = service.send(:build_highly_unique_text_base, idea, 1, 'ABC123')
-        
+
         expect(result).to include('Test Hook [WEEK 1 EDITION - VERSION ABC123]')
         expect(result).to include('Test Description')
         expect(result).to include('Test CTA')

@@ -138,7 +138,7 @@ RSpec.describe Heygen::BaseService, type: :service do
 
   describe 'HTTP methods with valid token' do
     let(:mock_http_client) { double('http_client') }
-    
+
     before do
       allow(Heygen::HttpClient).to receive(:new).with(user: user).and_return(mock_http_client)
     end
@@ -151,11 +151,11 @@ RSpec.describe Heygen::BaseService, type: :service do
           data: { test: 'data' },
           error: nil
         }
-        
+
         expect(mock_http_client).to receive(:get_with_logging).with('/test', params: { limit: 10 }).and_return(successful_result)
-        
+
         result = subject.test_get('/test', query: { limit: 10 })
-        
+
         expect(result.success?).to be true
         expect(result.code).to eq(200)
         expect(result.body).to eq({ test: 'data' })
@@ -168,11 +168,11 @@ RSpec.describe Heygen::BaseService, type: :service do
           data: nil,
           error: { code: 404, message: 'Not Found', raw: { error: 'Resource not found' } }
         }
-        
+
         expect(mock_http_client).to receive(:get_with_logging).with('/test', params: {}).and_return(failed_result)
-        
+
         result = subject.test_get('/test')
-        
+
         expect(result.success?).to be false
         expect(result.code).to eq(404)
         expect(result.message).to eq('Not Found')
@@ -181,18 +181,18 @@ RSpec.describe Heygen::BaseService, type: :service do
 
       it 'handles exceptions during HTTP call' do
         expect(mock_http_client).to receive(:get_with_logging).and_raise(StandardError, 'Connection failed')
-        
+
         result = subject.test_get('/test')
-        
+
         expect(result.success?).to be false
         expect(result.message).to eq('HTTP request failed: Connection failed')
       end
 
       it 'handles ArgumentError exceptions specifically' do
         expect(mock_http_client).to receive(:get_with_logging).and_raise(ArgumentError, 'Invalid argument')
-        
+
         result = subject.test_get('/test')
-        
+
         expect(result.success?).to be false
         expect(result.message).to eq('Invalid argument')
       end
@@ -206,11 +206,11 @@ RSpec.describe Heygen::BaseService, type: :service do
           data: { id: '123' },
           error: nil
         }
-        
+
         expect(mock_http_client).to receive(:post_with_logging).with('/create', body: { name: 'test' }).and_return(successful_result)
-        
+
         result = subject.test_post('/create', body: { name: 'test' })
-        
+
         expect(result.success?).to be true
         expect(result.code).to eq(201)
         expect(result.body).to eq({ id: '123' })
@@ -221,24 +221,24 @@ RSpec.describe Heygen::BaseService, type: :service do
           success: false,
           status: 422,
           data: nil,
-          error: { code: 422, message: 'Validation failed', raw: { errors: ['Name required'] } }
+          error: { code: 422, message: 'Validation failed', raw: { errors: [ 'Name required' ] } }
         }
-        
+
         expect(mock_http_client).to receive(:post_with_logging).with('/create', body: {}).and_return(failed_result)
-        
+
         result = subject.test_post('/create')
-        
+
         expect(result.success?).to be false
         expect(result.code).to eq(422)
         expect(result.message).to eq('Validation failed')
-        expect(result.body).to eq({ errors: ['Name required'] })
+        expect(result.body).to eq({ errors: [ 'Name required' ] })
       end
 
       it 'handles exceptions during HTTP call' do
         expect(mock_http_client).to receive(:post_with_logging).and_raise(StandardError, 'Network error')
-        
+
         result = subject.test_post('/create')
-        
+
         expect(result.success?).to be false
         expect(result.message).to eq('HTTP request failed: Network error')
       end
@@ -260,14 +260,14 @@ RSpec.describe Heygen::BaseService, type: :service do
 
       it 'returns error response for GET requests' do
         result = subject.test_get('/test')
-        
+
         expect(result.success?).to be false
         expect(result.message).to eq('Invalid token format')
       end
 
       it 'returns error response for POST requests' do
         result = subject.test_post('/test')
-        
+
         expect(result.success?).to be false
         expect(result.message).to eq('Invalid token format')
       end
@@ -283,9 +283,9 @@ RSpec.describe Heygen::BaseService, type: :service do
           data: { result: 'success' },
           error: nil
         }
-        
+
         wrapped = subject.send(:wrap_faraday_response, faraday_result)
-        
+
         expect(wrapped.success?).to be true
         expect(wrapped.code).to eq(200)
         expect(wrapped.status).to eq(200)
@@ -300,9 +300,9 @@ RSpec.describe Heygen::BaseService, type: :service do
           data: nil,
           error: { code: 400, message: 'Bad Request', raw: { error: 'Invalid input' } }
         }
-        
+
         wrapped = subject.send(:wrap_faraday_response, faraday_result)
-        
+
         expect(wrapped.success?).to be false
         expect(wrapped.code).to eq(400)
         expect(wrapped.status).to eq(400)
@@ -317,9 +317,9 @@ RSpec.describe Heygen::BaseService, type: :service do
           data: nil,
           error: { message: 'Server Error' }
         }
-        
+
         wrapped = subject.send(:wrap_faraday_response, faraday_result)
-        
+
         expect(wrapped.code).to eq(0)
         expect(wrapped.body).to eq({ error: 'Server Error' })
       end
@@ -331,9 +331,9 @@ RSpec.describe Heygen::BaseService, type: :service do
           data: nil,
           error: { code: 500 }
         }
-        
+
         wrapped = subject.send(:wrap_faraday_response, faraday_result)
-        
+
         expect(wrapped.message).to eq('Request failed')
         expect(wrapped.body).to eq({ error: nil })
       end
@@ -342,7 +342,7 @@ RSpec.describe Heygen::BaseService, type: :service do
     describe '#create_error_response' do
       it 'creates error response with correct structure' do
         response = subject.send(:create_error_response, 'Test error')
-        
+
         expect(response.success?).to be false
         expect(response.code).to eq(0)
         expect(response.status).to eq(0)
@@ -355,7 +355,7 @@ RSpec.describe Heygen::BaseService, type: :service do
       it 'handles ArgumentError specifically' do
         error = ArgumentError.new('Invalid argument')
         response = subject.send(:handle_http_error, error)
-        
+
         expect(response.success?).to be false
         expect(response.message).to eq('Invalid argument')
       end
@@ -363,7 +363,7 @@ RSpec.describe Heygen::BaseService, type: :service do
       it 'handles generic exceptions' do
         error = StandardError.new('Generic error')
         response = subject.send(:handle_http_error, error)
-        
+
         expect(response.success?).to be false
         expect(response.message).to eq('HTTP request failed: Generic error')
       end
@@ -371,7 +371,7 @@ RSpec.describe Heygen::BaseService, type: :service do
       it 'handles NoMethodError' do
         error = NoMethodError.new('Method not found')
         response = subject.send(:handle_http_error, error)
-        
+
         expect(response.success?).to be false
         expect(response.message).to eq('HTTP request failed: Method not found')
       end
@@ -381,9 +381,9 @@ RSpec.describe Heygen::BaseService, type: :service do
   describe '#parse_json' do
     context 'with array input' do
       it 'returns the array as-is' do
-        data = [{ "key" => "value" }]
+        data = [ { "key" => "value" } ]
         result = subject.test_parse_json(data)
-        
+
         expect(result).to eq(data)
       end
     end
@@ -406,17 +406,17 @@ RSpec.describe Heygen::BaseService, type: :service do
     context 'with malformed JSON' do
       it 'handles missing closing brace' do
         expect(Rails.logger).to receive(:warn).with(/JSON parse error/)
-        
+
         result = subject.test_parse_json('{"key": "value"')
-        
+
         expect(result).to eq({ error: "Invalid JSON response" })
       end
 
       it 'handles invalid JSON characters' do
         expect(Rails.logger).to receive(:warn).with(/JSON parse error/)
-        
+
         result = subject.test_parse_json('{"key": value}')
-        
+
         expect(result).to eq({ error: "Invalid JSON response" })
       end
     end
@@ -426,7 +426,7 @@ RSpec.describe Heygen::BaseService, type: :service do
     it 'stores additional options' do
       service = test_service_class.new(user, timeout: 30, retries: 3)
       options = service.instance_variable_get(:@options)
-      
+
       expect(options[:timeout]).to eq(30)
       expect(options[:retries]).to eq(3)
     end
@@ -434,7 +434,7 @@ RSpec.describe Heygen::BaseService, type: :service do
     it 'handles empty options' do
       service = test_service_class.new(user)
       options = service.instance_variable_get(:@options)
-      
+
       expect(options).to eq({})
     end
   end
@@ -467,7 +467,7 @@ RSpec.describe Heygen::BaseService, type: :service do
 
     context 'with malformed API token' do
       let(:malformed_token) { double('token', encrypted_token: nil) }
-      
+
       before do
         allow(user).to receive(:active_token_for).with("heygen").and_return(malformed_token)
       end

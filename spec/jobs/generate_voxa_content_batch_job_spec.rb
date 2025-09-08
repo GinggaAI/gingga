@@ -566,7 +566,7 @@ RSpec.describe GenerateVoxaContentBatchJob do
 
         updated_items = strategy_plan.creas_content_items.where(status: 'in_production')
         expect(updated_items.count).to be > 0
-        
+
         # Verify that items were saved despite name conflicts
         conflicted_item = updated_items.find { |item| item.content_name.include?('Refined Content 1') }
         expect(conflicted_item).to be_present
@@ -601,7 +601,7 @@ RSpec.describe GenerateVoxaContentBatchJob do
 
       before do
         allow(mock_chat_client).to receive(:chat!).and_return(mock_response_with_new_item)
-        
+
         # Create existing item with same content name
         create(:creas_content_item,
                user: user,
@@ -612,7 +612,7 @@ RSpec.describe GenerateVoxaContentBatchJob do
 
       it 'handles content name uniqueness during creation' do
         initial_count = strategy_plan.creas_content_items.count
-        
+
         described_class.perform_now(strategy_plan.id, batch_number, total_batches, batch_id)
 
         strategy_plan.reload
@@ -625,15 +625,15 @@ RSpec.describe GenerateVoxaContentBatchJob do
 
       it 'generates unique variations with version numbers' do
         original_name = 'Test Content'
-        
+
         result = job.send(:generate_unique_content_name, original_name, brand.id)
-        
+
         expect(result).to eq('Test Content v1')
       end
 
       it 'increments version when variations exist' do
         original_name = 'Popular Content'
-        
+
         # Create existing variations
         create(:creas_content_item,
                user: user,
@@ -645,15 +645,15 @@ RSpec.describe GenerateVoxaContentBatchJob do
                brand: brand,
                creas_strategy_plan: strategy_plan,
                content_name: 'Popular Content v2')
-        
+
         result = job.send(:generate_unique_content_name, original_name, brand.id)
-        
+
         expect(result).to eq('Popular Content v3')
       end
 
       it 'falls back to timestamp when max attempts reached' do
         original_name = 'Very Popular Content'
-        
+
         # Create many variations to exhaust attempts
         (1..10).each do |i|
           create(:creas_content_item,
@@ -662,15 +662,15 @@ RSpec.describe GenerateVoxaContentBatchJob do
                  creas_strategy_plan: strategy_plan,
                  content_name: "Very Popular Content v#{i}")
         end
-        
+
         result = job.send(:generate_unique_content_name, original_name, brand.id)
-        
+
         expect(result).to match(/Very Popular Content \d{8}/)
       end
 
       it 'handles blank names' do
         result = job.send(:generate_unique_content_name, '', brand.id)
-        
+
         expect(result).to eq('')
       end
     end
@@ -714,7 +714,7 @@ RSpec.describe GenerateVoxaContentBatchJob do
 
       it 'builds context from previous batches' do
         context = job.send(:build_existing_content_context, strategy_plan, 2)
-        
+
         expect(context).to include('Previous Content')
         expect(context).to include('Batch 1')
         expect(context).to include('instagram')
@@ -734,14 +734,14 @@ RSpec.describe GenerateVoxaContentBatchJob do
         end
 
         context = job.send(:build_existing_content_context, strategy_plan, 2)
-        
+
         expect(context.length).to be <= 803  # Should be truncated with "..."
         expect(context).to end_with('...') if context.length > 800
       end
 
       it 'returns empty string when no previous content exists' do
         context = job.send(:build_existing_content_context, strategy_plan, 1)
-        
+
         expect(context).to eq('')
       end
     end
@@ -813,7 +813,7 @@ RSpec.describe GenerateVoxaContentBatchJob do
         expect(attrs[:dubbing]).to eq({ "es" => "Spanish dubbing" })
         expect(attrs[:assets]).to eq({ "video_url" => "https://example.com/video.mp4" })
         expect(attrs[:accessibility]).to eq({ "alt_text" => "Alt text" })
-        
+
         expect(attrs[:meta]).to include(
           "hook" => "Test Hook",
           "cta" => "Test CTA",
@@ -872,7 +872,7 @@ RSpec.describe GenerateVoxaContentBatchJob do
         described_class.perform_now(strategy_plan.id, batch_number, total_batches, batch_id)
 
         strategy_plan.reload
-        
+
         # Job should complete despite individual item failures
         expect(strategy_plan.status).to eq('completed')
         expect(strategy_plan.meta['voxa_batches']).to be_present
@@ -888,14 +888,14 @@ RSpec.describe GenerateVoxaContentBatchJob do
         content_id = 'also-non-existent'
 
         result = job.send(:find_existing_content_item_in_batch, empty_content_items, origin_id, content_id)
-        
+
         expect(result).to be_nil
       end
 
       it 'finds items by different matching strategies' do
         item1 = build(:creas_content_item, content_id: 'match-by-content-id', origin_id: nil)
         item2 = build(:creas_content_item, content_id: 'other-content-id', origin_id: 'match-by-origin-id')
-        content_items = [item1, item2]
+        content_items = [ item1, item2 ]
 
         # Test matching by content_id when used as origin_id (first match condition)
         result = job.send(:find_existing_content_item_in_batch, content_items, 'match-by-content-id', nil)
@@ -904,8 +904,8 @@ RSpec.describe GenerateVoxaContentBatchJob do
         # Test matching by content_id as fallback parameter (third condition)
         result = job.send(:find_existing_content_item_in_batch, content_items, nil, 'match-by-content-id')
         expect(result.content_id).to eq('match-by-content-id')
-        
-        # The second condition has a bug - it checks origin_id.present? twice instead of checking 
+
+        # The second condition has a bug - it checks origin_id.present? twice instead of checking
         # if the item's origin_id matches the provided origin_id
         # So we'll test that it returns nil when trying to match by origin_id
         result = job.send(:find_existing_content_item_in_batch, content_items, 'match-by-origin-id', nil)
@@ -970,7 +970,7 @@ RSpec.describe GenerateVoxaContentBatchJob do
 
         strategy_plan.reload
         expect(strategy_plan.status).to eq('completed')
-        
+
         # Verify that items were processed regardless of initial status
         processed_items = strategy_plan.creas_content_items.where(status: 'in_production')
         expect(processed_items.count).to be > 0
@@ -984,8 +984,8 @@ RSpec.describe GenerateVoxaContentBatchJob do
                brand: brand,
                status: :pending,
                weekly_plan: [
-                 { "ideas" => [{ "id" => "week1-item1", "pilar" => "C" }] },
-                 { "ideas" => [{ "id" => "week2-item1", "pilar" => "R" }] }
+                 { "ideas" => [ { "id" => "week1-item1", "pilar" => "C" } ] },
+                 { "ideas" => [ { "id" => "week2-item1", "pilar" => "R" } ] }
                ])
       end
 

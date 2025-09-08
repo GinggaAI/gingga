@@ -9,7 +9,7 @@ RSpec.describe Http::BaseClient, type: :service do
   describe "#initialize" do
     it "initializes with required base_url" do
       client = described_class.new(base_url: base_url)
-      
+
       expect(client.instance_variable_get(:@base_url)).to eq(base_url)
       expect(client.instance_variable_get(:@headers)).to eq({})
       expect(client.instance_variable_get(:@api_key)).to be_nil
@@ -23,7 +23,7 @@ RSpec.describe Http::BaseClient, type: :service do
         api_key: api_key,
         bearer_token: bearer_token
       )
-      
+
       expect(client.instance_variable_get(:@base_url)).to eq(base_url)
       expect(client.instance_variable_get(:@headers)).to eq(headers)
       expect(client.instance_variable_get(:@api_key)).to eq(api_key)
@@ -32,7 +32,7 @@ RSpec.describe Http::BaseClient, type: :service do
 
     it "initializes with partial optional parameters" do
       client = described_class.new(base_url: base_url, api_key: api_key)
-      
+
       expect(client.instance_variable_get(:@base_url)).to eq(base_url)
       expect(client.instance_variable_get(:@headers)).to eq({})
       expect(client.instance_variable_get(:@api_key)).to eq(api_key)
@@ -60,7 +60,7 @@ RSpec.describe Http::BaseClient, type: :service do
         stub_const("Http::BaseClient::DEFAULT_TIMEOUT", (ENV["HTTP_TIMEOUT"] || 30).to_i)
         stub_const("Http::BaseClient::DEFAULT_OPEN_TIMEOUT", (ENV["HTTP_OPEN_TIMEOUT"] || 5).to_i)
         stub_const("Http::BaseClient::DEFAULT_RETRIES", (ENV["HTTP_RETRIES"] || 2).to_i)
-        
+
         expect(Http::BaseClient::DEFAULT_TIMEOUT).to eq(45)
         expect(Http::BaseClient::DEFAULT_OPEN_TIMEOUT).to eq(10)
         expect(Http::BaseClient::DEFAULT_RETRIES).to eq(5)
@@ -187,7 +187,7 @@ RSpec.describe Http::BaseClient, type: :service do
         expect(faraday_request).to receive(:url).with("/test")
         expect(params_double).to receive(:update).with({ page: 1 })
         expect(headers_double).to receive(:update).with({ "Accept" => "json" })
-        
+
         result = client.send(:request, :get, "/test", params: { page: 1 }, headers: { "Accept" => "json" })
         expect(result).to eq({ success: true })
       end
@@ -201,7 +201,7 @@ RSpec.describe Http::BaseClient, type: :service do
         end
 
         expect(faraday_request).to receive(:body=).with(body.to_json)
-        
+
         client.send(:request, :post, "/create", body: body)
       end
 
@@ -214,41 +214,41 @@ RSpec.describe Http::BaseClient, type: :service do
         expect(params_double).not_to receive(:update)
         expect(headers_double).not_to receive(:update)
         expect(faraday_request).not_to receive(:body=)
-        
+
         client.send(:request, :get, "/test", params: {}, headers: {})
       end
 
       it "handles Faraday::TimeoutError" do
         allow(faraday_connection).to receive(:send).and_raise(Faraday::TimeoutError, "Request timeout")
         expect(client).to receive(:failure).with("timeout", "Request timeout", response_time: kind_of(Integer))
-        
+
         client.send(:request, :get, "/test")
       end
 
       it "handles Faraday::ConnectionFailed" do
         allow(faraday_connection).to receive(:send).and_raise(Faraday::ConnectionFailed, "Connection failed")
         expect(client).to receive(:failure).with("connection_failed", "Connection failed", response_time: kind_of(Integer))
-        
+
         client.send(:request, :get, "/test")
       end
 
       it "handles StandardError" do
         allow(faraday_connection).to receive(:send).and_raise(StandardError, "Unexpected error")
         expect(client).to receive(:failure).with("unexpected_error", "Unexpected error", response_time: kind_of(Integer))
-        
+
         client.send(:request, :get, "/test")
       end
 
       it "calculates response time correctly" do
         start_time = Time.parse("2025-01-01 10:00:00")
         end_time = Time.parse("2025-01-01 10:00:00.250") # 250ms later
-        
+
         allow(Time).to receive(:current).and_return(start_time, end_time)
         allow(faraday_connection).to receive(:send).and_return(faraday_response)
-        
+
         expect(client).to receive(:instrument!).with(:get, "/test", faraday_response, 250)
         expect(client).to receive(:handle_response).with(faraday_response, 250)
-        
+
         client.send(:request, :get, "/test")
       end
     end
@@ -257,7 +257,7 @@ RSpec.describe Http::BaseClient, type: :service do
       it "creates and memoizes Faraday connection" do
         connection = client.send(:connection)
         same_connection = client.send(:connection)
-        
+
         expect(connection).to be_a(Faraday::Connection)
         expect(connection).to equal(same_connection) # Same object instance
       end
@@ -351,7 +351,7 @@ RSpec.describe Http::BaseClient, type: :service do
 
       it "applies default Content-Type and Accept headers" do
         client.send(:apply_default_headers!, faraday_connection)
-        
+
         expect(connection_headers["Content-Type"]).to eq("application/json")
         expect(connection_headers["Accept"]).to eq("application/json")
       end
@@ -359,28 +359,28 @@ RSpec.describe Http::BaseClient, type: :service do
       it "applies custom headers" do
         client = described_class.new(base_url: base_url, headers: { "Custom-Header" => "custom-value" })
         client.send(:apply_default_headers!, faraday_connection)
-        
+
         expect(connection_headers["Custom-Header"]).to eq("custom-value")
       end
 
       it "applies Bearer token when present" do
         client = described_class.new(base_url: base_url, bearer_token: bearer_token)
         client.send(:apply_default_headers!, faraday_connection)
-        
+
         expect(connection_headers["Authorization"]).to eq("Bearer #{bearer_token}")
       end
 
       it "applies API key when present" do
         client = described_class.new(base_url: base_url, api_key: api_key)
         client.send(:apply_default_headers!, faraday_connection)
-        
+
         expect(connection_headers["X-API-KEY"]).to eq(api_key)
       end
 
       it "applies both Bearer token and API key when both present" do
         client = described_class.new(base_url: base_url, api_key: api_key, bearer_token: bearer_token)
         client.send(:apply_default_headers!, faraday_connection)
-        
+
         expect(connection_headers["Authorization"]).to eq("Bearer #{bearer_token}")
         expect(connection_headers["X-API-KEY"]).to eq(api_key)
       end
@@ -388,7 +388,7 @@ RSpec.describe Http::BaseClient, type: :service do
       it "does not apply authentication headers when not present" do
         client = described_class.new(base_url: base_url)
         client.send(:apply_default_headers!, faraday_connection)
-        
+
         expect(connection_headers).not_to have_key("Authorization")
         expect(connection_headers).not_to have_key("X-API-KEY")
       end
@@ -396,14 +396,14 @@ RSpec.describe Http::BaseClient, type: :service do
       it "does not apply empty Bearer token" do
         client = described_class.new(base_url: base_url, bearer_token: "")
         client.send(:apply_default_headers!, faraday_connection)
-        
+
         expect(connection_headers).not_to have_key("Authorization")
       end
 
       it "does not apply empty API key" do
         client = described_class.new(base_url: base_url, api_key: "")
         client.send(:apply_default_headers!, faraday_connection)
-        
+
         expect(connection_headers).not_to have_key("X-API-KEY")
       end
     end
@@ -414,15 +414,15 @@ RSpec.describe Http::BaseClient, type: :service do
       it "handles successful 2xx responses" do
         resp = double(status: 200, body: { "data" => "success" })
         expect(client).to receive(:success).with({ "data" => "success" }, 200, response_time)
-        
+
         client.send(:handle_response, resp, response_time)
       end
 
       it "handles different 2xx success codes" do
-        [200, 201, 204, 299].each do |code|
+        [ 200, 201, 204, 299 ].each do |code|
           resp = double(status: code, body: { "result" => "ok" })
           expect(client).to receive(:success).with({ "result" => "ok" }, code, response_time)
-          
+
           client.send(:handle_response, resp, response_time)
         end
       end
@@ -430,26 +430,26 @@ RSpec.describe Http::BaseClient, type: :service do
       it "handles client error responses" do
         resp = double(status: 400, body: { "error" => "Bad request" })
         expect(client).to receive(:failure).with(
-          "http_400", 
+          "http_400",
           "Bad request",
           code: 400,
           raw: { "error" => "Bad request" },
           response_time: response_time
         )
-        
+
         client.send(:handle_response, resp, response_time)
       end
 
       it "handles server error responses" do
         resp = double(status: 500, body: { "message" => "Internal server error" })
         expect(client).to receive(:failure).with(
-          "http_500", 
+          "http_500",
           "Internal server error",
           code: 500,
           raw: { "message" => "Internal server error" },
           response_time: response_time
         )
-        
+
         client.send(:handle_response, resp, response_time)
       end
 
@@ -457,7 +457,7 @@ RSpec.describe Http::BaseClient, type: :service do
         resp = double(status: 404, body: "Not found")
         expect(client).to receive(:safe_error_message).with("Not found", 404).and_return("Not found")
         expect(client).to receive(:failure)
-        
+
         client.send(:handle_response, resp, response_time)
       end
     end
@@ -519,9 +519,9 @@ RSpec.describe Http::BaseClient, type: :service do
         data = { "result" => "success" }
         status = 200
         response_time = 150
-        
+
         result = client.send(:success, data, status, response_time)
-        
+
         expect(result).to eq({
           success: true,
           status: 200,
@@ -532,7 +532,7 @@ RSpec.describe Http::BaseClient, type: :service do
 
       it "handles nil data" do
         result = client.send(:success, nil, 204, 100)
-        
+
         expect(result[:success]).to be true
         expect(result[:data]).to be_nil
         expect(result[:status]).to eq(204)
@@ -541,9 +541,9 @@ RSpec.describe Http::BaseClient, type: :service do
 
     describe "#failure" do
       it "returns failure result hash with all parameters" do
-        result = client.send(:failure, "timeout", "Request timed out", 
+        result = client.send(:failure, "timeout", "Request timed out",
                              code: 408, raw: "raw response", response_time: 200)
-        
+
         expect(result).to eq({
           success: false,
           error: {
@@ -558,7 +558,7 @@ RSpec.describe Http::BaseClient, type: :service do
 
       it "returns failure result hash with minimal parameters" do
         result = client.send(:failure, "error", "Something went wrong")
-        
+
         expect(result).to eq({
           success: false,
           error: {
@@ -592,17 +592,17 @@ RSpec.describe Http::BaseClient, type: :service do
           status: 200,
           response_time_ms: 150
         )
-        
+
         client.send(:instrument!, :get, "/test", resp, response_time)
       end
 
       it "handles different HTTP verbs" do
-        [:get, :post, :put, :patch, :delete].each do |verb|
+        [ :get, :post, :put, :patch, :delete ].each do |verb|
           expect(ActiveSupport::Notifications).to receive(:instrument).with(
             "http.request",
             hash_including(verb: verb.to_s.upcase)
           )
-          
+
           client.send(:instrument!, verb, "/test", resp, response_time)
         end
       end
@@ -616,7 +616,7 @@ RSpec.describe Http::BaseClient, type: :service do
           expect(payload[:status]).to eq(201)
           expect(payload[:response_time_ms]).to eq(response_time)
         end
-        
+
         resp = double(status: 201)
         client.send(:instrument!, :post, "/create", resp, response_time)
       end
@@ -631,15 +631,15 @@ RSpec.describe Http::BaseClient, type: :service do
         :request, :connection, :apply_default_headers!,
         :handle_response, :safe_error_message, :success, :failure, :instrument!
       ]
-      
+
       private_methods.each do |method|
         expect(client.private_methods).to include(method)
       end
     end
 
     it "keeps public methods public" do
-      public_methods = [:get, :post, :put, :patch, :delete]
-      
+      public_methods = [ :get, :post, :put, :patch, :delete ]
+
       public_methods.each do |method|
         expect(client).to respond_to(method)
       end
@@ -687,7 +687,7 @@ RSpec.describe Http::BaseClient, type: :service do
       )
       allow(auth_client).to receive(:handle_response).and_return({ success: true })
       allow(auth_client).to receive(:instrument!)
-      
+
       result = auth_client.get("/bearer")
       expect(result).to include(success: true)
     end
@@ -699,21 +699,21 @@ RSpec.describe Http::BaseClient, type: :service do
     it "handles malformed JSON responses gracefully" do
       resp = double(status: 200, body: "invalid json{")
       expect(client).to receive(:success).with("invalid json{", 200, 100)
-      
+
       client.send(:handle_response, resp, 100)
     end
 
     it "handles nil response body" do
       resp = double(status: 204, body: nil)
       expect(client).to receive(:success).with(nil, 204, 100)
-      
+
       client.send(:handle_response, resp, 100)
     end
 
     it "handles response with zero response time" do
       resp = double(status: 200, body: {})
       expect(client).to receive(:success).with({}, 200, 0)
-      
+
       client.send(:handle_response, resp, 0)
     end
   end

@@ -109,9 +109,9 @@ RSpec.describe ReelNarrativePresenter, type: :presenter do
       end
 
       it 'returns full error messages from reel' do
-        expected_messages = ["Title can't be blank", "Description is too short"]
+        expected_messages = [ "Title can't be blank", "Description is too short" ]
         allow(reel.errors).to receive(:full_messages).and_return(expected_messages)
-        
+
         expect(presenter.error_messages).to eq(expected_messages)
       end
     end
@@ -300,9 +300,9 @@ RSpec.describe ReelNarrativePresenter, type: :presenter do
       end
 
       it 'returns all error messages' do
-        expected_messages = ["Title can't be blank", "Story content is required"]
+        expected_messages = [ "Title can't be blank", "Story content is required" ]
         allow(reel.errors).to receive(:full_messages).and_return(expected_messages)
-        
+
         expect(presenter.error_messages).to match_array(expected_messages)
       end
     end
@@ -355,29 +355,29 @@ RSpec.describe ReelNarrativePresenter, type: :presenter do
 
     it 'calls I18n.t with correct keys for all translation methods' do
       translation_methods = [
-        [:page_title, "reels.narrative.page_title"],
-        [:main_title, "reels.create_reel"],
-        [:main_description, "reels.description"],
-        [:error_title, "reels.errors.fix_following"],
-        [:basic_info_title, "reels.basic_info.title"],
-        [:basic_info_description, "reels.basic_info.description"],
-        [:title_label, "reels.fields.title"],
-        [:title_placeholder, "reels.placeholders.title"],
-        [:description_label, "reels.fields.description"],
-        [:description_placeholder, "reels.placeholders.description"],
-        [:narrative_content_title, "reels.narrative.content_title"],
-        [:narrative_content_description, "reels.narrative.content_description"],
-        [:story_content_label, "reels.narrative.your_story"],
-        [:story_content_placeholder, "reels.placeholders.narration_text"],
-        [:image_themes_title, "reels.narrative.image_themes_title"],
-        [:image_themes_description, "reels.narrative.image_themes_description"],
-        [:image_themes_label, "reels.narrative.image_themes"],
-        [:image_themes_placeholder, "reels.placeholders.image_themes"],
-        [:additional_instructions_title, "reels.additional_instructions.title"],
-        [:additional_instructions_description, "reels.additional_instructions.description"],
-        [:style_direction_label, "reels.additional_instructions.style_direction"],
-        [:style_direction_placeholder, "reels.placeholders.additional_instructions"],
-        [:submit_button_label, "reels.submit.narrative"]
+        [ :page_title, "reels.narrative.page_title" ],
+        [ :main_title, "reels.create_reel" ],
+        [ :main_description, "reels.description" ],
+        [ :error_title, "reels.errors.fix_following" ],
+        [ :basic_info_title, "reels.basic_info.title" ],
+        [ :basic_info_description, "reels.basic_info.description" ],
+        [ :title_label, "reels.fields.title" ],
+        [ :title_placeholder, "reels.placeholders.title" ],
+        [ :description_label, "reels.fields.description" ],
+        [ :description_placeholder, "reels.placeholders.description" ],
+        [ :narrative_content_title, "reels.narrative.content_title" ],
+        [ :narrative_content_description, "reels.narrative.content_description" ],
+        [ :story_content_label, "reels.narrative.your_story" ],
+        [ :story_content_placeholder, "reels.placeholders.narration_text" ],
+        [ :image_themes_title, "reels.narrative.image_themes_title" ],
+        [ :image_themes_description, "reels.narrative.image_themes_description" ],
+        [ :image_themes_label, "reels.narrative.image_themes" ],
+        [ :image_themes_placeholder, "reels.placeholders.image_themes" ],
+        [ :additional_instructions_title, "reels.additional_instructions.title" ],
+        [ :additional_instructions_description, "reels.additional_instructions.description" ],
+        [ :style_direction_label, "reels.additional_instructions.style_direction" ],
+        [ :style_direction_placeholder, "reels.placeholders.additional_instructions" ],
+        [ :submit_button_label, "reels.submit.narrative" ]
       ]
 
       translation_methods.each do |method_name, i18n_key|

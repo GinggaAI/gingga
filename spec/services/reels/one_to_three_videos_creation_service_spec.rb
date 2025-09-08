@@ -21,7 +21,7 @@ RSpec.describe Reels::OneToThreeVideosCreationService do
   describe '#initialize' do
     it 'initializes with user, template, and params' do
       service = described_class.new(user: user, template: template, params: params)
-      
+
       expect(service.instance_variable_get(:@user)).to eq(user)
       expect(service.instance_variable_get(:@template)).to eq(template)
       expect(service.instance_variable_get(:@params)).to eq(params)
@@ -30,7 +30,7 @@ RSpec.describe Reels::OneToThreeVideosCreationService do
     context 'when template is not provided' do
       it 'allows nil template' do
         service = described_class.new(user: user, template: nil, params: params)
-        
+
         expect(service.instance_variable_get(:@template)).to be_nil
       end
     end
@@ -38,7 +38,7 @@ RSpec.describe Reels::OneToThreeVideosCreationService do
     context 'when params are not provided' do
       it 'allows nil params' do
         service = described_class.new(user: user, template: template, params: nil)
-        
+
         expect(service.instance_variable_get(:@params)).to be_nil
       end
     end
@@ -205,9 +205,9 @@ RSpec.describe Reels::OneToThreeVideosCreationService do
       # This tests that the method properly calls the parent implementation
       base_params = params.merge(status: "draft")
       allow_any_instance_of(Reels::BaseCreationService).to receive(:reel_params).and_return(base_params)
-      
+
       result = service.send(:reel_params)
-      
+
       expect(result).to eq(base_params)
     end
 
@@ -216,11 +216,11 @@ RSpec.describe Reels::OneToThreeVideosCreationService do
       it 'should be extended to include video compilation specific fields' do
         # Currently returns base_params as-is, but the method is ready for extension
         result_params = service.send(:reel_params)
-        
+
         # Verify current behavior
         expect(result_params.keys).not_to include(:video_prompts)
         expect(result_params.keys).not_to include(:compilation_style)
-        
+
         # This test serves as documentation for future enhancement:
         # When video compilation fields are implemented, they should be merged here
       end

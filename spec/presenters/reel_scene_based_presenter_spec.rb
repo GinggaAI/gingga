@@ -109,9 +109,9 @@ RSpec.describe ReelSceneBasedPresenter, type: :presenter do
       end
 
       it 'returns full error messages from reel' do
-        expected_messages = ["Title can't be blank", "Description is too short"]
+        expected_messages = [ "Title can't be blank", "Description is too short" ]
         allow(reel.errors).to receive(:full_messages).and_return(expected_messages)
-        
+
         expect(presenter.error_messages).to eq(expected_messages)
       end
     end
@@ -343,9 +343,9 @@ RSpec.describe ReelSceneBasedPresenter, type: :presenter do
       end
 
       it 'returns all error messages' do
-        expected_messages = ["Title can't be blank", "Description is required"]
+        expected_messages = [ "Title can't be blank", "Description is required" ]
         allow(reel.errors).to receive(:full_messages).and_return(expected_messages)
-        
+
         expect(presenter.error_messages).to match_array(expected_messages)
       end
     end
@@ -399,28 +399,28 @@ RSpec.describe ReelSceneBasedPresenter, type: :presenter do
 
     it 'calls I18n.t with correct keys for all translation methods' do
       translation_methods = [
-        [:page_title, "reels.scene_based.page_title"],
-        [:main_title, "reels.create_reel"],
-        [:main_description, "reels.description"],
-        [:error_title, "reels.errors.fix_following"],
-        [:basic_info_title, "reels.basic_info.title"],
-        [:basic_info_description, "reels.basic_info.description"],
-        [:title_label, "reels.fields.title"],
-        [:title_placeholder, "reels.placeholders.title"],
-        [:description_label, "reels.fields.description"],
-        [:description_placeholder, "reels.placeholders.description"],
-        [:ai_avatar_title, "reels.ai_avatar.title"],
-        [:ai_avatar_description, "reels.ai_avatar.description"],
-        [:use_ai_avatars_label, "reels.ai_avatar.use_ai_avatars"],
-        [:use_ai_avatars_description, "reels.ai_avatar.enable_description"],
-        [:scene_breakdown_title, "reels.scene_breakdown.title"],
-        [:scene_breakdown_description, "reels.scene_breakdown.description"],
-        [:add_scene_label, "reels.scene_breakdown.add_scene"],
-        [:additional_instructions_title, "reels.additional_instructions.title"],
-        [:additional_instructions_description, "reels.additional_instructions.description"],
-        [:style_direction_label, "reels.additional_instructions.style_direction"],
-        [:style_direction_placeholder, "reels.placeholders.additional_instructions"],
-        [:submit_button_label, "reels.submit.scene_based"]
+        [ :page_title, "reels.scene_based.page_title" ],
+        [ :main_title, "reels.create_reel" ],
+        [ :main_description, "reels.description" ],
+        [ :error_title, "reels.errors.fix_following" ],
+        [ :basic_info_title, "reels.basic_info.title" ],
+        [ :basic_info_description, "reels.basic_info.description" ],
+        [ :title_label, "reels.fields.title" ],
+        [ :title_placeholder, "reels.placeholders.title" ],
+        [ :description_label, "reels.fields.description" ],
+        [ :description_placeholder, "reels.placeholders.description" ],
+        [ :ai_avatar_title, "reels.ai_avatar.title" ],
+        [ :ai_avatar_description, "reels.ai_avatar.description" ],
+        [ :use_ai_avatars_label, "reels.ai_avatar.use_ai_avatars" ],
+        [ :use_ai_avatars_description, "reels.ai_avatar.enable_description" ],
+        [ :scene_breakdown_title, "reels.scene_breakdown.title" ],
+        [ :scene_breakdown_description, "reels.scene_breakdown.description" ],
+        [ :add_scene_label, "reels.scene_breakdown.add_scene" ],
+        [ :additional_instructions_title, "reels.additional_instructions.title" ],
+        [ :additional_instructions_description, "reels.additional_instructions.description" ],
+        [ :style_direction_label, "reels.additional_instructions.style_direction" ],
+        [ :style_direction_placeholder, "reels.placeholders.additional_instructions" ],
+        [ :submit_button_label, "reels.submit.scene_based" ]
       ]
 
       translation_methods.each do |method_name, i18n_key|

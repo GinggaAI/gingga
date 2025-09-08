@@ -147,7 +147,7 @@ RSpec.describe Creas::VoxaContentService, type: :service do
   describe "#initialize" do
     it "initializes with strategy plan and no target week" do
       service = described_class.new(strategy_plan: strategy_plan)
-      
+
       expect(service.instance_variable_get(:@plan)).to eq(strategy_plan)
       expect(service.instance_variable_get(:@user)).to eq(user)
       expect(service.instance_variable_get(:@brand)).to eq(brand)
@@ -156,7 +156,7 @@ RSpec.describe Creas::VoxaContentService, type: :service do
 
     it "initializes with strategy plan and target week" do
       service = described_class.new(strategy_plan: strategy_plan, target_week: 2)
-      
+
       expect(service.instance_variable_get(:@plan)).to eq(strategy_plan)
       expect(service.instance_variable_get(:@user)).to eq(user)
       expect(service.instance_variable_get(:@brand)).to eq(brand)
@@ -165,7 +165,7 @@ RSpec.describe Creas::VoxaContentService, type: :service do
 
     it "initializes with associations from strategy plan" do
       service = described_class.new(strategy_plan: strategy_plan)
-      
+
       expect(service.instance_variable_get(:@user)).to eq(strategy_plan.user)
       expect(service.instance_variable_get(:@brand)).to eq(strategy_plan.brand)
     end
@@ -175,7 +175,7 @@ RSpec.describe Creas::VoxaContentService, type: :service do
     describe "#initialize" do
       it "initializes with message only" do
         error = Creas::VoxaContentService::ServiceError.new("Test error")
-        
+
         expect(error.message).to eq("Test error")
         expect(error.type).to eq(:generic)
         expect(error.user_message).to eq("Test error")
@@ -187,7 +187,7 @@ RSpec.describe Creas::VoxaContentService, type: :service do
           type: :processing_error,
           user_message: "Something went wrong"
         )
-        
+
         expect(error.message).to eq("Internal error")
         expect(error.type).to eq(:processing_error)
         expect(error.user_message).to eq("Something went wrong")
@@ -195,7 +195,7 @@ RSpec.describe Creas::VoxaContentService, type: :service do
 
       it "uses message as user_message when user_message is not provided" do
         error = Creas::VoxaContentService::ServiceError.new("Test error", type: :validation)
-        
+
         expect(error.user_message).to eq("Test error")
         expect(error.type).to eq(:validation)
       end
@@ -215,9 +215,9 @@ RSpec.describe Creas::VoxaContentService, type: :service do
       fresh_plan = strategy_plan
       expect(CreasStrategyPlan).to receive(:find).with(strategy_plan.id).and_return(fresh_plan)
       expect(GenerateVoxaContentBatchJob).to receive(:perform_later)
-      
+
       service.call
-      
+
       # Verify instance variables were updated with fresh references
       expect(service.instance_variable_get(:@plan)).to eq(fresh_plan)
       expect(service.instance_variable_get(:@user)).to eq(fresh_plan.user)
@@ -229,24 +229,24 @@ RSpec.describe Creas::VoxaContentService, type: :service do
       non_plan_object = double("NonPlan", id: 123, user: user, brand: brand, status: "draft")
       service = described_class.new(strategy_plan: non_plan_object)
       expect(GenerateVoxaContentBatchJob).to receive(:perform_later)
-      
+
       # Should not try to find fresh plan for non-CreasStrategyPlan objects
       expect(CreasStrategyPlan).not_to receive(:find)
-      
+
       allow(non_plan_object).to receive(:creas_content_items).and_return(double(count: 0))
       allow(non_plan_object).to receive(:update!)
       allow(non_plan_object).to receive(:weekly_plan).and_return(nil)
-      
+
       service.call
     end
 
     it "logs comprehensive information during execution" do
       expect(Rails.logger).to receive(:info).with(/Starting content refinement for strategy plan/).ordered
       expect(Rails.logger).to receive(:info).with(/Current content items count:/).ordered
-      expect(Rails.logger).to receive(:info).with(/Starting full strategy refinement/).ordered  
+      expect(Rails.logger).to receive(:info).with(/Starting full strategy refinement/).ordered
       expect(Rails.logger).to receive(:info).at_least(:once)  # Allow additional logging calls
       expect(GenerateVoxaContentBatchJob).to receive(:perform_later)
-      
+
       service.call
     end
 
@@ -284,7 +284,7 @@ RSpec.describe Creas::VoxaContentService, type: :service do
       expect(GenerateVoxaContentBatchJob).to receive(:perform_later).with(
         strategy_plan.id,
         1,  # target_batch_number
-        4,  # total_batches 
+        4,  # total_batches
         kind_of(String)  # batch_id (UUID)
       )
 
@@ -317,7 +317,7 @@ RSpec.describe Creas::VoxaContentService, type: :service do
       it "logs specific week information" do
         expect(Rails.logger).to receive(:info).at_least(:once)  # Allow all logging calls
         expect(GenerateVoxaContentBatchJob).to receive(:perform_later)
-        
+
         service.call
       end
     end
@@ -345,17 +345,17 @@ RSpec.describe Creas::VoxaContentService, type: :service do
       it "logs warning when strategy is already processing" do
         strategy_plan.update!(status: :processing)
         expect(Rails.logger).to receive(:warn).with(/is already in processing status/)
-        
+
         expect { service.call }.to raise_error(Creas::VoxaContentService::ServiceError)
       end
 
       it "handles standard errors and wraps them in ServiceError" do
         # Mock an error during execution after fresh plan is loaded
         allow(CreasStrategyPlan).to receive(:find).and_raise(StandardError, "Database error")
-        
+
         expect(Rails.logger).to receive(:error).with(/Failed to start content refinement/)
         expect(Rails.logger).to receive(:error).with(/Error backtrace:/)
-        
+
         expect { service.call }.to raise_error(Creas::VoxaContentService::ServiceError) do |error|
           expect(error.type).to eq(:processing_error)
           expect(error.user_message).to include("Failed to refine content")
@@ -366,7 +366,7 @@ RSpec.describe Creas::VoxaContentService, type: :service do
       it "handles errors with target week specified" do
         service = described_class.new(strategy_plan: strategy_plan, target_week: 2)
         allow(CreasStrategyPlan).to receive(:find).and_raise(StandardError, "Database error")
-        
+
         expect { service.call }.to raise_error(Creas::VoxaContentService::ServiceError) do |error|
           expect(error.user_message).to include("Failed to refine week 2 content")
         end
@@ -376,9 +376,9 @@ RSpec.describe Creas::VoxaContentService, type: :service do
         # Mock a ServiceError during execution
         service_error = Creas::VoxaContentService::ServiceError.new("Custom error", type: :custom)
         allow(CreasStrategyPlan).to receive(:find).and_raise(service_error)
-        
+
         expect(Rails.logger).to receive(:error).with("Voxa VoxaContentService: Custom error")
-        
+
         expect { service.call }.to raise_error(service_error)
       end
 
@@ -386,11 +386,11 @@ RSpec.describe Creas::VoxaContentService, type: :service do
         error_without_backtrace = StandardError.new("No backtrace")
         allow(error_without_backtrace).to receive(:backtrace).and_return(nil)
         allow(CreasStrategyPlan).to receive(:find).and_raise(error_without_backtrace)
-        
+
         expect(Rails.logger).to receive(:error).with(/Failed to start content refinement/)
         # Should not try to log backtrace when it's nil
         expect(Rails.logger).not_to receive(:error).with(/Error backtrace:/)
-        
+
         expect { service.call }.to raise_error(Creas::VoxaContentService::ServiceError)
       end
     end
@@ -405,14 +405,14 @@ RSpec.describe Creas::VoxaContentService, type: :service do
 
       it "logs weekly plan count information" do
         expect(Rails.logger).to receive(:info).with(/Strategy plan has .+ weeks in weekly_plan/)
-        
+
         service.send(:calculate_batches_needed)
       end
 
       it "handles strategy plan with no weekly plan" do
         allow(strategy_plan).to receive(:weekly_plan).and_return(nil)
         expect(Rails.logger).to receive(:info).with(/Strategy plan has 4 weeks in weekly_plan/)
-        
+
         result = service.send(:calculate_batches_needed)
         expect(result).to eq(4)
       end
@@ -428,7 +428,7 @@ RSpec.describe Creas::VoxaContentService, type: :service do
         ]
         allow(strategy_plan).to receive(:weekly_plan).and_return(custom_weekly_plan)
         expect(Rails.logger).to receive(:info).with(/Strategy plan has 6 weeks in weekly_plan/)
-        
+
         # Still returns 4 batches regardless of actual weekly plan count
         result = service.send(:calculate_batches_needed)
         expect(result).to eq(4)
@@ -453,18 +453,18 @@ RSpec.describe Creas::VoxaContentService, type: :service do
       expect(strategy_plan.creas_content_items.count).to eq(2)
       expect(Rails.logger).to receive(:info).at_least(:once)  # Allow all logging calls
       expect(GenerateVoxaContentBatchJob).to receive(:perform_later)
-      
+
       service.call
     end
 
     it "does not modify existing content items synchronously" do
       expect(GenerateVoxaContentBatchJob).to receive(:perform_later).once
-      
+
       initial_count = strategy_plan.creas_content_items.count
       initial_draft_count = strategy_plan.creas_content_items.where(status: "draft").count
-      
+
       service.call
-      
+
       expect(strategy_plan.creas_content_items.reload.count).to eq(initial_count)
       expect(strategy_plan.creas_content_items.where(status: "draft").count).to eq(initial_draft_count)
     end

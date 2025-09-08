@@ -22,7 +22,7 @@ RSpec.describe Heygen::HttpClient, type: :service do
 
       it 'inherits from Http::BaseClient properly' do
         client = described_class.new(user: user)
-        
+
         expect(client).to be_a(::Http::BaseClient)
         expect(client.instance_variable_get(:@user)).to eq(user)
         expect(client.instance_variable_get(:@api_token)).to eq(api_token)
@@ -33,7 +33,7 @@ RSpec.describe Heygen::HttpClient, type: :service do
         allow(ENV).to receive(:fetch).with("HEYGEN_API_BASE", "https://api.heygen.com").and_return(custom_base_url)
 
         client = described_class.new(user: user)
-        
+
         expect(client).to be_a(::Http::BaseClient)
         expect(client.instance_variable_get(:@user)).to eq(user)
       end

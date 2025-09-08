@@ -59,10 +59,10 @@ RSpec.describe SettingsController, type: :request do
       it 'redirects with success message' do
         # Mock the ValidateAndSyncService to return success with group message
         mock_result = OpenStruct.new(
-          success?: true, 
-          data: { 
-            synchronized_count: 5, 
-            message_key: 'settings.heygen.group_validation_success' 
+          success?: true,
+          data: {
+            synchronized_count: 5,
+            message_key: 'settings.heygen.group_validation_success'
           }
         )
         allow(Heygen::ValidateAndSyncService).to receive_message_chain(:new, :call).and_return(mock_result)

@@ -368,14 +368,14 @@ RSpec.describe Heygen::SynchronizeAvatarsService, type: :service do
           # Mock validation failure
           allow_any_instance_of(Avatar).to receive(:save).and_return(false)
           allow_any_instance_of(Avatar).to receive(:errors).and_return(
-            double('errors', full_messages: ['Name is required', 'Avatar ID is invalid'])
+            double('errors', full_messages: [ 'Name is required', 'Avatar ID is invalid' ])
           )
           allow(Rails.logger).to receive(:error)
         end
 
         it 'logs error and returns nil' do
           expect(Rails.logger).to receive(:error).with(/Failed to sync avatar/)
-          
+
           avatar = service.send(:sync_avatar, avatar_data, raw_response)
 
           expect(avatar).to be_nil
@@ -447,8 +447,8 @@ RSpec.describe Heygen::SynchronizeAvatarsService, type: :service do
 
         it 'logs avatar fetching information' do
           allow_any_instance_of(Heygen::ListAvatarsService).to receive(:call)
-            .and_return({ success: true, data: [{ id: 'test' }] })
-          
+            .and_return({ success: true, data: [ { id: 'test' } ] })
+
           expect(Rails.logger).to receive(:info).with(/📊 All avatars result/)
 
           service.send(:fetch_avatars)
@@ -483,7 +483,7 @@ RSpec.describe Heygen::SynchronizeAvatarsService, type: :service do
 
     before do
       allow_any_instance_of(Heygen::ListAvatarsService).to receive(:call)
-        .and_return({ success: true, data: [avatar_data] })
+        .and_return({ success: true, data: [ avatar_data ] })
     end
 
     it 'creates Avatar record that responds to to_api_format' do
@@ -509,9 +509,9 @@ RSpec.describe Heygen::SynchronizeAvatarsService, type: :service do
     context 'when user is nil' do
       it 'handles nil user gracefully by returning failure result' do
         service = described_class.new(user: nil)
-        
+
         allow_any_instance_of(Heygen::ListAvatarsService).to receive(:call)
-          .and_return({ success: true, data: [{ id: "test" }] })
+          .and_return({ success: true, data: [ { id: "test" } ] })
 
         result = service.call
         expect(result.success?).to be false
@@ -544,12 +544,12 @@ RSpec.describe Heygen::SynchronizeAvatarsService, type: :service do
     context 'when Avatar model validation fails' do
       before do
         allow_any_instance_of(Heygen::ListAvatarsService).to receive(:call)
-          .and_return({ success: true, data: [{ id: "test_avatar", name: "Test" }] })
-        
+          .and_return({ success: true, data: [ { id: "test_avatar", name: "Test" } ] })
+
         # Simulate validation failure
         allow_any_instance_of(Avatar).to receive(:save).and_return(false)
         allow_any_instance_of(Avatar).to receive(:errors).and_return(
-          double('errors', full_messages: ['Validation failed'])
+          double('errors', full_messages: [ 'Validation failed' ])
         )
         allow(Rails.logger).to receive(:error)
       end
@@ -569,7 +569,7 @@ RSpec.describe Heygen::SynchronizeAvatarsService, type: :service do
         circular_data[:self] = circular_data
 
         allow_any_instance_of(Heygen::ListAvatarsService).to receive(:call)
-          .and_return({ success: true, data: [circular_data] })
+          .and_return({ success: true, data: [ circular_data ] })
       end
 
       it 'handles JSON serialization errors' do
