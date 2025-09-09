@@ -461,6 +461,25 @@ bundle exec brakeman          # Security scan
 npm run build:css             # Rebuild CSS
 ```
 
+### Background Jobs Monitoring
+Monitor background jobs status during development and troubleshooting:
+
+```bash
+# Quick job status check
+bundle exec rails runner "puts \"Pendientes: #{SolidQueue::Job.where(finished_at: nil).count}\""
+
+# Comprehensive health check
+bundle exec rails runner scripts/monitoring/solidqueue_health.rb
+
+# Check specific job types
+bundle exec rails runner "puts SolidQueue::Job.where(class_name: 'CheckVideoStatusJob', finished_at: nil).count"
+
+# Start SolidQueue workers (if needed)
+bundle exec solid_queue
+```
+
+**See**: `/doc/backend/background_jobs_implementation_guide.md#monitoring-y-troubleshooting-de-solidqueue` for complete monitoring documentation.
+
 ---
 
 ## 📋 Quality Checklists

@@ -1,5 +1,5 @@
 class ReelScene < ApplicationRecord
-  belongs_to :reel
+  belongs_to :reel, counter_cache: true
 
   validates :avatar_id, presence: true
   validates :voice_id, presence: true

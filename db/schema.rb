@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_09_125410) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_09_164315) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -286,6 +286,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_09_125410) do
     t.string "style_preference"
     t.boolean "use_ai_avatar"
     t.text "additional_instructions"
+    t.integer "reel_scenes_count", default: 0, null: false
     t.index ["user_id"], name: "index_reels_on_user_id"
   end
 

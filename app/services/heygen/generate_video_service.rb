@@ -87,9 +87,9 @@ class Heygen::GenerateVideoService < Heygen::BaseService
   end
 
   def parse_response(response)
-    data = parse_json(response)
+    data = response.body["data"]
     {
-      video_id: data.dig("data", "video_id"),
+      video_id: data.dig("video_id"),
       status: "processing"
     }
   end

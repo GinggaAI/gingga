@@ -28,8 +28,7 @@ class Heygen::CheckVideoStatusService < Heygen::BaseService
   end
 
   def parse_response(response)
-    data = parse_json(response)
-    video_data = data["data"] || {}
+    video_data = response.body["data"] || {}
 
     {
       status: map_heygen_status(video_data["status"]),
