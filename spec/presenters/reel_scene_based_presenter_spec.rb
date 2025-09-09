@@ -461,4 +461,114 @@ RSpec.describe ReelSceneBasedPresenter, type: :presenter do
       end
     end
   end
+
+  describe 'avatar selection methods' do
+    describe '#avatars_for_select' do
+      context 'when user has active avatars' do
+        let!(:avatar1) { create(:avatar, user: user, name: 'John Doe', avatar_id: 'avatar_123', active: true) }
+        let!(:avatar2) { create(:avatar, user: user, name: 'Jane Smith', avatar_id: 'avatar_456', active: true) }
+        let!(:inactive_avatar) { create(:avatar, user: user, name: 'Inactive Avatar', avatar_id: 'avatar_789', active: false) }
+
+        it 'returns array of [name, avatar_id] pairs for active avatars only' do
+          expected_avatars = [
+            ['John Doe', 'avatar_123'],
+            ['Jane Smith', 'avatar_456']
+          ]
+          expect(presenter.avatars_for_select).to match_array(expected_avatars)
+        end
+      end
+
+      context 'when user has no active avatars' do
+        it 'returns empty array' do
+          expect(presenter.avatars_for_select).to eq([])
+        end
+      end
+    end
+
+    describe '#has_avatars?' do
+      context 'when user has active avatars' do
+        let!(:avatar) { create(:avatar, user: user, active: true) }
+
+        it 'returns true' do
+          expect(presenter.has_avatars?).to be true
+        end
+      end
+
+      context 'when user has only inactive avatars' do
+        let!(:avatar) { create(:avatar, user: user, active: false) }
+
+        it 'returns false' do
+          expect(presenter.has_avatars?).to be false
+        end
+      end
+
+      context 'when user has no avatars' do
+        it 'returns false' do
+          expect(presenter.has_avatars?).to be false
+        end
+      end
+    end
+
+    describe '#no_avatars_message' do
+      it 'returns translated no avatars message' do
+        expect(I18n).to receive(:t).with("reels.scene_based.no_avatars_message").and_return("No avatars available.")
+        expect(presenter.no_avatars_message).to eq("No avatars available.")
+      end
+    end
+  end
+
+  describe 'voice selection methods' do
+    describe '#voices_for_select' do
+      context 'when user has active voices' do
+        let!(:voice1) { create(:voice, user: user, name: 'Emma Watson', voice_id: 'voice_123', active: true) }
+        let!(:voice2) { create(:voice, user: user, name: 'Morgan Freeman', voice_id: 'voice_456', active: true) }
+        let!(:inactive_voice) { create(:voice, user: user, name: 'Inactive Voice', voice_id: 'voice_789', active: false) }
+
+        it 'returns array of [name, voice_id] pairs for active voices only' do
+          expected_voices = [
+            ['Emma Watson', 'voice_123'],
+            ['Morgan Freeman', 'voice_456']
+          ]
+          expect(presenter.voices_for_select).to match_array(expected_voices)
+        end
+      end
+
+      context 'when user has no active voices' do
+        it 'returns empty array' do
+          expect(presenter.voices_for_select).to eq([])
+        end
+      end
+    end
+
+    describe '#has_voices?' do
+      context 'when user has active voices' do
+        let!(:voice) { create(:voice, user: user, active: true) }
+
+        it 'returns true' do
+          expect(presenter.has_voices?).to be true
+        end
+      end
+
+      context 'when user has only inactive voices' do
+        let!(:voice) { create(:voice, user: user, active: false) }
+
+        it 'returns false' do
+          expect(presenter.has_voices?).to be false
+        end
+      end
+
+      context 'when user has no voices' do
+        it 'returns false' do
+          expect(presenter.has_voices?).to be false
+        end
+      end
+    end
+
+    describe '#no_voices_message' do
+      it 'returns translated no voices message' do
+        expect(I18n).to receive(:t).with("reels.scene_based.no_voices_message").and_return("No voices available.")
+        expect(presenter.no_voices_message).to eq("No voices available.")
+      end
+    end
+  end
 end

@@ -24,7 +24,10 @@ class SettingsController < ApplicationController
   end
 
   def validate_heygen_api
-    result = Heygen::ValidateAndSyncService.new(user: current_user).call
+    voices_count = params[:voices_count]&.to_i
+    voices_count = nil unless voices_count && voices_count.between?(1, 30)
+    
+    result = Heygen::ValidateAndSyncService.new(user: current_user, voices_count: voices_count).call
 
     if result.success?
       count = result.data[:synchronized_count]

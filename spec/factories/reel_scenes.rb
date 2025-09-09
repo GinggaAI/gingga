@@ -5,5 +5,6 @@ FactoryBot.define do
     avatar_id { "avatar_#{SecureRandom.hex(4)}" }
     voice_id { "voice_#{SecureRandom.hex(4)}" }
     script { "This is a sample script for scene #{scene_number}. Lorem ipsum dolor sit amet." }
+    video_type { 'avatar' }
   end
 end

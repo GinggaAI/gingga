@@ -154,4 +154,18 @@ class ReelSceneBasedPresenter
   def no_avatars_message
     I18n.t("reels.scene_based.no_avatars_message")
   end
+
+  def voices_for_select
+    current_user.voices.active.map do |voice|
+      [ voice.name, voice.voice_id ]
+    end
+  end
+
+  def has_voices?
+    current_user.voices.active.exists?
+  end
+
+  def no_voices_message
+    I18n.t("reels.scene_based.no_voices_message")
+  end
 end

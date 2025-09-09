@@ -347,6 +347,7 @@ en:
       avatar_video: "Avatar Video"
       kling_video: "Kling Video"
       no_avatars_message: "No avatars available. Please sync your avatars from your provider first."
+      no_voices_message: "No voices available. Please sync your voices from your HeyGen account first."
       
     # Narrative
     narrative:

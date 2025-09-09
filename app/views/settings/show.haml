@@ -182,8 +182,13 @@
                   / Validate section - OUTSIDE the main form
                   .mt-4
                     - if @presenter.show_validate_button?
-                      %form{ action: validate_heygen_api_settings_path, method: "post", style: "display: inline-block; margin: 0;", onsubmit: "return confirm('This will synchronize your HeyGen avatars. Continue?')" }
+                      %form{ action: validate_heygen_api_settings_path, method: "post", style: "margin: 0;", onsubmit: "return confirm('This will synchronize your HeyGen avatars and voices. Continue?')" }
                         = hidden_field_tag :authenticity_token, form_authenticity_token
+                        .mb-4
+                          %label.peer-disabled:cursor-not-allowed.peer-disabled:opacity-70.text-sm.font-medium.text-gray-700{:for => "voices_count"} Number of Voices to Sync
+                          .relative.mt-1
+                            = number_field_tag :voices_count, 10, id: "voices_count", min: 1, max: 30, placeholder: "10", class: "flex h-10 w-full bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm rounded-xl border-2 border-gray-200 focus:border-[#FFC940]"
+                          .mt-2.text-xs.text-gray-500 Choose how many voices to synchronize (1-30)
                         %button{type: "submit", class: @presenter.validate_button_class, data: { disable_with: "Validating...", turbo: "false" }}
                           Validate
                     - if @presenter.show_disabled_validate_button?

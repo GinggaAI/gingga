@@ -15,6 +15,8 @@ RSpec.describe ReelScene, type: :model do
     it { should validate_length_of(:script).is_at_least(1).is_at_most(5000) }
     it { should validate_presence_of(:scene_number) }
     it { should validate_inclusion_of(:scene_number).in_range(1..3) }
+    it { should validate_presence_of(:video_type) }
+    it { should validate_inclusion_of(:video_type).in_array(%w[avatar kling]) }
 
     describe 'scene_number uniqueness' do
       let!(:existing_scene) { create(:reel_scene, reel: reel, scene_number: 1) }
@@ -58,7 +60,7 @@ RSpec.describe ReelScene, type: :model do
 
   describe '#complete?' do
     context 'when all required fields are present' do
-      let(:scene) { build(:reel_scene, reel: reel, avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'Test script') }
+      let(:scene) { build(:reel_scene, reel: reel, avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'Test script', video_type: 'avatar') }
 
       it 'returns true' do
         expect(scene.complete?).to be true
@@ -66,7 +68,7 @@ RSpec.describe ReelScene, type: :model do
     end
 
     context 'when avatar_id is missing' do
-      let(:scene) { build(:reel_scene, reel: reel, avatar_id: nil, voice_id: 'voice_1', script: 'Test script') }
+      let(:scene) { build(:reel_scene, reel: reel, avatar_id: nil, voice_id: 'voice_1', script: 'Test script', video_type: 'avatar') }
 
       it 'returns false' do
         expect(scene.complete?).to be false
@@ -74,7 +76,7 @@ RSpec.describe ReelScene, type: :model do
     end
 
     context 'when voice_id is missing' do
-      let(:scene) { build(:reel_scene, reel: reel, avatar_id: 'avatar_1', voice_id: nil, script: 'Test script') }
+      let(:scene) { build(:reel_scene, reel: reel, avatar_id: 'avatar_1', voice_id: nil, script: 'Test script', video_type: 'avatar') }
 
       it 'returns false' do
         expect(scene.complete?).to be false
@@ -82,7 +84,7 @@ RSpec.describe ReelScene, type: :model do
     end
 
     context 'when script is missing' do
-      let(:scene) { build(:reel_scene, reel: reel, avatar_id: 'avatar_1', voice_id: 'voice_1', script: nil) }
+      let(:scene) { build(:reel_scene, reel: reel, avatar_id: 'avatar_1', voice_id: 'voice_1', script: nil, video_type: 'avatar') }
 
       it 'returns false' do
         expect(scene.complete?).to be false
@@ -90,7 +92,15 @@ RSpec.describe ReelScene, type: :model do
     end
 
     context 'when script is empty' do
-      let(:scene) { build(:reel_scene, reel: reel, avatar_id: 'avatar_1', voice_id: 'voice_1', script: '') }
+      let(:scene) { build(:reel_scene, reel: reel, avatar_id: 'avatar_1', voice_id: 'voice_1', script: '', video_type: 'avatar') }
+
+      it 'returns false' do
+        expect(scene.complete?).to be false
+      end
+    end
+
+    context 'when video_type is missing' do
+      let(:scene) { build(:reel_scene, reel: reel, avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'Test script', video_type: nil) }
 
       it 'returns false' do
         expect(scene.complete?).to be false
@@ -99,7 +109,7 @@ RSpec.describe ReelScene, type: :model do
   end
 
   describe '#to_heygen_payload' do
-    let(:scene) { build(:reel_scene, reel: reel, avatar_id: 'avatar_123', voice_id: 'voice_456', script: 'Hello world') }
+    let(:scene) { build(:reel_scene, reel: reel, avatar_id: 'avatar_123', voice_id: 'voice_456', script: 'Hello world', video_type: 'avatar') }
 
     it 'returns hash with heygen API format' do
       payload = scene.to_heygen_payload
@@ -107,7 +117,8 @@ RSpec.describe ReelScene, type: :model do
       expect(payload).to eq({
         avatar_id: 'avatar_123',
         voice_id: 'voice_456',
-        script: 'Hello world'
+        script: 'Hello world',
+        video_type: 'avatar'
       })
     end
   end

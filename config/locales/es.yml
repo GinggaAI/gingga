@@ -314,6 +314,8 @@ es:
       video_type: "Tipo de Video"
       avatar_video: "Video Avatar"
       kling_video: "Video Kling"
+      no_avatars_message: "No hay avatares disponibles. Por favor sincroniza tus avatares desde tu proveedor primero."
+      no_voices_message: "No hay voces disponibles. Por favor sincroniza tus voces desde tu cuenta de HeyGen primero."
       
     # Narrative
     narrative:

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_08_152753) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_09_125410) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -261,6 +261,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_08_152753) do
     t.integer "scene_number"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "video_type", default: "avatar"
     t.index ["reel_id"], name: "index_reel_scenes_on_reel_id"
   end
 

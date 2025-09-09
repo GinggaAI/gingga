@@ -1,8 +1,9 @@
 require "ostruct"
 
 class Heygen::ValidateAndSyncService
-  def initialize(user:)
+  def initialize(user:, voices_count: nil)
     @user = user
+    @voices_count = voices_count
   end
 
   def call
@@ -14,19 +15,33 @@ class Heygen::ValidateAndSyncService
     group_url = heygen_token.group_url
     Rails.logger.info "🔗 [DEBUG] ValidateAndSyncService - group_url from token: #{group_url.inspect}"
 
-    sync_result = Heygen::SynchronizeAvatarsService.new(user: @user, group_url: group_url).call
+    # Synchronize avatars
+    avatars_sync_result = Heygen::SynchronizeAvatarsService.new(user: @user, group_url: group_url).call
 
-    Rails.logger.info "📊 Validation result: Success=#{sync_result.success?}, Data=#{sync_result.data&.keys}, Error=#{sync_result.error}"
+    Rails.logger.info "📊 Avatar sync result: Success=#{avatars_sync_result.success?}, Data=#{avatars_sync_result.data&.keys}, Error=#{avatars_sync_result.error}"
 
-    if sync_result.success?
-      count = sync_result.data[:synchronized_count] || 0
-      Rails.logger.info "✅ Successfully synchronized #{count} avatars"
+    return failure_result("Avatar synchronization failed: #{avatars_sync_result.error}") unless avatars_sync_result.success?
+
+    avatar_count = avatars_sync_result.data[:synchronized_count] || 0
+    Rails.logger.info "✅ Successfully synchronized #{avatar_count} avatars"
+
+    # Synchronize voices
+    voices_sync_result = Heygen::SynchronizeVoicesService.new(user: @user, voices_count: @voices_count).call
+
+    Rails.logger.info "🎵 Voice sync result: Success=#{voices_sync_result.success?}, Data=#{voices_sync_result.data&.keys}, Error=#{voices_sync_result.error}"
+
+    if voices_sync_result.success?
+      voice_count = voices_sync_result.data[:synchronized_count] || 0
+      Rails.logger.info "✅ Successfully synchronized #{voice_count} voices"
 
       message_key = group_url.present? ? "settings.heygen.group_validation_success" : "settings.heygen.validation_success"
-      success_result(count: count, message_key: message_key)
+      success_result(avatar_count: avatar_count, voice_count: voice_count, message_key: message_key)
     else
-      Rails.logger.error "❌ Avatar validation failed: #{sync_result.error}"
-      failure_result("Validation failed: #{sync_result.error}")
+      # Voices sync failure shouldn't fail the entire operation, just log it
+      Rails.logger.warn "⚠️ Voice synchronization failed (continuing): #{voices_sync_result.error}"
+      
+      message_key = group_url.present? ? "settings.heygen.group_validation_success" : "settings.heygen.validation_success"
+      success_result(avatar_count: avatar_count, voice_count: 0, message_key: message_key, voice_error: voices_sync_result.error)
     end
   rescue StandardError => e
     Rails.logger.error "❌ Avatar validation error: #{e.message}"
@@ -35,10 +50,16 @@ class Heygen::ValidateAndSyncService
 
   private
 
-  def success_result(count:, message_key:)
+  def success_result(avatar_count:, voice_count:, message_key:, voice_error: nil)
     OpenStruct.new(
       success?: true,
-      data: { synchronized_count: count, message_key: message_key },
+      data: { 
+        synchronized_count: avatar_count, # Keep for backward compatibility
+        avatar_count: avatar_count,
+        voice_count: voice_count,
+        message_key: message_key,
+        voice_error: voice_error
+      },
       error: nil
     )
   end

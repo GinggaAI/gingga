@@ -5,6 +5,7 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
   let(:group_url) { "https://api.heygen.com/v1/group/test_group" }
 
   subject { described_class.new(user: user) }
+  let(:subject_with_limit) { described_class.new(user: user, voices_count: 5) }
 
   before do
     # Mock logger to avoid noise in tests
@@ -16,6 +17,13 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
     it 'initializes with user' do
       service = described_class.new(user: user)
       expect(service.instance_variable_get(:@user)).to eq(user)
+      expect(service.instance_variable_get(:@voices_count)).to be_nil
+    end
+
+    it 'initializes with user and voices_count' do
+      service = described_class.new(user: user, voices_count: 10)
+      expect(service.instance_variable_get(:@user)).to eq(user)
+      expect(service.instance_variable_get(:@voices_count)).to eq(10)
     end
   end
 
@@ -41,22 +49,36 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
 
     context 'when user has valid HeyGen API token' do
       let(:api_token) { double('api_token', group_url: group_url) }
-      let(:sync_service_instance) { double('sync_service') }
-      let(:sync_result) { double('sync_result') }
+      let(:avatars_sync_service_instance) { double('avatars_sync_service') }
+      let(:avatars_sync_result) { double('avatars_sync_result') }
+      let(:voices_sync_service_instance) { double('voices_sync_service') }
+      let(:voices_sync_result) { double('voices_sync_result') }
 
       before do
         allow(user).to receive(:active_token_for).with("heygen").and_return(api_token)
-        allow(Heygen::SynchronizeAvatarsService).to receive(:new).with(user: user, group_url: group_url).and_return(sync_service_instance)
-        allow(sync_service_instance).to receive(:call).and_return(sync_result)
+        allow(Heygen::SynchronizeAvatarsService).to receive(:new).with(user: user, group_url: group_url).and_return(avatars_sync_service_instance)
+        allow(avatars_sync_service_instance).to receive(:call).and_return(avatars_sync_result)
+        allow(Heygen::SynchronizeVoicesService).to receive(:new).with(user: user).and_return(voices_sync_service_instance)
+        allow(voices_sync_service_instance).to receive(:call).and_return(voices_sync_result)
+        
+        # Mock the API token to prevent real API calls in the voices service
+        allow(api_token).to receive(:encrypted_token).and_return('fake_token')
       end
 
       context 'when synchronization succeeds' do
-        let(:synchronized_count) { 5 }
+        let(:avatar_count) { 5 }
+        let(:voice_count) { 3 }
 
         before do
-          allow(sync_result).to receive(:success?).and_return(true)
-          allow(sync_result).to receive(:data).and_return({ synchronized_count: synchronized_count })
-          allow(sync_result).to receive(:error).and_return(nil)
+          # Mock avatar synchronization success
+          allow(avatars_sync_result).to receive(:success?).and_return(true)
+          allow(avatars_sync_result).to receive(:data).and_return({ synchronized_count: avatar_count })
+          allow(avatars_sync_result).to receive(:error).and_return(nil)
+
+          # Mock voice synchronization success
+          allow(voices_sync_result).to receive(:success?).and_return(true)
+          allow(voices_sync_result).to receive(:data).and_return({ synchronized_count: voice_count })
+          allow(voices_sync_result).to receive(:error).and_return(nil)
         end
 
         context 'with group URL present' do
@@ -64,15 +86,19 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
             result = subject.call
 
             expect(result.success?).to be true
-            expect(result.data[:synchronized_count]).to eq(synchronized_count)
+            expect(result.data[:synchronized_count]).to eq(avatar_count) # Backward compatibility
+            expect(result.data[:avatar_count]).to eq(avatar_count)
+            expect(result.data[:voice_count]).to eq(voice_count)
             expect(result.data[:message_key]).to eq("settings.heygen.group_validation_success")
             expect(result.error).to be_nil
           end
 
           it 'logs success information' do
             expect(Rails.logger).to receive(:info).with("🔗 [DEBUG] ValidateAndSyncService - group_url from token: #{group_url.inspect}")
-            expect(Rails.logger).to receive(:info).with("📊 Validation result: Success=true, Data=[:synchronized_count], Error=")
-            expect(Rails.logger).to receive(:info).with("✅ Successfully synchronized #{synchronized_count} avatars")
+            expect(Rails.logger).to receive(:info).with("📊 Avatar sync result: Success=true, Data=[:synchronized_count], Error=")
+            expect(Rails.logger).to receive(:info).with("✅ Successfully synchronized #{avatar_count} avatars")
+            expect(Rails.logger).to receive(:info).with("🎵 Voice sync result: Success=true, Data=[:synchronized_count], Error=")
+            expect(Rails.logger).to receive(:info).with("✅ Successfully synchronized #{voice_count} voices")
 
             subject.call
           end
@@ -210,26 +236,36 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
   describe 'private methods' do
     describe '#success_result' do
       it 'returns OpenStruct with success true and provided data' do
-        result = subject.send(:success_result, count: 3, message_key: "test.key")
+        result = subject.send(:success_result, avatar_count: 3, voice_count: 2, message_key: "test.key")
 
         expect(result).to be_a(OpenStruct)
         expect(result.success?).to be true
-        expect(result.data[:synchronized_count]).to eq(3)
+        expect(result.data[:synchronized_count]).to eq(3) # Backward compatibility
+        expect(result.data[:avatar_count]).to eq(3)
+        expect(result.data[:voice_count]).to eq(2)
         expect(result.data[:message_key]).to eq("test.key")
         expect(result.error).to be_nil
       end
 
       it 'handles different count values' do
-        result = subject.send(:success_result, count: 0, message_key: "zero.key")
+        result = subject.send(:success_result, avatar_count: 0, voice_count: 5, message_key: "zero.key")
 
-        expect(result.data[:synchronized_count]).to eq(0)
+        expect(result.data[:synchronized_count]).to eq(0) # Avatar count for backward compatibility
+        expect(result.data[:avatar_count]).to eq(0)
+        expect(result.data[:voice_count]).to eq(5)
         expect(result.data[:message_key]).to eq("zero.key")
       end
 
       it 'handles different message keys' do
-        result = subject.send(:success_result, count: 1, message_key: "settings.heygen.group_validation_success")
+        result = subject.send(:success_result, avatar_count: 1, voice_count: 1, message_key: "settings.heygen.group_validation_success")
 
         expect(result.data[:message_key]).to eq("settings.heygen.group_validation_success")
+      end
+
+      it 'handles voice_error parameter' do
+        result = subject.send(:success_result, avatar_count: 2, voice_count: 0, message_key: "test.key", voice_error: "Voice sync failed")
+
+        expect(result.data[:voice_error]).to eq("Voice sync failed")
       end
     end
 
