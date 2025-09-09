@@ -4,6 +4,8 @@ class Reel < ApplicationRecord
 
   accepts_nested_attributes_for :reel_scenes, allow_destroy: true
 
+  before_validation :assign_scene_numbers
+
   validates :template, presence: true, inclusion: {
     in: %w[solo_avatars avatar_and_video narration_over_7_images one_to_three_videos],
     message: "%{value} is not a valid template"
@@ -36,6 +38,25 @@ class Reel < ApplicationRecord
   end
 
   private
+
+  def assign_scene_numbers
+    # Only assign scene numbers to new scenes without numbers
+    scenes_to_number = reel_scenes.select { |scene| scene.scene_number.blank? }
+    
+    if scenes_to_number.any?
+      # Find existing scene numbers
+      existing_numbers = reel_scenes.map(&:scene_number).compact
+      
+      # Assign scene numbers sequentially
+      scenes_to_number.each_with_index do |scene, index|
+        next_number = (1..3).find { |n| !existing_numbers.include?(n) }
+        if next_number
+          scene.scene_number = next_number
+          existing_numbers << next_number
+        end
+      end
+    end
+  end
 
   def must_have_exactly_three_scenes
     return unless persisted? # Skip validation for new records

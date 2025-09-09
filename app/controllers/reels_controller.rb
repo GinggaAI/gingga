@@ -29,7 +29,7 @@ class ReelsController < ApplicationController
     result = ReelCreationService.new(user: current_user, params: reel_params).call
 
     if result[:success]
-      redirect_to result[:reel], notice: "Reel created successfully! Your reel is being generated."
+      redirect_to result[:reel], notice: "Reel created successfully! Your video is being generated with HeyGen and will be ready shortly."
     else
       @reel = result[:reel]
       template = @reel&.template || reel_params[:template]

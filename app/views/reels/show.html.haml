@@ -1,0 +1,70 @@
+%main.flex-1.overflow-y-auto
+  .p-8
+    .max-w-4xl.mx-auto
+      .flex.items-center.gap-2.mb-4
+        = link_to reels_path, class: "text-gray-600 hover:text-gray-800 transition-colors" do
+          ←
+        %span.text-gray-400 |
+        %span.text-gray-600 My Reels
+
+      .mb-8
+        %h1.text-3xl.font-bold.mb-2.text-gray-900= @reel.title || "Untitled Reel"
+        %p.text-gray-600= @reel.description if @reel.description.present?
+
+      .bg-white.border.border-gray-200.shadow-lg.rounded-2xl.mb-6
+        .p-6
+          .flex.items-center.gap-3.mb-4
+            %div.w-8.h-8.rounded-lg.flex.items-center.justify-center{class: status_icon_class(@reel.status)}
+              = status_icon(@reel.status)
+            %div
+              %h3.text-lg.font-semibold.text-gray-900= "Video Status: #{@reel.status.titleize}"
+              %p.text-sm.text-gray-600= status_description(@reel.status)
+
+          - if @reel.status == "completed" && @reel.video_url.present?
+            .mt-6
+              %h4.text-md.font-semibold.mb-3 Your Generated Video
+              .aspect-video.bg-black.rounded-lg.overflow-hidden
+                %video.w-full.h-full{controls: true, poster: @reel.thumbnail_url}
+                  %source{src: @reel.video_url, type: "video/mp4"}
+                  Your browser does not support the video tag.
+              
+              - if @reel.duration
+                .mt-2.text-sm.text-gray-600
+                  Duration: #{@reel.duration} seconds
+
+          - elsif @reel.status == "processing"
+            .mt-6.text-center
+              .animate-spin.inline-block.w-8.h-8.border-4.border-gray-200.border-t-blue-500.rounded-full
+              %p.mt-2.text-gray-600 Your video is being generated with HeyGen...
+              %p.text-sm.text-gray-500 This usually takes a few minutes. You can refresh this page to check the status.
+
+          - elsif @reel.status == "failed"
+            .mt-6.p-4.bg-red-50.border.border-red-200.rounded-xl
+              %p.text-red-800 There was an error generating your video. Please try creating a new reel.
+
+      .bg-white.border.border-gray-200.shadow-lg.rounded-2xl
+        .p-6
+          %h3.text-lg.font-semibold.mb-4 Reel Details
+          .grid.grid-cols-1.md:grid-cols-2.gap-4
+            .space-y-2
+              %div
+                %span.font-medium Template:
+                %span.ml-2= @reel.template.humanize
+              %div
+                %span.font-medium Created:
+                %span.ml-2= @reel.created_at.strftime("%B %d, %Y at %I:%M %p")
+              - if @reel.heygen_video_id.present?
+                %div
+                  %span.font-medium HeyGen Video ID:
+                  %span.ml-2.font-mono.text-sm= @reel.heygen_video_id
+
+            - if @reel.reel_scenes.any?
+              .space-y-2
+                %h4.font-medium Scenes
+                - @reel.reel_scenes.ordered.each do |scene|
+                  .bg-gray-50.p-3.rounded-lg
+                    %div.font-medium.text-sm Scene #{scene.scene_number}
+                    %div.text-xs.text-gray-600
+                      Type: #{scene.video_type&.titleize || 'Avatar'}
+                    - if scene.script.present?
+                      %div.text-sm.mt-1= truncate(scene.script, length: 100)

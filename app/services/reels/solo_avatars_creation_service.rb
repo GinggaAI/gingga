@@ -11,7 +11,8 @@ module Reels
           scene_number: i + 1,
           avatar_id: nil,
           voice_id: nil,
-          script: nil
+          script: nil,
+          video_type: 'avatar'
         )
       end
     end

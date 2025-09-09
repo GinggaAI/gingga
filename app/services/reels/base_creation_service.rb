@@ -17,6 +17,7 @@ module Reels
       setup_template_specific_fields(reel) if reel.new_record?
 
       if reel.save
+        trigger_video_generation(reel)
         success_result(reel)
       else
         failure_result("Validation failed", reel)
@@ -31,6 +32,32 @@ module Reels
 
     def setup_template_specific_fields(reel)
       # Override in subclasses
+    end
+
+    def trigger_video_generation(reel)
+      return unless should_generate_video?(reel)
+      return unless reel.ready_for_generation?
+
+      Rails.logger.info "🎬 Triggering video generation for reel #{reel.id}"
+      
+      generation_result = Heygen::GenerateVideoService.new(@user, reel).call
+      
+      if generation_result[:success]
+        Rails.logger.info "✅ Video generation started successfully for reel #{reel.id}"
+        # Schedule status checking job
+        CheckVideoStatusJob.set(wait: 30.seconds).perform_later(reel.id)
+      else
+        Rails.logger.error "❌ Video generation failed for reel #{reel.id}: #{generation_result[:error]}"
+        reel.update!(status: "failed")
+      end
+    rescue StandardError => e
+      Rails.logger.error "🚨 Error triggering video generation for reel #{reel.id}: #{e.message}"
+      reel.update!(status: "failed")
+    end
+
+    def should_generate_video?(reel)
+      # Only generate videos for templates that support HeyGen integration
+      reel.template.in?(%w[solo_avatars avatar_and_video])
     end
 
     def success_result(reel)
