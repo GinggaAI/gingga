@@ -228,7 +228,7 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
       it 'builds character with type video' do
         scene = { avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'Test script', video_type: 'kling' }
         result = service.send(:build_scene_input, scene, 1)
-        
+
         expect(result[:character][:type]).to eq('video')
         expect(result[:character][:video_content]).to eq('Test script')
         expect(result[:voice][:input_text]).to eq('Test script')
@@ -240,7 +240,7 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
       it 'defaults to avatar type' do
         scene = { avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'Test script', video_type: 'unknown_type' }
         result = service.send(:build_scene_input, scene, 1)
-        
+
         expect(result[:character][:type]).to eq('avatar')
         expect(result[:character][:avatar_id]).to eq('avatar_1')
         expect(result[:character][:avatar_style]).to eq('normal')
@@ -253,7 +253,7 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
       it 'defaults to avatar type' do
         scene = { avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'Test script', video_type: nil }
         result = service.send(:build_scene_input, scene, 1)
-        
+
         expect(result[:character][:type]).to eq('avatar')
         expect(result[:character][:avatar_id]).to eq('avatar_1')
         expect(result[:character][:avatar_style]).to eq('normal')
@@ -266,7 +266,7 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
       it 'builds character with avatar type' do
         scene = { avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'Test script', video_type: 'avatar' }
         result = service.send(:build_scene_input, scene, 1)
-        
+
         expect(result[:character][:type]).to eq('avatar')
         expect(result[:character][:avatar_id]).to eq('avatar_1')
         expect(result[:character][:avatar_style]).to eq('normal')

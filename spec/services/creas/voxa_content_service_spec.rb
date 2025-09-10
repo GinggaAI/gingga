@@ -36,7 +36,7 @@ RSpec.describe Creas::VoxaContentService, type: :service do
               "description" => "Test description",
               "platform" => "Instagram Reels",
               "pilar" => "C",
-              "recommended_template" => "solo_avatars",
+              "recommended_template" => "only_avatars",
               "video_source" => "none"
             }
           ]
@@ -69,7 +69,7 @@ RSpec.describe Creas::VoxaContentService, type: :service do
               "description" => "Test description",
               "platform" => "Instagram Reels",
               "pilar" => "C",
-              "recommended_template" => "solo_avatars",
+              "recommended_template" => "only_avatars",
               "video_source" => "none"
             },
             {
@@ -107,7 +107,7 @@ RSpec.describe Creas::VoxaContentService, type: :service do
           "aspect_ratio" => "9:16",
           "language" => "en-US",
           "pilar" => "C",
-          "template" => "solo_avatars",
+          "template" => "only_avatars",
           "video_source" => "none",
           "post_description" => "This is a test post description",
           "text_base" => "Test text base",

@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe ReelSceneBasedPresenter, type: :presenter do
   let(:user) { create(:user) }
-  let(:reel) { create(:reel, :solo_avatars, user: user) }
+  let(:reel) { create(:reel, :only_avatars, user: user) }
   let(:presenter) { described_class.new(reel: reel, current_user: user) }
 
   describe '#initialize' do

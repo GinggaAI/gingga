@@ -91,7 +91,7 @@ RSpec.describe Creas::ContentItemFormatter, type: :service do
     end
 
     context "with avatar template" do
-      let(:content_item) { create(:creas_content_item, template: "solo_avatars") }
+      let(:content_item) { create(:creas_content_item, template: "only_avatars") }
 
       it "formats scenes correctly" do
         result = formatter.to_h

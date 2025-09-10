@@ -302,7 +302,7 @@ RSpec.describe ReelNarrativePresenter, type: :presenter do
     end
 
     context 'with different reel templates' do
-      let(:solo_reel) { create(:reel, :solo_avatars, user: user) }
+      let(:solo_reel) { create(:reel, :only_avatars, user: user) }
       let(:solo_presenter) { described_class.new(reel: solo_reel, current_user: user) }
 
       it 'works with different reel templates' do

@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :reel do
     association :user
-    template { "solo_avatars" }
+    template { "only_avatars" }
     status { "draft" }
     title { "Test Reel" }
     description { "Test description" }
@@ -13,8 +13,8 @@ FactoryBot.define do
     use_ai_avatar { false }
     additional_instructions { "Test instructions" }
 
-    trait :solo_avatars do
-      template { "solo_avatars" }
+    trait :only_avatars do
+      template { "only_avatars" }
     end
 
     trait :avatar_and_video do

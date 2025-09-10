@@ -98,15 +98,15 @@ RSpec.describe CreasStrategyPlan, type: :model do
     let(:strategy_plan) { create(:creas_strategy_plan, month: "2025-08") }
 
     describe '#content_stats' do
-      let!(:item1) { create(:creas_content_item, creas_strategy_plan: strategy_plan, status: "in_production", template: "solo_avatars", video_source: "none") }
-      let!(:item2) { create(:creas_content_item, creas_strategy_plan: strategy_plan, status: "ready_for_review", template: "solo_avatars", video_source: "none") }
+      let!(:item1) { create(:creas_content_item, creas_strategy_plan: strategy_plan, status: "in_production", template: "only_avatars", video_source: "none") }
+      let!(:item2) { create(:creas_content_item, creas_strategy_plan: strategy_plan, status: "ready_for_review", template: "only_avatars", video_source: "none") }
       let!(:item3) { create(:creas_content_item, creas_strategy_plan: strategy_plan, status: "in_production", template: "remix", video_source: "external") }
 
       it 'returns grouped stats by status, template, and video_source' do
         stats = strategy_plan.content_stats
 
-        expect(stats[[ "in_production", "solo_avatars", "none" ]]).to eq(1)
-        expect(stats[[ "ready_for_review", "solo_avatars", "none" ]]).to eq(1)
+        expect(stats[[ "in_production", "only_avatars", "none" ]]).to eq(1)
+        expect(stats[[ "ready_for_review", "only_avatars", "none" ]]).to eq(1)
         expect(stats[[ "in_production", "remix", "external" ]]).to eq(1)
       end
     end

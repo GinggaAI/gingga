@@ -109,7 +109,7 @@ noctua_payload = {
           "description" => "Explicamos cómo las nuevas tecnologías se están volviendo más accesibles para el usuario común, rompiendo barreras tradicionales.",
           "platform" => "Instagram Reels", 
           "pilar" => "C",
-          "recommended_template" => "solo_avatars",
+          "recommended_template" => "only_avatars",
           "video_source" => "none",
           "visual_notes" => "Avatar hablando directamente a cámara",
           "kpi_focus" => "reach",
@@ -290,7 +290,7 @@ mock_voxa_response = {
       "aspect_ratio" => "9:16",
       "language" => "es-ES",
       "pilar" => "C",
-      "template" => "solo_avatars",
+      "template" => "only_avatars",
       "video_source" => "none",
       "post_description" => "Contenido educativo sobre accesibilidad tecnológica para audiencias generales",
       "text_base" => "¿Sabías que la tecnología puede ser más accesible? Aquí te explico 3 formas de democratizar el acceso a herramientas digitales. ¿Cuál es tu favorita? 👇",
@@ -378,7 +378,7 @@ begin
           "aspect_ratio" => "9:16",
           "language" => "es-ES",
           "pilar" => "C",
-          "template" => "solo_avatars",
+          "template" => "only_avatars",
           "video_source" => "none",
           "post_description" => "Contenido educativo sobre accesibilidad tecnológica",
           "text_base" => "¿Sabías que la tecnología puede ser más accesible? Aquí 3 formas de democratizar el acceso. ¿Cuál prefieres? 👇",
@@ -509,7 +509,7 @@ begin
           "aspect_ratio" => "9:16",
           "language" => "es-ES",
           "pilar" => "C",
-          "template" => "solo_avatars",
+          "template" => "only_avatars",
           "video_source" => "none",
           "post_description" => "Descripción actualizada",
           "text_base" => "Texto base actualizado",
@@ -594,8 +594,8 @@ if content_item
   puts "   Compliance: #{formatted_hash[:compliance_check]}"
   
   # Verificar estructura de escenas/beats según template
-  if content_item.template == "solo_avatars"
-    puts "\n🎭 Escenas (solo_avatars):"
+  if content_item.template == "only_avatars"
+    puts "\n🎭 Escenas (only_avatars):"
     puts "   Cantidad: #{formatted_hash[:scenes].length}"
     puts "   Primera escena: #{formatted_hash[:scenes].first&.dig(:role)}"
   elsif content_item.template == "narration_over_7_images"

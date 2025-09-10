@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe ReelCreationService do
   let(:user) { create(:user) }
-  let(:valid_template) { "solo_avatars" }
+  let(:valid_template) { "only_avatars" }
   let(:valid_params) do
     {
       template: valid_template,
@@ -55,7 +55,7 @@ RSpec.describe ReelCreationService do
       let(:service) { described_class.new(user: user, template: valid_template) }
 
       it 'delegates to the appropriate template service' do
-        expect(Reels::SoloAvatarsCreationService).to receive(:new)
+        expect(Reels::OnlyAvatarsCreationService).to receive(:new)
           .with(user: user, template: valid_template)
           .and_return(double(initialize_reel: { success: true, reel: double, error: nil }))
 
@@ -67,7 +67,7 @@ RSpec.describe ReelCreationService do
       it 'returns success result from template service' do
         mock_reel = double('reel')
         mock_service = double('service', initialize_reel: { success: true, reel: mock_reel, error: nil })
-        allow(Reels::SoloAvatarsCreationService).to receive(:new).and_return(mock_service)
+        allow(Reels::OnlyAvatarsCreationService).to receive(:new).and_return(mock_service)
 
         result = service.initialize_reel
 
@@ -90,7 +90,7 @@ RSpec.describe ReelCreationService do
       end
 
       it 'does not call any template service' do
-        expect(Reels::SoloAvatarsCreationService).not_to receive(:new)
+        expect(Reels::OnlyAvatarsCreationService).not_to receive(:new)
         expect(Reels::AvatarAndVideoCreationService).not_to receive(:new)
         expect(Reels::NarrationOver7ImagesCreationService).not_to receive(:new)
         expect(Reels::OneToThreeVideosCreationService).not_to receive(:new)
@@ -114,7 +114,7 @@ RSpec.describe ReelCreationService do
     context 'with each valid template type' do
       let(:templates_and_services) do
         {
-          "solo_avatars" => Reels::SoloAvatarsCreationService,
+          "only_avatars" => Reels::OnlyAvatarsCreationService,
           "avatar_and_video" => Reels::AvatarAndVideoCreationService,
           "narration_over_7_images" => Reels::NarrationOver7ImagesCreationService,
           "one_to_three_videos" => Reels::OneToThreeVideosCreationService
@@ -167,7 +167,7 @@ RSpec.describe ReelCreationService do
         mock_reel = double('reel')
         mock_service = double('service', call: { success: true, reel: mock_reel, error: nil })
 
-        expect(Reels::SoloAvatarsCreationService).to receive(:new)
+        expect(Reels::OnlyAvatarsCreationService).to receive(:new)
           .with(user: user, params: valid_params)
           .and_return(mock_service)
 
@@ -208,7 +208,7 @@ RSpec.describe ReelCreationService do
     context 'with each valid template type' do
       let(:templates_and_services) do
         {
-          "solo_avatars" => Reels::SoloAvatarsCreationService,
+          "only_avatars" => Reels::OnlyAvatarsCreationService,
           "avatar_and_video" => Reels::AvatarAndVideoCreationService,
           "narration_over_7_images" => Reels::NarrationOver7ImagesCreationService,
           "one_to_three_videos" => Reels::OneToThreeVideosCreationService
@@ -233,9 +233,9 @@ RSpec.describe ReelCreationService do
   describe '#template_service_for' do
     let(:service) { described_class.new(user: user) }
 
-    it 'returns correct service class for solo_avatars' do
-      result = service.send(:template_service_for, "solo_avatars")
-      expect(result).to eq(Reels::SoloAvatarsCreationService)
+    it 'returns correct service class for only_avatars' do
+      result = service.send(:template_service_for, "only_avatars")
+      expect(result).to eq(Reels::OnlyAvatarsCreationService)
     end
 
     it 'returns correct service class for avatar_and_video' do
@@ -268,8 +268,8 @@ RSpec.describe ReelCreationService do
     let(:service) { described_class.new(user: user) }
 
     context 'with valid templates' do
-      it 'returns true for solo_avatars' do
-        expect(service.send(:valid_template?, "solo_avatars")).to be true
+      it 'returns true for only_avatars' do
+        expect(service.send(:valid_template?, "only_avatars")).to be true
       end
 
       it 'returns true for avatar_and_video' do
@@ -405,7 +405,7 @@ RSpec.describe ReelCreationService do
       let(:service) { described_class.new(user: user, params: valid_params) }
 
       it 'allows exceptions to bubble up' do
-        allow(Reels::SoloAvatarsCreationService).to receive(:new).and_raise(StandardError, "Service error")
+        allow(Reels::OnlyAvatarsCreationService).to receive(:new).and_raise(StandardError, "Service error")
 
         expect { service.call }.to raise_error(StandardError, "Service error")
       end
@@ -417,7 +417,7 @@ RSpec.describe ReelCreationService do
       it 'passes through the result as-is' do
         unexpected_result = { custom: "format" }
         mock_service = double('service', call: unexpected_result)
-        allow(Reels::SoloAvatarsCreationService).to receive(:new).and_return(mock_service)
+        allow(Reels::OnlyAvatarsCreationService).to receive(:new).and_return(mock_service)
 
         result = service.call
 
@@ -426,7 +426,7 @@ RSpec.describe ReelCreationService do
     end
 
     context 'with whitespace in template' do
-      let(:template_with_whitespace) { "  solo_avatars  " }
+      let(:template_with_whitespace) { "  only_avatars  " }
       let(:params_with_whitespace) { valid_params.merge(template: template_with_whitespace) }
       let(:service) { described_class.new(user: user, params: params_with_whitespace) }
 

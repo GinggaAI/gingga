@@ -7,12 +7,12 @@ class Reel < ApplicationRecord
   before_validation :assign_scene_numbers
 
   validates :template, presence: true, inclusion: {
-    in: %w[solo_avatars avatar_and_video narration_over_7_images one_to_three_videos],
+    in: %w[only_avatars avatar_and_video narration_over_7_images one_to_three_videos],
     message: "%{value} is not a valid template"
   }
   validates :status, inclusion: { in: %w[draft processing completed failed] }
 
-  validate :must_have_exactly_three_scenes, if: -> { template.in?(%w[solo_avatars avatar_and_video]) }
+  validate :must_have_exactly_three_scenes, if: -> { template.in?(%w[only_avatars avatar_and_video]) }
   validate :all_scenes_must_be_complete, if: -> { requires_scenes? }
 
   scope :by_template, ->(template) { where(template: template) }
@@ -20,7 +20,7 @@ class Reel < ApplicationRecord
 
   def ready_for_generation?
     case template
-    when "solo_avatars", "avatar_and_video"
+    when "only_avatars", "avatar_and_video"
       reel_scenes.count == 3 && reel_scenes.all?(&:complete?)
     when "narration_over_7_images"
       # Will need narrative content fields - placeholder for now
@@ -34,7 +34,7 @@ class Reel < ApplicationRecord
   end
 
   def requires_scenes?
-    template.in?(%w[solo_avatars avatar_and_video])
+    template.in?(%w[only_avatars avatar_and_video])
   end
 
   private

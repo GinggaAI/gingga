@@ -26,7 +26,7 @@
 ```ruby
 # Added comprehensive tests for all template types
 describe '#ready_for_generation?' do
-  context 'for solo_avatars template' do
+  context 'for only_avatars template' do
     it 'returns true when has exactly 3 complete scenes'
     it 'returns false when has less than 3 scenes'
     it 'returns false when has incomplete scenes'
@@ -54,7 +54,7 @@ end
 **Scene Requirements Logic**
 ```ruby
 describe '#requires_scenes?' do
-  it 'returns true for solo_avatars template'
+  it 'returns true for only_avatars template'
   it 'returns true for avatar_and_video template'
   it 'returns false for narration_over_7_images template'
   it 'returns false for one_to_three_videos template'
@@ -65,7 +65,7 @@ end
 ```ruby
 describe 'scene number assignment' do
   it 'assigns scene numbers automatically' do
-    reel = create(:reel, user: user, template: 'solo_avatars')
+    reel = create(:reel, user: user, template: 'only_avatars')
     scene_without_number = build(:reel_scene, reel: reel, scene_number: nil)
     reel.reel_scenes << scene_without_number
     reel.send(:assign_scene_numbers)

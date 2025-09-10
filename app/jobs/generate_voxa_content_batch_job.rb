@@ -353,7 +353,7 @@ EXISTING CONTENT FROM PREVIOUS BATCHES (avoid duplication):
   end
 
   def generate_default_shotplan(item)
-    template = item["template"] || "solo_avatars"
+    template = item["template"] || "only_avatars"
 
     case template
     when "narration_over_7_images"
@@ -368,7 +368,7 @@ EXISTING CONTENT FROM PREVIOUS BATCHES (avoid duplication):
         end
       }
     else
-      # Default for solo_avatars, avatar_and_video, etc.
+      # Default for only_avatars, avatar_and_video, etc.
       {
         "scenes" => [
           {
@@ -641,17 +641,17 @@ EXISTING CONTENT FROM PREVIOUS BATCHES (avoid duplication):
   end
 
   def normalize_template(template)
-    valid_templates = %w[solo_avatars avatar_and_video narration_over_7_images remix one_to_three_videos]
+    valid_templates = %w[only_avatars avatar_and_video narration_over_7_images remix one_to_three_videos]
 
-    return "solo_avatars" if template.blank?
+    return "only_avatars" if template.blank?
     return template if valid_templates.include?(template)
 
     template_mappings = {
-      "solo_avatar" => "solo_avatars",
-      "single_avatar" => "solo_avatars",
-      "avatar_only" => "solo_avatars",
-      "text" => "solo_avatars",
-      "avatar" => "solo_avatars",
+      "solo_avatar" => "only_avatars",
+      "single_avatar" => "only_avatars",
+      "avatar_only" => "only_avatars",
+      "text" => "only_avatars",
+      "avatar" => "only_avatars",
       "avatar_video" => "avatar_and_video",
       "avatar_with_video" => "avatar_and_video",
       "hybrid" => "avatar_and_video",
@@ -676,8 +676,8 @@ EXISTING CONTENT FROM PREVIOUS BATCHES (avoid duplication):
       return normalized_template
     end
 
-    Rails.logger.warn "Voxa GenerateVoxaContentBatchJob: Unknown template '#{template}', defaulting to 'solo_avatars'"
-    "solo_avatars"
+    Rails.logger.warn "Voxa GenerateVoxaContentBatchJob: Unknown template '#{template}', defaulting to 'only_avatars'"
+    "only_avatars"
   end
 
   def generate_unique_content_name(original_name, brand_id)

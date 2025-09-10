@@ -37,7 +37,7 @@ RSpec.describe Creas::ContentItemInitializerService do
                 'cta' => 'Follow us!',
                 'kpi_focus' => 'engagement',
                 'success_criteria' => '≥10% saves',
-                'recommended_template' => 'solo_avatars',
+                'recommended_template' => 'only_avatars',
                 'video_source' => 'kling',
                 'visual_notes' => 'Cool visuals',
                 'repurpose_to' => [ 'TikTok' ],
@@ -117,7 +117,7 @@ RSpec.describe Creas::ContentItemInitializerService do
           aspect_ratio: '9:16',
           language: 'en',
           pilar: 'C',
-          template: 'solo_avatars',
+          template: 'only_avatars',
           video_source: 'kling',
           post_description: 'Test description (Week 1 content)',
           timezone: 'Europe/Madrid',
@@ -675,21 +675,21 @@ RSpec.describe Creas::ContentItemInitializerService do
       let(:service) { described_class.new(strategy_plan: strategy_plan) }
 
       it 'normalizes various template variations' do
-        expect(service.send(:normalize_template, 'solo_avatar')).to eq('solo_avatars')
+        expect(service.send(:normalize_template, 'solo_avatar')).to eq('only_avatars')
         expect(service.send(:normalize_template, 'avatar_video')).to eq('avatar_and_video')
         expect(service.send(:normalize_template, 'narration_7_images')).to eq('narration_over_7_images')
         expect(service.send(:normalize_template, 'multi_video')).to eq('one_to_three_videos')
         expect(service.send(:normalize_template, 'remix_video')).to eq('remix')
       end
 
-      it 'defaults unknown templates to solo_avatars' do
-        expect(service.send(:normalize_template, 'unknown_template')).to eq('solo_avatars')
-        expect(service.send(:normalize_template, nil)).to eq('solo_avatars')
-        expect(service.send(:normalize_template, '')).to eq('solo_avatars')
+      it 'defaults unknown templates to only_avatars' do
+        expect(service.send(:normalize_template, 'unknown_template')).to eq('only_avatars')
+        expect(service.send(:normalize_template, nil)).to eq('only_avatars')
+        expect(service.send(:normalize_template, '')).to eq('only_avatars')
       end
 
       it 'returns valid templates unchanged' do
-        expect(service.send(:normalize_template, 'solo_avatars')).to eq('solo_avatars')
+        expect(service.send(:normalize_template, 'only_avatars')).to eq('only_avatars')
         expect(service.send(:normalize_template, 'avatar_and_video')).to eq('avatar_and_video')
       end
     end
@@ -705,7 +705,7 @@ RSpec.describe Creas::ContentItemInitializerService do
       it 'fixes invalid template' do
         item.template = 'invalid_template'
         service.send(:apply_basic_recovery_fixes, item)
-        expect(item.template).to eq('solo_avatars')
+        expect(item.template).to eq('only_avatars')
       end
 
       it 'fixes invalid pilar' do
@@ -762,7 +762,7 @@ RSpec.describe Creas::ContentItemInitializerService do
         # Patch the apply_recovery_fixes method to avoid the idea bug
         allow(service).to receive(:apply_recovery_fixes) do |item_arg, attempt, week_number, retry_index|
           # Just apply basic fixes without the idea reference
-          item_arg.template = "solo_avatars"
+          item_arg.template = "only_avatars"
           item_arg.pilar = "C"
           item_arg.status = "draft"
         end
@@ -792,7 +792,7 @@ RSpec.describe Creas::ContentItemInitializerService do
 
         service.send(:apply_recovery_fixes, item, 1, 1, 0)
 
-        expect(item.template).to eq('solo_avatars')
+        expect(item.template).to eq('only_avatars')
         expect(item.pilar).to eq('C')
         expect(item.status).to eq('draft')
       end
@@ -825,7 +825,7 @@ RSpec.describe Creas::ContentItemInitializerService do
               # Apply the nuclear fixes manually to avoid the bug
               item.content_name = "Emergency Recovery Content W1-#{Time.current.strftime("%H%M%S")}"
               item.content_id = "EMERGENCY-1-0-#{Time.current.strftime("%H%M%S")}"
-              item.template = "solo_avatars"
+              item.template = "only_avatars"
               item.pilar = "C"
               item.status = "draft"
               item.meta = { "recovery_mode" => true }
@@ -839,7 +839,7 @@ RSpec.describe Creas::ContentItemInitializerService do
 
         expect(item.content_name).to match(/Emergency Recovery Content/)
         expect(item.content_id).to match(/EMERGENCY-/)
-        expect(item.template).to eq('solo_avatars')
+        expect(item.template).to eq('only_avatars')
         expect(item.pilar).to eq('C')
         expect(item.status).to eq('draft')
         expect(item.meta['recovery_mode']).to be true

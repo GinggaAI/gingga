@@ -205,7 +205,7 @@ class GenerateVoxaContentJob < ApplicationJob
   end
 
   def generate_default_shotplan(item)
-    template = item["template"] || "solo_avatars"
+    template = item["template"] || "only_avatars"
 
     case template
     when "narration_over_7_images"
@@ -220,7 +220,7 @@ class GenerateVoxaContentJob < ApplicationJob
         end
       }
     else
-      # Default for solo_avatars, avatar_and_video, etc.
+      # Default for only_avatars, avatar_and_video, etc.
       {
         "scenes" => [
           {
@@ -423,20 +423,20 @@ class GenerateVoxaContentJob < ApplicationJob
 
   def normalize_template(template)
     # Valid templates according to CreasContentItem model validation
-    valid_templates = %w[solo_avatars avatar_and_video narration_over_7_images remix one_to_three_videos]
+    valid_templates = %w[only_avatars avatar_and_video narration_over_7_images remix one_to_three_videos]
 
-    return "solo_avatars" if template.blank?
+    return "only_avatars" if template.blank?
 
     # If template is already valid, return it
     return template if valid_templates.include?(template)
 
     # Template normalization mapping for common variations
     template_mappings = {
-      "solo_avatar" => "solo_avatars",
-      "single_avatar" => "solo_avatars",
-      "avatar_only" => "solo_avatars",
-      "text" => "solo_avatars",
-      "avatar" => "solo_avatars",
+      "solo_avatar" => "only_avatars",
+      "single_avatar" => "only_avatars",
+      "avatar_only" => "only_avatars",
+      "text" => "only_avatars",
+      "avatar" => "only_avatars",
       "avatar_video" => "avatar_and_video",
       "avatar_with_video" => "avatar_and_video",
       "hybrid" => "avatar_and_video",
@@ -462,8 +462,8 @@ class GenerateVoxaContentJob < ApplicationJob
       return normalized_template
     end
 
-    # If no mapping found, log the unknown template and default to solo_avatars
-    Rails.logger.warn "Voxa GenerateVoxaContentJob: Unknown template '#{template}', defaulting to 'solo_avatars'"
-    "solo_avatars"
+    # If no mapping found, log the unknown template and default to only_avatars
+    Rails.logger.warn "Voxa GenerateVoxaContentJob: Unknown template '#{template}', defaulting to 'only_avatars'"
+    "only_avatars"
   end
 end

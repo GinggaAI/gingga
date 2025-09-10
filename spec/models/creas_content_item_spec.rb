@@ -41,7 +41,7 @@ RSpec.describe CreasContentItem, type: :model do
 
     describe "template validation" do
       it "allows valid template values" do
-        %w[solo_avatars avatar_and_video narration_over_7_images remix one_to_three_videos].each do |template|
+        %w[only_avatars avatar_and_video narration_over_7_images remix one_to_three_videos].each do |template|
           content_item = build(:creas_content_item, template: template)
           expect(content_item).to be_valid
         end
@@ -228,7 +228,7 @@ RSpec.describe CreasContentItem, type: :model do
 
     describe "#beats" do
       it "returns empty array for non-narration template" do
-        item = create(:creas_content_item, template: "solo_avatars")
+        item = create(:creas_content_item, template: "only_avatars")
         expect(item.beats).to eq([])
       end
 

@@ -19,7 +19,7 @@ RSpec.describe GenerateNoctuaStrategyBatchJob do
           "description" => "Share industry insights",
           "platform" => "Instagram Reels",
           "pilar" => "C",
-          "recommended_template" => "solo_avatars",
+          "recommended_template" => "only_avatars",
           "video_source" => "none"
         },
         {

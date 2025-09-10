@@ -1,9 +1,9 @@
 module Reels
-  class SoloAvatarsCreationService < BaseCreationService
+  class OnlyAvatarsCreationService < BaseCreationService
     private
 
     def setup_template_specific_fields(reel)
-      # Solo avatars template requires exactly 3 scenes
+      # Only avatars template requires exactly 3 scenes
       return if reel.reel_scenes.any? # Don't add if scenes already exist
 
       3.times do |i|

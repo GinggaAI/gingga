@@ -1,6 +1,14 @@
 class ReelShowPresenter
   include ReelsHelper
-  
+
+  # Whitelisted CSS classes for security - only predefined values allowed
+  STATUS_BADGE_CLASSES = {
+    "draft" => "status-badge status-badge--draft",
+    "processing" => "status-badge status-badge--processing",
+    "completed" => "status-badge status-badge--completed",
+    "failed" => "status-badge status-badge--failed"
+  }.freeze
+
   def initialize(reel)
     @reel = reel
   end
@@ -22,20 +30,9 @@ class ReelShowPresenter
   end
 
   def status_badge_class
-    # Return semantic CSS class name - safe and maintainable
-    # Using frozen strings and explicit whitelisting for security
-    case status.to_s.strip
-    when "draft"
-      "status-badge status-badge--draft".freeze
-    when "processing" 
-      "status-badge status-badge--processing".freeze
-    when "completed"
-      "status-badge status-badge--completed".freeze
-    when "failed"
-      "status-badge status-badge--failed".freeze
-    else
-      "status-badge status-badge--draft".freeze # Safe fallback
-    end
+    # Use whitelisted hash lookup for security - prevents any user input injection
+    # Only predefined CSS classes can be returned, fallback to safe default
+    STATUS_BADGE_CLASSES.fetch(status.to_s.strip, STATUS_BADGE_CLASSES["draft"]).html_safe
   end
 
   def status_icon

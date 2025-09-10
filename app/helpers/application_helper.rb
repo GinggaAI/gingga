@@ -9,7 +9,7 @@ module ApplicationHelper
 
   def reel_icon_class(reel)
     case reel.template
-    when "solo_avatars", "avatar_and_video"
+    when "only_avatars", "avatar_and_video"
       "bg-gradient-to-r from-purple-500 to-pink-500"
     when "narration_over_7_images"
       "bg-blue-600"
@@ -22,7 +22,7 @@ module ApplicationHelper
 
   def reel_icon_svg(reel)
     case reel.template
-    when "solo_avatars", "avatar_and_video"
+    when "only_avatars", "avatar_and_video"
       content_tag(:svg, class: "lucide lucide-video w-4 h-4", fill: "none", height: "24", stroke: "currentColor", "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "2", viewBox: "0 0 24 24", width: "24", xmlns: "http://www.w3.org/2000/svg") do
         concat content_tag(:path, "", d: "m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5")
         concat content_tag(:rect, "", height: "12", rx: "2", width: "14", x: "2", y: "6")
@@ -37,8 +37,8 @@ module ApplicationHelper
 
   def reel_display_title(reel)
     case reel.template
-    when "solo_avatars"
-      "Solo Avatar Video"
+    when "only_avatars"
+      "Only Avatar Video"
     when "avatar_and_video"
       "Avatar & Video Reel"
     when "narration_over_7_images"

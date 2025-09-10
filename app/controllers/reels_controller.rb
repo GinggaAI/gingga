@@ -53,12 +53,12 @@ class ReelsController < ApplicationController
   end
 
   def valid_template?(template)
-    %w[solo_avatars avatar_and_video narration_over_7_images one_to_three_videos].include?(template)
+    %w[only_avatars avatar_and_video narration_over_7_images one_to_three_videos].include?(template)
   end
 
   def render_template_view(template, **options)
     case template
-    when "solo_avatars", "avatar_and_video", "one_to_three_videos"
+    when "only_avatars", "avatar_and_video", "one_to_three_videos"
       render "reels/scene_based", **options
     when "narration_over_7_images"
       render "reels/narrative", **options
@@ -70,7 +70,7 @@ class ReelsController < ApplicationController
 
   def setup_presenter(template)
     case template
-    when "solo_avatars", "avatar_and_video", "one_to_three_videos"
+    when "only_avatars", "avatar_and_video", "one_to_three_videos"
       @presenter = ReelSceneBasedPresenter.new(reel: @reel, current_user: current_user)
     when "narration_over_7_images"
       @presenter = ReelNarrativePresenter.new(reel: @reel, current_user: current_user)

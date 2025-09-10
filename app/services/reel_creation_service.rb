@@ -26,8 +26,8 @@ class ReelCreationService
 
   def template_service_for(template)
     case template
-    when "solo_avatars"
-      Reels::SoloAvatarsCreationService
+    when "only_avatars"
+      Reels::OnlyAvatarsCreationService
     when "avatar_and_video"
       Reels::AvatarAndVideoCreationService
     when "narration_over_7_images"
@@ -38,7 +38,7 @@ class ReelCreationService
   end
 
   def valid_template?(template)
-    %w[solo_avatars avatar_and_video narration_over_7_images one_to_three_videos].include?(template)
+    %w[only_avatars avatar_and_video narration_over_7_images one_to_three_videos].include?(template)
   end
 
   def success_result(reel)

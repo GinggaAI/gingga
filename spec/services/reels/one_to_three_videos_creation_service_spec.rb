@@ -287,7 +287,7 @@ RSpec.describe Reels::OneToThreeVideosCreationService do
     it 'differs from scene-based templates by not requiring scenes' do
       result = service.call
 
-      # Unlike solo_avatars or avatar_and_video templates, this one doesn't need scenes
+      # Unlike only_avatars or avatar_and_video templates, this one doesn't need scenes
       expect(result[:reel].reel_scenes.count).to eq(0)
       expect(result[:reel]).to be_valid
     end

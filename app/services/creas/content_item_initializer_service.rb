@@ -607,8 +607,8 @@ module Creas
 
     def apply_basic_recovery_fixes(item)
       # Fix template validation
-      if item.errors[:template].any? || !%w[solo_avatars avatar_and_video narration_over_7_images remix one_to_three_videos].include?(item.template)
-        item.template = "solo_avatars"
+      if item.errors[:template].any? || !%w[only_avatars avatar_and_video narration_over_7_images remix one_to_three_videos].include?(item.template)
+        item.template = "only_avatars"
       end
 
       # Fix pilar validation
@@ -646,7 +646,7 @@ module Creas
       when 1
         # Attempt 1: Fix template validation
         if item.errors[:template].any?
-          item.template = "solo_avatars"
+          item.template = "only_avatars"
         end
 
         # Fix pilar validation
@@ -696,7 +696,7 @@ module Creas
         item.post_description = "Emergency recovery content for week #{week_number}. Original content could not be saved due to validation conflicts."
         item.text_base = "This is emergency recovery content generated to ensure the content plan is complete."
         item.hashtags = ""
-        item.template = "solo_avatars"
+        item.template = "only_avatars"
         item.pilar = "C"
         item.status = "draft"
         item.video_source = "none"
@@ -705,7 +705,7 @@ module Creas
         item.day_of_the_week = "Monday"
         item.meta = {
           "recovery_mode" => true,
-          "original_idea_id" => idea["id"],
+          "original_idea_id" => item.origin_id || "recovery-#{timestamp}",
           "recovery_timestamp" => Time.current.iso8601
         }
 
@@ -715,20 +715,21 @@ module Creas
 
     def normalize_template(template)
       # Valid templates according to CreasContentItem model validation
-      valid_templates = %w[solo_avatars avatar_and_video narration_over_7_images remix one_to_three_videos]
+      valid_templates = %w[only_avatars avatar_and_video narration_over_7_images remix one_to_three_videos]
 
-      return "solo_avatars" if template.blank?
+      return "only_avatars" if template.blank?
 
       # If template is already valid, return it
       return template if valid_templates.include?(template)
 
       # Template normalization mapping for common variations
       template_mappings = {
-        "solo_avatar" => "solo_avatars",
-        "single_avatar" => "solo_avatars",
-        "avatar_only" => "solo_avatars",
-        "text" => "solo_avatars",
-        "avatar" => "solo_avatars",
+        "solo_avatar" => "only_avatars",
+        "solo_avatars" => "only_avatars",
+        "single_avatar" => "only_avatars",
+        "avatar_only" => "only_avatars",
+        "text" => "only_avatars",
+        "avatar" => "only_avatars",
         "avatar_video" => "avatar_and_video",
         "avatar_with_video" => "avatar_and_video",
         "hybrid" => "avatar_and_video",
@@ -755,8 +756,8 @@ module Creas
       end
 
       # If no mapping found, log the unknown template and default to solo_avatars
-      Rails.logger.warn "ContentItemInitializerService: Unknown template '#{template}', defaulting to 'solo_avatars'"
-      "solo_avatars"
+      Rails.logger.warn "ContentItemInitializerService: Unknown template '#{template}', defaulting to 'only_avatars'"
+      "only_avatars"
     end
   end
 end

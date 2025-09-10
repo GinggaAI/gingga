@@ -20,7 +20,7 @@ RSpec.describe ReelsController, type: :request do
     let(:valid_params) do
       {
         reel: {
-          template: "solo_avatars",
+          template: "only_avatars",
           title: "Test Reel",
           description: "Test Description",
           use_ai_avatar: true,
@@ -62,7 +62,7 @@ RSpec.describe ReelsController, type: :request do
 
       reel = Reel.last
       expect(reel.reel_scenes.count).to eq(3)
-      expect(reel.template).to eq('solo_avatars')
+      expect(reel.template).to eq('only_avatars')
     end
   end
 

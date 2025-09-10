@@ -2,7 +2,7 @@ module ReelsHelper
   def status_icon(status)
     # Sanitize input and ensure only safe, predefined icons are returned
     safe_status = status.to_s.strip
-    
+
     case safe_status
     when "draft"
       "📝"
@@ -20,7 +20,7 @@ module ReelsHelper
   def status_icon_class(status)
     # Sanitize input and ensure only safe, predefined CSS classes are returned
     safe_status = status.to_s.strip
-    
+
     css_class = case safe_status
     when "draft"
       "bg-gray-100"
@@ -33,7 +33,7 @@ module ReelsHelper
     else
       "bg-gray-100"  # Safe default
     end
-    
+
     # Return as safe HTML to prevent XSS warnings
     css_class.html_safe
   end
@@ -42,7 +42,7 @@ module ReelsHelper
   def safe_status_css_class(status)
     # Only allow explicitly defined status values to prevent XSS
     allowed_statuses = %w[draft processing completed failed]
-    
+
     if allowed_statuses.include?(status.to_s.strip)
       status_icon_class(status)
     else
@@ -53,7 +53,7 @@ module ReelsHelper
   def status_description(status)
     # Sanitize input and ensure only safe, predefined descriptions are returned
     safe_status = status.to_s.strip
-    
+
     case safe_status
     when "draft"
       "This reel is saved as a draft and hasn't been generated yet."

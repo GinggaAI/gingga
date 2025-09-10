@@ -69,7 +69,7 @@ RSpec.describe Creas::Prompts do
     it 'includes allowed values constraints' do
       expect(subject).to include('ALLOWED VALUES')
       expect(subject).to include('awareness | engagement | sales | community')
-      expect(subject).to include('solo_avatars | avatar_and_video')
+      expect(subject).to include('only_avatars | avatar_and_video')
       expect(subject).to include('reach | saves | comments | CTR | DM')
     end
 
@@ -198,7 +198,7 @@ RSpec.describe Creas::Prompts do
 
     it 'defines template rules' do
       expect(subject).to include('CRITICAL TEMPLATE RULES')
-      expect(subject).to include('solo_avatars')
+      expect(subject).to include('only_avatars')
       expect(subject).to include('avatar_and_video')
       expect(subject).to include('narration_over_7_images')
       expect(subject).to include('remix')
@@ -364,7 +364,7 @@ RSpec.describe Creas::Prompts do
       voxa = described_class.voxa_system(strategy_plan_data: { brand_name: "Test" })
 
       # Both should reference the same template types
-      templates = [ 'solo_avatars', 'avatar_and_video', 'narration_over_7_images', 'remix', 'one_to_three_videos' ]
+      templates = [ 'only_avatars', 'avatar_and_video', 'narration_over_7_images', 'remix', 'one_to_three_videos' ]
       templates.each do |template|
         expect(noctua).to include(template)
         expect(voxa).to include(template)

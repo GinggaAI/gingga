@@ -18,7 +18,7 @@ Complete refactoring of the reel creation system from a simple `mode`-based appr
 - No data migration needed as no existing reels in database
 
 **Template Values**:
-- `solo_avatars` - Single AI avatar speaking scenes
+- `only_avatars` - Single AI avatar speaking scenes
 - `avatar_and_video` - Mix of AI avatars and video content
 - `narration_over_7_images` - Voice narration over image sequence
 - `one_to_three_videos` - Video compilation template
@@ -30,16 +30,16 @@ Complete refactoring of the reel creation system from a simple `mode`-based appr
 ```ruby
 # Key changes:
 validates :template, presence: true, inclusion: { 
-  in: %w[solo_avatars avatar_and_video narration_over_7_images one_to_three_videos],
+  in: %w[only_avatars avatar_and_video narration_over_7_images one_to_three_videos],
   message: "%{value} is not a valid template"
 }
 
-validate :must_have_exactly_three_scenes, if: -> { template.in?(%w[solo_avatars avatar_and_video]) }
+validate :must_have_exactly_three_scenes, if: -> { template.in?(%w[only_avatars avatar_and_video]) }
 validate :all_scenes_must_be_complete, if: -> { requires_scenes? }
 
 def ready_for_generation?
   case template
-  when "solo_avatars", "avatar_and_video"
+  when "only_avatars", "avatar_and_video"
     reel_scenes.count == 3 && reel_scenes.all?(&:complete?)
   when "narration_over_7_images", "one_to_three_videos" 
     true # Future implementation
@@ -49,7 +49,7 @@ def ready_for_generation?
 end
 
 def requires_scenes?
-  template.in?(%w[solo_avatars avatar_and_video])
+  template.in?(%w[only_avatars avatar_and_video])
 end
 ```
 
@@ -65,7 +65,7 @@ end
 - Handles reel initialization and parameter validation
 
 **Template-Specific Services**:
-- `app/services/reels/solo_avatars_creation_service.rb`
+- `app/services/reels/only_avatars_creation_service.rb`
 - `app/services/reels/avatar_and_video_creation_service.rb`
 - `app/services/reels/narration_over_7_images_creation_service.rb`
 - `app/services/reels/one_to_three_videos_creation_service.rb`
@@ -122,9 +122,9 @@ end
 ```ruby
 resources :reels, only: [ :index, :new, :create, :show ] do
   collection do
-    get "scene-based", to: "reels#new", defaults: { template: "solo_avatars" }, as: :scene_based
+    get "scene-based", to: "reels#new", defaults: { template: "only_avatars" }, as: :scene_based
     get "narrative", to: "reels#new", defaults: { template: "narration_over_7_images" }, as: :narrative
-    post "scene-based", to: "reels#create", defaults: { template: "solo_avatars" }
+    post "scene-based", to: "reels#create", defaults: { template: "only_avatars" }
     post "narrative", to: "reels#create", defaults: { template: "narration_over_7_images" }
     get "new/:template", to: "reels#new", as: :new_template
   end
@@ -319,7 +319,7 @@ RAILS_ENV=test bin/rails db:migrate
 ### Service Objects (New)
 - `app/services/reel_creation_service.rb`
 - `app/services/reels/base_creation_service.rb`
-- `app/services/reels/solo_avatars_creation_service.rb`
+- `app/services/reels/only_avatars_creation_service.rb`
 - `app/services/reels/avatar_and_video_creation_service.rb`
 - `app/services/reels/narration_over_7_images_creation_service.rb`
 - `app/services/reels/one_to_three_videos_creation_service.rb`

@@ -130,7 +130,7 @@ RSpec.describe ReelShowPresenter do
 
   describe 'scene methods' do
     context 'when reel has scenes' do
-      let(:reel_with_scenes) { create(:reel, user: user, template: 'solo_avatars') }
+      let(:reel_with_scenes) { create(:reel, user: user, template: 'only_avatars') }
       let(:presenter_with_scenes) { described_class.new(reel_with_scenes) }
 
       before do
@@ -146,7 +146,7 @@ RSpec.describe ReelShowPresenter do
 
       it 'returns ordered scenes' do
         expect(presenter_with_scenes.ordered_scenes.count).to eq(3)
-        expect(presenter_with_scenes.ordered_scenes.map(&:scene_number)).to eq([1, 2, 3])
+        expect(presenter_with_scenes.ordered_scenes.map(&:scene_number)).to eq([ 1, 2, 3 ])
       end
     end
 

@@ -24,7 +24,7 @@ This document captures common development issues encountered during the auto-cre
 describe 'error recovery' do
   it 'handles template normalization' do
     service = described_class.new(user: user, idea: idea)
-    expect(service.send(:normalize_template, 'solo_avatar')).to eq('solo_avatars')
+    expect(service.send(:normalize_template, 'solo_avatar')).to eq('only_avatars')
   end
 end
 

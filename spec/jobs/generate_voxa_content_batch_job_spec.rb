@@ -45,7 +45,7 @@ RSpec.describe GenerateVoxaContentBatchJob do
           "content_type" => "reel",
           "platform" => "Instagram",
           "pilar" => "C",
-          "template" => "solo_avatars",
+          "template" => "only_avatars",
           "video_source" => "kling",
           "post_description" => "Refined description 1",
           "text_base" => "Refined text 1",
@@ -63,7 +63,7 @@ RSpec.describe GenerateVoxaContentBatchJob do
           "content_type" => "reel",
           "platform" => "Instagram",
           "pilar" => "E",
-          "template" => "solo_avatars",
+          "template" => "only_avatars",
           "video_source" => "kling",
           "post_description" => "Refined description 2",
           "text_base" => "Refined text 2",
@@ -353,7 +353,7 @@ RSpec.describe GenerateVoxaContentBatchJob do
       let(:job) { described_class.new }
 
       it 'normalizes known template variations' do
-        expect(job.send(:normalize_template, "solo_avatar")).to eq("solo_avatars")
+        expect(job.send(:normalize_template, "solo_avatar")).to eq("only_avatars")
         expect(job.send(:normalize_template, "avatar_video")).to eq("avatar_and_video")
         expect(job.send(:normalize_template, "seven_images")).to eq("narration_over_7_images")
         expect(job.send(:normalize_template, "multi_video")).to eq("one_to_three_videos")
@@ -361,14 +361,14 @@ RSpec.describe GenerateVoxaContentBatchJob do
       end
 
       it 'returns valid templates unchanged' do
-        expect(job.send(:normalize_template, "solo_avatars")).to eq("solo_avatars")
+        expect(job.send(:normalize_template, "only_avatars")).to eq("only_avatars")
         expect(job.send(:normalize_template, "avatar_and_video")).to eq("avatar_and_video")
       end
 
-      it 'defaults unknown templates to solo_avatars' do
-        expect(job.send(:normalize_template, "unknown_template")).to eq("solo_avatars")
-        expect(job.send(:normalize_template, nil)).to eq("solo_avatars")
-        expect(job.send(:normalize_template, "")).to eq("solo_avatars")
+      it 'defaults unknown templates to only_avatars' do
+        expect(job.send(:normalize_template, "unknown_template")).to eq("only_avatars")
+        expect(job.send(:normalize_template, nil)).to eq("only_avatars")
+        expect(job.send(:normalize_template, "")).to eq("only_avatars")
       end
     end
 
@@ -459,13 +459,13 @@ RSpec.describe GenerateVoxaContentBatchJob do
       end
 
       it 'generates default shotplan when neither is available' do
-        voxa_item = { "hook" => "Test hook", "template" => "solo_avatars" }
+        voxa_item = { "hook" => "Test hook", "template" => "only_avatars" }
         existing_record.shotplan = nil
 
         result = job.send(:ensure_shot_plan, voxa_item, existing_record)
         expect(result["scenes"]).to be_present
         expect(result["scenes"][0]["voiceover"]).to eq("Test hook")
-        expect(result["beats"]).to eq([])  # beats should be empty for solo_avatars template
+        expect(result["beats"]).to eq([])  # beats should be empty for only_avatars template
       end
 
       it 'generates correct default shotplan for narration_over_7_images template' do
@@ -523,7 +523,7 @@ RSpec.describe GenerateVoxaContentBatchJob do
               "content_type" => "reel",
               "platform" => "Instagram",
               "pilar" => "C",
-              "template" => "solo_avatars",
+              "template" => "only_avatars",
               "video_source" => "kling",
               "post_description" => "Description #{i + 1}",
               "text_base" => "Text #{i + 1}",
@@ -588,7 +588,7 @@ RSpec.describe GenerateVoxaContentBatchJob do
               "content_type" => "reel",
               "platform" => "Instagram",
               "pilar" => "C",
-              "template" => "solo_avatars",
+              "template" => "only_avatars",
               "video_source" => "kling",
               "post_description" => "New description",
               "text_base" => "New text",
@@ -762,7 +762,7 @@ RSpec.describe GenerateVoxaContentBatchJob do
           "content_type" => "reel",
           "platform" => "Instagram",
           "pilar" => "C",
-          "template" => "solo_avatars",
+          "template" => "only_avatars",
           "video_source" => "kling",
           "post_description" => "Mapped description",
           "text_base" => "Mapped text",
@@ -800,7 +800,7 @@ RSpec.describe GenerateVoxaContentBatchJob do
           content_type: "reel",
           platform: "instagram",
           pilar: "C",
-          template: "solo_avatars",
+          template: "only_avatars",
           video_source: "kling",
           post_description: "Mapped description",
           text_base: "Mapped text",
@@ -832,7 +832,7 @@ RSpec.describe GenerateVoxaContentBatchJob do
           "content_type" => "post",
           "platform" => "instagram",
           "pilar" => "C",
-          "template" => "solo_avatars",
+          "template" => "only_avatars",
           "video_source" => "none",
           "post_description" => "Description",
           "text_base" => "Text",

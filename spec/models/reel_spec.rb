@@ -19,7 +19,7 @@ RSpec.describe Reel, type: :model do
 
     describe 'scene validations for template-based reels' do
       context 'when template requires scenes' do
-        let(:reel) { create(:reel, user: user, template: 'solo_avatars') }
+        let(:reel) { create(:reel, user: user, template: 'only_avatars') }
 
         it 'validates exactly 3 scenes are present' do
           create(:reel_scene, reel: reel, scene_number: 1)
@@ -27,7 +27,7 @@ RSpec.describe Reel, type: :model do
 
           expect(reel.reload.valid?).to be false
           reel.reload.valid?
-          expect(reel.errors[:reel_scenes]).to include('must have exactly 3 scenes for solo_avatars template')
+          expect(reel.errors[:reel_scenes]).to include('must have exactly 3 scenes for only_avatars template')
         end
 
         it 'is valid with exactly 3 scenes' do
@@ -53,7 +53,7 @@ RSpec.describe Reel, type: :model do
         end
 
         it 'skips validation for new records' do
-          new_reel = build(:reel, user: user, template: 'solo_avatars')
+          new_reel = build(:reel, user: user, template: 'only_avatars')
           expect(new_reel).to be_valid
         end
       end
@@ -69,13 +69,13 @@ RSpec.describe Reel, type: :model do
   end
 
   describe 'scopes' do
-    let!(:solo_avatars_reel) { create(:reel, user: user, template: 'solo_avatars') }
+    let!(:only_avatars_reel) { create(:reel, user: user, template: 'only_avatars') }
     let!(:draft_reel) { create(:reel, user: user, status: 'draft') }
     let!(:processing_reel) { create(:reel, user: user, status: 'processing') }
 
     describe '.by_template' do
       it 'returns reels with specified template' do
-        expect(Reel.where(template: 'solo_avatars')).to include(solo_avatars_reel)
+        expect(Reel.where(template: 'only_avatars')).to include(only_avatars_reel)
       end
     end
 
@@ -89,8 +89,8 @@ RSpec.describe Reel, type: :model do
   end
 
   describe '#ready_for_generation?' do
-    context 'for solo_avatars template' do
-      let(:reel) { create(:reel, user: user, template: 'solo_avatars') }
+    context 'for only_avatars template' do
+      let(:reel) { create(:reel, user: user, template: 'only_avatars') }
 
       context 'when reel has exactly 3 complete scenes' do
         before do
@@ -176,8 +176,8 @@ RSpec.describe Reel, type: :model do
   end
 
   describe '#requires_scenes?' do
-    it 'returns true for solo_avatars template' do
-      reel = build(:reel, user: user, template: 'solo_avatars')
+    it 'returns true for only_avatars template' do
+      reel = build(:reel, user: user, template: 'only_avatars')
       expect(reel.requires_scenes?).to be true
     end
 
@@ -199,7 +199,7 @@ RSpec.describe Reel, type: :model do
 
   describe 'scene number assignment' do
     it 'assigns scene numbers automatically' do
-      reel = create(:reel, user: user, template: 'solo_avatars')
+      reel = create(:reel, user: user, template: 'only_avatars')
 
       # Test that the assign_scene_numbers method exists and works
       scene_without_number = build(:reel_scene, reel: reel, scene_number: nil)
@@ -217,7 +217,7 @@ RSpec.describe Reel, type: :model do
       reel = create(:reel, user: user)
       expect(reel).to be_persisted
       expect(reel.user).to eq(user)
-      expect(reel.template).to eq('solo_avatars')
+      expect(reel.template).to eq('only_avatars')
       expect(reel.status).to eq('draft')
     end
   end

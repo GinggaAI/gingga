@@ -55,7 +55,7 @@ module Reels
 
     def should_generate_video?(reel)
       # Only generate videos for templates that support HeyGen integration
-      reel.template.in?(%w[solo_avatars avatar_and_video])
+      reel.template.in?(%w[only_avatars avatar_and_video])
     end
 
     def success_result(reel)
