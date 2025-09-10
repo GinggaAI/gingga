@@ -1,9 +1,10 @@
 # Manual de Implementación: Sistema de Background Jobs en Gingga
 
 **Autor**: Claude  
-**Fecha**: 29 de Agosto, 2025  
-**Versión**: 1.0  
+**Fecha**: 9 de Septiembre, 2025  
+**Versión**: 1.1  
 **Audiencia**: Desarrolladores Backend, DevOps, SysAdmins  
+**Última actualización**: Agregada sección completa de monitoreo para SolidQueue con scripts automatizados  
 
 ---
 
@@ -14,10 +15,11 @@
 3. [Flujo Detallado de Jobs](#flujo-detallado-de-jobs)
 4. [Problemas Identificados](#problemas-identificados)
 5. [Replicación Manual de Jobs](#replicación-manual-de-jobs)
-6. [Implementación de Sidekiq](#implementación-de-sidekiq)
-7. [Monitoring y Troubleshooting](#monitoring-y-troubleshooting)
-8. [Testing y Validación](#testing-y-validación)
-9. [Runbook de Operaciones](#runbook-de-operaciones)
+6. [Monitoring y Troubleshooting de SolidQueue](#monitoring-y-troubleshooting-de-solidqueue)
+7. [Implementación de Sidekiq](#implementación-de-sidekiq)
+8. [Monitoring y Troubleshooting](#monitoring-y-troubleshooting)
+9. [Testing y Validación](#testing-y-validación)
+10. [Runbook de Operaciones](#runbook-de-operaciones)
 
 ---
 
@@ -640,6 +642,292 @@ end
 # Uso:
 # rails runner scripts/recover_stuck_plans.rb  
 # recover_stuck_plan("your-plan-id")
+```
+
+---
+
+## Monitoring y Troubleshooting de SolidQueue
+
+### Comandos de Monitoreo Básico
+
+#### Verificar Estado General de Jobs
+```bash
+# Ver resumen rápido de jobs pendientes
+bundle exec rails runner "puts \"📋 Jobs pendientes: #{SolidQueue::Job.where(finished_at: nil).count}\""
+
+# Ver jobs completados
+bundle exec rails runner "puts \"✅ Jobs completados: #{SolidQueue::Job.where.not(finished_at: nil).count}\""
+
+# Ver total de jobs en el sistema
+bundle exec rails runner "puts \"📊 Total jobs: #{SolidQueue::Job.count}\""
+```
+
+#### Análisis Detallado de Jobs
+```ruby
+# Script completo para análisis de jobs
+bundle exec rails runner "
+puts '=== ANÁLISIS COMPLETO DE JOBS ==='
+
+# Jobs pendientes (sin finished_at)
+pending = SolidQueue::Job.where(finished_at: nil).count
+puts \"📋 Jobs pendientes: #{pending}\"
+
+# Jobs completados (con finished_at)
+completed = SolidQueue::Job.where.not(finished_at: nil).count
+puts \"✅ Jobs completados: #{completed}\"
+
+# Jobs por tipo
+puts \"\\n📊 Jobs por tipo:\"
+SolidQueue::Job.group(:class_name).count.each do |job_class, count|
+  puts \"  #{job_class}: #{count}\"
+end
+
+# Jobs pendientes detalles
+puts \"\\n⏳ Jobs pendientes detalles:\"
+SolidQueue::Job.where(finished_at: nil).limit(10).each do |job|
+  puts \"  - #{job.class_name} (creado: #{job.created_at})\"
+end
+
+# Jobs programados para el futuro
+future_jobs = SolidQueue::Job.where('scheduled_at > ?', Time.current).count
+puts \"\\n⏰ Jobs programados para el futuro: #{future_jobs}\"
+
+# Jobs antiguos pendientes (más de 1 día)
+old_pending = SolidQueue::Job.where(finished_at: nil).where('created_at < ?', 1.day.ago).count
+puts \"\\n⚠️  Jobs pendientes antiguos (>1 día): #{old_pending}\"
+"
+```
+
+### Monitoreo de Jobs Específicos
+
+#### CheckVideoStatusJob (HeyGen Integration)
+```bash
+# Ver jobs de video pendientes
+bundle exec rails runner "
+video_jobs = SolidQueue::Job.where(class_name: 'CheckVideoStatusJob', finished_at: nil)
+puts \"🎥 CheckVideoStatusJob pendientes: #{video_jobs.count}\"
+video_jobs.each { |job| puts \"  - Creado: #{job.created_at}\" }
+"
+```
+
+#### Jobs de Generación de Contenido
+```bash
+# Noctua Strategy Jobs
+bundle exec rails runner "
+noctua_pending = SolidQueue::Job.where(class_name: 'GenerateNoctuaStrategyBatchJob', finished_at: nil).count
+puts \"🧠 Noctua Strategy Jobs pendientes: #{noctua_pending}\"
+"
+
+# Voxa Content Jobs  
+bundle exec rails runner "
+voxa_pending = SolidQueue::Job.where(class_name: 'GenerateVoxaContentBatchJob', finished_at: nil).count
+puts \"📝 Voxa Content Jobs pendientes: #{voxa_pending}\"
+"
+```
+
+### Dashboard Web para SolidQueue
+
+#### Configuración del Dashboard
+```ruby
+# config/routes.rb
+require "solid_queue/web"
+
+Rails.application.routes.draw do
+  # Montar el dashboard de SolidQueue (solo en desarrollo/staging)
+  if Rails.env.development? || Rails.env.staging?
+    mount SolidQueue::Web => "/solid_queue"
+  end
+  
+  # En producción, proteger con autenticación
+  if Rails.env.production?
+    authenticate :user, ->(user) { user.admin? } do
+      mount SolidQueue::Web => "/solid_queue"
+    end
+  end
+end
+```
+
+#### Acceso al Dashboard
+```bash
+# Visitar en el navegador:
+# Desarrollo: http://localhost:3000/solid_queue
+# Producción: https://yourdomain.com/solid_queue (requiere admin)
+```
+
+### Comandos de Limpieza y Mantenimiento
+
+#### Limpiar Jobs Antiguos
+```bash
+# Eliminar jobs completados antiguos (más de 7 días)
+bundle exec rails runner "
+old_completed = SolidQueue::Job.where.not(finished_at: nil)
+                                .where('finished_at < ?', 7.days.ago)
+puts \"🧹 Eliminando #{old_completed.count} jobs completados antiguos\"
+old_completed.delete_all
+"
+
+# Eliminar jobs pendientes muy antiguos (más de 2 días - usar con cuidado)
+bundle exec rails runner "
+very_old_pending = SolidQueue::Job.where(finished_at: nil)
+                                  .where('created_at < ?', 2.days.ago)
+puts \"⚠️  CUIDADO: #{very_old_pending.count} jobs pendientes antiguos encontrados\"
+puts \"Para eliminarlos ejecuta:\"
+puts \"very_old_pending.destroy_all\"
+"
+```
+
+#### Reiniciar Jobs Fallidos
+```ruby
+# Script para reiniciar jobs específicos
+bundle exec rails runner "
+# Encontrar jobs fallidos
+failed_jobs = SolidQueue::Job.joins(:failed_execution)
+puts \"❌ Jobs fallidos: #{failed_jobs.count}\"
+
+# Para reiniciar un job específico (reemplaza con ID real)
+# job_id = 'your-job-id'
+# job = SolidQueue::Job.find(job_id)
+# job.retry! if job.respond_to?(:retry!)
+"
+```
+
+### Scripts de Monitoreo Automatizado
+
+#### Health Check Script
+```ruby
+# scripts/monitoring/solidqueue_health.rb
+#!/usr/bin/env ruby
+
+class SolidQueueHealthCheck
+  def self.run
+    puts "=== SOLID QUEUE HEALTH CHECK ==="
+    puts "Timestamp: #{Time.current}"
+    
+    # Métricas básicas
+    total_jobs = SolidQueue::Job.count
+    pending_jobs = SolidQueue::Job.where(finished_at: nil).count
+    completed_jobs = SolidQueue::Job.where.not(finished_at: nil).count
+    
+    puts "📊 MÉTRICAS GENERALES:"
+    puts "  Total jobs: #{total_jobs}"
+    puts "  Pendientes: #{pending_jobs}"
+    puts "  Completados: #{completed_jobs}"
+    
+    # Alertas
+    old_pending = SolidQueue::Job.where(finished_at: nil)
+                                 .where('created_at < ?', 1.hour.ago).count
+    
+    if old_pending > 0
+      puts "⚠️  ALERTA: #{old_pending} jobs pendientes de más de 1 hora"
+    end
+    
+    # Jobs por tipo
+    puts "\n📋 JOBS POR TIPO:"
+    SolidQueue::Job.group(:class_name).count.each do |job_class, count|
+      pending_count = SolidQueue::Job.where(class_name: job_class, finished_at: nil).count
+      puts "  #{job_class}: #{count} total (#{pending_count} pendientes)"
+    end
+    
+    # Recomendaciones
+    if pending_jobs > 10
+      puts "\n💡 RECOMENDACIÓN: Considerar iniciar workers de SolidQueue"
+      puts "   Comando: bundle exec solid_queue"
+    end
+    
+    puts "\n✅ Health check completado"
+  end
+end
+
+# Ejecutar el health check
+SolidQueueHealthCheck.run
+```
+
+#### Uso del Health Check
+```bash
+# Ejecutar manualmente
+bundle exec rails runner scripts/monitoring/solidqueue_health.rb
+
+# Programar en cron (cada 30 minutos)
+# */30 * * * * cd /path/to/app && bundle exec rails runner scripts/monitoring/solidqueue_health.rb >> log/solidqueue_health.log 2>&1
+```
+
+### Comandos de Troubleshooting
+
+#### Verificar Workers Activos
+```bash
+# Ver si hay workers de SolidQueue corriendo
+ps aux | grep solid_queue
+
+# Ver logs de SolidQueue
+tail -f log/development.log | grep SolidQueue
+
+# Iniciar workers manualmente (desarrollo)
+bundle exec solid_queue
+```
+
+#### Información de Jobs Específicos
+```ruby
+# Inspeccionar un job específico
+bundle exec rails runner "
+job_id = 'your-job-id'
+job = SolidQueue::Job.find(job_id)
+puts \"Job: #{job.class_name}\"
+puts \"Estado: #{job.finished_at ? 'Completado' : 'Pendiente'}\"
+puts \"Creado: #{job.created_at}\"
+puts \"Argumentos: #{job.arguments}\"
+"
+```
+
+### Alertas y Notificaciones
+
+#### Configurar Alertas por Email
+```ruby
+# app/jobs/application_job.rb
+class ApplicationJob < ActiveJob::Base
+  rescue_from StandardError do |exception|
+    # Log del error
+    Rails.logger.error "Job #{self.class} failed: #{exception.message}"
+    
+    # Enviar alerta si es un job crítico
+    if critical_job?
+      AdminNotificationMailer.job_failure(
+        job_class: self.class.name,
+        error: exception.message,
+        timestamp: Time.current
+      ).deliver_now
+    end
+    
+    # Re-lanzar la excepción para que SolidQueue la maneje
+    raise exception
+  end
+  
+  private
+  
+  def critical_job?
+    %w[CheckVideoStatusJob GenerateNoctuaStrategyBatchJob].include?(self.class.name)
+  end
+end
+```
+
+### Comandos Rápidos de Referencia
+
+```bash
+# COMANDOS ESENCIALES PARA COPIAR/PEGAR
+
+# Ver resumen rápido
+bundle exec rails runner "puts \"Pendientes: #{SolidQueue::Job.where(finished_at: nil).count}\""
+
+# Ver jobs de video específicamente  
+bundle exec rails runner "puts SolidQueue::Job.where(class_name: 'CheckVideoStatusJob', finished_at: nil).count"
+
+# Limpiar jobs completados antiguos (7+ días)
+bundle exec rails runner "SolidQueue::Job.where.not(finished_at: nil).where('finished_at < ?', 7.days.ago).delete_all"
+
+# Health check completo
+bundle exec rails runner scripts/monitoring/solidqueue_health.rb
+
+# Iniciar workers (desarrollo)
+bundle exec solid_queue
 ```
 
 ---

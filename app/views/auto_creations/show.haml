@@ -37,7 +37,7 @@
                     %path{:d => "M4 17v2"}
                     %path{:d => "M5 18H3"}
                   Generate Post
-                %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.bg-primary.h-10.px-4.w-full.bg-gradient-to-r.text-white.font-medium.py-6.rounded-xl.text-lg{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-primary/90 from-[#A37FFF] to-[#3AC8FF] hover:from-[#3AC8FF] hover:to-[#A37FFF]"}
+                = link_to scene_based_reels_path, class: "inline-flex items-center justify-center gap-2 whitespace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary h-10 px-4 w-full bg-gradient-to-r text-white font-medium py-6 rounded-xl text-lg [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-primary/90 from-[#A37FFF] to-[#3AC8FF] hover:from-[#3AC8FF] hover:to-[#A37FFF] no-underline" do
                   %svg.lucide.lucide-video.w-5.h-5.mr-2{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}>
                     %path{:d => "m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"}
                     %rect{:height => "12", :rx => "2", :width => "14", :x => "2", :y => "6"}
@@ -61,70 +61,35 @@
         .flex.flex-col.p-6{:class => "space-y-1.5"}
           .font-semibold.tracking-tight.text-xl Recent Creations
         .p-6.pt-0
-          .space-y-4
-            .flex.items-center.justify-between.p-4.bg-gray-50.rounded-xl.hover:bg-gray-100.transition-colors
-              .flex.items-center.gap-4
-                .w-10.h-10.rounded-lg.flex.items-center.justify-center.text-white.bg-gradient-to-r.from-purple-500.to-pink-500
-                  %svg.lucide.lucide-instagram.w-4.h-4{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                    %rect{:height => "20", :rx => "5", :ry => "5", :width => "20", :x => "2", :y => "2"}
-                    %path{:d => "M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"}
-                    %line{:x1 => "17.5", :x2 => "17.51", :y1 => "6.5", :y2 => "6.5"}
-                %div
-                  %h4.font-medium.text-gray-900 5 Tips for Better Content
-                  .flex.items-center.gap-2.mt-1
-                    .inline-flex.items-center.rounded-full.border.text-xs.font-semibold.transition-colors.focus:outline-none.focus:ring-2.focus:ring-ring.focus:ring-offset-2.border-transparent.bg-secondary.text-secondary-foreground.capitalize{:class => "px-2.5 py-0.5 hover:bg-secondary/80"} post
-                    %span.text-sm.text-gray-500.flex.items-center.gap-1
-                      %svg.lucide.lucide-clock.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}>
-                        %circle{:cx => "12", :cy => "12", :r => "10"}
-                        %polyline{:points => "12 6 12 12 16 14"}
-                      2 hours ago
-              %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.border.border-input.bg-background.hover:bg-accent.hover:text-accent-foreground.h-9.px-3.rounded-xl{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"} View
-            .flex.items-center.justify-between.p-4.bg-gray-50.rounded-xl.hover:bg-gray-100.transition-colors
-              .flex.items-center.gap-4
-                .w-10.h-10.rounded-lg.flex.items-center.justify-center.text-white.bg-gradient-to-r.from-purple-500.to-pink-500
-                  %svg.lucide.lucide-video.w-4.h-4{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                    %path{:d => "m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"}
-                    %rect{:height => "12", :rx => "2", :width => "14", :x => "2", :y => "6"}
-                %div
-                  %h4.font-medium.text-gray-900 Behind the Scenes Reel
-                  .flex.items-center.gap-2.mt-1
-                    .inline-flex.items-center.rounded-full.border.text-xs.font-semibold.transition-colors.focus:outline-none.focus:ring-2.focus:ring-ring.focus:ring-offset-2.border-transparent.bg-secondary.text-secondary-foreground.capitalize{:class => "px-2.5 py-0.5 hover:bg-secondary/80"} reel
-                    %span.text-sm.text-gray-500.flex.items-center.gap-1
-                      %svg.lucide.lucide-clock.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}>
-                        %circle{:cx => "12", :cy => "12", :r => "10"}
-                        %polyline{:points => "12 6 12 12 16 14"}
-                      5 hours ago
-              %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.border.border-input.bg-background.hover:bg-accent.hover:text-accent-foreground.h-9.px-3.rounded-xl{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"} View
-            .flex.items-center.justify-between.p-4.bg-gray-50.rounded-xl.hover:bg-gray-100.transition-colors
-              .flex.items-center.gap-4
-                .w-10.h-10.rounded-lg.flex.items-center.justify-center.text-white.bg-blue-600
-                  %svg.lucide.lucide-instagram.w-4.h-4{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                    %rect{:height => "20", :rx => "5", :ry => "5", :width => "20", :x => "2", :y => "2"}
-                    %path{:d => "M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"}
-                    %line{:x1 => "17.5", :x2 => "17.51", :y1 => "6.5", :y2 => "6.5"}
-                %div
-                  %h4.font-medium.text-gray-900 Industry Insights
-                  .flex.items-center.gap-2.mt-1
-                    .inline-flex.items-center.rounded-full.border.text-xs.font-semibold.transition-colors.focus:outline-none.focus:ring-2.focus:ring-ring.focus:ring-offset-2.border-transparent.bg-secondary.text-secondary-foreground.capitalize{:class => "px-2.5 py-0.5 hover:bg-secondary/80"} post
-                    %span.text-sm.text-gray-500.flex.items-center.gap-1
-                      %svg.lucide.lucide-clock.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}>
-                        %circle{:cx => "12", :cy => "12", :r => "10"}
-                        %polyline{:points => "12 6 12 12 16 14"}
-                      1 day ago
-              %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.border.border-input.bg-background.hover:bg-accent.hover:text-accent-foreground.h-9.px-3.rounded-xl{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"} View
-            .flex.items-center.justify-between.p-4.bg-gray-50.rounded-xl.hover:bg-gray-100.transition-colors
-              .flex.items-center.gap-4
-                .w-10.h-10.rounded-lg.flex.items-center.justify-center.text-white.bg-black
-                  %svg.lucide.lucide-video.w-4.h-4{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
-                    %path{:d => "m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"}
-                    %rect{:height => "12", :rx => "2", :width => "14", :x => "2", :y => "6"}
-                %div
-                  %h4.font-medium.text-gray-900 Quick Tutorial
-                  .flex.items-center.gap-2.mt-1
-                    .inline-flex.items-center.rounded-full.border.text-xs.font-semibold.transition-colors.focus:outline-none.focus:ring-2.focus:ring-ring.focus:ring-offset-2.border-transparent.bg-secondary.text-secondary-foreground.capitalize{:class => "px-2.5 py-0.5 hover:bg-secondary/80"} reel
-                    %span.text-sm.text-gray-500.flex.items-center.gap-1
-                      %svg.lucide.lucide-clock.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}>
-                        %circle{:cx => "12", :cy => "12", :r => "10"}
-                        %polyline{:points => "12 6 12 12 16 14"}
-                      2 days ago
-              %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.border.border-input.bg-background.hover:bg-accent.hover:text-accent-foreground.h-9.px-3.rounded-xl{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"} View
+          - if @recent_reels.any?
+            .space-y-4
+              - @recent_reels.each do |reel|
+                .flex.items-center.justify-between.p-4.bg-gray-50.rounded-xl.hover:bg-gray-100.transition-colors
+                  .flex.items-center.gap-4
+                    .w-10.h-10.rounded-lg.flex.items-center.justify-center.text-white{class: reel_icon_class(reel)}
+                      = reel_icon_svg(reel)
+                    %div
+                      %h4.font-medium.text-gray-900= reel_display_title(reel)
+                      .flex.items-center.gap-2.mt-1
+                        .inline-flex.items-center.rounded-full.border.text-xs.font-semibold.transition-colors.focus:outline-none.focus:ring-2.focus:ring-ring.focus:ring-offset-2.border-transparent.bg-secondary.text-secondary-foreground.capitalize{:class => "px-2.5 py-0.5 hover:bg-secondary/80"}= reel_type_display(reel)
+                        %span.text-sm.text-gray-500.flex.items-center.gap-1
+                          %svg.lucide.lucide-clock.w-3.h-3{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
+                            %circle{:cx => "12", :cy => "12", :r => "10"}
+                            %polyline{:points => "12 6 12 12 16 14"}
+                          = time_ago_in_words(reel.created_at)
+                          ago
+                  = link_to reel_path(reel), class: "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 rounded-xl [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0" do
+                    View
+          - else
+            .text-center.py-8
+              .w-16.h-16.mx-auto.mb-4.bg-gray-100.rounded-full.flex.items-center.justify-center
+                %svg.lucide.lucide-video.w-6.h-6.text-gray-400{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
+                  %path{:d => "m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"}
+                  %rect{:height => "12", :rx => "2", :width => "14", :x => "2", :y => "6"}
+              %h3.text-lg.font-medium.text-gray-900.mb-2 No videos yet
+              %p.text-gray-500.mb-4 Create your first video to see it here
+              = link_to scene_based_reels_path, class: "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2 rounded-xl bg-gradient-to-r from-[#A37FFF] to-[#3AC8FF] hover:from-[#3AC8FF] hover:to-[#A37FFF] no-underline text-white" do
+                %svg.lucide.lucide-plus.w-4.h-4.mr-2{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}
+                  %path{:d => "M5 12h14"}
+                  %path{:d => "M12 5v14"}
+                Create Video

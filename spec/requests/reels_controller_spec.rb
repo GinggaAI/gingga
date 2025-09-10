@@ -20,6 +20,7 @@ RSpec.describe ReelsController, type: :request do
     let(:valid_params) do
       {
         reel: {
+          template: "only_avatars",
           title: "Test Reel",
           description: "Test Description",
           use_ai_avatar: true,
@@ -61,7 +62,7 @@ RSpec.describe ReelsController, type: :request do
 
       reel = Reel.last
       expect(reel.reel_scenes.count).to eq(3)
-      expect(reel.mode).to eq('scene_based')
+      expect(reel.template).to eq('only_avatars')
     end
   end
 
@@ -70,7 +71,7 @@ RSpec.describe ReelsController, type: :request do
       get "/en/reels/narrative"
 
       expect(response).to have_http_status(:success)
-      expect(response.body).to include("narrative reel")
+      expect(response.body).to include("Narrative")
     end
   end
 
@@ -78,10 +79,10 @@ RSpec.describe ReelsController, type: :request do
     let(:valid_params) do
       {
         reel: {
+          template: "narration_over_7_images",
           title: "Narrative Reel",
           description: "Story description",
           category: "educational",
-          format: "short_vertical",
           story_content: "This is my story...",
           music_preference: "upbeat",
           style_preference: "modern"
@@ -102,7 +103,7 @@ RSpec.describe ReelsController, type: :request do
       post "/en/reels/narrative", params: valid_params
 
       reel = Reel.last
-      expect(reel.mode).to eq('narrative')
+      expect(reel.template).to eq('narration_over_7_images')
       expect(reel.title).to eq('Narrative Reel')
       expect(reel.category).to eq('educational')
     end

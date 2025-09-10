@@ -316,3 +316,9 @@ body {
   opacity: 1;
 }
 
+/* Tab Components */
+.tab-active {
+  background-color: var(--primary);
+  color: white;
+}
+

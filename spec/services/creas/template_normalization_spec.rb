@@ -35,18 +35,18 @@ RSpec.describe 'Template Normalization', type: :service do
 
       created_item = strategy_plan.creas_content_items.first
       expect(created_item).to be_present
-      expect(created_item.template).to eq("solo_avatars") # Should be normalized
+      expect(created_item.template).to eq("only_avatars") # Should be normalized
     end
 
     it 'handles common template variations' do
       test_cases = [
-        { input: "text", expected: "solo_avatars" },
-        { input: "avatar", expected: "solo_avatars" },
+        { input: "text", expected: "only_avatars" },
+        { input: "avatar", expected: "only_avatars" },
         { input: "carousel", expected: "narration_over_7_images" },
         { input: "slideshow", expected: "narration_over_7_images" },
         { input: "videos", expected: "one_to_three_videos" },
-        { input: nil, expected: "solo_avatars" },
-        { input: "", expected: "solo_avatars" }
+        { input: nil, expected: "only_avatars" },
+        { input: "", expected: "only_avatars" }
       ]
 
       test_cases.each do |test_case|
@@ -61,8 +61,8 @@ RSpec.describe 'Template Normalization', type: :service do
 
     it 'normalizes invalid templates from Voxa response' do
       test_cases = [
-        { input: "unknown_template", expected: "solo_avatars" },
-        { input: "text", expected: "solo_avatars" },
+        { input: "unknown_template", expected: "only_avatars" },
+        { input: "text", expected: "only_avatars" },
         { input: "carousel", expected: "narration_over_7_images" },
         { input: "videos", expected: "one_to_three_videos" }
       ]
@@ -109,7 +109,7 @@ RSpec.describe 'Template Normalization', type: :service do
       expect(created_items.count).to eq(1)
 
       item = created_items.first
-      expect(item.template).to eq("solo_avatars") # Should be normalized
+      expect(item.template).to eq("only_avatars") # Should be normalized
       expect(item.pilar).to eq("C") # Should be fixed
       expect(item.video_source).to eq("none") # Should be fixed
       expect(item.status).to eq("draft") # Should be valid
@@ -161,7 +161,7 @@ RSpec.describe 'Template Normalization', type: :service do
 
       # All should have valid normalized templates
       created_items.each do |item|
-        expect(%w[solo_avatars avatar_and_video narration_over_7_images remix one_to_three_videos]).to include(item.template)
+        expect(%w[only_avatars avatar_and_video narration_over_7_images remix one_to_three_videos]).to include(item.template)
       end
     end
   end

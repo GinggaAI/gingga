@@ -24,7 +24,6 @@ module Creas
       @user = @plan.user   # Update user reference from fresh plan
       @brand = @plan.brand # Update brand reference from fresh plan
 
-      Rails.logger.info "Voxa VoxaContentService: Starting content refinement for strategy plan #{@plan.id} (user: #{@user.id}, brand: #{@brand&.id})"
 
       # Check if strategy is already being processed
       if @plan.status == "processing"
@@ -38,32 +37,26 @@ module Creas
 
       # Log current content state
       current_content_count = @plan.creas_content_items.count
-      Rails.logger.info "Voxa VoxaContentService: Current content items count: #{current_content_count}"
 
       # Determine batches based on whether we're refining a specific week or all weeks
       if @target_week
         # Single week refinement
         total_batches = 1
         target_batch_number = @target_week
-        Rails.logger.info "Voxa VoxaContentService: Starting single week refinement for week #{@target_week} of strategy plan #{@plan.id}"
       else
         # All weeks refinement
         total_batches = calculate_batches_needed
         target_batch_number = 1
-        Rails.logger.info "Voxa VoxaContentService: Starting full strategy refinement for strategy plan #{@plan.id} with #{total_batches} batches"
       end
 
       batch_id = SecureRandom.uuid
 
-      Rails.logger.info "Voxa VoxaContentService: Starting batch processing for strategy plan #{@plan.id} with #{total_batches} batches (batch_id: #{batch_id})"
 
       # Update strategy plan status to pending (will be updated to processing by first batch job)
       @plan.update!(status: :pending)
-      Rails.logger.info "Voxa VoxaContentService: Strategy plan #{@plan.id} status updated to pending"
 
       # Queue first batch job for Voxa processing
       ::GenerateVoxaContentBatchJob.perform_later(@plan.id, target_batch_number, total_batches, batch_id)
-      Rails.logger.info "Voxa VoxaContentService: GenerateVoxaContentBatchJob batch #{target_batch_number}/#{total_batches} queued for strategy plan #{@plan.id}"
 
       # Return the plan immediately (status: pending)
       @plan
@@ -89,7 +82,6 @@ module Creas
       # Each batch will process content items from one specific week
       weekly_plan_count = @plan.weekly_plan&.count || 4
 
-      Rails.logger.info "Voxa VoxaContentService: Strategy plan has #{weekly_plan_count} weeks in weekly_plan"
 
       # Always use 4 batches to match standard 4-week monthly strategy structure
       4

@@ -149,7 +149,7 @@ RSpec.describe 'Day of Week Content Placement', type: :integration do
             "content_type" => "reel",
             "platform" => "Instagram",
             "pilar" => "C",
-            "template" => "solo_avatars",
+            "template" => "only_avatars",
             "video_source" => "kling",
             "post_description" => "Refined description",
             "text_base" => "Refined text",

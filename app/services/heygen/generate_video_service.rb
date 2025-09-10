@@ -36,36 +36,60 @@ class Heygen::GenerateVideoService < Heygen::BaseService
 
     {
       video_inputs: scenes.map.with_index(1) do |scene, index|
-        {
-          character: {
-            type: "avatar",
-            avatar_id: scene[:avatar_id],
-            avatar_style: "normal"
-          },
-          voice: {
-            type: "text",
-            input_text: scene[:script],
-            voice_id: scene[:voice_id]
-          },
-          background: {
-            type: "color",
-            value: "#ffffff"
-          }
-        }
+        build_scene_input(scene, index)
       end,
       dimension: {
-        width: 1280,
-        height: 720
+        width: 720,
+        height: 1280
       },
-      aspect_ratio: "16:9",
+      aspect_ratio: "9:16",
       test: @api_token.mode == "test"
     }
   end
 
+  def build_scene_input(scene, index)
+    base_input = {
+      voice: {
+        type: "text",
+        input_text: scene[:script],
+        voice_id: scene[:voice_id]
+      },
+      background: {
+        type: "color",
+        value: "#ffffff"
+      }
+    }
+
+    case scene[:video_type]
+    when "avatar"
+      base_input[:character] = {
+        type: "avatar",
+        avatar_id: scene[:avatar_id],
+        avatar_style: "normal"
+      }
+    when "kling"
+      # For Kling videos, we might need different structure
+      # This is a placeholder - adjust based on actual HeyGen API requirements
+      base_input[:character] = {
+        type: "video",
+        video_content: scene[:script] # or other video-specific content
+      }
+    else
+      # Default to avatar if video_type is not recognized
+      base_input[:character] = {
+        type: "avatar",
+        avatar_id: scene[:avatar_id],
+        avatar_style: "normal"
+      }
+    end
+
+    base_input
+  end
+
   def parse_response(response)
-    data = parse_json(response)
+    data = response.body["data"]
     {
-      video_id: data.dig("data", "video_id"),
+      video_id: data.dig("video_id"),
       status: "processing"
     }
   end

@@ -84,7 +84,7 @@ module Creas
         "title":"...", "hook":"...",
         "description":"Highly detailed tactical brief (context, beats, key points, pillar objective, tone cues, concrete examples).",
         "platform":"Instagram | TikTok | YouTube Shorts | LinkedIn",
-        "recommended_template":"solo_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos",
+        "recommended_template":"only_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos",
         "video_source":"none | external | kling",
         "visual_notes":"Shots, pacing, captions, overlays.",
         "assets_hints":{"external_video_url":"","external_video_notes":"e.g., use 00:03–00:08 for Hook","video_prompts":[],"broll_suggestions":[]},
@@ -104,7 +104,7 @@ module Creas
         "description":"Production-ready brief (context, beats, examples, pillar objective, tone, language variants).",
         "platform":"Instagram Reels",
         "pilar":"C|R|E|A|S",
-        "recommended_template":"solo_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos",
+        "recommended_template":"only_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos",
         "video_source":"none | external | kling",
         "visual_notes":"...",
         "assets_hints":{"external_video_url":"","video_prompts":[],"broll_suggestions":[]},
@@ -120,7 +120,7 @@ module Creas
 
       ALLOWED VALUES
       objective_of_the_month: awareness | engagement | sales | community
-      recommended_template: solo_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos
+      recommended_template: only_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos
       video_source: none | external | kling
       kpi_focus: reach | saves | comments | CTR | DM
       status: draft | in_production | ready_for_review | approved
@@ -160,7 +160,7 @@ module Creas
       Scope
         Output only Reels (vertical 9:16).
         Default platform: "Instagram Reels".
-        Choose exactly one template per item: solo_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos.
+        Choose exactly one template per item: only_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos.
 
       Input
         strategy_plan_data: Normalized output from StrategyPlanFormatter with structure:
@@ -182,7 +182,7 @@ module Creas
                     "description": "...",
                     "platform": "Instagram Reels",
                     "pilar": "C",
-                    "recommended_template": "solo_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos",
+                    "recommended_template": "only_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos",
                     "video_source": "none | external | kling"
                   }
                 ]
@@ -232,7 +232,7 @@ module Creas
         "subtitles": { "mode": "platform_auto", "languages": ["en-US"] },
         "dubbing": { "enabled": false, "languages": [] },
         "pilar": "C | R | E | A | S",
-        "template": "solo_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos",
+        "template": "only_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos",
         "video_source": "none | external | kling",
         "post_description": "...",       // what viewer sees + structure
         "text_base": "...",              // final caption/copy
@@ -268,7 +268,7 @@ module Creas
       }
 
       CRITICAL TEMPLATE RULES (apply strictly - failure to follow = invalid output)
-        solo_avatars
+        only_avatars
           • "video_source": "none"
           • shotplan.scenes: EXACTLY 3 scenes, all type:"avatar"#{' '}
           • Each scene MUST have: avatar_id, voice_id, voiceover
@@ -342,7 +342,7 @@ module Creas
         ✅ Root keys present; else ask.
         ✅ Each item has all required fields: id, origin_id, week, content_name, status, dates, platform, aspect_ratio, language, pilar, template, video_source, post_description, text_base, hashtags.
         ✅ TEMPLATE-SPECIFIC VALIDATION:
-          • solo_avatars → shotplan.scenes = 3 items, shotplan.beats = []
+          • only_avatars → shotplan.scenes = 3 items, shotplan.beats = []
           • avatar_and_video → shotplan.scenes = 3 items, shotplan.beats = []
           • narration_over_7_images → shotplan.scenes = [], shotplan.beats = 7 items
           • remix → has video_url

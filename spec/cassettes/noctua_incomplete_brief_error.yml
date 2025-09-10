@@ -55,7 +55,7 @@ http_interactions:
         | in_production | ready_for_review | approved\",\n  \"title\":\"...\", \"hook\":\"...\",\n  \"description\":\"Highly
         detailed tactical brief (context, beats, key points, pillar objective, tone
         cues, concrete examples).\",\n  \"platform\":\"Instagram | TikTok | YouTube
-        Shorts | LinkedIn\",\n  \"recommended_template\":\"solo_avatars | avatar_and_video
+        Shorts | LinkedIn\",\n  \"recommended_template\":\"only_avatars | avatar_and_video
         | narration_over_7_images | remix | one_to_three_videos\",\n  \"video_source\":\"none
         | external | kling\",\n  \"visual_notes\":\"Shots, pacing, captions, overlays.\",\n  \"assets_hints\":{\"external_video_url\":\"\",\"external_video_notes\":\"e.g.,
         use 00:03–00:08 for Hook\",\"video_prompts\":[],\"broll_suggestions\":[]},\n  \"kpi_focus\":\"reach
@@ -64,7 +64,7 @@ http_interactions:
         \"language_variants\":[]\n}\n\nWEEK_IDEA_OBJ (for weekly_plan.ideas):\n{\n  \"id\":\"YYYYMM-\u003cbrand_slug\u003e-w\u003cweek\u003e-i\u003cidx\u003e-\u003cPILLAR\u003e\",\n  \"status\":\"draft\",\n  \"title\":\"...\",
         \"hook\":\"...\",\n  \"description\":\"Production-ready brief (context, beats,
         examples, pillar objective, tone, language variants).\",\n  \"platform\":\"Instagram
-        Reels\",\n  \"pilar\":\"C|R|E|A|S\",\n  \"recommended_template\":\"solo_avatars
+        Reels\",\n  \"pilar\":\"C|R|E|A|S\",\n  \"recommended_template\":\"only_avatars
         | avatar_and_video | narration_over_7_images | remix | one_to_three_videos\",\n  \"video_source\":\"none
         | external | kling\",\n  \"visual_notes\":\"...\",\n  \"assets_hints\":{\"external_video_url\":\"\",\"video_prompts\":[],\"broll_suggestions\":[]},\n  \"kpi_focus\":\"reach\",
         \"success_criteria\":\"≥X metric\",\n  \"beats_outline\":[\"Hook\",\"Value\",\"CTA\"],\n  \"cta\":\"...\",
@@ -73,7 +73,7 @@ http_interactions:
         1; idx starts at 1. IDs must be unique.\nDistribution IDs: YYYYMM-\u003cbrand_slug\u003e-\u003cPILLAR\u003e-w\u003cweek\u003e-i\u003cidx\u003e\nWeekly
         IDs: YYYYMM-\u003cbrand_slug\u003e-w\u003cweek\u003e-i\u003cidx\u003e-\u003cPILLAR\u003e\n\nALLOWED
         VALUES\nobjective_of_the_month: awareness | engagement | sales | community\nrecommended_template:
-        solo_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos\nvideo_source:
+        only_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos\nvideo_source:
         none | external | kling\nkpi_focus: reach | saves | comments | CTR | DM\nstatus:
         draft | in_production | ready_for_review | approved\n\nFINAL VALIDATION CHECKLIST
         (MANDATORY - auto-check before output):\n✓ 1. Brief complete; else ask\n✓
@@ -218,7 +218,7 @@ http_interactions:
         | in_production | ready_for_review | approved\",\n  \"title\":\"...\", \"hook\":\"...\",\n  \"description\":\"Highly
         detailed tactical brief (context, beats, key points, pillar objective, tone
         cues, concrete examples).\",\n  \"platform\":\"Instagram | TikTok | YouTube
-        Shorts | LinkedIn\",\n  \"recommended_template\":\"solo_avatars | avatar_and_video
+        Shorts | LinkedIn\",\n  \"recommended_template\":\"only_avatars | avatar_and_video
         | narration_over_7_images | remix | one_to_three_videos\",\n  \"video_source\":\"none
         | external | kling\",\n  \"visual_notes\":\"Shots, pacing, captions, overlays.\",\n  \"assets_hints\":{\"external_video_url\":\"\",\"external_video_notes\":\"e.g.,
         use 00:03–00:08 for Hook\",\"video_prompts\":[],\"broll_suggestions\":[]},\n  \"kpi_focus\":\"reach
@@ -227,7 +227,7 @@ http_interactions:
         \"language_variants\":[]\n}\n\nWEEK_IDEA_OBJ (for weekly_plan.ideas):\n{\n  \"id\":\"YYYYMM-\u003cbrand_slug\u003e-w\u003cweek\u003e-i\u003cidx\u003e-\u003cPILLAR\u003e\",\n  \"status\":\"draft\",\n  \"title\":\"...\",
         \"hook\":\"...\",\n  \"description\":\"Production-ready brief (context, beats,
         examples, pillar objective, tone, language variants).\",\n  \"platform\":\"Instagram
-        Reels\",\n  \"pilar\":\"C|R|E|A|S\",\n  \"recommended_template\":\"solo_avatars
+        Reels\",\n  \"pilar\":\"C|R|E|A|S\",\n  \"recommended_template\":\"only_avatars
         | avatar_and_video | narration_over_7_images | remix | one_to_three_videos\",\n  \"video_source\":\"none
         | external | kling\",\n  \"visual_notes\":\"...\",\n  \"assets_hints\":{\"external_video_url\":\"\",\"video_prompts\":[],\"broll_suggestions\":[]},\n  \"kpi_focus\":\"reach\",
         \"success_criteria\":\"≥X metric\",\n  \"beats_outline\":[\"Hook\",\"Value\",\"CTA\"],\n  \"cta\":\"...\",
@@ -236,7 +236,7 @@ http_interactions:
         1; idx starts at 1. IDs must be unique.\nDistribution IDs: YYYYMM-\u003cbrand_slug\u003e-\u003cPILLAR\u003e-w\u003cweek\u003e-i\u003cidx\u003e\nWeekly
         IDs: YYYYMM-\u003cbrand_slug\u003e-w\u003cweek\u003e-i\u003cidx\u003e-\u003cPILLAR\u003e\n\nALLOWED
         VALUES\nobjective_of_the_month: awareness | engagement | sales | community\nrecommended_template:
-        solo_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos\nvideo_source:
+        only_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos\nvideo_source:
         none | external | kling\nkpi_focus: reach | saves | comments | CTR | DM\nstatus:
         draft | in_production | ready_for_review | approved\n\nFINAL VALIDATION CHECKLIST
         (MANDATORY - auto-check before output):\n✓ 1. Brief complete; else ask\n✓

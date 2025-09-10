@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_01_144938) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_09_164315) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -37,6 +37,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_01_144938) do
     t.index ["user_id"], name: "index_ai_responses_on_user_id"
   end
 
+  create_table "api_responses", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "provider", null: false
+    t.string "endpoint", null: false
+    t.text "request_data"
+    t.text "response_data"
+    t.integer "status_code"
+    t.integer "response_time_ms"
+    t.boolean "success", default: false
+    t.string "error_message"
+    t.uuid "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_api_responses_on_created_at"
+    t.index ["provider", "endpoint"], name: "index_api_responses_on_provider_and_endpoint"
+    t.index ["success"], name: "index_api_responses_on_success"
+    t.index ["user_id", "provider"], name: "index_api_responses_on_user_id_and_provider"
+    t.index ["user_id"], name: "index_api_responses_on_user_id"
+  end
+
   create_table "api_tokens", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "provider"
     t.string "mode"
@@ -45,6 +64,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_01_144938) do
     t.boolean "is_valid"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "group_url"
     t.index ["user_id"], name: "index_api_tokens_on_user_id"
   end
 
@@ -57,6 +77,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_01_144938) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["brand_id"], name: "index_audiences_on_brand_id"
+  end
+
+  create_table "avatars", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "avatar_id", null: false
+    t.string "name", null: false
+    t.string "provider", null: false
+    t.string "status", default: "active"
+    t.text "preview_image_url"
+    t.string "gender"
+    t.boolean "is_public", default: false
+    t.text "raw_response"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["avatar_id", "provider", "user_id"], name: "index_avatars_on_unique_avatar_per_user_provider", unique: true
+    t.index ["provider"], name: "index_avatars_on_provider"
+    t.index ["status"], name: "index_avatars_on_status"
+    t.index ["user_id", "provider"], name: "index_avatars_on_user_id_and_provider"
+    t.index ["user_id"], name: "index_avatars_on_user_id"
   end
 
   create_table "brand_channels", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -222,12 +261,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_01_144938) do
     t.integer "scene_number"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "video_type", default: "avatar"
     t.index ["reel_id"], name: "index_reel_scenes_on_reel_id"
   end
 
   create_table "reels", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
-    t.string "mode"
+    t.string "template"
     t.string "video_id"
     t.string "status"
     t.text "preview_url"
@@ -246,6 +286,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_01_144938) do
     t.string "style_preference"
     t.boolean "use_ai_avatar"
     t.text "additional_instructions"
+    t.integer "reel_scenes_count", default: 0, null: false
     t.index ["user_id"], name: "index_reels_on_user_id"
   end
 
@@ -382,9 +423,30 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_01_144938) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "voices", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "voice_id"
+    t.string "language"
+    t.string "gender"
+    t.string "name"
+    t.string "preview_audio"
+    t.boolean "support_pause"
+    t.boolean "emotion_support"
+    t.boolean "support_interactive_avatar"
+    t.boolean "support_locale"
+    t.boolean "active"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "voice_id"], name: "index_voices_on_user_id_and_voice_id", unique: true
+    t.index ["user_id"], name: "index_voices_on_user_id"
+    t.index ["voice_id"], name: "index_voices_on_voice_id"
+  end
+
   add_foreign_key "ai_responses", "users"
+  add_foreign_key "api_responses", "users"
   add_foreign_key "api_tokens", "users"
   add_foreign_key "audiences", "brands"
+  add_foreign_key "avatars", "users"
   add_foreign_key "brand_channels", "brands"
   add_foreign_key "brands", "users"
   add_foreign_key "creas_content_items", "brands"
@@ -403,4 +465,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_01_144938) do
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "voices", "users"
 end

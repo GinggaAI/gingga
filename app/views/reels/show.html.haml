@@ -1,0 +1,72 @@
+- presenter = ReelShowPresenter.new(@reel)
+
+%main.flex-1.overflow-y-auto
+  .p-8
+    .max-w-4xl.mx-auto
+      .flex.items-center.gap-2.mb-4
+        = link_to reels_path, class: "text-gray-600 hover:text-gray-800 transition-colors" do
+          ←
+        %span.text-gray-400 |
+        %span.text-gray-600 My Reels
+
+      .mb-8
+        %h1.text-3xl.font-bold.mb-2.text-gray-900= presenter.title
+        - if presenter.description
+          %p.text-gray-600= presenter.description
+
+      .bg-white.border.border-gray-200.shadow-lg.rounded-2xl.mb-6
+        .p-6
+          .flex.items-center.gap-3.mb-4
+            %div{class: presenter.status_badge_class}
+              = presenter.status_icon
+            %div
+              %h3.text-lg.font-semibold.text-gray-900= "Video Status: #{presenter.status_titleized}"
+              %p.text-sm.text-gray-600= presenter.status_description
+
+          - if presenter.show_video?
+            .mt-6
+              %h4.text-md.font-semibold.mb-3 Your Generated Video
+              .aspect-video.bg-black.rounded-lg.overflow-hidden
+                %video.w-full.h-full{controls: true, poster: presenter.thumbnail_url}
+                  %source{src: presenter.video_url, type: "video/mp4"}
+                  Your browser does not support the video tag.
+              
+              - if presenter.duration_text
+                .mt-2.text-sm.text-gray-600= presenter.duration_text
+
+          - elsif presenter.show_processing_indicator?
+            .mt-6.text-center
+              .animate-spin.inline-block.w-8.h-8.border-4.border-gray-200.border-t-blue-500.rounded-full
+              %p.mt-2.text-gray-600= presenter.processing_message
+              %p.text-sm.text-gray-500= presenter.processing_subtitle
+
+          - elsif presenter.show_error_message?
+            .mt-6.p-4.bg-red-50.border.border-red-200.rounded-xl
+              %p.text-red-800= presenter.error_message
+
+      .bg-white.border.border-gray-200.shadow-lg.rounded-2xl
+        .p-6
+          %h3.text-lg.font-semibold.mb-4 Reel Details
+          .grid.grid-cols-1.md:grid-cols-2.gap-4
+            .space-y-2
+              %div
+                %span.font-medium Template:
+                %span.ml-2= presenter.template_humanized
+              %div
+                %span.font-medium Created:
+                %span.ml-2= presenter.created_at_formatted
+              - if presenter.heygen_video_id.present?
+                %div
+                  %span.font-medium HeyGen Video ID:
+                  %span.ml-2.font-mono.text-sm= presenter.heygen_video_id
+
+            - if presenter.has_scenes?
+              .space-y-2
+                %h4.font-medium Scenes
+                - presenter.ordered_scenes.each do |scene|
+                  .bg-gray-50.p-3.rounded-lg
+                    %div.font-medium.text-sm Scene #{scene.scene_number}
+                    %div.text-xs.text-gray-600
+                      Type: #{scene.video_type&.titleize || 'Avatar'}
+                    - if scene.script.present?
+                      %div.text-sm.mt-1= truncate(scene.script, length: 100)

@@ -53,6 +53,18 @@ en:
     account_subtitle: "Manage your account settings and language preferences"
     language_settings: "Language Settings"
     language_subtitle: "Choose your preferred language for the interface"
+    heygen:
+      save_success: "HeyGen API key saved successfully!"
+      save_failed: "Failed to save HeyGen API key: %{error}"
+      empty_token: "HeyGen API key cannot be empty."
+      validation_success:
+        one: "HeyGen API validation successful! %{count} avatar synchronized."
+        other: "HeyGen API validation successful! %{count} avatars synchronized."
+      group_validation_success:
+        one: "HeyGen group validation successful! %{count} avatar synchronized from specific group."
+        other: "HeyGen group validation successful! %{count} avatars synchronized from specific group."
+      validation_failed: "HeyGen API validation failed: %{error}"
+      disabled_validate_button_title: "Save API key first to enable validation"
 
   # Brands
   brands:
@@ -305,3 +317,124 @@ en:
       network_error: "Network error occurred. Please try again."
       failed_to_load: "Failed to load strategy plan"
       no_strategy_to_refine: "No strategy plan found to refine"
+
+  # Reels
+  reels:
+    create_reel: "Create Reel"
+    description: "Choose your preferred creation method and generate engaging video content"
+    choose_creation_method: "Choose Creation Method"
+    
+    # Tabs
+    tabs:
+      scene_based: "Scene-Based"
+      narrative: "Narrative"
+      
+    # Scene-Based
+    scene_based:
+      page_title: "Create Scene-Based Reel"
+      title: "Scene-Based Creation"
+      description: "Break down your reel into individual scenes for precise control over each moment"
+      scene_number: "Scene %{number}"
+      sections_count: "3 sections"
+      avatar: "Avatar"
+      select_avatar: "Select avatar"
+      avatar_1: "Avatar 1"
+      voice: "Voice"
+      select_voice: "Select voice"
+      voice_1: "Voice 1"
+      script: "Script"
+      script_placeholder: "Describe what happens in scene %{number}..."
+      video_type: "Video Type"
+      avatar_video: "Avatar Video"
+      kling_video: "Kling Video"
+      no_avatars_message: "No avatars available. Please sync your avatars from your provider first."
+      no_voices_message: "No voices available. Please sync your voices from your HeyGen account first."
+      max_scenes_message: "Maximum of 5 scenes allowed"
+      min_scenes_message: "At least 1 scene is required"
+      remove_scene: "Remove Scene"
+      select_avatar: "Select Avatar"
+      select_voice: "Select Voice"
+      scene_script_placeholder: "Enter the script for Scene %{number}. What should the avatar say in this scene?"
+      scene_help_text:
+        avatar: "Choose the AI avatar for this scene"
+        voice: "Choose the voice for this scene"
+        script: "Keep it under 500 characters for best results"
+      
+    # Narrative
+    narrative:
+      page_title: "Create Narrative Reel"
+      title: "Narrative Creation"
+      description: "Tell your story and let AI create compelling narrative-driven reel"
+      content_title: "Narrative Content"
+      content_description: "Define the narration and visual themes for your reel"
+      narration_text: "Narration Text"
+      image_themes_title: "Visual Themes"
+      image_themes_description: "Define the visual style and themes for your images"
+      image_themes: "Image Themes"
+      category: "Category"
+      select_category: "Select category"
+      target_audience: "Target Audience"
+      select_audience: "Select audience"
+      story_content: "Story Content"
+      story_content_description: "Tell your story that will be transformed into a compelling narrative"
+      your_story: "Your Story"
+      story_instructions: "Tell your story. What happened? What did you learn? What message do you want to convey? Think about:"
+      story_bullet_1: "• The beginning - how did it start?"
+      story_bullet_2: "• The challenge or turning point"
+      story_bullet_3: "• The resolution or lesson learned"
+      story_detail_note: "Be as detailed as possible. The AI will use this to create your narrative structure."
+      music_style: "Music & Style"
+      music_style_description: "Set the mood and aesthetic for your reel"
+      music_preference: "Music Preference"
+      select_music_style: "Select music style"
+      visual_style: "Visual Style"
+      select_visual_style: "Select visual style"
+      
+    # Common Fields
+    fields:
+      title: "Reel Title"
+      description: "Description"
+      
+    # Placeholders
+    placeholders:
+      title: "Enter the title for your reel..."
+      description: "Briefly describe what your reel will be about..."
+      narration_text: "Enter the narration text that will be spoken in your reel..."
+      image_themes: "e.g., modern office, creative workspace, professional photography"
+      additional_instructions: "Add any specific style preferences, mood, pacing, or technical requirements..."
+      
+    # Basic Info
+    basic_info:
+      title: "Basic Reel Info"
+      description: "Essential information about your reel"
+      
+    # AI Avatar
+    ai_avatar:
+      title: "AI Avatar"
+      description: "Choose whether to use AI avatars for your scenes"
+      use_ai_avatars: "Use AI Avatars"
+      enable_description: "Enable AI-generated human avatars for talking head scenes"
+      
+    # Scene Breakdown
+    scene_breakdown:
+      title: "Scene Breakdown"
+      description: "Create individual scenes for your reel. Each scene will have its own script and settings."
+      scenes_count:
+        one: "%{count} scene"
+        other: "%{count} scenes"
+      add_scene: "Add Scene"
+      
+    # Additional Instructions
+    additional_instructions:
+      title: "Additional Instructions"
+      description: "Any specific requirements or creative direction"
+      style_direction: "Style & Direction Notes"
+      
+    # Submit Buttons
+    submit:
+      scene_based: "Generate Scene-Based Reel"
+      narrative: "Generate Narrative Reel"
+      
+    # Errors
+    errors:
+      fix_following: "Please fix the following errors:"

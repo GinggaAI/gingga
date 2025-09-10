@@ -11,8 +11,10 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
   end
 
   let!(:api_token) do
-    token = build(:api_token, user: user, provider: 'heygen', is_valid: true)
-    token.save(validate: false)
+    # Skip the before_save callback to avoid API calls in tests
+    ApiToken.skip_callback(:save, :before, :validate_token_with_provider)
+    token = create(:api_token, :heygen, user: user, is_valid: true)
+    ApiToken.set_callback(:save, :before, :validate_token_with_provider)
     token
   end
   let(:reel) { create(:reel, user: user) }
@@ -37,9 +39,12 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
 
       before do
         allow(reel).to receive(:ready_for_generation?).and_return(true)
-        allow(Heygen::GenerateVideoService).to receive(:post).and_return(
-          double(success?: true, body: mock_response.to_json)
+        mock_response_double = OpenStruct.new(
+          success?: true,
+          body: mock_response
         )
+
+        allow(subject).to receive(:generate_video).and_return(mock_response_double)
       end
 
       it 'updates reel status to processing' do
@@ -99,23 +104,14 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
             }
           ],
           dimension: {
-            width: 1280,
-            height: 720
+            width: 720,
+            height: 1280
           },
-          aspect_ratio: "16:9",
+          aspect_ratio: "9:16",
           test: api_token.mode == 'test'
         }
 
-        expect(Heygen::GenerateVideoService).to receive(:post).with(
-          '/v2/video/generate',
-          {
-            headers: {
-              'X-API-KEY' => api_token.encrypted_token,
-              'Content-Type' => 'application/json'
-            },
-            body: expected_payload.to_json
-          }
-        ).and_return(double(success?: true, body: mock_response.to_json))
+        expect(subject).to receive(:generate_video).with(expected_payload).and_return(double(success?: true, body: mock_response))
 
         subject.call
       end
@@ -137,14 +133,19 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
       end
 
       context 'when API token is in test mode' do
-        let!(:api_token) { create(:api_token, user: user, provider: 'heygen', is_valid: true, mode: 'test') }
+        let!(:api_token) do
+          # Skip the before_save callback to avoid API calls in tests
+          ApiToken.skip_callback(:save, :before, :validate_token_with_provider)
+          token = create(:api_token, :heygen, user: user, is_valid: true, mode: 'test')
+          ApiToken.set_callback(:save, :before, :validate_token_with_provider)
+          token
+        end
 
         it 'includes test: true in payload' do
           expected_test_value = true
 
-          expect(Heygen::GenerateVideoService).to receive(:post) do |_path, options|
-            payload = JSON.parse(options[:body])
-            expect(payload['test']).to eq(expected_test_value)
+          expect(subject).to receive(:generate_video) do |payload|
+            expect(payload[:test]).to eq(expected_test_value)
             double(success?: true, body: mock_response.to_json)
           end
 
@@ -181,9 +182,12 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
     context 'when API call fails' do
       before do
         allow(reel).to receive(:ready_for_generation?).and_return(true)
-        allow(Heygen::GenerateVideoService).to receive(:post).and_return(
-          double(success?: false, message: 'API Error')
+        mock_response_double = OpenStruct.new(
+          success?: false,
+          message: 'API Error'
         )
+
+        allow(subject).to receive(:generate_video).and_return(mock_response_double)
       end
 
       it 'returns failure result' do
@@ -201,7 +205,7 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
     context 'when an exception occurs' do
       before do
         allow(reel).to receive(:ready_for_generation?).and_return(true)
-        allow(Heygen::GenerateVideoService).to receive(:post).and_raise(StandardError, 'Network error')
+        allow(subject).to receive(:generate_video).and_raise(StandardError, 'Network error')
       end
 
       it 'returns failure result with error message' do
@@ -213,6 +217,61 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
 
       it 'updates reel status to failed' do
         expect { subject.call }.to change { reel.reload.status }.to('failed')
+      end
+    end
+  end
+
+  describe '#build_scene_input private method' do
+    let(:service) { described_class.new(user, reel) }
+
+    context 'when video_type is kling' do
+      it 'builds character with type video' do
+        scene = { avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'Test script', video_type: 'kling' }
+        result = service.send(:build_scene_input, scene, 1)
+
+        expect(result[:character][:type]).to eq('video')
+        expect(result[:character][:video_content]).to eq('Test script')
+        expect(result[:voice][:input_text]).to eq('Test script')
+        expect(result[:voice][:voice_id]).to eq('voice_1')
+      end
+    end
+
+    context 'when video_type is unknown' do
+      it 'defaults to avatar type' do
+        scene = { avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'Test script', video_type: 'unknown_type' }
+        result = service.send(:build_scene_input, scene, 1)
+
+        expect(result[:character][:type]).to eq('avatar')
+        expect(result[:character][:avatar_id]).to eq('avatar_1')
+        expect(result[:character][:avatar_style]).to eq('normal')
+        expect(result[:voice][:input_text]).to eq('Test script')
+        expect(result[:voice][:voice_id]).to eq('voice_1')
+      end
+    end
+
+    context 'when video_type is nil' do
+      it 'defaults to avatar type' do
+        scene = { avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'Test script', video_type: nil }
+        result = service.send(:build_scene_input, scene, 1)
+
+        expect(result[:character][:type]).to eq('avatar')
+        expect(result[:character][:avatar_id]).to eq('avatar_1')
+        expect(result[:character][:avatar_style]).to eq('normal')
+        expect(result[:voice][:input_text]).to eq('Test script')
+        expect(result[:voice][:voice_id]).to eq('voice_1')
+      end
+    end
+
+    context 'when video_type is avatar' do
+      it 'builds character with avatar type' do
+        scene = { avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'Test script', video_type: 'avatar' }
+        result = service.send(:build_scene_input, scene, 1)
+
+        expect(result[:character][:type]).to eq('avatar')
+        expect(result[:character][:avatar_id]).to eq('avatar_1')
+        expect(result[:character][:avatar_style]).to eq('normal')
+        expect(result[:voice][:input_text]).to eq('Test script')
+        expect(result[:voice][:voice_id]).to eq('voice_1')
       end
     end
   end

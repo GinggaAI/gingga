@@ -125,7 +125,7 @@ Transforms `CreasContentItem` records into frontend-friendly JSON:
             "description": "...",
             "platform": "Instagram Reels",
             "pilar": "C", 
-            "recommended_template": "solo_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos",
+            "recommended_template": "only_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos",
             "video_source": "none | external | kling"
           }
         ]

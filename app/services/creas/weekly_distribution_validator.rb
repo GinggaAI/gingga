@@ -45,7 +45,7 @@ module Creas
                 "description" => "Auto-generated content idea",
                 "platform" => "Instagram Reels",
                 "pilar" => pillar,
-                "recommended_template" => "solo_avatars",
+                "recommended_template" => "only_avatars",
                 "video_source" => "none"
               }
             end

@@ -1,20 +1,21 @@
 class Heygen::ListVoicesService < Heygen::BaseService
-  def initialize(user, filters = {})
+  def initialize(user, filters = {}, voices_count: nil)
     @filters = filters
+    @voices_count = voices_count
     super(user)
   end
 
   def call
     return failure_result("No valid Heygen API token found") unless api_token_present?
 
-    cached_result = Rails.cache.read(cache_key)
-    return success_result(filter_voices(cached_result)) if cached_result
+    # cached_result = Rails.cache.read(cache_key)
+    # return success_result(filter_voices(cached_result)) if cached_result
 
     response = fetch_voices
 
     if response.success?
       voices_data = parse_response(response)
-      Rails.cache.write(cache_key, voices_data, expires_in: 18.hours)
+      # Rails.cache.write(cache_key, voices_data, expires_in: 18.hours)
       success_result(filter_voices(voices_data))
     else
       failure_result("Failed to fetch voices: #{response.message}")
@@ -30,9 +31,12 @@ class Heygen::ListVoicesService < Heygen::BaseService
   end
 
   def parse_response(response)
-    data = parse_json(response)
-    return [] unless data["data"]
-    voices = data.dig("data", "voices") || []
+    # data = parse_json(response)
+    return [] unless response.body["data"]
+    voices = response.body["data"]["voices"] || []
+
+    # Limit voices if voices_count is specified
+    voices = voices.first(@voices_count) if @voices_count&.positive?
 
     voices.map do |voice|
       {

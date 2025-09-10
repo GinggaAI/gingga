@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :reel do
     association :user
-    mode { "scene_based" }
+    template { "only_avatars" }
     status { "draft" }
     title { "Test Reel" }
     description { "Test description" }
@@ -13,12 +13,20 @@ FactoryBot.define do
     use_ai_avatar { false }
     additional_instructions { "Test instructions" }
 
-    trait :narrative do
-      mode { "narrative" }
+    trait :only_avatars do
+      template { "only_avatars" }
     end
 
-    trait :scene_based do
-      mode { "scene_based" }
+    trait :avatar_and_video do
+      template { "avatar_and_video" }
+    end
+
+    trait :narration_over_7_images do
+      template { "narration_over_7_images" }
+    end
+
+    trait :one_to_three_videos do
+      template { "one_to_three_videos" }
     end
   end
 end

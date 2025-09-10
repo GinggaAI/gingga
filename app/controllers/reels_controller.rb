@@ -10,37 +10,31 @@ class ReelsController < ApplicationController
     # Show individual reel
   end
 
-  def scene_based
-    @reel = current_user.reels.build(mode: "scene_based")
-    3.times { |i| @reel.reel_scenes.build(scene_number: i + 1) }
-  end
+  def new
+    template = params[:template]
+    return redirect_to reels_path, alert: "Invalid template" unless valid_template?(template)
 
-  def create_scene_based
-    @reel = current_user.reels.build(scene_based_params)
-    @reel.mode = "scene_based"
-    @reel.status = "draft"
+    result = ReelCreationService.new(user: current_user, template: template).initialize_reel
 
-    if @reel.save
-      redirect_to @reel, notice: "Scene-based reel created successfully! Your reel is being generated."
+    if result[:success]
+      @reel = result[:reel]
+      setup_presenter(template)
+      render_template_view(template)
     else
-      3.times { |i| @reel.reel_scenes.build(scene_number: i + 1) if @reel.reel_scenes.find_by(scene_number: i + 1).nil? }
-      render :scene_based, status: :unprocessable_entity
+      redirect_to reels_path, alert: result[:error]
     end
   end
 
-  def narrative
-    @reel = current_user.reels.build(mode: "narrative")
-  end
+  def create
+    result = ReelCreationService.new(user: current_user, params: reel_params).call
 
-  def create_narrative
-    @reel = current_user.reels.build(narrative_params)
-    @reel.mode = "narrative"
-    @reel.status = "draft"
-
-    if @reel.save
-      redirect_to @reel, notice: "Narrative reel created successfully! Your reel is being generated."
+    if result[:success]
+      redirect_to result[:reel], notice: "Reel created successfully! Your video is being generated with HeyGen and will be ready shortly."
     else
-      render :narrative, status: :unprocessable_entity
+      @reel = result[:reel]
+      template = @reel&.template || reel_params[:template]
+      setup_presenter(template)
+      render_template_view(template, status: :unprocessable_entity)
     end
   end
 
@@ -50,17 +44,36 @@ class ReelsController < ApplicationController
     @reel = current_user.reels.find(params[:id])
   end
 
-  def scene_based_params
+  def reel_params
     params.require(:reel).permit(
-      :title, :description, :use_ai_avatar, :additional_instructions,
-      reel_scenes_attributes: [ :id, :scene_number, :avatar_id, :voice_id, :script, :_destroy ]
+      :template, :title, :description, :category, :use_ai_avatar, :additional_instructions,
+      :story_content, :music_preference, :style_preference,
+      reel_scenes_attributes: [ :id, :scene_number, :avatar_id, :voice_id, :script, :video_type, :_destroy ]
     )
   end
 
-  def narrative_params
-    params.require(:reel).permit(
-      :title, :description, :category, :format, :story_content,
-      :music_preference, :style_preference
-    )
+  def valid_template?(template)
+    %w[only_avatars avatar_and_video narration_over_7_images one_to_three_videos].include?(template)
+  end
+
+  def render_template_view(template, **options)
+    case template
+    when "only_avatars", "avatar_and_video", "one_to_three_videos"
+      render "reels/scene_based", **options
+    when "narration_over_7_images"
+      render "reels/narrative", **options
+    else
+      # This should never happen due to validation, but add safety net
+      redirect_to reels_path, alert: "Invalid template"
+    end
+  end
+
+  def setup_presenter(template)
+    case template
+    when "only_avatars", "avatar_and_video", "one_to_three_videos"
+      @presenter = ReelSceneBasedPresenter.new(reel: @reel, current_user: current_user)
+    when "narration_over_7_images"
+      @presenter = ReelNarrativePresenter.new(reel: @reel, current_user: current_user)
+    end
   end
 end

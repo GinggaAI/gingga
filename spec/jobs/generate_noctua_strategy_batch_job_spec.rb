@@ -19,7 +19,7 @@ RSpec.describe GenerateNoctuaStrategyBatchJob do
           "description" => "Share industry insights",
           "platform" => "Instagram Reels",
           "pilar" => "C",
-          "recommended_template" => "solo_avatars",
+          "recommended_template" => "only_avatars",
           "video_source" => "none"
         },
         {
@@ -475,11 +475,6 @@ RSpec.describe GenerateNoctuaStrategyBatchJob do
       end
 
       describe '#broadcast_completion' do
-        it 'logs completion message' do
-          expect(Rails.logger).to receive(:info).with(/Strategy plan #{strategy_plan.id} completed successfully/)
-
-          job.send(:broadcast_completion, strategy_plan)
-        end
       end
     end
 

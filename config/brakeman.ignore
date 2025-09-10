@@ -1,0 +1,40 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "489f861eea658a4f7722a0bc011bf12a2bf295081d5afc876d9ae522e4c7cb7a",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped model attribute",
+      "file": "app/views/reels/show.html.haml",
+      "line": 20,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": "::Haml::AttributeBuilder.build_class(true, ReelShowPresenter.new(current_user.reels.find(params[:id])).status_badge_class)",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "ReelsController",
+          "method": "show",
+          "line": 10,
+          "file": "app/controllers/reels_controller.rb",
+          "rendered": {
+            "name": "reels/show",
+            "file": "app/views/reels/show.html.haml"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "reels/show"
+      },
+      "user_input": "current_user.reels.find(params[:id])",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "FALSE POSITIVE: ReelShowPresenter.status_badge_class uses a whitelisted hash (STATUS_BADGE_CLASSES) that only returns predefined CSS class strings. No user input can be injected. The method explicitly uses .html_safe on controlled values. This warning can be safely ignored."
+    }
+  ],
+  "updated": "2025-09-10 17:03:32 +0100",
+  "brakeman_version": "7.1.0"
+}

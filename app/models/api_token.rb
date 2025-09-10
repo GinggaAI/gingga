@@ -8,6 +8,10 @@ class ApiToken < ApplicationRecord
   validates :encrypted_token, presence: true
   validates :provider, uniqueness: { scope: [ :user_id, :mode ] }
 
+  scope :test_mode, -> { where(mode: "test") }
+  scope :production_mode, -> { where(mode: "production") }
+  scope :valid_tokens, -> { where(is_valid: true) }
+
   before_save :validate_token_with_provider
 
   private

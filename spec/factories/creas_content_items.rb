@@ -20,7 +20,7 @@ FactoryBot.define do
     aspect_ratio { "9:16" }
     language { "en-US" }
     pilar { "C" }
-    template { "solo_avatars" }
+    template { "only_avatars" }
     video_source { "none" }
     post_description { "This is a sample post description" }
     text_base { "This is the text base for the content" }

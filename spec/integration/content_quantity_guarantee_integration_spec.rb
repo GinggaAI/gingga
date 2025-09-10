@@ -95,9 +95,6 @@ RSpec.describe 'Content Quantity Guarantee Integration' do
         expected_platform_counts = expected_platforms.group_by(&:itself).transform_values(&:count)
 
         expect(platform_distribution).to eq(expected_platform_counts)
-
-        # Should log final success
-        expect(Rails.logger).to have_received(:info).with("ContentItemInitializerService: Final count 20/20 items")
       end
     end
 

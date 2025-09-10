@@ -267,6 +267,58 @@ end
 - **Consistent interface**: Use `#call` method as entry point
 - **Error handling**: Always handle and communicate errors clearly
 - **Return objects**: Use consistent result objects for success/failure
+- **Environment-agnostic behavior**: **NEVER** use `Rails.env` conditionals in service logic
+- **Use VCR for testing**: Mock external API calls with VCR, not environment checks
+- **Centralized HTTP clients**: Use `Http::BaseClient` for external API calls, not direct HTTParty/Net::HTTP
+
+### Service Anti-Patterns (AVOID)
+```ruby
+# ❌ FORBIDDEN - Environment-dependent behavior
+class SomeService
+  def call
+    if Rails.env.development?
+      return mock_data  # Wrong approach
+    end
+    real_api_call
+  end
+end
+
+# ❌ FORBIDDEN - Direct HTTP library usage
+class SomeService
+  include HTTParty  # Avoid direct HTTParty usage
+  
+  def call
+    self.class.get("/api/endpoint")  # Not centralized
+  end
+end
+
+# ✅ CORRECT - Consistent behavior with centralized HTTP client
+class SomeService < BaseService  
+  def call
+    response = get("/api/endpoint")  # Uses injected Http::BaseClient
+    process_response(response)
+  end
+end
+
+# ✅ CORRECT - Or inject HTTP client explicitly
+class SomeService
+  def initialize(http_client:)
+    @http_client = http_client
+  end
+  
+  def call
+    response = @http_client.get("/api/endpoint")
+    process_response(response)
+  end
+end
+```
+
+### HTTP Client Architecture
+For external API calls, use the centralized HTTP client pattern:
+- **`Http::BaseClient`**: Base class with Faraday, retries, instrumentation
+- **Provider-specific clients**: Extend BaseClient (e.g., `Heygen::HttpClient`)
+- **Service integration**: Inject HTTP client into service objects
+- **Testing**: Use VCR for HTTP interaction recording/playback
 
 ---
 
@@ -408,6 +460,25 @@ bundle exec rubocop           # Code style
 bundle exec brakeman          # Security scan
 npm run build:css             # Rebuild CSS
 ```
+
+### Background Jobs Monitoring
+Monitor background jobs status during development and troubleshooting:
+
+```bash
+# Quick job status check
+bundle exec rails runner "puts \"Pendientes: #{SolidQueue::Job.where(finished_at: nil).count}\""
+
+# Comprehensive health check
+bundle exec rails runner scripts/monitoring/solidqueue_health.rb
+
+# Check specific job types
+bundle exec rails runner "puts SolidQueue::Job.where(class_name: 'CheckVideoStatusJob', finished_at: nil).count"
+
+# Start SolidQueue workers (if needed)
+bundle exec solid_queue
+```
+
+**See**: `/doc/backend/background_jobs_implementation_guide.md#monitoring-y-troubleshooting-de-solidqueue` for complete monitoring documentation.
 
 ---
 

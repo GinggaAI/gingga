@@ -1,16 +1,87 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["scenesContainer", "sceneCounter"]
-  static values = { sceneCount: Number }
+  static targets = ["scenesContainer", "sceneCounter", "aiToggle", "scene", "avatarFields", "videoTypeSelect"]
+  static values = { sceneCount: Number, avatars: Array, messages: Object }
 
   connect() {
     this.updateSceneCounter()
+    this.initializeAvatarToggle()
+  }
+
+  initializeAvatarToggle() {
+    // Set initial state based on checkbox value
+    this.toggleAvatarFields()
+  }
+
+  toggleAiAvatars() {
+    this.toggleAvatarFields()
+  }
+
+  toggleAvatarFields() {
+    const isEnabled = this.aiToggleTarget.checked
+    const avatarFieldsTargets = this.avatarFieldsTargets
+    const videoTypeSelects = this.videoTypeSelectTargets
+    
+    // Handle avatar fields visibility
+    avatarFieldsTargets.forEach(fields => {
+      if (isEnabled) {
+        fields.style.display = 'grid'
+        fields.classList.remove('opacity-50')
+        // Enable all inputs
+        const inputs = fields.querySelectorAll('input, select')
+        inputs.forEach(input => input.disabled = false)
+      } else {
+        fields.style.display = 'none'
+        fields.classList.add('opacity-50')
+        // Disable all inputs
+        const inputs = fields.querySelectorAll('input, select')
+        inputs.forEach(input => input.disabled = true)
+      }
+    })
+    
+    // Handle video type select states
+    videoTypeSelects.forEach(select => {
+      if (isEnabled) {
+        // When AI Avatar is enabled, enable select and default to avatar
+        select.disabled = false
+        select.value = 'avatar'
+      } else {
+        // When AI Avatar is disabled, disable select and force to kling
+        select.disabled = true
+        select.value = 'kling'
+      }
+    })
+    
+    // Also update avatar fields visibility based on select changes
+    this.updateAvatarFieldsVisibility()
+  }
+
+  updateAvatarFieldsVisibility() {
+    const videoTypeSelects = this.videoTypeSelectTargets
+    const avatarFieldsTargets = this.avatarFieldsTargets
+    
+    videoTypeSelects.forEach((select, index) => {
+      const avatarFields = avatarFieldsTargets[index]
+      if (avatarFields) {
+        if (select.value === 'avatar') {
+          avatarFields.style.display = 'grid'
+          avatarFields.style.opacity = '1'
+        } else {
+          avatarFields.style.display = 'none'
+          avatarFields.style.opacity = '0.5'
+        }
+      }
+    })
+  }
+
+  handleVideoTypeChange(event) {
+    this.updateAvatarFieldsVisibility()
   }
 
   addScene() {
     if (this.sceneCountValue >= 5) {
-      alert("Maximum of 5 scenes allowed")
+      alert(this.messagesValue.max_scenes)
       return
     }
 
@@ -21,7 +92,7 @@ export default class extends Controller {
 
   removeScene(event) {
     if (this.sceneCountValue <= 1) {
-      alert("At least 1 scene is required")
+      alert(this.messagesValue.min_scenes)
       return
     }
 
@@ -42,6 +113,8 @@ export default class extends Controller {
   }
 
   generateSceneHTML(sceneNumber) {
+    const avatarOptions = this.generateAvatarOptions();
+    
     return `
       <div class="ui-scene-fields" data-scene-number="${sceneNumber}">
         <div class="ui-scene-fields__header">
@@ -50,8 +123,8 @@ export default class extends Controller {
             <button type="button" 
                     class="ui-scene-fields__remove" 
                     data-action="click->scene-list#removeScene"
-                    aria-label="Remove Scene ${sceneNumber}">
-              Remove Scene
+                    aria-label="${this.messagesValue.remove_scene} ${sceneNumber}">
+              ${this.messagesValue.remove_scene}
             </button>
           ` : ''}
         </div>
@@ -63,14 +136,11 @@ export default class extends Controller {
             <select name="reel[scenes][${sceneNumber}][avatar_id]" 
                     class="ui-scene-fields__select"
                     aria-describedby="avatar_help_${sceneNumber}">
-              <option value="">Select Avatar</option>
-              <option value="avatar_001">Professional Male</option>
-              <option value="avatar_002">Professional Female</option>
-              <option value="avatar_003">Casual Male</option>
-              <option value="avatar_004">Casual Female</option>
+              <option value="">${this.messagesValue.select_avatar}</option>
+              ${avatarOptions}
             </select>
             <small id="avatar_help_${sceneNumber}" class="ui-scene-fields__help">
-              Choose the AI avatar for this scene
+              ${this.messagesValue.avatar_help}
             </small>
           </div>
           
@@ -79,21 +149,21 @@ export default class extends Controller {
             <select name="reel[scenes][${sceneNumber}][voice_id]" 
                     class="ui-scene-fields__select"
                     aria-describedby="voice_help_${sceneNumber}">
-              <option value="">Select Voice</option>
+              <option value="">${this.messagesValue.select_voice}</option>
               <option value="voice_001">Clear Male Voice</option>
               <option value="voice_002">Clear Female Voice</option>
               <option value="voice_003">Friendly Male Voice</option>
               <option value="voice_004">Friendly Female Voice</option>
             </select>
             <small id="voice_help_${sceneNumber}" class="ui-scene-fields__help">
-              Choose the voice for this scene
+              ${this.messagesValue.voice_help}
             </small>
           </div>
           
           <div class="ui-scene-fields__field">
             <label class="ui-scene-fields__label">Script</label>
             <textarea name="reel[scenes][${sceneNumber}][script]"
-                     placeholder="Enter the script for Scene ${sceneNumber}. What should the avatar say in this scene?"
+                     placeholder="${this.getScriptPlaceholder(sceneNumber)}"
                      class="ui-scene-fields__textarea"
                      rows="4"
                      maxlength="500"
@@ -102,7 +172,7 @@ export default class extends Controller {
                      data-action="input->scene-character-counter#updateCounter"></textarea>
             <div class="ui-scene-fields__field-footer">
               <small id="script_help_${sceneNumber}" class="ui-scene-fields__help">
-                Keep it under 500 characters for best results
+                ${this.messagesValue.script_help}
               </small>
               <span class="ui-scene-fields__char-count" data-scene-character-counter-target="counter">
                 0/500
@@ -161,5 +231,21 @@ export default class extends Controller {
 
   updateSceneCounter() {
     this.sceneCounterTarget.textContent = this.sceneCountValue
+  }
+
+  generateAvatarOptions() {
+    if (!this.hasAvatarsValue || this.avatarsValue.length === 0) {
+      return `<option value="" disabled>${this.messagesValue.no_avatars}</option>`;
+    }
+    
+    return this.avatarsValue.map(avatar => {
+      const [name, id] = avatar;
+      return `<option value="${id}">${name}</option>`;
+    }).join('');
+  }
+
+  getScriptPlaceholder(sceneNumber) {
+    // Replace %{number} in the i18n string with the actual scene number
+    return this.messagesValue.script_placeholder.replace('%{number}', sceneNumber);
   }
 }

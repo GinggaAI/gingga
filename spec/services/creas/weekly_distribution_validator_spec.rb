@@ -18,7 +18,7 @@ RSpec.describe Creas::WeeklyDistributionValidator do
                 "description" => "Description 1",
                 "platform" => "Instagram Reels",
                 "pilar" => "C",
-                "recommended_template" => "solo_avatars",
+                "recommended_template" => "only_avatars",
                 "video_source" => "none"
               }
             ]
@@ -221,7 +221,7 @@ RSpec.describe Creas::WeeklyDistributionValidator do
           expect(idea["description"]).to eq("Auto-generated content idea")
           expect(idea["platform"]).to eq("Instagram Reels")
           expect(idea["pilar"]).to be_in(%w[C R E A S])
-          expect(idea["recommended_template"]).to eq("solo_avatars")
+          expect(idea["recommended_template"]).to eq("only_avatars")
           expect(idea["video_source"]).to eq("none")
         end
       end

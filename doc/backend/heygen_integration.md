@@ -327,3 +327,174 @@ video_url = result[:data][:video_url]
 ---
 
 This manual testing guide validates the Heygen flow end-to-end before connecting it to frontend flows or automations (e.g., via n8n).
+
+---
+
+## ⚠️ Anti-Patterns to Avoid
+
+### ❌ Environment-Dependent Behavior in Services
+
+**NEVER** implement different behavior based on `Rails.env` within service objects, especially for API calls:
+
+```ruby
+# ❌ WRONG - Environment-dependent behavior
+def call
+  if Rails.env.development?
+    return mock_data  # Bad practice
+  end
+  
+  make_real_api_call
+end
+```
+
+**Why This Is Bad:**
+- Violates the principle that services should behave consistently across environments
+- Makes testing unreliable and unpredictable
+- Creates hidden behavior that's hard to debug
+- Tests may pass in development but fail in production
+- Breaks the Rails principle of "Convention over Configuration"
+
+**✅ CORRECT Approach:**
+```ruby
+# ✅ GOOD - Consistent behavior, use VCR for testing
+def call
+  response = make_api_call
+  parse_response(response)
+end
+```
+
+**For Testing:** Use VCR (Video Cassette Recorder) to record and replay HTTP interactions:
+```ruby
+# spec/services/heygen/list_avatars_service_spec.rb
+RSpec.describe Heygen::ListAvatarsService do
+  it 'fetches avatars from API', :vcr do
+    service = described_class.new(user)
+    result = service.call
+    expect(result[:success]).to be true
+  end
+end
+```
+
+### Best Practices for Service Objects:
+- **Consistent behavior** across all environments
+- **Use VCR for testing** external API calls
+- **Dependency injection** for better testability
+- **Single responsibility** - each service does one thing well
+- **Proper error handling** without environment-specific logic
+
+---
+
+## 🚀 HTTP Client Architecture (Updated January 2025)
+
+### Centralized HTTP Client with Faraday
+
+The HeyGen integration now uses a centralized HTTP client architecture based on Faraday for improved reliability, better middleware support, and enhanced testability.
+
+#### Http::BaseClient
+**Location**: `app/services/http/base_client.rb`
+
+A centralized HTTP client that provides:
+- **Faraday-based requests** with automatic JSON handling
+- **Retry logic** with exponential backoff
+- **Request/response instrumentation** for observability
+- **Consistent error handling** across all HTTP operations
+- **Timeout management** with configurable limits
+
+```ruby
+# Features:
+- Automatic JSON request/response handling
+- Built-in retry mechanism (2 retries by default)
+- Request instrumentation via ActiveSupport::Notifications
+- Configurable timeouts and retry intervals
+- Support for Bearer token and API key authentication
+```
+
+#### Heygen::HttpClient
+**Location**: `app/services/heygen/http_client.rb`
+
+HeyGen-specific HTTP client that extends `Http::BaseClient`:
+- **Automatic API token management** from user's active tokens
+- **Request/response logging** integrated with `ApiResponse` model
+- **HeyGen-specific headers** (X-Client, X-API-KEY)
+- **Sensitive data sanitization** in logs
+
+```ruby
+# Usage in services:
+@http_client = Heygen::HttpClient.new(user: current_user)
+result = @http_client.get_with_logging("/v2/avatars")
+```
+
+#### HTTP Request Instrumentation
+**Location**: `config/initializers/http_instrumentation.rb`
+
+All HTTP requests are automatically instrumented and logged:
+```
+[HTTP] GET https://api.heygen.com/v2/avatars → 200 (1205ms)
+[HTTP] POST https://api.heygen.com/v2/video/generate → 201 (3421ms)
+```
+
+### Migration from HTTParty
+
+**Previous architecture** (HTTParty):
+```ruby
+# Old pattern - class-level HTTP methods
+class Heygen::SomeService
+  include HTTParty
+  base_uri "https://api.heygen.com"
+  
+  def call
+    response = self.class.get("/endpoint", headers: headers)
+  end
+end
+```
+
+**New architecture** (Faraday):
+```ruby
+# New pattern - centralized HTTP client
+class Heygen::SomeService < Heygen::BaseService
+  def call
+    response = get("/endpoint")  # Uses injected HTTP client
+  end
+end
+```
+
+### Testing with VCR
+
+Services are tested using VCR (Video Cassette Recorder) for HTTP interactions:
+
+```ruby
+RSpec.describe Heygen::ListAvatarsService, type: :service do
+  context 'when user has valid API token', :vcr do
+    before do
+      # Mock token validation for test environment
+      allow(subject).to receive(:api_token_present?).and_return(true)
+    end
+    
+    it 'returns successful result' do
+      result = subject.call
+      expect(result[:success]).to be true
+    end
+  end
+end
+```
+
+**VCR Configuration** (`spec/support/vcr.rb`):
+- **Automatic cassette generation** from real API calls
+- **API key sanitization** in recorded responses
+- **Request matching** on method, URI, headers, and body
+- **Configurable recording modes** for different scenarios
+
+### Performance Benefits
+
+- **Connection pooling** via Faraday
+- **Automatic retry logic** reduces transient failures
+- **Request instrumentation** enables monitoring and debugging
+- **Middleware architecture** allows for easy extensions
+- **Better error handling** with specific exception types
+
+### Security Enhancements
+
+- **API key sanitization** in logs and VCR cassettes
+- **Centralized authentication** handling
+- **Request/response logging** without exposing sensitive data
+- **Configurable timeout limits** prevent hanging requests

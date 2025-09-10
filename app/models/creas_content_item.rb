@@ -17,7 +17,7 @@ class CreasContentItem < ApplicationRecord
   }
 
   validates :template, inclusion: {
-    in: %w[solo_avatars avatar_and_video narration_over_7_images remix one_to_three_videos],
+    in: %w[only_avatars avatar_and_video narration_over_7_images remix one_to_three_videos],
     message: "%{value} is not a valid template"
   }
 
