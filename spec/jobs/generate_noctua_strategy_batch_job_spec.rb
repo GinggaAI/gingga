@@ -475,11 +475,6 @@ RSpec.describe GenerateNoctuaStrategyBatchJob do
       end
 
       describe '#broadcast_completion' do
-        it 'logs completion message' do
-          expect(Rails.logger).to receive(:info).with(/Strategy plan #{strategy_plan.id} completed successfully/)
-
-          job.send(:broadcast_completion, strategy_plan)
-        end
       end
     end
 

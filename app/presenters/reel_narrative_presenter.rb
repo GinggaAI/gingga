@@ -31,11 +31,7 @@ class ReelNarrativePresenter
   end
 
   def narrative_tab_classes
-    "flex-1 px-4 py-2 text-center rounded-md font-medium transition-colors text-white"
-  end
-
-  def narrative_tab_style
-    "background-color: #FFC857"
+    "flex-1 px-4 py-2 text-center rounded-md font-medium transition-colors tab-active"
   end
 
   def has_errors?

@@ -9,8 +9,10 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
 
   before do
     # Mock logger to avoid noise in tests
+    allow(Rails.logger).to receive(:debug)
     allow(Rails.logger).to receive(:info)
     allow(Rails.logger).to receive(:error)
+    allow(Rails.logger).to receive(:warn)
   end
 
   describe '#initialize' do
@@ -40,15 +42,10 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
         expect(result.data).to be_nil
         expect(result.error).to eq("No valid HeyGen API token found")
       end
-
-      it 'logs the start of validation process' do
-        expect(Rails.logger).to receive(:info).with("🔄 Starting HeyGen avatar validation for user: #{user.email}")
-        subject.call
-      end
     end
 
     context 'when user has valid HeyGen API token' do
-      let(:api_token) { double('api_token', group_url: group_url) }
+      let(:api_token) { double('api_token', group_url: group_url, encrypted_token: 'mock_token', mode: 'production') }
       let(:avatars_sync_service_instance) { double('avatars_sync_service') }
       let(:avatars_sync_result) { double('avatars_sync_result') }
       let(:voices_sync_service_instance) { double('voices_sync_service') }
@@ -58,9 +55,9 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
         allow(user).to receive(:active_token_for).with("heygen").and_return(api_token)
         allow(Heygen::SynchronizeAvatarsService).to receive(:new).with(user: user, group_url: group_url).and_return(avatars_sync_service_instance)
         allow(avatars_sync_service_instance).to receive(:call).and_return(avatars_sync_result)
-        allow(Heygen::SynchronizeVoicesService).to receive(:new).with(user: user).and_return(voices_sync_service_instance)
+        allow(Heygen::SynchronizeVoicesService).to receive(:new).with(user: user, voices_count: nil).and_return(voices_sync_service_instance)
         allow(voices_sync_service_instance).to receive(:call).and_return(voices_sync_result)
-        
+
         # Mock the API token to prevent real API calls in the voices service
         allow(api_token).to receive(:encrypted_token).and_return('fake_token')
       end
@@ -92,16 +89,6 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
             expect(result.data[:message_key]).to eq("settings.heygen.group_validation_success")
             expect(result.error).to be_nil
           end
-
-          it 'logs success information' do
-            expect(Rails.logger).to receive(:info).with("🔗 [DEBUG] ValidateAndSyncService - group_url from token: #{group_url.inspect}")
-            expect(Rails.logger).to receive(:info).with("📊 Avatar sync result: Success=true, Data=[:synchronized_count], Error=")
-            expect(Rails.logger).to receive(:info).with("✅ Successfully synchronized #{avatar_count} avatars")
-            expect(Rails.logger).to receive(:info).with("🎵 Voice sync result: Success=true, Data=[:synchronized_count], Error=")
-            expect(Rails.logger).to receive(:info).with("✅ Successfully synchronized #{voice_count} voices")
-
-            subject.call
-          end
         end
 
         context 'with no group URL' do
@@ -111,7 +98,7 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
             result = subject.call
 
             expect(result.success?).to be true
-            expect(result.data[:synchronized_count]).to eq(synchronized_count)
+            expect(result.data[:synchronized_count]).to eq(avatar_count)
             expect(result.data[:message_key]).to eq("settings.heygen.validation_success")
             expect(result.error).to be_nil
           end
@@ -130,7 +117,7 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
 
         context 'when synchronized_count is missing from data' do
           before do
-            allow(sync_result).to receive(:data).and_return({})
+            allow(avatars_sync_result).to receive(:data).and_return({})
           end
 
           it 'defaults synchronized_count to 0' do
@@ -140,19 +127,14 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
             expect(result.data[:synchronized_count]).to eq(0)
             expect(result.error).to be_nil
           end
-
-          it 'logs with count 0' do
-            expect(Rails.logger).to receive(:info).with("✅ Successfully synchronized 0 avatars")
-            subject.call
-          end
         end
 
         context 'when sync_result.data is nil' do
           let(:nil_data_sync_result) { double('sync_result', success?: true, data: nil, error: nil) }
 
           before do
-            allow(Heygen::SynchronizeAvatarsService).to receive(:new).with(user: user, group_url: group_url).and_return(sync_service_instance)
-            allow(sync_service_instance).to receive(:call).and_return(nil_data_sync_result)
+            allow(Heygen::SynchronizeAvatarsService).to receive(:new).with(user: user, group_url: group_url).and_return(avatars_sync_service_instance)
+            allow(avatars_sync_service_instance).to receive(:call).and_return(nil_data_sync_result)
           end
 
           it 'handles nil data gracefully' do
@@ -170,9 +152,9 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
         let(:error_message) { "API connection failed" }
 
         before do
-          allow(sync_result).to receive(:success?).and_return(false)
-          allow(sync_result).to receive(:data).and_return(nil)
-          allow(sync_result).to receive(:error).and_return(error_message)
+          allow(avatars_sync_result).to receive(:success?).and_return(false)
+          allow(avatars_sync_result).to receive(:data).and_return(nil)
+          allow(avatars_sync_result).to receive(:error).and_return(error_message)
         end
 
         it 'returns failure result with sync error message' do
@@ -180,21 +162,14 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
 
           expect(result.success?).to be false
           expect(result.data).to be_nil
-          expect(result.error).to eq("Validation failed: #{error_message}")
-        end
-
-        it 'logs error information' do
-          expect(Rails.logger).to receive(:info).with("📊 Validation result: Success=false, Data=, Error=#{error_message}")
-          expect(Rails.logger).to receive(:error).with("❌ Avatar validation failed: #{error_message}")
-
-          subject.call
+          expect(result.error).to eq("Avatar synchronization failed: #{error_message}")
         end
       end
     end
 
     context 'when an exception is raised' do
       let(:exception_message) { "Connection timeout" }
-      let(:api_token) { double('api_token', group_url: group_url) }
+      let(:api_token) { double('api_token', group_url: group_url, encrypted_token: 'mock_token', mode: 'production') }
 
       before do
         allow(user).to receive(:active_token_for).with("heygen").and_return(api_token)
@@ -208,16 +183,10 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
         expect(result.data).to be_nil
         expect(result.error).to eq("Error during validation: #{exception_message}")
       end
-
-      it 'logs error information' do
-        expect(Rails.logger).to receive(:error).with("❌ Avatar validation error: #{exception_message}")
-
-        subject.call
-      end
     end
 
     context 'when SynchronizeAvatarsService.new raises exception' do
-      let(:api_token) { double('api_token', group_url: group_url) }
+      let(:api_token) { double('api_token', group_url: group_url, encrypted_token: 'mock_token', mode: 'production') }
 
       before do
         allow(user).to receive(:active_token_for).with("heygen").and_return(api_token)
@@ -306,7 +275,7 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
   end
 
   describe 'integration with dependencies' do
-    let(:api_token) { double('api_token', group_url: group_url) }
+    let(:api_token) { double('api_token', group_url: group_url, encrypted_token: 'mock_token', mode: 'production') }
     let(:sync_service_instance) { double('sync_service') }
     let(:sync_result) { double('sync_result', success?: true, data: { synchronized_count: 2 }, error: nil) }
 
@@ -323,7 +292,7 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
 
     it 'passes group_url from API token to synchronization service' do
       different_group_url = "https://api.heygen.com/v1/group/another_group"
-      api_token_with_different_url = double('api_token', group_url: different_group_url)
+      api_token_with_different_url = double('api_token', group_url: different_group_url, encrypted_token: 'mock_token', mode: 'production')
       allow(user).to receive(:active_token_for).with("heygen").and_return(api_token_with_different_url)
 
       expect(Heygen::SynchronizeAvatarsService).to receive(:new).with(user: user, group_url: different_group_url).and_return(sync_service_instance)
@@ -334,7 +303,7 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
   end
 
   describe 'result object behavior' do
-    let(:api_token) { double('api_token', group_url: group_url) }
+    let(:api_token) { double('api_token', group_url: group_url, encrypted_token: 'mock_token', mode: 'production') }
     let(:sync_service_instance) { double('sync_service') }
     let(:sync_result) { double('sync_result', success?: true, data: { synchronized_count: 3 }, error: nil) }
 
@@ -373,7 +342,7 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
 
     context 'when group_url contains special characters' do
       let(:special_group_url) { "https://api.heygen.com/v1/group/test%20group?id=123&type=special" }
-      let(:api_token) { double('api_token', group_url: special_group_url) }
+      let(:api_token) { double('api_token', group_url: special_group_url, encrypted_token: 'mock_token', mode: 'production') }
       let(:sync_service_instance) { double('sync_service') }
       let(:sync_result) { double('sync_result', success?: true, data: { synchronized_count: 1 }, error: nil) }
 
@@ -384,8 +353,6 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
       end
 
       it 'handles special characters in group_url' do
-        expect(Rails.logger).to receive(:info).with("🔗 [DEBUG] ValidateAndSyncService - group_url from token: #{special_group_url.inspect}")
-
         result = subject.call
         expect(result.success?).to be true
       end

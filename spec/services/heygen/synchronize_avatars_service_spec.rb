@@ -4,6 +4,13 @@ RSpec.describe Heygen::SynchronizeAvatarsService, type: :service do
   let(:user) { create(:user) }
   let(:service) { described_class.new(user: user) }
 
+  before do
+    # Mock logger to avoid noise in tests
+    allow(Rails.logger).to receive(:debug)
+    allow(Rails.logger).to receive(:info)
+    allow(Rails.logger).to receive(:error)
+  end
+
   describe '#call' do
     context 'when HeyGen API returns avatars successfully' do
       let(:mock_response) do
@@ -441,15 +448,6 @@ RSpec.describe Heygen::SynchronizeAvatarsService, type: :service do
         it 'calls ListAvatarsService' do
           expect_any_instance_of(Heygen::ListAvatarsService).to receive(:call)
             .and_return({ success: true, data: [] })
-
-          service.send(:fetch_avatars)
-        end
-
-        it 'logs avatar fetching information' do
-          allow_any_instance_of(Heygen::ListAvatarsService).to receive(:call)
-            .and_return({ success: true, data: [ { id: 'test' } ] })
-
-          expect(Rails.logger).to receive(:info).with(/📊 All avatars result/)
 
           service.send(:fetch_avatars)
         end

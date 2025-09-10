@@ -63,15 +63,9 @@ RSpec.describe ReelNarrativePresenter, type: :presenter do
     end
 
     describe '#narrative_tab_classes' do
-      it 'returns active tab CSS classes' do
-        expected_classes = "flex-1 px-4 py-2 text-center rounded-md font-medium transition-colors text-white"
+      it 'returns active tab CSS classes with tab-active class' do
+        expected_classes = "flex-1 px-4 py-2 text-center rounded-md font-medium transition-colors tab-active"
         expect(presenter.narrative_tab_classes).to eq(expected_classes)
-      end
-    end
-
-    describe '#narrative_tab_style' do
-      it 'returns active tab inline style' do
-        expect(presenter.narrative_tab_style).to eq("background-color: #FFC857")
       end
     end
   end
@@ -336,12 +330,7 @@ RSpec.describe ReelNarrativePresenter, type: :presenter do
 
     it 'returns consistent CSS classes for active tab' do
       classes = presenter.narrative_tab_classes
-      expect(classes).to include('flex-1', 'px-4', 'py-2', 'text-center', 'rounded-md', 'font-medium', 'transition-colors', 'text-white')
-    end
-
-    it 'returns consistent inline style for active tab' do
-      style = presenter.narrative_tab_style
-      expect(style).to match(/background-color:\s*#FFC857/)
+      expect(classes).to include('flex-1', 'px-4', 'py-2', 'text-center', 'rounded-md', 'font-medium', 'transition-colors', 'tab-active')
     end
   end
 

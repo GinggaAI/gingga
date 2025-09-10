@@ -41,6 +41,7 @@ SimpleCov.start 'rails' do
   add_filter "/gems/"
   add_filter "/config/"
   add_filter "/app/controllers/"
+  add_filter "/app/helpers/"
   add_filter %r{_preview\.rb\z}
   # Filter standard Rails base classes with minimal/no custom logic
   add_filter "app/helpers/application_helper.rb"

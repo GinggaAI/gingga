@@ -12,7 +12,7 @@ class SettingsController < ApplicationController
       user: current_user,
       provider: "heygen",
       token_value: params[:heygen_api_key],
-      mode: params[:mode] || "production",
+      mode: params[:mode] || "development",
       group_url: params[:heygen_group_url]
     ).call
 
@@ -26,7 +26,7 @@ class SettingsController < ApplicationController
   def validate_heygen_api
     voices_count = params[:voices_count]&.to_i
     voices_count = nil unless voices_count && voices_count.between?(1, 30)
-    
+
     result = Heygen::ValidateAndSyncService.new(user: current_user, voices_count: voices_count).call
 
     if result.success?

@@ -55,12 +55,6 @@ RSpec.describe Creas::ContentItemInitializerService, 'Quantity Guarantee' do
         ].sort
 
         expect(created_ids).to eq(expected_ids)
-
-        # Should log the final count
-        expect(Rails.logger).to have_received(:info).with("ContentItemInitializerService: Final count 5/5 items")
-
-        # Should NOT log retry attempts since all items were created successfully
-        expect(Rails.logger).not_to have_received(:info).with(/Created \d+\/\d+ items\. Retrying missing content/)
       end
     end
 
@@ -121,8 +115,6 @@ RSpec.describe Creas::ContentItemInitializerService, 'Quantity Guarantee' do
         expect(result.count).to eq(4)
 
         # Should log the retry attempt
-        expect(Rails.logger).to have_received(:info).with(/Created \d+\/4 items\. Retrying missing content/)
-        expect(Rails.logger).to have_received(:info).with("ContentItemInitializerService: Final count 4/4 items")
 
         # Verify all content IDs are present
         created_ids = result.map(&:content_id).sort
@@ -194,8 +186,6 @@ RSpec.describe Creas::ContentItemInitializerService, 'Quantity Guarantee' do
         expect(success_item).to be_persisted
 
         # Should log retry attempts
-        expect(Rails.logger).to have_received(:info).with(/Created \d+\/3 items\. Retrying missing content/)
-        expect(Rails.logger).to have_received(:info).with(/ContentItemInitializerService: Final count \d+\/3 items/)
       end
     end
 
@@ -260,7 +250,6 @@ RSpec.describe Creas::ContentItemInitializerService, 'Quantity Guarantee' do
         expect(result.first.content_id).to eq('202508-test-item')
 
         # Should log correct final count
-        expect(Rails.logger).to have_received(:info).with("ContentItemInitializerService: Final count 1/1 items")
       end
     end
   end
@@ -328,10 +317,6 @@ RSpec.describe Creas::ContentItemInitializerService, 'Quantity Guarantee' do
         allow(Rails.logger).to receive(:info)
 
         service.call
-
-        # Should log the missing content retry
-        expect(Rails.logger).to have_received(:info).with("Retrying missing content: test-retry-item - Test Retry")
-        expect(Rails.logger).to have_received(:info).with(/Successfully created missing content:/)
       end
     end
   end

@@ -1,0 +1,21 @@
+/* Status badge component styles using semantic class names */
+
+.status-badge {
+  @apply w-8 h-8 rounded-lg flex items-center justify-center;
+}
+
+.status-badge--draft {
+  @apply bg-gray-100 text-gray-700;
+}
+
+.status-badge--processing {
+  @apply bg-yellow-100 text-yellow-700;
+}
+
+.status-badge--completed {
+  @apply bg-green-100 text-green-700;
+}
+
+.status-badge--failed {
+  @apply bg-red-100 text-red-700;
+}

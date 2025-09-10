@@ -42,11 +42,11 @@ class Reel < ApplicationRecord
   def assign_scene_numbers
     # Only assign scene numbers to new scenes without numbers
     scenes_to_number = reel_scenes.select { |scene| scene.scene_number.blank? }
-    
+
     if scenes_to_number.any?
       # Find existing scene numbers
       existing_numbers = reel_scenes.map(&:scene_number).compact
-      
+
       # Assign scene numbers sequentially
       scenes_to_number.each_with_index do |scene, index|
         next_number = (1..3).find { |n| !existing_numbers.include?(n) }

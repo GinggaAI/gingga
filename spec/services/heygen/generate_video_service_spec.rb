@@ -41,11 +41,10 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
         allow(reel).to receive(:ready_for_generation?).and_return(true)
         mock_response_double = OpenStruct.new(
           success?: true,
-          body: mock_response.to_json
+          body: mock_response
         )
 
         allow(subject).to receive(:generate_video).and_return(mock_response_double)
-        allow(subject).to receive(:parse_json).and_return(mock_response)
       end
 
       it 'updates reel status to processing' do
@@ -105,14 +104,14 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
             }
           ],
           dimension: {
-            width: 1280,
-            height: 720
+            width: 720,
+            height: 1280
           },
-          aspect_ratio: "16:9",
+          aspect_ratio: "9:16",
           test: api_token.mode == 'test'
         }
 
-        expect(subject).to receive(:generate_video).with(expected_payload).and_return(double(success?: true, body: mock_response.to_json))
+        expect(subject).to receive(:generate_video).with(expected_payload).and_return(double(success?: true, body: mock_response))
 
         subject.call
       end
@@ -218,6 +217,61 @@ RSpec.describe Heygen::GenerateVideoService, type: :service do
 
       it 'updates reel status to failed' do
         expect { subject.call }.to change { reel.reload.status }.to('failed')
+      end
+    end
+  end
+
+  describe '#build_scene_input private method' do
+    let(:service) { described_class.new(user, reel) }
+
+    context 'when video_type is kling' do
+      it 'builds character with type video' do
+        scene = { avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'Test script', video_type: 'kling' }
+        result = service.send(:build_scene_input, scene, 1)
+        
+        expect(result[:character][:type]).to eq('video')
+        expect(result[:character][:video_content]).to eq('Test script')
+        expect(result[:voice][:input_text]).to eq('Test script')
+        expect(result[:voice][:voice_id]).to eq('voice_1')
+      end
+    end
+
+    context 'when video_type is unknown' do
+      it 'defaults to avatar type' do
+        scene = { avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'Test script', video_type: 'unknown_type' }
+        result = service.send(:build_scene_input, scene, 1)
+        
+        expect(result[:character][:type]).to eq('avatar')
+        expect(result[:character][:avatar_id]).to eq('avatar_1')
+        expect(result[:character][:avatar_style]).to eq('normal')
+        expect(result[:voice][:input_text]).to eq('Test script')
+        expect(result[:voice][:voice_id]).to eq('voice_1')
+      end
+    end
+
+    context 'when video_type is nil' do
+      it 'defaults to avatar type' do
+        scene = { avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'Test script', video_type: nil }
+        result = service.send(:build_scene_input, scene, 1)
+        
+        expect(result[:character][:type]).to eq('avatar')
+        expect(result[:character][:avatar_id]).to eq('avatar_1')
+        expect(result[:character][:avatar_style]).to eq('normal')
+        expect(result[:voice][:input_text]).to eq('Test script')
+        expect(result[:voice][:voice_id]).to eq('voice_1')
+      end
+    end
+
+    context 'when video_type is avatar' do
+      it 'builds character with avatar type' do
+        scene = { avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'Test script', video_type: 'avatar' }
+        result = service.send(:build_scene_input, scene, 1)
+        
+        expect(result[:character][:type]).to eq('avatar')
+        expect(result[:character][:avatar_id]).to eq('avatar_1')
+        expect(result[:character][:avatar_style]).to eq('normal')
+        expect(result[:voice][:input_text]).to eq('Test script')
+        expect(result[:voice][:voice_id]).to eq('voice_1')
       end
     end
   end

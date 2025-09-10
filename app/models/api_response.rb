@@ -29,14 +29,16 @@ class ApiResponse < ApplicationRecord
   def parsed_request_data
     return {} unless request_data.present?
     JSON.parse(request_data)
-  rescue JSON::ParserError
+  rescue JSON::ParserError => e
+    Rails.logger.error "Failed to parse request_data JSON for ApiResponse ID #{id}: #{e.message}. Data: #{request_data.truncate(200)}"
     {}
   end
 
   def parsed_response_data
     return {} unless response_data.present?
     JSON.parse(response_data)
-  rescue JSON::ParserError
+  rescue JSON::ParserError => e
+    Rails.logger.error "Failed to parse response_data JSON for ApiResponse ID #{id}: #{e.message}. Data: #{response_data.truncate(200)}"
     {}
   end
 end

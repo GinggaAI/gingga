@@ -32,6 +32,7 @@ es:
         one: "¡Validación de API HeyGen exitosa! %{count} avatar sincronizado."
         other: "¡Validación de API HeyGen exitosa! %{count} avatares sincronizados."
       validation_failed: "Falló la validación de API HeyGen: %{error}"
+      disabled_validate_button_title: "Guarda la clave API primero para habilitar la validación"
 
   # Brands
   brands:
@@ -316,6 +317,16 @@ es:
       kling_video: "Video Kling"
       no_avatars_message: "No hay avatares disponibles. Por favor sincroniza tus avatares desde tu proveedor primero."
       no_voices_message: "No hay voces disponibles. Por favor sincroniza tus voces desde tu cuenta de HeyGen primero."
+      max_scenes_message: "Máximo de 5 escenas permitidas"
+      min_scenes_message: "Se requiere al menos 1 escena"
+      remove_scene: "Eliminar Escena"
+      select_avatar: "Seleccionar Avatar"
+      select_voice: "Seleccionar Voz"
+      scene_script_placeholder: "Ingresa el guión para la Escena %{number}. ¿Qué debería decir el avatar en esta escena?"
+      scene_help_text:
+        avatar: "Elige el avatar de IA para esta escena"
+        voice: "Elige la voz para esta escena"
+        script: "Manténlo bajo 500 caracteres para mejores resultados"
       
     # Narrative
     narrative:

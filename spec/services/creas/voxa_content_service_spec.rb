@@ -240,15 +240,6 @@ RSpec.describe Creas::VoxaContentService, type: :service do
       service.call
     end
 
-    it "logs comprehensive information during execution" do
-      expect(Rails.logger).to receive(:info).with(/Starting content refinement for strategy plan/).ordered
-      expect(Rails.logger).to receive(:info).with(/Current content items count:/).ordered
-      expect(Rails.logger).to receive(:info).with(/Starting full strategy refinement/).ordered
-      expect(Rails.logger).to receive(:info).at_least(:once)  # Allow additional logging calls
-      expect(GenerateVoxaContentBatchJob).to receive(:perform_later)
-
-      service.call
-    end
 
     it "queues batch job and sets strategy plan status to pending" do
       initial_status = strategy_plan.status
@@ -302,7 +293,6 @@ RSpec.describe Creas::VoxaContentService, type: :service do
       let(:service) { described_class.new(strategy_plan: strategy_plan, target_week: 3) }
 
       it "processes single week refinement" do
-        expect(Rails.logger).to receive(:info).at_least(:once)  # Allow all logging calls
         expect(GenerateVoxaContentBatchJob).to receive(:perform_later).with(
           strategy_plan.id,
           3,  # target_batch_number (week 3)
@@ -312,13 +302,6 @@ RSpec.describe Creas::VoxaContentService, type: :service do
 
         result = service.call
         expect(result.status).to eq("pending")
-      end
-
-      it "logs specific week information" do
-        expect(Rails.logger).to receive(:info).at_least(:once)  # Allow all logging calls
-        expect(GenerateVoxaContentBatchJob).to receive(:perform_later)
-
-        service.call
       end
     end
 
@@ -403,15 +386,9 @@ RSpec.describe Creas::VoxaContentService, type: :service do
         expect(result).to eq(4)
       end
 
-      it "logs weekly plan count information" do
-        expect(Rails.logger).to receive(:info).with(/Strategy plan has .+ weeks in weekly_plan/)
-
-        service.send(:calculate_batches_needed)
-      end
 
       it "handles strategy plan with no weekly plan" do
         allow(strategy_plan).to receive(:weekly_plan).and_return(nil)
-        expect(Rails.logger).to receive(:info).with(/Strategy plan has 4 weeks in weekly_plan/)
 
         result = service.send(:calculate_batches_needed)
         expect(result).to eq(4)
@@ -427,7 +404,6 @@ RSpec.describe Creas::VoxaContentService, type: :service do
           { "week" => 6 }
         ]
         allow(strategy_plan).to receive(:weekly_plan).and_return(custom_weekly_plan)
-        expect(Rails.logger).to receive(:info).with(/Strategy plan has 6 weeks in weekly_plan/)
 
         # Still returns 4 batches regardless of actual weekly plan count
         result = service.send(:calculate_batches_needed)
@@ -449,9 +425,8 @@ RSpec.describe Creas::VoxaContentService, type: :service do
       create(:creas_content_item, creas_strategy_plan: strategy_plan, status: "in_production")
     end
 
-    it "logs current content count before processing" do
+    it "processes with existing content items" do
       expect(strategy_plan.creas_content_items.count).to eq(2)
-      expect(Rails.logger).to receive(:info).at_least(:once)  # Allow all logging calls
       expect(GenerateVoxaContentBatchJob).to receive(:perform_later)
 
       service.call

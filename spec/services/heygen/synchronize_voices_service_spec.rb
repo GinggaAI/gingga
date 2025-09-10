@@ -121,7 +121,7 @@ RSpec.describe Heygen::SynchronizeVoicesService, type: :service do
 
       it 'respects voices_count limit when specified' do
         # Expect ListVoicesService to be called with voices_count parameter
-        expect_any_instance_of(Heygen::ListVoicesService).to receive(:new)
+        expect(Heygen::ListVoicesService).to receive(:new)
           .with(user, {}, voices_count: 2).and_call_original
 
         service_with_limit.call

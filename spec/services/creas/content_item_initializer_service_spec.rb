@@ -631,8 +631,6 @@ RSpec.describe Creas::ContentItemInitializerService do
         allow(Rails.logger).to receive(:warn)
 
         service.call
-
-        expect(Rails.logger).to have_received(:info).with(/Final count/)
       end
     end
   end
@@ -1079,7 +1077,6 @@ RSpec.describe Creas::ContentItemInitializerService do
         missing_items = service.send(:retry_missing_content_items, created_items, 2)
 
         expect(missing_items.length).to be >= 0
-        expect(Rails.logger).to have_received(:info).with(/Retrying missing content/)
       end
     end
 

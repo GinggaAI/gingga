@@ -44,8 +44,7 @@ class Heygen::SynchronizeAvatarsService
     else
       # Use the original service to fetch all avatars
       result = Heygen::ListAvatarsService.new(@user).call
-      Rails.logger.info "📊 All avatars result: success=#{result[:success]}, count=#{result[:data]&.size}"
-      result
+        result
     end
   end
 

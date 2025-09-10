@@ -4,15 +4,12 @@ class GenerateVoxaContentBatchJob < ApplicationJob
   retry_on StandardError, wait: :exponentially_longer, attempts: 3
 
   def perform(strategy_plan_id, batch_number, total_batches, batch_id)
-    Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Starting week #{batch_number} batch (#{batch_number}/#{total_batches}) for strategy plan #{strategy_plan_id} (batch_id: #{batch_id})"
-
     strategy_plan = CreasStrategyPlan.find(strategy_plan_id)
 
     begin
       # Mark strategy plan as processing if it's the first batch
       if batch_number == 1 && strategy_plan.status == "pending"
         strategy_plan.update!(status: :processing)
-        Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Strategy plan #{strategy_plan.id} marked as processing"
       end
 
       # Ensure initial content items exist using ContentItemInitializerService
@@ -27,8 +24,6 @@ class GenerateVoxaContentBatchJob < ApplicationJob
         return
       end
 
-      Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Processing #{content_items.count} content items for week #{batch_number} (batch #{batch_number})"
-
       # Mark items as in_progress
       content_items.update_all(
         status: "in_progress",
@@ -41,19 +36,16 @@ class GenerateVoxaContentBatchJob < ApplicationJob
       brand_context = build_brand_context(strategy_plan.brand)
       existing_content_context = build_existing_content_context(strategy_plan, batch_number)
 
-      Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Building prompts for OpenAI week #{batch_number} batch"
       system_msg = build_batch_system_prompt(strategy_plan_data, batch_number, total_batches)
       user_msg = build_batch_user_prompt(strategy_plan_data, brand_context, existing_content_context, batch_number)
 
       # Call OpenAI
-      Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Calling OpenAI API for week #{batch_number} batch (model: #{Rails.application.config.openai_model}, temperature: 0.5)"
       client = GinggaOpenAI::ChatClient.new(
         user: strategy_plan.user,
         model: Rails.application.config.openai_model,
         temperature: 0.5
       )
       response = client.chat!(system: system_msg, user: user_msg)
-      Rails.logger.info "Voxa GenerateVoxaContentBatchJob: OpenAI response received for batch #{batch_number} (#{response&.length || 0} characters)"
 
       # Save raw AI response for debugging
       AiResponse.create!(
@@ -80,10 +72,8 @@ class GenerateVoxaContentBatchJob < ApplicationJob
         }
       )
 
-      Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Parsing OpenAI response for batch #{batch_number}"
       parsed_response = JSON.parse(response)
       voxa_items = parsed_response.fetch("items")
-      Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Found #{voxa_items.count} items in Voxa batch #{batch_number} response"
 
       # Process Voxa items for this batch
       processed_count = process_voxa_batch_items(strategy_plan, voxa_items, content_items, batch_number)
@@ -116,15 +106,11 @@ class GenerateVoxaContentBatchJob < ApplicationJob
 
   def ensure_draft_content_exists(strategy_plan)
     existing_count = strategy_plan.creas_content_items.count
-    Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Checking draft content - existing count: #{existing_count}"
 
     if existing_count == 0
-      Rails.logger.info "Voxa GenerateVoxaContentBatchJob: No existing content found for strategy plan #{strategy_plan.id}, creating draft content"
       Creas::ContentItemInitializerService.new(strategy_plan: strategy_plan).call
       new_count = strategy_plan.creas_content_items.count
-      Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Created #{new_count} draft content items"
     else
-      Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Using existing #{existing_count} content items"
     end
   end
 
@@ -132,7 +118,6 @@ class GenerateVoxaContentBatchJob < ApplicationJob
     # Organize content items by week - each batch processes content from one specific week
     # batch_number corresponds to the week number (1-4)
 
-    Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Selecting content items for week #{batch_number} (batch #{batch_number})"
 
     # Get all available content items for the specific week that haven't been processed
     available_items = strategy_plan.creas_content_items.where(
@@ -141,7 +126,6 @@ class GenerateVoxaContentBatchJob < ApplicationJob
       week: batch_number
     ).order(:created_at)
 
-    Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Found #{available_items.count} content items for week #{batch_number}"
 
     available_items
   end
@@ -204,11 +188,8 @@ EXISTING CONTENT FROM PREVIOUS BATCHES (avoid duplication):
     processed_items = []
     skipped_count = 0
 
-    Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Processing #{voxa_items.count} Voxa items for batch #{batch_number}"
 
     voxa_items.each_with_index do |item, index|
-      Rails.logger.debug "Voxa GenerateVoxaContentBatchJob: Processing batch #{batch_number} item #{index + 1}/#{voxa_items.count}: #{item['id']}"
-
       begin
         processed_item = upsert_voxa_batch_item(strategy_plan, item, content_items, batch_number)
         if processed_item&.persisted?
@@ -226,7 +207,6 @@ EXISTING CONTENT FROM PREVIOUS BATCHES (avoid duplication):
     end
 
     actual_count = processed_items.count
-    Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Batch #{batch_number} processing complete - #{actual_count} items processed successfully, #{skipped_count} items skipped"
 
     actual_count
   end
@@ -281,7 +261,6 @@ EXISTING CONTENT FROM PREVIOUS BATCHES (avoid duplication):
 
     begin
       rec.save!
-      Rails.logger.debug "Voxa GenerateVoxaContentBatchJob: Updated content item #{rec.content_id} status: #{original_status} → in_production (batch #{batch_number})"
     rescue ActiveRecord::RecordInvalid => e
       # Handle content name uniqueness validation errors gracefully
       if e.record.errors[:content_name].any? { |msg| msg.include?("already exists for this brand") }
@@ -298,7 +277,6 @@ EXISTING CONTENT FROM PREVIOUS BATCHES (avoid duplication):
 
         begin
           rec.save!
-          Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Successfully updated content item #{rec.content_id} with unique name '#{unique_name}' (batch #{batch_number})"
         rescue ActiveRecord::RecordInvalid => retry_error
           Rails.logger.error "Voxa GenerateVoxaContentBatchJob: Failed to update content item #{rec.content_id} even with unique name in batch #{batch_number}: #{retry_error.message}"
           Rails.logger.error "Voxa GenerateVoxaContentBatchJob: Continuing processing - item #{rec.content_id} will remain in status #{original_status}"
@@ -342,7 +320,6 @@ EXISTING CONTENT FROM PREVIOUS BATCHES (avoid duplication):
 
         begin
           rec.save!
-          Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Successfully created content item with unique name '#{unique_name}' (batch #{batch_number})"
         rescue ActiveRecord::RecordInvalid => retry_error
           Rails.logger.error "Voxa GenerateVoxaContentBatchJob: Failed to create content item even with unique name in batch #{batch_number}: #{retry_error.message}"
           Rails.logger.error "Voxa GenerateVoxaContentBatchJob: Continuing processing - item creation failed"
@@ -431,8 +408,6 @@ EXISTING CONTENT FROM PREVIOUS BATCHES (avoid duplication):
   end
 
   def mark_batch_completed(strategy_plan, batch_number, total_batches, batch_id, processed_count)
-    Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Marking batch #{batch_number}/#{total_batches} as completed with #{processed_count} processed items"
-
     # Check for stuck items in this batch
     stuck_in_progress = strategy_plan.creas_content_items.where(
       status: "in_progress",
@@ -463,8 +438,6 @@ EXISTING CONTENT FROM PREVIOUS BATCHES (avoid duplication):
   end
 
   def queue_next_batch(strategy_plan_id, next_batch_number, total_batches, batch_id)
-    Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Queuing next batch #{next_batch_number}/#{total_batches}"
-
     # Use perform_later with a small delay to ensure sequential processing
     # Skip delay in test environment since inline adapter doesn't support it
     if Rails.env.test?
@@ -485,8 +458,6 @@ EXISTING CONTENT FROM PREVIOUS BATCHES (avoid duplication):
   end
 
   def finalize_voxa_processing(strategy_plan, batch_id)
-    Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Finalizing Voxa processing for strategy plan #{strategy_plan.id}"
-
     # Check for items stuck in in_progress status and fix them
     stuck_items = strategy_plan.creas_content_items.where(status: "in_progress")
     if stuck_items.exists?
@@ -517,8 +488,6 @@ EXISTING CONTENT FROM PREVIOUS BATCHES (avoid duplication):
         stuck_items_fixed: stuck_items.exists? ? stuck_items.count : 0
       )
     )
-
-    Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Voxa batch processing completed for strategy plan #{strategy_plan.id}: #{total_processed}/#{total_expected} items processed (#{(total_processed.to_f / total_expected * 100).round(1)}%), #{draft_items} draft items remaining"
   end
 
   def handle_batch_error(strategy_plan, error_message, batch_number, content_items = nil)
@@ -704,7 +673,6 @@ EXISTING CONTENT FROM PREVIOUS BATCHES (avoid duplication):
 
     normalized_template = template_mappings[template.downcase.strip]
     if normalized_template
-      Rails.logger.info "Voxa GenerateVoxaContentBatchJob: Normalized template '#{template}' to '#{normalized_template}'"
       return normalized_template
     end
 
@@ -729,7 +697,6 @@ EXISTING CONTENT FROM PREVIOUS BATCHES (avoid duplication):
         .exists?
 
       unless exists
-        Rails.logger.debug "Voxa GenerateVoxaContentBatchJob: Generated unique content name: '#{candidate_name}' (attempt #{attempt})"
         return candidate_name
       end
     end

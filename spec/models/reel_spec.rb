@@ -89,50 +89,126 @@ RSpec.describe Reel, type: :model do
   end
 
   describe '#ready_for_generation?' do
-    let(:reel) { create(:reel, user: user, template: 'solo_avatars') }
+    context 'for solo_avatars template' do
+      let(:reel) { create(:reel, user: user, template: 'solo_avatars') }
 
-    context 'when reel has exactly 3 complete scenes' do
-      before do
+      context 'when reel has exactly 3 complete scenes' do
+        before do
+          create(:reel_scene, reel: reel, scene_number: 1, avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'Scene 1')
+          create(:reel_scene, reel: reel, scene_number: 2, avatar_id: 'avatar_2', voice_id: 'voice_2', script: 'Scene 2')
+          create(:reel_scene, reel: reel, scene_number: 3, avatar_id: 'avatar_3', voice_id: 'voice_3', script: 'Scene 3')
+        end
+
+        it 'returns true' do
+          expect(reel.ready_for_generation?).to be true
+        end
+      end
+
+      context 'when reel has less than 3 scenes' do
+        before do
+          create(:reel_scene, reel: reel, scene_number: 1)
+          create(:reel_scene, reel: reel, scene_number: 2)
+        end
+
+        it 'returns false' do
+          expect(reel.ready_for_generation?).to be false
+        end
+      end
+
+      context 'when reel has incomplete scenes' do
+        before do
+          create(:reel_scene, reel: reel, scene_number: 1, avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'Scene 1')
+          scene_2 = create(:reel_scene, reel: reel, scene_number: 2, avatar_id: 'avatar_2', voice_id: 'voice_2', script: 'Valid script')
+          scene_2.update_column(:script, '') # Bypass validation to test incomplete scene
+          create(:reel_scene, reel: reel, scene_number: 3, avatar_id: 'avatar_3', voice_id: 'voice_3', script: 'Scene 3')
+        end
+
+        it 'returns false' do
+          reel.reload # Ensure we see the updated scene data
+          expect(reel.ready_for_generation?).to be false
+        end
+      end
+    end
+
+    context 'for avatar_and_video template' do
+      let(:reel) { create(:reel, user: user, template: 'avatar_and_video') }
+
+      it 'returns true when has 3 complete scenes' do
         create(:reel_scene, reel: reel, scene_number: 1, avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'Scene 1')
         create(:reel_scene, reel: reel, scene_number: 2, avatar_id: 'avatar_2', voice_id: 'voice_2', script: 'Scene 2')
         create(:reel_scene, reel: reel, scene_number: 3, avatar_id: 'avatar_3', voice_id: 'voice_3', script: 'Scene 3')
-      end
 
-      it 'returns true' do
         expect(reel.ready_for_generation?).to be true
       end
-    end
 
-    context 'when reel has less than 3 scenes' do
-      before do
-        create(:reel_scene, reel: reel, scene_number: 1)
-        create(:reel_scene, reel: reel, scene_number: 2)
-      end
-
-      it 'returns false' do
-        expect(reel.ready_for_generation?).to be false
-      end
-    end
-
-    context 'when reel has incomplete scenes' do
-      before do
+      it 'returns false when has less than 3 scenes' do
         create(:reel_scene, reel: reel, scene_number: 1, avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'Scene 1')
-        scene_2 = create(:reel_scene, reel: reel, scene_number: 2, avatar_id: 'avatar_2', voice_id: 'voice_2', script: 'Valid script')
-        scene_2.update_column(:script, '') # Bypass validation to test incomplete scene
-        create(:reel_scene, reel: reel, scene_number: 3, avatar_id: 'avatar_3', voice_id: 'voice_3', script: 'Scene 3')
-      end
 
-      it 'returns false' do
         expect(reel.ready_for_generation?).to be false
       end
     end
 
-    context 'when template does not require scenes' do
+    context 'for narration_over_7_images template' do
       let(:reel) { create(:reel, user: user, template: 'narration_over_7_images') }
 
       it 'returns true' do
         expect(reel.ready_for_generation?).to be true
       end
+    end
+
+    context 'for one_to_three_videos template' do
+      let(:reel) { create(:reel, user: user, template: 'one_to_three_videos') }
+
+      it 'returns true' do
+        expect(reel.ready_for_generation?).to be true
+      end
+    end
+
+    context 'for unknown template' do
+      let(:reel) { build(:reel, user: user, template: 'unknown') }
+
+      it 'returns false' do
+        # We need to bypass the validation to test the ready_for_generation? method with invalid template
+        reel.save(validate: false)
+        expect(reel.ready_for_generation?).to be false
+      end
+    end
+  end
+
+  describe '#requires_scenes?' do
+    it 'returns true for solo_avatars template' do
+      reel = build(:reel, user: user, template: 'solo_avatars')
+      expect(reel.requires_scenes?).to be true
+    end
+
+    it 'returns true for avatar_and_video template' do
+      reel = build(:reel, user: user, template: 'avatar_and_video')
+      expect(reel.requires_scenes?).to be true
+    end
+
+    it 'returns false for narration_over_7_images template' do
+      reel = build(:reel, user: user, template: 'narration_over_7_images')
+      expect(reel.requires_scenes?).to be false
+    end
+
+    it 'returns false for one_to_three_videos template' do
+      reel = build(:reel, user: user, template: 'one_to_three_videos')
+      expect(reel.requires_scenes?).to be false
+    end
+  end
+
+  describe 'scene number assignment' do
+    it 'assigns scene numbers automatically' do
+      reel = create(:reel, user: user, template: 'solo_avatars')
+
+      # Test that the assign_scene_numbers method exists and works
+      scene_without_number = build(:reel_scene, reel: reel, scene_number: nil)
+      reel.reel_scenes << scene_without_number
+
+      # Manually call the private method to test it
+      reel.send(:assign_scene_numbers)
+
+      expect(scene_without_number.scene_number).to be_between(1, 3)
     end
   end
 

@@ -61,7 +61,7 @@ class SettingsPresenter
   end
 
   def disabled_validate_button_title
-    "Save API key first to enable validation"
+    I18n.t("settings.heygen.disabled_validate_button_title")
   end
 
   # Flash Messages
@@ -83,8 +83,7 @@ class SettingsPresenter
 
   # API Integrations Overview Stats
   def active_connections_count
-    # Count valid API tokens
-    @user.api_tokens.where(is_valid: true).count
+    @user.api_tokens.valid_tokens.count
   end
 
   def available_services_count
@@ -93,8 +92,7 @@ class SettingsPresenter
   end
 
   def test_mode_count
-    # Count test mode tokens
-    @user.api_tokens.where(mode: "test").count
+    @user.api_tokens.test_mode.count
   end
 
   private

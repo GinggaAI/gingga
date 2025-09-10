@@ -4,13 +4,9 @@ class GenerateVoxaContentJob < ApplicationJob
   retry_on StandardError, wait: :exponentially_longer, attempts: 3
 
   def perform(strategy_plan_id)
-    Rails.logger.info "Voxa GenerateVoxaContentJob: Starting job for strategy plan #{strategy_plan_id}"
-
     strategy_plan = CreasStrategyPlan.find(strategy_plan_id)
-    Rails.logger.info "Voxa GenerateVoxaContentJob: Found strategy plan #{strategy_plan.id} (user: #{strategy_plan.user_id}, brand: #{strategy_plan.brand_id})"
 
     strategy_plan.update!(status: :processing)
-    Rails.logger.info "Voxa GenerateVoxaContentJob: Strategy plan status updated to processing"
 
     begin
       # Ensure initial content items exist using ContentItemInitializerService
@@ -18,27 +14,21 @@ class GenerateVoxaContentJob < ApplicationJob
 
       # Get expected content count for validation
       expected_count = calculate_expected_content_count(strategy_plan)
-      Rails.logger.info "Voxa GenerateVoxaContentJob: Expected content count: #{expected_count}"
 
       # Generate Voxa refinements
-      Rails.logger.info "Voxa GenerateVoxaContentJob: Generating strategy plan data and brand context"
       strategy_plan_data = Creas::StrategyPlanFormatter.new(strategy_plan).for_voxa
       brand_context = build_brand_context(strategy_plan.brand)
 
-      Rails.logger.info "Voxa GenerateVoxaContentJob: Building prompts for OpenAI"
       system_msg = Creas::Prompts.voxa_system(strategy_plan_data: strategy_plan_data)
       user_msg = Creas::Prompts.voxa_user(strategy_plan_data: strategy_plan_data, brand_context: brand_context)
 
       # Call OpenAI
-      Rails.logger.info "Voxa GenerateVoxaContentJob: Calling OpenAI API (model: #{Rails.application.config.openai_model}, temperature: 0.4)"
       client = GinggaOpenAI::ChatClient.new(
         user: strategy_plan.user,
         model: Rails.application.config.openai_model,
         temperature: 0.4
       )
       response = client.chat!(system: system_msg, user: user_msg)
-      Rails.logger.info "Voxa GenerateVoxaContentJob: OpenAI response received (#{response&.length || 0} characters)"
-      Rails.logger.info "Voxa GenerateVoxaContentJob: response #{response}"
 
       # Save raw AI response for debugging
       AiResponse.create!(
@@ -59,13 +49,10 @@ class GenerateVoxaContentJob < ApplicationJob
         }
       )
 
-      Rails.logger.info "Voxa GenerateVoxaContentJob: Parsing OpenAI response"
       parsed_response = JSON.parse(response)
       voxa_items = parsed_response.fetch("items")
-      Rails.logger.info "Voxa GenerateVoxaContentJob: Found #{voxa_items.count} items in Voxa response"
 
       # Process Voxa items and ensure we have the right count
-      Rails.logger.info "Voxa GenerateVoxaContentJob: Processing Voxa items"
       processed_count = process_voxa_items(strategy_plan, voxa_items, expected_count)
 
       # Update strategy plan status
@@ -79,7 +66,6 @@ class GenerateVoxaContentJob < ApplicationJob
       )
 
       # Log successful completion
-      Rails.logger.info "Voxa content generation completed for strategy plan #{strategy_plan.id}: #{processed_count}/#{expected_count} items processed"
 
     rescue JSON::ParserError => e
       Rails.logger.error "Voxa GenerateVoxaContentJob: JSON parsing error for strategy plan #{strategy_plan.id}: #{e.message}"
@@ -99,15 +85,11 @@ class GenerateVoxaContentJob < ApplicationJob
   def ensure_draft_content_exists(strategy_plan)
     # Use ContentItemInitializerService to ensure draft content exists
     existing_count = strategy_plan.creas_content_items.count
-    Rails.logger.info "Voxa GenerateVoxaContentJob: Checking draft content - existing count: #{existing_count}"
 
     if existing_count == 0
-      Rails.logger.info "Voxa GenerateVoxaContentJob: No existing content found for strategy plan #{strategy_plan.id}, creating draft content"
       Creas::ContentItemInitializerService.new(strategy_plan: strategy_plan).call
       new_count = strategy_plan.creas_content_items.count
-      Rails.logger.info "Voxa GenerateVoxaContentJob: Created #{new_count} draft content items"
     else
-      Rails.logger.info "Voxa GenerateVoxaContentJob: Using existing #{existing_count} content items"
     end
   end
 
@@ -119,7 +101,6 @@ class GenerateVoxaContentJob < ApplicationJob
   def process_voxa_items(strategy_plan, voxa_items, expected_count)
     processed_items = []
 
-    Rails.logger.info "Voxa GenerateVoxaContentJob: Processing #{voxa_items.count} Voxa items in database transaction"
     CreasContentItem.transaction do
       voxa_items.each_with_index do |item, index|
         Rails.logger.debug "Voxa GenerateVoxaContentJob: Processing item #{index + 1}/#{voxa_items.count}: #{item['id']}"
@@ -129,7 +110,6 @@ class GenerateVoxaContentJob < ApplicationJob
     end
 
     actual_count = processed_items.count
-    Rails.logger.info "Voxa GenerateVoxaContentJob: Successfully processed #{actual_count} Voxa items"
 
     # Validate count matches expectation
     if actual_count != expected_count
@@ -138,12 +118,10 @@ class GenerateVoxaContentJob < ApplicationJob
       # Attempt to ensure we have the right number of content items
       ensure_complete_content_set(strategy_plan, expected_count, actual_count)
     else
-      Rails.logger.info "Voxa GenerateVoxaContentJob: Content count matches expectation: #{actual_count}"
     end
 
     # Return final count
     final_count = strategy_plan.creas_content_items.count
-    Rails.logger.info "Voxa GenerateVoxaContentJob: Final content items count: #{final_count}"
     final_count
   end
 
@@ -286,12 +264,10 @@ class GenerateVoxaContentJob < ApplicationJob
     # quantity guarantee kicks in
     if actual_count < expected_count
       missing_count = expected_count - actual_count
-      Rails.logger.info "Voxa GenerateVoxaContentJob: Running ContentItemInitializerService to ensure complete content set (missing #{missing_count} items)"
       Creas::ContentItemInitializerService.new(strategy_plan: strategy_plan).call
 
       # Log the result
       final_count = strategy_plan.creas_content_items.count
-      Rails.logger.info "Voxa GenerateVoxaContentJob: After quantity guarantee, final count: #{final_count}/#{expected_count}"
     end
   end
 
@@ -483,7 +459,6 @@ class GenerateVoxaContentJob < ApplicationJob
     # Try to normalize the template
     normalized_template = template_mappings[template.downcase.strip]
     if normalized_template
-      Rails.logger.info "Voxa GenerateVoxaContentJob: Normalized template '#{template}' to '#{normalized_template}'"
       return normalized_template
     end
 

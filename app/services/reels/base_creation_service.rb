@@ -38,12 +38,10 @@ module Reels
       return unless should_generate_video?(reel)
       return unless reel.ready_for_generation?
 
-      Rails.logger.info "🎬 Triggering video generation for reel #{reel.id}"
-      
+
       generation_result = Heygen::GenerateVideoService.new(@user, reel).call
-      
+
       if generation_result[:success]
-        Rails.logger.info "✅ Video generation started successfully for reel #{reel.id}"
         # Schedule status checking job
         CheckVideoStatusJob.set(wait: 30.seconds).perform_later(reel.id)
       else

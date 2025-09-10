@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["scenesContainer", "sceneCounter", "aiToggle", "scene", "avatarFields", "videoTypeSelect"]
-  static values = { sceneCount: Number, avatars: Array }
+  static values = { sceneCount: Number, avatars: Array, messages: Object }
 
   connect() {
     this.updateSceneCounter()
@@ -81,7 +81,7 @@ export default class extends Controller {
 
   addScene() {
     if (this.sceneCountValue >= 5) {
-      alert("Maximum of 5 scenes allowed")
+      alert(this.messagesValue.max_scenes)
       return
     }
 
@@ -92,7 +92,7 @@ export default class extends Controller {
 
   removeScene(event) {
     if (this.sceneCountValue <= 1) {
-      alert("At least 1 scene is required")
+      alert(this.messagesValue.min_scenes)
       return
     }
 
@@ -123,8 +123,8 @@ export default class extends Controller {
             <button type="button" 
                     class="ui-scene-fields__remove" 
                     data-action="click->scene-list#removeScene"
-                    aria-label="Remove Scene ${sceneNumber}">
-              Remove Scene
+                    aria-label="${this.messagesValue.remove_scene} ${sceneNumber}">
+              ${this.messagesValue.remove_scene}
             </button>
           ` : ''}
         </div>
@@ -136,11 +136,11 @@ export default class extends Controller {
             <select name="reel[scenes][${sceneNumber}][avatar_id]" 
                     class="ui-scene-fields__select"
                     aria-describedby="avatar_help_${sceneNumber}">
-              <option value="">Select Avatar</option>
+              <option value="">${this.messagesValue.select_avatar}</option>
               ${avatarOptions}
             </select>
             <small id="avatar_help_${sceneNumber}" class="ui-scene-fields__help">
-              Choose the AI avatar for this scene
+              ${this.messagesValue.avatar_help}
             </small>
           </div>
           
@@ -149,21 +149,21 @@ export default class extends Controller {
             <select name="reel[scenes][${sceneNumber}][voice_id]" 
                     class="ui-scene-fields__select"
                     aria-describedby="voice_help_${sceneNumber}">
-              <option value="">Select Voice</option>
+              <option value="">${this.messagesValue.select_voice}</option>
               <option value="voice_001">Clear Male Voice</option>
               <option value="voice_002">Clear Female Voice</option>
               <option value="voice_003">Friendly Male Voice</option>
               <option value="voice_004">Friendly Female Voice</option>
             </select>
             <small id="voice_help_${sceneNumber}" class="ui-scene-fields__help">
-              Choose the voice for this scene
+              ${this.messagesValue.voice_help}
             </small>
           </div>
           
           <div class="ui-scene-fields__field">
             <label class="ui-scene-fields__label">Script</label>
             <textarea name="reel[scenes][${sceneNumber}][script]"
-                     placeholder="Enter the script for Scene ${sceneNumber}. What should the avatar say in this scene?"
+                     placeholder="${this.getScriptPlaceholder(sceneNumber)}"
                      class="ui-scene-fields__textarea"
                      rows="4"
                      maxlength="500"
@@ -172,7 +172,7 @@ export default class extends Controller {
                      data-action="input->scene-character-counter#updateCounter"></textarea>
             <div class="ui-scene-fields__field-footer">
               <small id="script_help_${sceneNumber}" class="ui-scene-fields__help">
-                Keep it under 500 characters for best results
+                ${this.messagesValue.script_help}
               </small>
               <span class="ui-scene-fields__char-count" data-scene-character-counter-target="counter">
                 0/500
@@ -235,12 +235,17 @@ export default class extends Controller {
 
   generateAvatarOptions() {
     if (!this.hasAvatarsValue || this.avatarsValue.length === 0) {
-      return '<option value="" disabled>No avatars available. Please sync your avatars from your provider first.</option>';
+      return `<option value="" disabled>${this.messagesValue.no_avatars}</option>`;
     }
     
     return this.avatarsValue.map(avatar => {
       const [name, id] = avatar;
       return `<option value="${id}">${name}</option>`;
     }).join('');
+  }
+
+  getScriptPlaceholder(sceneNumber) {
+    // Replace %{number} in the i18n string with the actual scene number
+    return this.messagesValue.script_placeholder.replace('%{number}', sceneNumber);
   }
 }

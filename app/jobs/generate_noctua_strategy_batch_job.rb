@@ -6,20 +6,17 @@ class GenerateNoctuaStrategyBatchJob < ApplicationJob
   def perform(strategy_plan_id, brief, batch_number, total_batches, batch_id)
     strategy_plan = CreasStrategyPlan.find(strategy_plan_id)
 
-    Rails.logger.info "GenerateNoctuaStrategyBatchJob: Starting batch #{batch_number}/#{total_batches} for strategy plan #{strategy_plan.id} (batch_id: #{batch_id})"
 
     begin
       # Mark strategy plan as processing if it's the first batch
       if batch_number == 1 && strategy_plan.status == "pending"
         strategy_plan.update!(status: :processing)
-        Rails.logger.info "GenerateNoctuaStrategyBatchJob: Strategy plan #{strategy_plan.id} marked as processing"
       end
 
       # Generate AI strategy for this specific week/batch
       system_prompt = build_batch_system_prompt(batch_number, total_batches)
       user_prompt = build_batch_user_prompt(brief, batch_number, total_batches, strategy_plan)
 
-      Rails.logger.info "GenerateNoctuaStrategyBatchJob: Calling OpenAI for batch #{batch_number} (model: #{Rails.application.config.openai_model}, temperature: 0.4)"
 
       json = GinggaOpenAI::ChatClient.new(
         user: strategy_plan.user,
@@ -27,7 +24,6 @@ class GenerateNoctuaStrategyBatchJob < ApplicationJob
         temperature: 0.4
       ).chat!(system: system_prompt, user: user_prompt)
 
-      Rails.logger.info "GenerateNoctuaStrategyBatchJob: OpenAI response received for batch #{batch_number} (#{json&.length || 0} characters)"
 
       # Save raw AI response for debugging
       ai_response = AiResponse.create!(
@@ -140,12 +136,9 @@ class GenerateNoctuaStrategyBatchJob < ApplicationJob
   end
 
   def process_batch_results(strategy_plan, parsed_response, batch_number, total_batches, batch_id)
-    Rails.logger.info "GenerateNoctuaStrategyBatchJob: Processing batch #{batch_number} results"
-
     # If this is the first batch and the response contains strategy-level information,
     # extract and store it for finalization (backwards compatibility with full strategy responses)
     if batch_number == 1 && parsed_response.is_a?(Hash) && (parsed_response["strategy_name"] || parsed_response["objective_of_the_month"])
-      Rails.logger.info "GenerateNoctuaStrategyBatchJob: First batch contains strategy-level information, storing for finalization"
       strategy_info = {
         strategy_name: parsed_response["strategy_name"],
         objective_of_the_month: parsed_response["objective_of_the_month"],
@@ -175,7 +168,6 @@ class GenerateNoctuaStrategyBatchJob < ApplicationJob
       current_meta["full_weekly_plan_from_ai"] = full_weekly_plan
       strategy_plan.update!(meta: current_meta)
 
-      Rails.logger.info "GenerateNoctuaStrategyBatchJob: Extracted week #{batch_number} from full strategy response with #{ideas.count} ideas"
     elsif parsed_response.is_a?(Hash) && parsed_response["weekly_plan"].present?
       # For batches 2-4 when we have a full strategy response, extract the specific week
       full_weekly_plan = parsed_response["weekly_plan"]
@@ -183,14 +175,12 @@ class GenerateNoctuaStrategyBatchJob < ApplicationJob
       week_data = current_week_data || {}
       ideas = week_data["content_pieces"] || week_data["ideas"] || []
 
-      Rails.logger.info "GenerateNoctuaStrategyBatchJob: Extracted week #{batch_number} from full strategy response with #{ideas.count} ideas (subsequent batch)"
     else
       # Standard batch response format
       week_data = parsed_response
       ideas = week_data["ideas"] || []
     end
 
-    Rails.logger.info "GenerateNoctuaStrategyBatchJob: Found #{ideas.count} ideas for week #{batch_number}"
 
     # Store batch results in strategy plan meta for later assembly
     current_batches = strategy_plan.meta&.dig("noctua_batches") || {}
@@ -209,13 +199,9 @@ class GenerateNoctuaStrategyBatchJob < ApplicationJob
         total_batches: total_batches
       )
     )
-
-    Rails.logger.info "GenerateNoctuaStrategyBatchJob: Batch #{batch_number} results stored in strategy plan meta"
   end
 
   def queue_next_batch(strategy_plan_id, brief, next_batch_number, total_batches, batch_id)
-    Rails.logger.info "GenerateNoctuaStrategyBatchJob: Queuing next batch #{next_batch_number}/#{total_batches}"
-
     # Use perform_later with a small delay to ensure sequential processing
     # Skip delay in test environment since inline adapter doesn't support it
     if Rails.env.test?
@@ -238,8 +224,6 @@ class GenerateNoctuaStrategyBatchJob < ApplicationJob
   end
 
   def finalize_strategy_plan(strategy_plan, batch_id)
-    Rails.logger.info "GenerateNoctuaStrategyBatchJob: Finalizing strategy plan #{strategy_plan.id} after all batches completed"
-
     # Use full weekly_plan from AI if available, otherwise assemble from batches
     full_weekly_plan_from_ai = strategy_plan.meta&.dig("full_weekly_plan_from_ai")
 
@@ -247,7 +231,6 @@ class GenerateNoctuaStrategyBatchJob < ApplicationJob
       # Use the original AI response structure
       weekly_plan = full_weekly_plan_from_ai
       total_ideas = weekly_plan.sum { |week| (week["content_pieces"] || week["ideas"] || []).count }
-      Rails.logger.info "GenerateNoctuaStrategyBatchJob: Using full weekly plan from AI response with #{weekly_plan.count} weeks"
     else
       # Assemble final weekly_plan from all batches
       batches = strategy_plan.meta&.dig("noctua_batches") || {}
@@ -265,7 +248,6 @@ class GenerateNoctuaStrategyBatchJob < ApplicationJob
         }
         total_ideas += batch_data["total_ideas"] || 0
       end
-      Rails.logger.info "GenerateNoctuaStrategyBatchJob: Assembled weekly plan from #{batches.count} batches"
     end
 
     # Calculate aggregated data - use existing frequency_per_week if available, otherwise calculate
@@ -312,7 +294,6 @@ class GenerateNoctuaStrategyBatchJob < ApplicationJob
       )
     )
 
-    Rails.logger.info "GenerateNoctuaStrategyBatchJob: Strategy plan #{strategy_plan.id} finalized with #{total_ideas} total ideas across #{batches.count} weeks"
 
     # Initialize content items from the weekly_plan
     initialize_content_items(strategy_plan)
@@ -322,13 +303,10 @@ class GenerateNoctuaStrategyBatchJob < ApplicationJob
   end
 
   def initialize_content_items(strategy_plan)
-    Rails.logger.info "GenerateNoctuaStrategyBatchJob: Initializing content items for strategy plan #{strategy_plan.id}"
-
     begin
       service = Creas::ContentItemInitializerService.new(strategy_plan: strategy_plan)
       created_items = service.call
 
-      Rails.logger.info "GenerateNoctuaStrategyBatchJob: Successfully created #{created_items.count} content items"
 
       # Validate quantity guarantee
       expected_count = strategy_plan.weekly_plan.sum { |week| week["ideas"]&.count || 0 }
@@ -337,7 +315,6 @@ class GenerateNoctuaStrategyBatchJob < ApplicationJob
       if actual_count < expected_count
         Rails.logger.warn "GenerateNoctuaStrategyBatchJob: Expected #{expected_count} content items but only #{actual_count} were created"
       else
-        Rails.logger.info "GenerateNoctuaStrategyBatchJob: Content creation successful: #{actual_count}/#{expected_count} items created"
       end
 
     rescue StandardError => e
@@ -347,7 +324,6 @@ class GenerateNoctuaStrategyBatchJob < ApplicationJob
   end
 
   def broadcast_completion(strategy_plan)
-    Rails.logger.info "Strategy plan #{strategy_plan.id} completed successfully with batch processing"
   end
 
   def handle_batch_error(strategy_plan, error_message, batch_number)

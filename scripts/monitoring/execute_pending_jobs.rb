@@ -17,31 +17,31 @@ pending_jobs.each_with_index do |job, index|
   puts "\n#{index + 1}. Ejecutando: #{job.class_name}"
   puts "   Creado: #{job.created_at}"
   puts "   ID: #{job.id}"
-  
+
   begin
     # Deserializar argumentos
     arguments = job.arguments || []
-    
+
     puts "   ⏳ Procesando..."
-    
+
     # Ejecutar el job usando perform_now
     job_class = job.class_name.constantize
-    
+
     if arguments.any?
       job_class.perform_now(*arguments)
     else
       job_class.perform_now
     end
-    
+
     # Marcar como completado
     job.update!(finished_at: Time.current)
-    
+
     puts "   ✅ Completado exitosamente"
-    
+
   rescue => e
     puts "   ❌ Error: #{e.message}"
     puts "   Stack trace: #{e.backtrace.first(3).join(', ')}"
-    
+
     # Opcionalmente marcar como fallido
     # job.update!(finished_at: Time.current, failed: true)
   end

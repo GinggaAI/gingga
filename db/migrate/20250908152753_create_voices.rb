@@ -16,6 +16,6 @@ class CreateVoices < ActiveRecord::Migration[8.0]
       t.timestamps
     end
     add_index :voices, :voice_id
-    add_index :voices, [:user_id, :voice_id], unique: true
+    add_index :voices, [ :user_id, :voice_id ], unique: true
   end
 end

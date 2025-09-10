@@ -39,7 +39,7 @@ module ApplicationHelper
     case reel.template
     when "solo_avatars"
       "Solo Avatar Video"
-    when "avatar_and_video"  
+    when "avatar_and_video"
       "Avatar & Video Reel"
     when "narration_over_7_images"
       "Narrated Image Reel"

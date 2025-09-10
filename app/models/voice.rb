@@ -17,7 +17,7 @@ class Voice < ApplicationRecord
   def self.sync_for_user(user, voices_data)
     transaction do
       user.voices.update_all(active: false)
-      
+
       voices_data.each do |voice_data|
         user.voices.find_or_create_by(voice_id: voice_data[:voice_id]) do |voice|
           voice.assign_attributes(

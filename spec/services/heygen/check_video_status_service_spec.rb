@@ -39,11 +39,10 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
       before do
         mock_response_double = OpenStruct.new(
           success?: true,
-          body: mock_response.to_json
+          body: mock_response
         )
 
         allow(subject).to receive(:check_status).and_return(mock_response_double)
-        allow(subject).to receive(:parse_json).and_return(mock_response)
       end
 
       it 'makes API call with correct video ID' do
@@ -88,11 +87,10 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
       before do
         mock_response_double = OpenStruct.new(
           success?: true,
-          body: mock_response.to_json
+          body: mock_response
         )
 
         allow(subject).to receive(:check_status).and_return(mock_response_double)
-        allow(subject).to receive(:parse_json).and_return(mock_response)
       end
 
       it 'updates reel status but not video data' do
@@ -122,11 +120,10 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
       before do
         mock_response_double = OpenStruct.new(
           success?: true,
-          body: mock_response.to_json
+          body: mock_response
         )
 
         allow(subject).to receive(:check_status).and_return(mock_response_double)
-        allow(subject).to receive(:parse_json).and_return(mock_response)
       end
 
       it 'updates reel status to failed' do
@@ -143,11 +140,10 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
           mock_response = { 'data' => { 'status' => heygen_status } }
           mock_response_double = OpenStruct.new(
             success?: true,
-            body: mock_response.to_json
+            body: mock_response
           )
 
           allow(subject).to receive(:check_status).and_return(mock_response_double)
-          allow(subject).to receive(:parse_json).and_return(mock_response)
 
           subject.call
           expect(reel.reload.status).to eq('processing')
@@ -159,11 +155,10 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
           mock_response = { 'data' => { 'status' => heygen_status } }
           mock_response_double = OpenStruct.new(
             success?: true,
-            body: mock_response.to_json
+            body: mock_response
           )
 
           allow(subject).to receive(:check_status).and_return(mock_response_double)
-          allow(subject).to receive(:parse_json).and_return(mock_response)
 
           subject.call
           expect(reel.reload.status).to eq('completed')
@@ -175,11 +170,10 @@ RSpec.describe Heygen::CheckVideoStatusService, type: :service do
           mock_response = { 'data' => { 'status' => heygen_status } }
           mock_response_double = OpenStruct.new(
             success?: true,
-            body: mock_response.to_json
+            body: mock_response
           )
 
           allow(subject).to receive(:check_status).and_return(mock_response_double)
-          allow(subject).to receive(:parse_json).and_return(mock_response)
 
           subject.call
           expect(reel.reload.status).to eq('failed')

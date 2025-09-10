@@ -56,15 +56,9 @@ RSpec.describe ReelSceneBasedPresenter, type: :presenter do
 
   describe 'tab styling methods' do
     describe '#scene_based_tab_classes' do
-      it 'returns active tab CSS classes' do
-        expected_classes = "flex-1 px-4 py-2 text-center rounded-md font-medium transition-colors text-white"
+      it 'returns active tab CSS classes with tab-active class' do
+        expected_classes = "flex-1 px-4 py-2 text-center rounded-md font-medium transition-colors tab-active"
         expect(presenter.scene_based_tab_classes).to eq(expected_classes)
-      end
-    end
-
-    describe '#scene_based_tab_style' do
-      it 'returns active tab inline style' do
-        expect(presenter.scene_based_tab_style).to eq("background-color: #FFC857")
       end
     end
 
@@ -375,17 +369,12 @@ RSpec.describe ReelSceneBasedPresenter, type: :presenter do
   describe 'CSS and styling consistency' do
     it 'returns consistent CSS classes for active tab' do
       classes = presenter.scene_based_tab_classes
-      expect(classes).to include('flex-1', 'px-4', 'py-2', 'text-center', 'rounded-md', 'font-medium', 'transition-colors', 'text-white')
+      expect(classes).to include('flex-1', 'px-4', 'py-2', 'text-center', 'rounded-md', 'font-medium', 'transition-colors', 'tab-active')
     end
 
     it 'returns consistent CSS classes for inactive tab' do
       classes = presenter.narrative_tab_classes
       expect(classes).to include('flex-1', 'px-4', 'py-2', 'text-center', 'rounded-md', 'font-medium', 'transition-colors', 'text-gray-600', 'hover:text-gray-900')
-    end
-
-    it 'returns consistent inline style for active tab' do
-      style = presenter.scene_based_tab_style
-      expect(style).to match(/background-color:\s*#FFC857/)
     end
   end
 
@@ -465,14 +454,14 @@ RSpec.describe ReelSceneBasedPresenter, type: :presenter do
   describe 'avatar selection methods' do
     describe '#avatars_for_select' do
       context 'when user has active avatars' do
-        let!(:avatar1) { create(:avatar, user: user, name: 'John Doe', avatar_id: 'avatar_123', active: true) }
-        let!(:avatar2) { create(:avatar, user: user, name: 'Jane Smith', avatar_id: 'avatar_456', active: true) }
-        let!(:inactive_avatar) { create(:avatar, user: user, name: 'Inactive Avatar', avatar_id: 'avatar_789', active: false) }
+        let!(:avatar1) { create(:avatar, user: user, name: 'John Doe', avatar_id: 'avatar_123', status: 'active') }
+        let!(:avatar2) { create(:avatar, user: user, name: 'Jane Smith', avatar_id: 'avatar_456', status: 'active') }
+        let!(:inactive_avatar) { create(:avatar, user: user, name: 'Inactive Avatar', avatar_id: 'avatar_789', status: 'inactive') }
 
         it 'returns array of [name, avatar_id] pairs for active avatars only' do
           expected_avatars = [
-            ['John Doe', 'avatar_123'],
-            ['Jane Smith', 'avatar_456']
+            [ 'John Doe', 'avatar_123' ],
+            [ 'Jane Smith', 'avatar_456' ]
           ]
           expect(presenter.avatars_for_select).to match_array(expected_avatars)
         end
@@ -487,7 +476,7 @@ RSpec.describe ReelSceneBasedPresenter, type: :presenter do
 
     describe '#has_avatars?' do
       context 'when user has active avatars' do
-        let!(:avatar) { create(:avatar, user: user, active: true) }
+        let!(:avatar) { create(:avatar, user: user, status: 'active') }
 
         it 'returns true' do
           expect(presenter.has_avatars?).to be true
@@ -495,7 +484,7 @@ RSpec.describe ReelSceneBasedPresenter, type: :presenter do
       end
 
       context 'when user has only inactive avatars' do
-        let!(:avatar) { create(:avatar, user: user, active: false) }
+        let!(:avatar) { create(:avatar, user: user, status: 'inactive') }
 
         it 'returns false' do
           expect(presenter.has_avatars?).to be false
@@ -526,8 +515,8 @@ RSpec.describe ReelSceneBasedPresenter, type: :presenter do
 
         it 'returns array of [name, voice_id] pairs for active voices only' do
           expected_voices = [
-            ['Emma Watson', 'voice_123'],
-            ['Morgan Freeman', 'voice_456']
+            [ 'Emma Watson', 'voice_123' ],
+            [ 'Morgan Freeman', 'voice_456' ]
           ]
           expect(presenter.voices_for_select).to match_array(expected_voices)
         end

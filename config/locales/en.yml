@@ -64,6 +64,7 @@ en:
         one: "HeyGen group validation successful! %{count} avatar synchronized from specific group."
         other: "HeyGen group validation successful! %{count} avatars synchronized from specific group."
       validation_failed: "HeyGen API validation failed: %{error}"
+      disabled_validate_button_title: "Save API key first to enable validation"
 
   # Brands
   brands:
@@ -348,6 +349,16 @@ en:
       kling_video: "Kling Video"
       no_avatars_message: "No avatars available. Please sync your avatars from your provider first."
       no_voices_message: "No voices available. Please sync your voices from your HeyGen account first."
+      max_scenes_message: "Maximum of 5 scenes allowed"
+      min_scenes_message: "At least 1 scene is required"
+      remove_scene: "Remove Scene"
+      select_avatar: "Select Avatar"
+      select_voice: "Select Voice"
+      scene_script_placeholder: "Enter the script for Scene %{number}. What should the avatar say in this scene?"
+      scene_help_text:
+        avatar: "Choose the AI avatar for this scene"
+        voice: "Choose the voice for this scene"
+        script: "Keep it under 500 characters for best results"
       
     # Narrative
     narrative:

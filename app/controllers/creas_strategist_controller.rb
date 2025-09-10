@@ -34,24 +34,15 @@ class CreasStrategistController < ApplicationController
   private
 
   def find_brand
-    Rails.logger.debug "=== DEBUG find_brand ==="
-    Rails.logger.debug "current_user: #{current_user.inspect}"
-    Rails.logger.debug "current_user.id: #{current_user&.id}"
-    Rails.logger.debug "current_user.brands.count: #{current_user&.brands&.count}"
-
     @brand = current_user.brands.first
-    Rails.logger.debug "@brand: #{@brand.inspect}"
 
     unless @brand
-      Rails.logger.debug "No brand found - responding with error"
       respond_to do |format|
         format.html { redirect_to planning_path, alert: "Please create a brand profile first" }
         format.json { render json: { success: false, error: "Please create a brand profile first" }, status: 422 }
       end
-      return # Important: stop execution here
+      nil # Important: stop execution here
     end
-
-    Rails.logger.debug "Brand found: #{@brand.name}"
   end
 
   def serialize_plan(plan)

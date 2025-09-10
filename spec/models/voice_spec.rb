@@ -135,9 +135,9 @@ RSpec.describe Voice, type: :model do
 
     it 'updates existing voices with new data' do
       existing_voice = create(:voice, user: user, voice_id: voices_data.first[:voice_id], name: 'Old Name')
-      
+
       Voice.sync_for_user(user, voices_data)
-      
+
       existing_voice.reload
       expect(existing_voice.name).to eq('mary_en_3')
       expect(existing_voice.language).to eq('English')
@@ -146,9 +146,9 @@ RSpec.describe Voice, type: :model do
 
     it 'marks old voices as inactive' do
       old_voice = create(:voice, user: user, voice_id: 'old_voice_id', active: true)
-      
+
       Voice.sync_for_user(user, voices_data)
-      
+
       old_voice.reload
       expect(old_voice.active).to be false
     end
@@ -156,7 +156,7 @@ RSpec.describe Voice, type: :model do
     it 'performs sync operations atomically' do
       # Test that all changes happen together or not at all
       allow(user.voices).to receive(:update_all).and_raise(StandardError, 'Test error')
-      
+
       expect { Voice.sync_for_user(user, voices_data) }.to raise_error(StandardError)
       # Verify no partial changes were made
       expect(user.voices.count).to eq(0)
@@ -164,7 +164,7 @@ RSpec.describe Voice, type: :model do
 
     it 'sets correct attributes for each voice' do
       Voice.sync_for_user(user, voices_data)
-      
+
       voice = user.voices.find_by(voice_id: voices_data.first[:voice_id])
       expect(voice.language).to eq('English')
       expect(voice.gender).to eq('unknown')

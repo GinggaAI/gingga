@@ -12,7 +12,7 @@ module Reels
           avatar_id: nil,
           voice_id: nil,
           script: nil,
-          video_type: 'avatar'
+          video_type: "avatar"
         )
       end
     end

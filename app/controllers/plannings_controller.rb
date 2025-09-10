@@ -36,10 +36,8 @@ class PlanningsController < ApplicationController
       redirect_to planning_path, alert: "No strategy found to refine." and return
     end
 
-    Rails.logger.info "PlanningsController: Starting Voxa refinement for strategy #{strategy.id} (user: #{current_user.id})"
 
     Creas::VoxaContentService.new(strategy_plan: strategy).call
-    Rails.logger.info "PlanningsController: Voxa refinement started successfully for strategy #{strategy.id}"
     redirect_to planning_path(plan_id: strategy.id), notice: "Content refinement has been started! Please come back to this page in a few minutes to see your refined content."
   rescue Creas::VoxaContentService::ServiceError => e
     Rails.logger.error "PlanningsController: Voxa refinement failed for strategy #{strategy.id}: #{e.message}"
@@ -64,10 +62,8 @@ class PlanningsController < ApplicationController
       redirect_to planning_path(plan_id: strategy.id), alert: "Invalid week number. Please select a week between 1 and 4." and return
     end
 
-    Rails.logger.info "PlanningsController: Starting week #{week_number} Voxa refinement for strategy #{strategy.id} (user: #{current_user.id})"
 
     Creas::VoxaContentService.new(strategy_plan: strategy, target_week: week_number).call
-    Rails.logger.info "PlanningsController: Week #{week_number} Voxa refinement started successfully for strategy #{strategy.id}"
     redirect_to planning_path(plan_id: strategy.id), notice: "Week #{week_number} content refinement has been started! Please come back to this page in a few minutes to see your refined content."
   rescue Creas::VoxaContentService::ServiceError => e
     Rails.logger.error "PlanningsController: Week #{week_number} Voxa refinement failed for strategy #{strategy.id}: #{e.message}"

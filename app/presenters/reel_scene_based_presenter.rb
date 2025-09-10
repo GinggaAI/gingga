@@ -27,11 +27,7 @@ class ReelSceneBasedPresenter
   end
 
   def scene_based_tab_classes
-    "flex-1 px-4 py-2 text-center rounded-md font-medium transition-colors text-white"
-  end
-
-  def scene_based_tab_style
-    "background-color: #FFC857"
+    "flex-1 px-4 py-2 text-center rounded-md font-medium transition-colors tab-active"
   end
 
   def narrative_tab_classes
@@ -167,5 +163,21 @@ class ReelSceneBasedPresenter
 
   def no_voices_message
     I18n.t("reels.scene_based.no_voices_message")
+  end
+
+  # JavaScript messages for internationalization
+  def js_messages
+    {
+      max_scenes: I18n.t("reels.scene_based.max_scenes_message"),
+      min_scenes: I18n.t("reels.scene_based.min_scenes_message"),
+      remove_scene: I18n.t("reels.scene_based.remove_scene"),
+      select_avatar: I18n.t("reels.scene_based.select_avatar"),
+      select_voice: I18n.t("reels.scene_based.select_voice"),
+      no_avatars: I18n.t("reels.scene_based.no_avatars_message"),
+      avatar_help: I18n.t("reels.scene_based.scene_help_text.avatar"),
+      voice_help: I18n.t("reels.scene_based.scene_help_text.voice"),
+      script_help: I18n.t("reels.scene_based.scene_help_text.script"),
+      script_placeholder: I18n.t("reels.scene_based.scene_script_placeholder")
+    }
   end
 end
