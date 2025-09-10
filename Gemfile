@@ -90,7 +90,7 @@ gem "devise", "~> 4.9"
 gem "httparty"
 gem "faraday", "~> 2.9"
 gem "faraday-retry"
-gem "ruby-openai", "~> 8.2"
+gem "ruby-openai", "~> 8.3"
 
 # View components for reusable UI with previews/specs
 gem "view_component"
