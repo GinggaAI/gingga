@@ -13,12 +13,12 @@ RSpec.describe Planning::MonthResolver do
     end
 
     context 'with invalid month parameter' do
-      it 'returns current month' do
+      it 'returns nil for security' do
         resolver = described_class.new('invalid')
         result = resolver.call
 
-        expect(result.month).to eq(Date.current.strftime("%Y-%-m"))
-        expect(result.display_month).not_to eq('Invalid Month')
+        expect(result.month).to be_nil
+        expect(result.display_month).to eq('Invalid Month')
       end
     end
 
@@ -36,7 +36,8 @@ RSpec.describe Planning::MonthResolver do
         resolver = described_class.new('2024-13') # Invalid month
         result = resolver.call
 
-        expect(result.month).to eq(Date.current.strftime("%Y-%-m"))
+        expect(result.month).to be_nil
+        expect(result.display_month).to eq("Invalid Month")
       end
     end
   end

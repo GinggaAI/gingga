@@ -438,4 +438,100 @@ RSpec.describe ReelCreationService do
       end
     end
   end
+
+  describe "Form submission scenario (regression test)" do
+    # This test covers the specific bug that was fixed
+    let(:form_params) do
+      {
+        template: "only_avatars",
+        title: "Form Submitted Reel",
+        description: "Created via form submission",
+        reel_scenes_attributes: {
+          "0" => {
+            scene_number: 1,
+            avatar_id: "avatar_123",
+            voice_id: "voice_456",
+            script: "Form script 1",
+            video_type: "avatar"
+          },
+          "1" => {
+            scene_number: 2,
+            avatar_id: "avatar_123",
+            voice_id: "voice_456",
+            script: "Form script 2",
+            video_type: "avatar"
+          },
+          "2" => {
+            scene_number: 3,
+            avatar_id: "avatar_123",
+            voice_id: "voice_456",
+            script: "Form script 3",
+            video_type: "avatar"
+          }
+        }
+      }
+    end
+
+    it "creates reel with nested scene attributes from form" do
+      result = service_with_params(form_params).call
+
+      expect(result[:success]).to be true
+      expect(result[:reel]).to be_persisted
+
+      reel = result[:reel]
+      expect(reel.title).to eq("Form Submitted Reel")
+      expect(reel.template).to eq("only_avatars")
+      expect(reel.reel_scenes.count).to eq(3)
+
+      # Verify scenes were created with form data
+      scenes = reel.reel_scenes.ordered
+      expect(scenes[0].script).to eq("Form script 1")
+      expect(scenes[0].avatar_id).to eq("avatar_123")
+      expect(scenes[0].video_type).to eq("avatar")
+    end
+
+    it "processes scene attributes correctly through nested assignment" do
+      result = service_with_params(form_params).call
+
+      reel = result[:reel]
+
+      # This is the critical test - scenes should be created via accepts_nested_attributes_for
+      expect(reel.reel_scenes).to all(be_persisted)
+      expect(reel.reel_scenes.pluck(:scene_number)).to eq([ 1, 2, 3 ])
+      expect(reel.reel_scenes.pluck(:script)).to eq([ "Form script 1", "Form script 2", "Form script 3" ])
+    end
+
+    it "creates reel ready for HeyGen generation when scenes are complete" do
+      result = service_with_params(form_params).call
+
+      reel = result[:reel]
+      expect(reel.ready_for_generation?).to be true
+      expect(reel.status).to eq("draft").or eq("processing").or eq("completed").or eq("failed")
+    end
+
+    context "with empty scene attributes (simulating empty form)" do
+      let(:empty_form_params) do
+        {
+          template: "only_avatars",
+          title: "Empty Form Reel"
+          # No reel_scenes_attributes
+        }
+      end
+
+      it "creates reel without scenes" do
+        result = service_with_params(empty_form_params).call
+
+        expect(result[:success]).to be true
+        reel = result[:reel]
+        expect(reel.reel_scenes.count).to eq(0)
+        expect(reel.ready_for_generation?).to be false
+      end
+    end
+  end
+
+  private
+
+  def service_with_params(params)
+    described_class.new(user: user, params: params)
+  end
 end

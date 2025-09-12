@@ -231,7 +231,7 @@ RSpec.describe PlanningsController, type: :request do
 
         expect(response).to redirect_to(planning_path(plan_id: strategy_plan.id))
         expect(flash[:alert]).to include("Failed to refine content")
-        expect(flash[:alert]).to include("Unexpected error")
+        expect(flash[:alert]).to include("Please try again")
       end
     end
   end

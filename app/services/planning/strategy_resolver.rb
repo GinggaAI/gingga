@@ -12,6 +12,7 @@ module Planning
       if @plan_id.present?
         find_by_id
       else
+        return nil if @month.nil? # Return nil for invalid months when finding by month
         find_by_month
       end
     end

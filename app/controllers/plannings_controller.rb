@@ -22,7 +22,33 @@ class PlanningsController < ApplicationController
     @plans = Planning::WeeklyPlansBuilder.call(@current_strategy)
   end
 
+  # GET /planning/strategy_for_month
+  def strategy_for_month
+    month = params[:month]
+    strategy = CreasStrategyPlan.find_by(
+      user: current_user,
+      brand: @brand,
+      month: month
+    )
+
+    if strategy
+      render json: {
+        strategy_name: strategy.strategy_name,
+        month: strategy.month,
+        brand_id: strategy.brand_id,
+        id: strategy.id
+      }
+    else
+      render json: { error: "No strategy found for month #{month}" }, status: :not_found
+    end
+  end
+
   private
+
+  # Build weekly plans for a strategy
+  def build_weekly_plans
+    Planning::WeeklyPlansBuilder.call(@current_strategy)
+  end
 
   # Simplified setup - delegating complex logic to services
   def set_brand

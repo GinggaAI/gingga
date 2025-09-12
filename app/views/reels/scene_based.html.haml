@@ -30,7 +30,7 @@
             %h3.text-lg.font-semibold.mb-2.text-center.text-gray-800= t('reels.scene_based.title')
             %p.text-center.text-gray-600= t('reels.scene_based.description')
 
-      = form_with model: @reel, url: scene_based_reels_path, local: true, data: { controller: "scene-list", scene_list_scene_count_value: 3, scene_list_avatars_value: @presenter.avatars_for_select.to_json, scene_list_messages_value: @presenter.js_messages.to_json }, class: "space-y-6" do |form|
+      = form_with model: @reel, local: true, data: { controller: "scene-list", scene_list_scene_count_value: 3, scene_list_avatars_value: @presenter.avatars_for_select.to_json, scene_list_messages_value: @presenter.js_messages.to_json }, class: "space-y-6" do |form|
         = form.hidden_field :template, value: "only_avatars"
 
         - if @presenter.has_errors?
@@ -110,9 +110,9 @@
                   .mb-4
                     %label.block.text-xs.font-medium.text-gray-700.mb-2= t('reels.scene_based.video_type')
                     %select.w-full.p-2.text-sm.border.border-gray-300.rounded-md.focus:ring-2.focus:ring-blue-500.focus:border-blue-500{ name: "reel[reel_scenes_attributes][#{i}][video_type]", data: { scene_list_target: "videoTypeSelect", action: "change->scene-list#handleVideoTypeChange" } }
-                      %option{value: "avatar"}
+                      %option{value: "avatar", selected: true}
                         🤖 #{t('reels.scene_based.avatar_video')}
-                      %option{value: "kling", selected: true}
+                      %option{value: "kling"}
                         🎬 #{t('reels.scene_based.kling_video')}
 
                   .grid.grid-cols-1.md:grid-cols-2.gap-4{ data: { scene_list_target: "avatarFields" } }

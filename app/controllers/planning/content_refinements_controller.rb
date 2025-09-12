@@ -22,6 +22,10 @@ class Planning::ContentRefinementsController < ApplicationController
       redirect_to planning_path(plan_id: @strategy.id),
                   alert: result.error_message
     end
+  rescue StandardError => e
+    Rails.logger.error "ContentRefinementsController error: #{e.message}"
+    redirect_to planning_path(plan_id: @strategy&.id),
+                alert: "Failed to refine content: #{e.message}"
   end
 
   private
@@ -47,8 +51,9 @@ class Planning::ContentRefinementsController < ApplicationController
     ).call
 
     unless @strategy
-      Rails.logger.warn "ContentRefinementsController: No strategy found (user: #{current_user.id})"
+      Rails.logger.warn "ContentRefinementsController: No strategy found (user: #{current_user.id}, plan_id: #{params[:plan_id]})"
       redirect_to planning_path, alert: "No strategy found to refine."
+      nil
     end
   end
 end

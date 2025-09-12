@@ -8,12 +8,18 @@ module Planning
 
     def call
       month = resolve_month
+
+      # If month is nil (invalid parameter was provided), return error state
+      if month.nil?
+        return Result.new(month: nil, display_month: "Invalid Month")
+      end
+
       display_month = format_month_for_display(month)
 
       Result.new(month: month, display_month: display_month)
     rescue StandardError => e
       Rails.logger.error "MonthResolver error: #{e.message}"
-      Result.new(month: current_month, display_month: "Invalid Month")
+      Result.new(month: nil, display_month: "Invalid Month")
     end
 
     private
@@ -24,11 +30,20 @@ module Planning
       return current_month unless month_param.present?
       return month_param if valid_month_format?(month_param)
 
-      current_month
+      # If month_param is present but invalid, return nil instead of falling back
+      # This prevents XSS and other malicious inputs from getting processed
+      nil
     end
 
     def valid_month_format?(month)
-      month.is_a?(String) && month.match?(/\A\d{4}-\d{1,2}\z/)
+      return false unless month.is_a?(String) && month.match?(/\A\d{4}-\d{1,2}\z/)
+
+      # Check if it's actually a valid date
+      year, month_num = month.split("-")
+      Date.new(year.to_i, month_num.to_i)
+      true
+    rescue ArgumentError, Date::Error
+      false
     end
 
     def current_month

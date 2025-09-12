@@ -9,7 +9,13 @@ module Reels
     def initialize_reel
       reel = @user.reels.build(template: @template, status: "draft")
       setup_template_specific_fields(reel)
-      success_result(reel)
+
+      # Save the reel so it can have associated scenes created
+      if reel.save
+        success_result(reel)
+      else
+        failure_result("Failed to initialize reel: #{reel.errors.full_messages.join(', ')}", reel)
+      end
     end
 
     def call

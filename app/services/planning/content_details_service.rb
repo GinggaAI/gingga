@@ -60,7 +60,7 @@ module Planning
     end
 
     def build_presenter
-      PlanningPresenter.new({}, brand: user_brand, current_plan: nil)
+      ::PlanningPresenter.new({}, brand: user_brand, current_plan: nil)
     end
 
     def user_brand

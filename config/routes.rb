@@ -8,7 +8,11 @@ Rails.application.routes.draw do
     get "/my-brand", to: "brands#edit", as: "my_brand"
 
     # Planning Display - Single Responsibility
-    resource :planning, only: [ :show ]
+    resource :planning, only: [ :show ] do
+      member do
+        get :strategy_for_month
+      end
+    end
 
     # Planning-related specialized controllers
     namespace :planning do
@@ -31,7 +35,7 @@ Rails.application.routes.draw do
     end
     get "/smart-planning", to: "plannings#smart_planning", as: "smart_planning"
 
-    resources :reels, only: [ :index, :new, :create, :show ] do
+    resources :reels, only: [ :index, :new, :create, :show, :edit ] do
       collection do
         get "scene-based", to: "reels#new", defaults: { template: "only_avatars" }, as: :scene_based
         get "narrative", to: "reels#new", defaults: { template: "narration_over_7_images" }, as: :narrative

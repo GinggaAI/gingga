@@ -236,8 +236,14 @@ class PlanningPresenter
     month = @params[:month]
     return nil unless month.is_a?(String)
 
-    # Only allow YYYY-MM or YYYY-M format
-    return month if month.match?(/\A\d{4}-\d{1,2}\z/)
+    # Only allow YYYY-MM or YYYY-M format and validate it's a real date
+    return nil unless month.match?(/\A\d{4}-\d{1,2}\z/)
+
+    # Additional validation to ensure it's a valid date
+    year, month_num = month.split("-")
+    Date.new(year.to_i, month_num.to_i)
+    month
+  rescue ArgumentError, Date::Error
     nil
   end
 

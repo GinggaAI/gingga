@@ -58,8 +58,8 @@ RSpec.describe Reels::OneToThreeVideosCreationService do
       expect(result[:error]).to be_nil
     end
 
-    it 'does not save the reel to the database' do
-      expect { service.initialize_reel }.not_to change(Reel, :count)
+    it 'saves the reel to the database' do
+      expect { service.initialize_reel }.to change(Reel, :count).by(1)
     end
 
     it 'does not create any reel scenes by default' do

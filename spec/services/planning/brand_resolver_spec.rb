@@ -6,6 +6,7 @@ RSpec.describe Planning::BrandResolver do
     let(:brand) { create(:brand, user: user) }
 
     it 'returns the first brand for the user' do
+      brand # Force creation of the brand
       result = described_class.call(user)
       expect(result).to eq(brand)
     end

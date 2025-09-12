@@ -1,12 +1,12 @@
 require 'rails_helper'
 
-RSpec.describe Planning::StrategiesController, type: :controller do
+RSpec.describe "Planning::StrategiesController", type: :request do
   let(:user) { create(:user) }
   let(:brand) { create(:brand, user: user) }
 
   before do
-    sign_in user
-    allow(Planning::BrandResolver).to receive(:call).with(user).and_return(brand)
+    sign_in user, scope: :user
+    allow(Planning::BrandResolver).to receive(:call).and_return(brand)
   end
 
   describe 'GET #for_month' do
@@ -23,7 +23,7 @@ RSpec.describe Planning::StrategiesController, type: :controller do
       end
 
       it 'returns formatted strategy' do
-        get :for_month, params: { month: '2024-12' }
+        get for_month_planning_strategies_path, params: { month: '2024-12' }
 
         expect(response).to have_http_status(:success)
         expect(JSON.parse(response.body)).to eq({ 'id' => strategy.id })
@@ -38,7 +38,7 @@ RSpec.describe Planning::StrategiesController, type: :controller do
       end
 
       it 'returns not found error' do
-        get :for_month, params: { month: '2024-12' }
+        get for_month_planning_strategies_path, params: { month: '2024-12' }
 
         expect(response).to have_http_status(:not_found)
         expect(JSON.parse(response.body)).to have_key('error')
