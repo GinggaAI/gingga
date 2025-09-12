@@ -86,6 +86,23 @@ Follow these fundamental Rails principles:
    - Views should only contain display logic and simple iteration
    - Use presenters to encapsulate complex view logic and formatting
 
+5. **Rails-First Development (JavaScript Guidelines)**
+   - **CORE PRINCIPLE**: Business logic MUST be in Ruby/Rails, NOT JavaScript
+   - **FORBIDDEN**: Complex business logic in JavaScript files or view templates
+   - **JavaScript ONLY for**: UI interactions, form submissions, DOM manipulation
+   - **Rails handles**: Data processing, business rules, conditional logic, formatting
+   - **Pattern**: Controller → Service → Presenter → View → Minimal JS for UX
+   - **Examples of what belongs in Ruby**: 
+     - Data filtering and sorting
+     - Conditional rendering logic  
+     - Business rule validation
+     - Content formatting and transformation
+   - **Examples of appropriate JS**:
+     - Form field showing/hiding
+     - AJAX form submissions
+     - Modal dialogs and dropdowns
+     - Client-side animations
+
 ### Required Quality Gates
 - ✅ All tests must pass (`bundle exec rspec`)
 - ✅ 90%+ code coverage on new/modified files

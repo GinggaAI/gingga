@@ -1,0 +1,161 @@
+- content_id = "content-#{Time.current.to_i}-#{rand(1000)}"
+- title = content_piece["title"] || 'Content Draft'
+- platform = content_piece["platform"] || 'Instagram'
+- content_type = content_piece["type"] || content_piece["content_type"] || 'Post'
+- status = content_piece["status"] || 'draft'
+- pilar = content_piece["pilar"] || content_piece["pillar"] || ''
+- status_colors = presenter.status_detail_colors_for(status)
+
+%div{id: content_id, class: "bg-white p-4 rounded border-l-4 #{status_colors[:border]} shadow-sm"}
+  .flex.justify-between.items-start.mb-3
+    %div
+      %h4.text-lg.font-semibold.text-gray-900= title
+      .flex.items-center.gap-2.mt-1
+        %span{class: "#{status_colors[:bg]} #{status_colors[:text]} text-xs px-2 py-1 rounded font-medium"}= status.humanize.upcase
+        %span.bg-gray-100.text-gray-700.text-xs.px-2.py-1.rounded= "#{platform} #{content_type}"
+        - if pilar.present?
+          %span.bg-indigo-100.text-indigo-700.text-xs.px-2.py-1.rounded= "Pillar #{pilar}"
+    %button.text-gray-400.hover:text-gray-600.text-lg.font-bold{onclick: "this.closest('.bg-white').remove()"} &times;
+
+  .grid.grid-cols-1.md:grid-cols-2.gap-4
+    / Left Column: Core Content
+    .space-y-3
+      - if content_piece["hook"].present?
+        .bg-blue-50.p-3.rounded
+          %h5.font-medium.text-gray-900.mb-1 🎣 Hook
+          %p.text-sm.text-gray-700= content_piece["hook"]
+
+      - if content_piece["description"].present?
+        .bg-yellow-50.p-3.rounded
+          %h5.font-medium.text-gray-900.mb-1 📝 Description
+          %p.text-sm.text-gray-700= content_piece["description"]
+
+      - if content_piece["cta"].present?
+        .bg-green-50.p-3.rounded
+          %h5.font-medium.text-gray-900.mb-1 📢 Call to Action
+          %p.text-sm.text-gray-700= content_piece["cta"]
+
+      - if content_piece["text_base"].present?
+        .bg-slate-50.p-3.rounded
+          %h5.font-medium.text-gray-900.mb-1 📄 Text Base
+          %p.text-sm.text-gray-700.whitespace-pre-line= content_piece["text_base"]
+
+    / Right Column: Production Details
+    .space-y-3
+      - if content_piece["visual_notes"].present?
+        .bg-purple-50.p-3.rounded
+          %h5.font-medium.text-gray-900.mb-1 🎨 Visual Notes
+          %p.text-sm.text-gray-700= content_piece["visual_notes"]
+
+      - if content_piece["template"].present?
+        .bg-indigo-50.p-3.rounded
+          %h5.font-medium.text-gray-900.mb-1 🎬 Template
+          %p.text-sm.text-gray-700= content_piece["template"].humanize
+
+      - if content_piece["hashtags"].present?
+        .bg-cyan-50.p-3.rounded
+          %h5.font-medium.text-gray-900.mb-1 #️⃣ Hashtags
+          %p.text-sm.text-gray-700= content_piece["hashtags"]
+
+      - if content_piece["kpi_focus"].present?
+        .bg-orange-50.p-3.rounded
+          %h5.font-medium.text-gray-900.mb-1 🎯 KPI Focus
+          %p.text-sm.text-gray-700= content_piece["kpi_focus"]
+
+      - if content_piece["success_criteria"].present?
+        .bg-teal-50.p-3.rounded
+          %h5.font-medium.text-gray-900.mb-1 📊 Success Criteria
+          %p.text-sm.text-gray-700= content_piece["success_criteria"]
+
+  - if content_piece["publish_date"] || content_piece["scheduled_day"]
+    .mt-4.p-3.bg-blue-50.rounded
+      %h5.font-medium.text-gray-900.mb-2 📅 Scheduling
+      .flex.gap-4.text-sm
+        - if content_piece["publish_date"]
+          %span.text-gray-700
+            %strong Publish Date:
+            = content_piece["publish_date"]
+        - if content_piece["scheduled_day"]
+          %span.text-gray-700
+            %strong Day:
+            = content_piece["scheduled_day"]
+
+  - if presenter.show_create_reel_button_for_content?(content_piece)
+    .mt-4.p-4.bg-gradient-to-r.from-green-50.to-blue-50.rounded-lg.border-l-4.border-green-500
+      .flex.items-center.justify-between
+        %div
+          %h5.font-medium.text-gray-900.mb-1 🎬 Create Reel
+          %p.text-sm.text-gray-600 This content is ready to be converted to a reel with preloaded data.
+        = link_to new_reel_path(template: content_piece["template"], smart_planning_data: presenter.format_content_for_reel_creation(content_piece).to_json), class: "bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2" do
+          %span 🚀
+          Create Reel
+
+  - if content_piece["scenes"]&.any?
+    .mt-4.p-3.bg-purple-50.rounded.border-l-4.border-purple-500
+      %h5.font-medium.text-gray-900.mb-3 🎬 Shot Plan - Scenes
+      .space-y-3
+        - content_piece["scenes"].each do |scene|
+          .bg-white.p-3.rounded.border-l-2.border-purple-300
+            .flex.items-start.justify-between.mb-2
+              %h6.font-semibold.text-sm.text-purple-800
+                - scene_title = scene["scene_number"] ? "Scene #{scene["scene_number"]}" : "Scene"
+                - scene_title += " - #{scene["role"]}" if scene["role"]
+                = scene_title
+              - if scene["duration"]
+                %span.text-xs.text-gray-500.bg-gray-100.px-2.py-1.rounded= scene["duration"]
+            
+            - if scene["description"]
+              %p.text-sm.text-gray-700.mb-2= scene["description"]
+            - if scene["visual"]
+              %p.text-xs.text-gray-600
+                %strong Visual:
+                = scene["visual"]
+            - if scene["on_screen_text"]
+              %p.text-xs.text-gray-600
+                %strong On-screen text:
+                = scene["on_screen_text"]
+            - if scene["voiceover"]
+              %p.text-xs.text-gray-600
+                %strong Voiceover:
+                = scene["voiceover"]
+            
+            - if scene["visual_elements"]&.any?
+              .mt-2
+                %p.text-xs.font-medium.text-gray-600.mb-1 Visual Elements:
+                .flex.flex-wrap.gap-1
+                  - scene["visual_elements"].each do |element|
+                    %span.text-xs.bg-purple-100.text-purple-700.px-2.py-1.rounded= element
+            
+            - if scene["avatar_id"]
+              %p.text-xs.text-gray-600.mt-1
+                %strong Avatar:
+                = scene["avatar_id"]
+            - if scene["voice_id"]
+              %p.text-xs.text-gray-600
+                %strong Voice:
+                = scene["voice_id"]
+
+  - if presenter.show_beats_for_content?(content_piece)
+    .mt-4.p-3.bg-amber-50.rounded.border-l-4.border-amber-500
+      %h5.font-medium.text-gray-900.mb-3 📋 Shot Plan - Beats
+      .space-y-2
+        - content_piece["beats"].each do |beat|
+          .bg-white.p-2.rounded.border-l-2.border-amber-300
+            .flex.items-center.justify-between
+              %span.font-medium.text-sm.text-amber-800
+                - beat_title = beat["beat_number"] ? "Beat #{beat["beat_number"]}" : "Beat"
+                - beat_title += " (#{beat["idx"]})" if beat["idx"]
+                = beat_title
+              - if beat["duration"]
+                %span.text-xs.text-gray-500.bg-gray-100.px-2.py-1.rounded= beat["duration"]
+            
+            - if beat["description"]
+              %p.text-sm.text-gray-700.mt-1= beat["description"]
+            - if beat["image_prompt"]
+              %p.text-xs.text-gray-600.mt-1
+                %strong Image:
+                = beat["image_prompt"]
+            - if beat["voiceover"]
+              %p.text-xs.text-gray-600
+                %strong Voiceover:
+                = beat["voiceover"]

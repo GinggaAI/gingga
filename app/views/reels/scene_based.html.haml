@@ -122,7 +122,7 @@
                         %option{value: ""}= t('reels.scene_based.select_avatar')
                         - if @presenter.has_avatars?
                           - @presenter.avatars_for_select.each do |avatar_name, avatar_id|
-                            %option{value: avatar_id}= avatar_name
+                            %option{value: avatar_id, selected: (@presenter.scene_data_for(i)["avatar_id"] == avatar_id)}= avatar_name
                         - else
                           %option{value: "", disabled: true}= @presenter.no_avatars_message
                     %div
@@ -131,13 +131,13 @@
                         %option{value: ""}= t('reels.scene_based.select_voice')
                         - if @presenter.has_voices?
                           - @presenter.voices_for_select.each do |voice_name, voice_id|
-                            %option{value: voice_id}= voice_name
+                            %option{value: voice_id, selected: (@presenter.scene_data_for(i)["voice_id"] == voice_id)}= voice_name
                         - else
                           %option{value: "", disabled: true}= @presenter.no_voices_message
 
                   .mt-3
                     %label.block.text-xs.font-medium.text-gray-700.mb-1= t('reels.scene_based.script')
-                    %textarea.w-full.p-2.text-sm.border.border-gray-300.rounded-md.focus:ring-2.focus:ring-blue-500.focus:border-blue-500{name: "reel[reel_scenes_attributes][#{i}][script]", rows: 3, placeholder: t('reels.scene_based.script_placeholder', number: i + 1)}
+                    %textarea.w-full.p-2.text-sm.border.border-gray-300.rounded-md.focus:ring-2.focus:ring-blue-500.focus:border-blue-500{name: "reel[reel_scenes_attributes][#{i}][script]", rows: 3, placeholder: t('reels.scene_based.script_placeholder', number: i + 1)}= @presenter.scene_data_for(i)["script"]
 
         .bg-white.border.border-gray-200.shadow-lg.rounded-2xl
           .p-6

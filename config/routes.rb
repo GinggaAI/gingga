@@ -10,6 +10,7 @@ Rails.application.routes.draw do
     resource :planning, only: [ :show ] do
       member do
         get :strategy_for_month
+        get :content_details
         post :voxa_refine
         post :voxa_refine_week
       end

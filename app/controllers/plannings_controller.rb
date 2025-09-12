@@ -47,6 +47,41 @@ class PlanningsController < ApplicationController
     redirect_to planning_path(plan_id: strategy.id), alert: "Failed to refine content: #{e.message}"
   end
 
+  # GET /planning/content_details - Rails-first AJAX endpoint for content details
+  def content_details
+    content_data = params[:content_data]
+    
+    unless content_data.present?
+      render json: { error: 'Content data is required' }, status: :bad_request
+      return
+    end
+
+    begin
+      # Parse the content piece data
+      content_piece = JSON.parse(content_data)
+      presenter = build_presenter
+      
+      Rails.logger.info "Content details request - content_piece keys: #{content_piece.keys}"
+      
+      # Render the partial as HTML
+      html = render_to_string(
+        partial: 'plannings/content_detail',
+        locals: { content_piece: content_piece, presenter: presenter },
+        formats: [:html]
+      )
+      
+      render json: { html: html }
+    rescue JSON::ParserError => e
+      Rails.logger.error "Failed to parse content data: #{e.message}"
+      Rails.logger.error "Raw content_data: #{content_data}"
+      render json: { error: 'Invalid content data format' }, status: :bad_request
+    rescue StandardError => e
+      Rails.logger.error "Error rendering content details: #{e.message}"
+      Rails.logger.error "Backtrace: #{e.backtrace.join("\n")}"
+      render json: { error: 'Failed to render content details' }, status: :internal_server_error
+    end
+  end
+
   # POST /planning/voxa_refine_week
   def voxa_refine_week
     strategy = find_strategy_by_id_or_current
