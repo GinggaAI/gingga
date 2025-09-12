@@ -604,7 +604,7 @@
   }
 
   function checkExistingStrategy(month) {
-    fetch(`/planning/strategy_for_month?month=${month}`)
+    fetch(`/planning/strategies/for_month?month=${month}`)
       .then(response => {
         if (response.ok) {
           return response.json();
@@ -1091,7 +1091,7 @@
     // Create form and submit
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = '/planning/voxa_refine';
+    form.action = '/planning/content_refinements';
 
     // Add CSRF token
     const csrfToken = document.querySelector('meta[name="csrf-token"]');
@@ -1142,7 +1142,7 @@
     // Create form and submit
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = '/planning/voxa_refine_week';
+    form.action = '/planning/content_refinements/week';
 
     // Add CSRF token
     const csrfToken = document.querySelector('meta[name="csrf-token"]');

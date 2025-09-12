@@ -49,22 +49,22 @@ class PlanningPresenter
   # Business logic for whether to show create reel button
   def show_create_reel_button_for_content?(content_piece)
     return false unless content_piece.is_a?(Hash)
-    
-    compatible_templates = ['only_avatars', 'avatar_and_video']
+
+    compatible_templates = [ "only_avatars", "avatar_and_video" ]
     has_compatible_template = content_piece["template"] && compatible_templates.include?(content_piece["template"])
-    is_refined = content_piece["status"] == 'in_production'
-    
+    is_refined = content_piece["status"] == "in_production"
+
     has_compatible_template && is_refined
   end
 
   # Format content piece data for reel creation
   def format_content_for_reel_creation(content_piece)
     return {} unless content_piece.is_a?(Hash)
-    
+
     {
       title: content_piece["title"] || content_piece["content_name"],
       content_name: content_piece["content_name"],
-      description: content_piece["description"] || content_piece["post_description"], 
+      description: content_piece["description"] || content_piece["post_description"],
       post_description: content_piece["post_description"],
       template: content_piece["template"],
       shotplan: {
@@ -76,54 +76,54 @@ class PlanningPresenter
   # Get content icon based on platform and type
   def content_icon_for(platform, content_type)
     platform_icons = {
-      'Instagram' => '📸',
-      'TikTok' => '🎵', 
-      'YouTube' => '🎥',
-      'Facebook' => '👥',
-      'Twitter' => '🐦',
-      'LinkedIn' => '💼'
+      "Instagram" => "📸",
+      "TikTok" => "🎵",
+      "YouTube" => "🎥",
+      "Facebook" => "👥",
+      "Twitter" => "🐦",
+      "LinkedIn" => "💼"
     }
 
     type_icons = {
-      'Reel' => '🎬',
-      'Post' => '📸',
-      'Story' => '📱',
-      'Carousel' => '🖼️',
-      'Video' => '🎥'
+      "Reel" => "🎬",
+      "Post" => "📸",
+      "Story" => "📱",
+      "Carousel" => "🖼️",
+      "Video" => "🎥"
     }
 
     # Since all content is reels for now, prioritize reel icon
     return type_icons[content_type] if content_type && type_icons[content_type]
-    platform_icons[platform] || '🎬'
+    platform_icons[platform] || "🎬"
   end
 
   # Get CSS classes for content status
   def status_css_classes_for(status)
     status_styles = {
-      'draft' => 'bg-gray-100 text-gray-700 border-l-4 border-gray-400',
-      'in_production' => 'bg-blue-100 text-blue-700 border-l-4 border-blue-500',
-      'ready_for_review' => 'bg-yellow-100 text-yellow-700 border-l-4 border-yellow-500',
-      'approved' => 'bg-green-100 text-green-700 border-l-4 border-green-500'
+      "draft" => "bg-gray-100 text-gray-700 border-l-4 border-gray-400",
+      "in_production" => "bg-blue-100 text-blue-700 border-l-4 border-blue-500",
+      "ready_for_review" => "bg-yellow-100 text-yellow-700 border-l-4 border-yellow-500",
+      "approved" => "bg-green-100 text-green-700 border-l-4 border-green-500"
     }
 
-    status_styles[status] || status_styles['draft']
+    status_styles[status] || status_styles["draft"]
   end
 
   # Get detailed status colors for content details
   def status_detail_colors_for(status)
     colors = {
-      'draft' => { bg: 'bg-gray-100', text: 'text-gray-700', border: 'border-gray-500' },
-      'in_production' => { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-500' },
-      'ready_for_review' => { bg: 'bg-yellow-100', text: 'text-yellow-800', border: 'border-yellow-500' },
-      'approved' => { bg: 'bg-green-100', text: 'text-green-800', border: 'border-green-500' }
+      "draft" => { bg: "bg-gray-100", text: "text-gray-700", border: "border-gray-500" },
+      "in_production" => { bg: "bg-blue-100", text: "text-blue-800", border: "border-blue-500" },
+      "ready_for_review" => { bg: "bg-yellow-100", text: "text-yellow-800", border: "border-yellow-500" },
+      "approved" => { bg: "bg-green-100", text: "text-green-800", border: "border-green-500" }
     }
 
-    colors[status] || colors['draft']
+    colors[status] || colors["draft"]
   end
 
   # Format content title with truncation
   def formatted_title_for_content(content_piece, max_length = 18)
-    title = content_piece["title"] || content_piece["hook"] || content_piece["cta"] || 'Draft'
+    title = content_piece["title"] || content_piece["hook"] || content_piece["cta"] || "Draft"
     title.length > max_length ? "#{title[0...max_length]}..." : title
   end
 
