@@ -13,7 +13,7 @@
               %path{d: "M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"}
               %path{d: "m9 12 2 2 4-4"}
             .text-sm
-              .font-medium.text-green-800 Success
+              .font-medium.text-green-800= t('settings.flash.success')
               .text-green-700.mt-1= notice
       
       - if alert
@@ -24,7 +24,7 @@
               %path{d: "m15 9-6 6"}  
               %path{d: "m9 9 6 6"}
             .text-sm
-              .font-medium.text-red-800 Error
+              .font-medium.text-red-800= t('settings.flash.error')
               .text-red-700.mt-1= alert
 
       .space-y-6{"data-controller" => "tabs", "data-orientation" => "horizontal", :dir => "ltr"}
@@ -34,16 +34,16 @@
               %path{:d => "m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"}
               %path{:d => "m21 2-9.6 9.6"}
               %circle{:cx => "7.5", :cy => "15.5", :r => "5.5"}
-            API Integrations
+            = t('settings.tabs.api_integrations')
           %button.inline-flex.items-center.justify-center.whitespace-nowrap.px-3.text-sm.ring-offset-background.transition-all.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.rounded-lg.font-medium{"aria-controls" => "radix-«r72»-content-account", "aria-selected" => "false", :class => "py-1.5 data-[state=active]:shadow-sm data-[state=active]:bg-[#FFC940] data-[state=active]:text-black", "data-orientation" => "horizontal", "data-radix-collection-item" => "", "data-state" => "inactive", "data-tabs-target" => "tab", "data-action" => "click->tabs#switchTab", :id => "radix-«r72»-trigger-account", :role => "tab", :tabindex => "-1", :type => "button"}
             %svg.lucide.lucide-user.w-4.h-4.mr-2{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}>
               %path{:d => "M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"}
               %circle{:cx => "12", :cy => "7", :r => "4"}
-            Account
+            = t('settings.tabs.account')
           %button.inline-flex.items-center.justify-center.whitespace-nowrap.px-3.text-sm.ring-offset-background.transition-all.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.rounded-lg.font-medium{"aria-controls" => "radix-«r72»-content-security", "aria-selected" => "false", :class => "py-1.5 data-[state=active]:shadow-sm data-[state=active]:bg-[#FFC940] data-[state=active]:text-black", "data-orientation" => "horizontal", "data-radix-collection-item" => "", "data-state" => "inactive", "data-tabs-target" => "tab", "data-action" => "click->tabs#switchTab", :id => "radix-«r72»-trigger-security", :role => "tab", :tabindex => "-1", :type => "button"}
             %svg.lucide.lucide-shield.w-4.h-4.mr-2{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}>
               %path{:d => "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"}
-            Security
+            = t('settings.tabs.security')
         .mt-2.ring-offset-background.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2{"aria-labelledby" => "radix-«r72»-trigger-api-tokens", "data-orientation" => "horizontal", "data-state" => "active", "data-tabs-target" => "panel", :id => "radix-«r72»-content-api-tokens", :role => "tabpanel", :style => "animation-duration: 0s;", :tabindex => "0"}
           .space-y-6
             .bg-card.text-card-foreground.border-0.shadow-lg.rounded-2xl
@@ -51,18 +51,18 @@
                 .font-semibold.tracking-tight.text-xl.flex.items-center.gap-2
                   %svg.lucide.lucide-zap.w-5.h-5{:class => "text-[#FFC940]", :fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}>
                     %path{:d => "M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"}
-                  API Integrations Overview
+                  = t('settings.api.overview_title')
               .p-6.pt-0
                 .grid.md:grid-cols-3.gap-6
                   .text-center.p-4.rounded-xl{:class => "bg-[#FFC940]/10"}
                     .text-2xl.font-bold.text-gray-900= @presenter.active_connections_count
-                    .text-sm.text-gray-600 Active Connections
+                    .text-sm.text-gray-600= t('settings.api.active_connections')
                   .text-center.p-4.rounded-xl{:class => "bg-[#3AC8FF]/10"}
                     .text-2xl.font-bold.text-gray-900= @presenter.available_services_count
-                    .text-sm.text-gray-600 Available Services
+                    .text-sm.text-gray-600= t('settings.api.available_services')
                   .text-center.p-4.rounded-xl{:class => "bg-[#A37FFF]/10"}
                     .text-2xl.font-bold.text-gray-900= @presenter.test_mode_count
-                    .text-sm.text-gray-600 Test Mode
+                    .text-sm.text-gray-600= t('settings.api.test_mode')
             .space-y-6
               .bg-card.text-card-foreground.border-0.shadow-lg.rounded-2xl
                 .flex.flex-col.p-6{:class => "space-y-1.5"}
@@ -76,10 +76,10 @@
                           %path{:d => "M4 17v2"}
                           %path{:d => "M5 18H3"}
                       %div
-                        .font-semibold.tracking-tight.text-lg OpenAI
-                        %p.text-sm.text-gray-600 AI text generation and content creation
+                        .font-semibold.tracking-tight.text-lg= t('settings.api.openai.title')
+                        %p.text-sm.text-gray-600= t('settings.api.openai.description')
                     .flex.items-center.gap-3
-                      .inline-flex.items-center.rounded-full.border.text-xs.font-semibold.transition-colors.focus:outline-none.focus:ring-2.focus:ring-ring.focus:ring-offset-2.border-transparent.bg-secondary.text-secondary-foreground{:class => "px-2.5 py-0.5 hover:bg-secondary/80"} Not configured
+                      .inline-flex.items-center.rounded-full.border.text-xs.font-semibold.transition-colors.focus:outline-none.focus:ring-2.focus:ring-ring.focus:ring-offset-2.border-transparent.bg-secondary.text-secondary-foreground{:class => "px-2.5 py-0.5 hover:bg-secondary/80"}= t('settings.api.openai.not_configured')
                       %button.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.border.border-input.hover:bg-accent.hover:text-accent-foreground.h-9.px-3.rounded-xl.bg-transparent{:class => "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"}
                         %svg.lucide.lucide-external-link.w-4.h-4.mr-1{:fill => "none", :height => "24", :stroke => "currentColor", "stroke-linecap" => "round", "stroke-linejoin" => "round", "stroke-width" => "2", :viewbox => "0 0 24 24", :width => "24", :xmlns => "http://www.w3.org/2000/svg"}>
                           %path{:d => "M15 3h6v6"}

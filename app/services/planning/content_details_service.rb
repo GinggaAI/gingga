@@ -17,14 +17,14 @@ module Planning
         log_json_error(e)
         Result.new(
           success?: false,
-          error_message: "Invalid content data format",
+          error_message: I18n.t("planning.errors.invalid_content_data_format"),
           status_code: :bad_request
         )
       rescue StandardError => e
         log_rendering_error(e)
         Result.new(
           success?: false,
-          error_message: "Failed to render content details",
+          error_message: I18n.t("planning.errors.failed_to_render_content_details"),
           status_code: :internal_server_error
         )
       end
@@ -41,7 +41,7 @@ module Planning
     def validation_error
       Result.new(
         success?: false,
-        error_message: "Content data is required",
+        error_message: I18n.t("planning.errors.content_data_required"),
         status_code: :bad_request
       )
     end

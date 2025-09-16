@@ -3840,4 +3840,524 @@ http_interactions:
 
         '
   recorded_at: Tue, 16 Sep 2025 09:19:27 GMT
+- request:
+    method: get
+    uri: https://api.heygen.com/v2/avatars
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v2.13.4
+      Content-Type:
+      - application/json
+      Accept:
+      - application/json
+      X-Client:
+      - Gingga/1.0
+      X-Api-Key:
+      - "<HEYGEN_API_KEY>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 401
+      message: UNAUTHORIZED
+    headers:
+      Date:
+      - Tue, 16 Sep 2025 12:06:07 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '73'
+      Connection:
+      - keep-alive
+      Server:
+      - gunicorn
+    body:
+      encoding: UTF-8
+      string: '{"data":null,"error":{"code":"internal_error","message":"Unauthorized"}}
+
+        '
+  recorded_at: Tue, 16 Sep 2025 12:06:07 GMT
+- request:
+    method: get
+    uri: https://api.heygen.com/v2/avatars
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v2.13.4
+      Content-Type:
+      - application/json
+      Accept:
+      - application/json
+      X-Client:
+      - Gingga/1.0
+      X-Api-Key:
+      - "<HEYGEN_API_KEY>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 401
+      message: UNAUTHORIZED
+    headers:
+      Date:
+      - Tue, 16 Sep 2025 12:10:39 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '73'
+      Connection:
+      - keep-alive
+      Server:
+      - gunicorn
+    body:
+      encoding: UTF-8
+      string: '{"data":null,"error":{"code":"internal_error","message":"Unauthorized"}}
+
+        '
+  recorded_at: Tue, 16 Sep 2025 12:10:39 GMT
+- request:
+    method: get
+    uri: https://api.heygen.com/v2/avatars
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v2.13.4
+      Content-Type:
+      - application/json
+      Accept:
+      - application/json
+      X-Client:
+      - Gingga/1.0
+      X-Api-Key:
+      - "<HEYGEN_API_KEY>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 401
+      message: UNAUTHORIZED
+    headers:
+      Date:
+      - Tue, 16 Sep 2025 12:11:27 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '73'
+      Connection:
+      - keep-alive
+      Server:
+      - gunicorn
+    body:
+      encoding: UTF-8
+      string: '{"data":null,"error":{"code":"internal_error","message":"Unauthorized"}}
+
+        '
+  recorded_at: Tue, 16 Sep 2025 12:11:27 GMT
+- request:
+    method: get
+    uri: https://api.heygen.com/v2/avatars
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v2.13.4
+      Content-Type:
+      - application/json
+      Accept:
+      - application/json
+      X-Client:
+      - Gingga/1.0
+      X-Api-Key:
+      - "<HEYGEN_API_KEY>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 401
+      message: UNAUTHORIZED
+    headers:
+      Date:
+      - Tue, 16 Sep 2025 12:23:25 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '73'
+      Connection:
+      - keep-alive
+      Server:
+      - gunicorn
+    body:
+      encoding: UTF-8
+      string: '{"data":null,"error":{"code":"internal_error","message":"Unauthorized"}}
+
+        '
+  recorded_at: Tue, 16 Sep 2025 12:23:25 GMT
+- request:
+    method: get
+    uri: https://api.heygen.com/v2/avatars
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v2.13.4
+      Content-Type:
+      - application/json
+      Accept:
+      - application/json
+      X-Client:
+      - Gingga/1.0
+      X-Api-Key:
+      - "<HEYGEN_API_KEY>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 401
+      message: UNAUTHORIZED
+    headers:
+      Date:
+      - Tue, 16 Sep 2025 12:28:05 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '73'
+      Connection:
+      - keep-alive
+      Server:
+      - gunicorn
+    body:
+      encoding: UTF-8
+      string: '{"data":null,"error":{"code":"internal_error","message":"Unauthorized"}}
+
+        '
+  recorded_at: Tue, 16 Sep 2025 12:28:05 GMT
+- request:
+    method: get
+    uri: https://api.heygen.com/v2/avatars
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v2.13.4
+      Content-Type:
+      - application/json
+      Accept:
+      - application/json
+      X-Client:
+      - Gingga/1.0
+      X-Api-Key:
+      - "<HEYGEN_API_KEY>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 401
+      message: UNAUTHORIZED
+    headers:
+      Date:
+      - Tue, 16 Sep 2025 12:34:35 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '73'
+      Connection:
+      - keep-alive
+      Server:
+      - gunicorn
+    body:
+      encoding: UTF-8
+      string: '{"data":null,"error":{"code":"internal_error","message":"Unauthorized"}}
+
+        '
+  recorded_at: Tue, 16 Sep 2025 12:34:35 GMT
+- request:
+    method: get
+    uri: https://api.heygen.com/v2/avatars
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v2.13.4
+      Content-Type:
+      - application/json
+      Accept:
+      - application/json
+      X-Client:
+      - Gingga/1.0
+      X-Api-Key:
+      - "<HEYGEN_API_KEY>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 401
+      message: UNAUTHORIZED
+    headers:
+      Date:
+      - Tue, 16 Sep 2025 13:00:51 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '73'
+      Connection:
+      - keep-alive
+      Server:
+      - gunicorn
+    body:
+      encoding: UTF-8
+      string: '{"data":null,"error":{"code":"internal_error","message":"Unauthorized"}}
+
+        '
+  recorded_at: Tue, 16 Sep 2025 13:00:51 GMT
+- request:
+    method: get
+    uri: https://api.heygen.com/v2/avatars
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v2.13.4
+      Content-Type:
+      - application/json
+      Accept:
+      - application/json
+      X-Client:
+      - Gingga/1.0
+      X-Api-Key:
+      - "<HEYGEN_API_KEY>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 401
+      message: UNAUTHORIZED
+    headers:
+      Date:
+      - Tue, 16 Sep 2025 13:09:24 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '73'
+      Connection:
+      - keep-alive
+      Server:
+      - gunicorn
+    body:
+      encoding: UTF-8
+      string: '{"data":null,"error":{"code":"internal_error","message":"Unauthorized"}}
+
+        '
+  recorded_at: Tue, 16 Sep 2025 13:09:24 GMT
+- request:
+    method: get
+    uri: https://api.heygen.com/v2/avatars
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v2.13.4
+      Content-Type:
+      - application/json
+      Accept:
+      - application/json
+      X-Client:
+      - Gingga/1.0
+      X-Api-Key:
+      - "<HEYGEN_API_KEY>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 401
+      message: UNAUTHORIZED
+    headers:
+      Date:
+      - Wed, 17 Sep 2025 10:39:02 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '73'
+      Connection:
+      - keep-alive
+      Server:
+      - gunicorn
+    body:
+      encoding: UTF-8
+      string: '{"data":null,"error":{"code":"internal_error","message":"Unauthorized"}}
+
+        '
+  recorded_at: Wed, 17 Sep 2025 10:39:02 GMT
+- request:
+    method: get
+    uri: https://api.heygen.com/v2/avatars
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v2.13.4
+      Content-Type:
+      - application/json
+      Accept:
+      - application/json
+      X-Client:
+      - Gingga/1.0
+      X-Api-Key:
+      - "<HEYGEN_API_KEY>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 401
+      message: UNAUTHORIZED
+    headers:
+      Date:
+      - Wed, 17 Sep 2025 10:40:01 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '73'
+      Connection:
+      - keep-alive
+      Server:
+      - gunicorn
+    body:
+      encoding: UTF-8
+      string: '{"data":null,"error":{"code":"internal_error","message":"Unauthorized"}}
+
+        '
+  recorded_at: Wed, 17 Sep 2025 10:40:01 GMT
+- request:
+    method: get
+    uri: https://api.heygen.com/v2/avatars
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v2.13.4
+      Content-Type:
+      - application/json
+      Accept:
+      - application/json
+      X-Client:
+      - Gingga/1.0
+      X-Api-Key:
+      - "<HEYGEN_API_KEY>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 401
+      message: UNAUTHORIZED
+    headers:
+      Date:
+      - Wed, 17 Sep 2025 10:40:17 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '73'
+      Connection:
+      - keep-alive
+      Server:
+      - gunicorn
+    body:
+      encoding: UTF-8
+      string: '{"data":null,"error":{"code":"internal_error","message":"Unauthorized"}}
+
+        '
+  recorded_at: Wed, 17 Sep 2025 10:40:18 GMT
+- request:
+    method: get
+    uri: https://api.heygen.com/v2/avatars
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v2.13.4
+      Content-Type:
+      - application/json
+      Accept:
+      - application/json
+      X-Client:
+      - Gingga/1.0
+      X-Api-Key:
+      - "<HEYGEN_API_KEY>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 401
+      message: UNAUTHORIZED
+    headers:
+      Date:
+      - Wed, 17 Sep 2025 10:41:17 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '73'
+      Connection:
+      - keep-alive
+      Server:
+      - gunicorn
+    body:
+      encoding: UTF-8
+      string: '{"data":null,"error":{"code":"internal_error","message":"Unauthorized"}}
+
+        '
+  recorded_at: Wed, 17 Sep 2025 10:41:17 GMT
+- request:
+    method: get
+    uri: https://api.heygen.com/v2/avatars
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v2.13.4
+      Content-Type:
+      - application/json
+      Accept:
+      - application/json
+      X-Client:
+      - Gingga/1.0
+      X-Api-Key:
+      - "<HEYGEN_API_KEY>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 401
+      message: UNAUTHORIZED
+    headers:
+      Date:
+      - Wed, 17 Sep 2025 10:43:58 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '73'
+      Connection:
+      - keep-alive
+      Server:
+      - gunicorn
+    body:
+      encoding: UTF-8
+      string: '{"data":null,"error":{"code":"internal_error","message":"Unauthorized"}}
+
+        '
+  recorded_at: Wed, 17 Sep 2025 10:43:58 GMT
 recorded_with: VCR 6.3.1

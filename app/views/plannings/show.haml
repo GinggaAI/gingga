@@ -221,9 +221,9 @@
   // JavaScript only handles UI interactions
 
   document.addEventListener('turbo:load', function() {
-    // Initialize page variables
-    window.currentMonth = '#{@presenter.safe_month_for_js}';
-    window.currentPlan = #{@presenter.current_plan_json};
+    // Initialize page variables with proper escaping
+    window.currentMonth = #{@presenter.safe_month_for_js.to_json.html_safe};
+    window.currentPlan = #{@presenter.current_plan_json.html_safe};
     const toggleBtn = document.getElementById('toggle-form');
     const overviewBtn = document.getElementById('toggle-overview');
     const voxaBtn = document.getElementById('voxa-refine');
@@ -382,7 +382,7 @@
 
       if (data.success) {
         // Show immediate feedback to user
-        alert('Strategy is being created! This may take a few moments. The page will update automatically when ready.');
+        alert('#{t('planning.js_messages.strategy_being_created_alert')}');
         
         // Check if the plan is immediately completed (sync) or pending (async)
         if (data.plan.status === 'completed') {
@@ -528,9 +528,8 @@
 
     if (alertDiv && alertText) {
       alertText.innerHTML = `
-        <strong>Missing Information Required</strong><br>
-        Your brand profile is missing some critical information needed to generate the strategy. 
-        Please complete your brand setup to proceed.<br><br>
+        <strong>#{t('planning.js_messages.missing_information_required')}</strong><br>
+        #{t('planning.js_messages.brand_profile_missing_info')}<br><br>
         <em>Details: ${message}</em>
       `;
       alertDiv.style.display = 'block';
@@ -556,8 +555,8 @@
     if (!titleElement || !descriptionElement || !buttonElement) return;
     
     if (isProcessing) {
-      titleElement.textContent = 'Strategy Generation In Progress';
-      descriptionElement.textContent = 'Your content strategy is being created. This may take a few moments.';
+      titleElement.textContent = '#{t('planning.js_messages.strategy_generation_in_progress')}';
+      descriptionElement.textContent = '#{t('planning.js_messages.strategy_being_created')}';
       buttonElement.style.display = 'none';
     } else {
       // Restore original text (this will be handled by page refresh in practice)  
@@ -878,7 +877,7 @@
     const detailsGrid = weekDetails.querySelector('.content-details-grid');
     
     // Show loading state
-    detailsGrid.innerHTML = '<div class="p-4 text-center text-gray-500">Loading content details...</div>';
+    detailsGrid.innerHTML = '<div class="p-4 text-center text-gray-500">#{t('planning.js_messages.loading_content_details')}</div>';
     
     // Make AJAX request to Rails controller
     const params = new URLSearchParams({
@@ -901,12 +900,12 @@
         weekDetails.style.display = 'block';
         weekDetails.scrollIntoView({ behavior: 'smooth', block: 'start' });
       } else {
-        detailsGrid.innerHTML = '<div class="p-4 text-center text-red-500">Error loading content details</div>';
+        detailsGrid.innerHTML = '<div class="p-4 text-center text-red-500">#{t('planning.js_messages.error_loading_content_details')}</div>';
       }
     })
     .catch(error => {
       console.error('Error fetching content details:', error);
-      detailsGrid.innerHTML = '<div class="p-4 text-center text-red-500">Failed to load content details</div>';
+      detailsGrid.innerHTML = '<div class="p-4 text-center text-red-500">#{t('planning.js_messages.failed_to_load_content_details')}</div>';
     });
   }
 
@@ -1126,7 +1125,7 @@
     const weekNumber = e.target.closest('button').getAttribute('data-week');
     
     if (!weekNumber) {
-      showError('Invalid week number');
+      showError('#{t('planning.js_messages.invalid_week_number')}');
       return;
     }
 
@@ -1135,7 +1134,7 @@
 
     // Show loading state
     button.disabled = true;
-    button.textContent = `Refining Week ${weekNumber}...`;
+    button.textContent = `#{t('planning.js_messages.refining_week', week: '${weekNumber}')}`.replace('${weekNumber}', weekNumber);
 
     hideMessages();
 

@@ -24,6 +24,12 @@ class ReelsController < ApplicationController
   end
 
   def new
+    # Validate template parameter against allowed templates to prevent dynamic render attacks
+    unless valid_template?(params[:template])
+      redirect_to reels_path, alert: I18n.t("reels.errors.invalid_template")
+      return
+    end
+
     form_result = Reels::FormSetupService.new(
       user: current_user,
       template: params[:template],
@@ -33,7 +39,8 @@ class ReelsController < ApplicationController
     if form_result[:success]
       @reel = form_result[:data][:reel]
       @presenter = form_result[:data][:presenter]
-      render form_result[:data][:view_template]
+      # Use safe render with validated template path
+      render_safe_template(form_result[:data][:view_template])
     else
       error_handler.handle_form_setup_error(form_result[:error])
     end
@@ -77,5 +84,23 @@ class ReelsController < ApplicationController
 
   def error_handler
     @error_handler ||= Reels::ErrorHandlingService.new(controller: self)
+  end
+
+  # Security: Validate template parameter against whitelist
+  def valid_template?(template)
+    allowed_templates = %w[only_avatars avatar_and_video one_to_three_videos narration_over_7_images]
+    allowed_templates.include?(template)
+  end
+
+  # Security: Safe template rendering with path validation
+  def render_safe_template(view_template)
+    allowed_view_templates = %w[reels/scene_based reels/narrative]
+
+    if allowed_view_templates.include?(view_template)
+      render view_template
+    else
+      Rails.logger.error "Security: Attempted to render unauthorized template: #{view_template}"
+      redirect_to reels_path, alert: I18n.t("reels.errors.invalid_template")
+    end
   end
 end

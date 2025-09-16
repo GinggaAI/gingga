@@ -11,7 +11,7 @@ module Planning
 
       # If month is nil (invalid parameter was provided), return error state
       if month.nil?
-        return Result.new(month: nil, display_month: "Invalid Month")
+        return Result.new(month: nil, display_month: I18n.t("planning.errors.invalid_month"))
       end
 
       display_month = format_month_for_display(month)
@@ -19,7 +19,7 @@ module Planning
       Result.new(month: month, display_month: display_month)
     rescue StandardError => e
       Rails.logger.error "MonthResolver error: #{e.message}"
-      Result.new(month: nil, display_month: "Invalid Month")
+      Result.new(month: nil, display_month: I18n.t("planning.errors.invalid_month"))
     end
 
     private
@@ -51,15 +51,15 @@ module Planning
     end
 
     def format_month_for_display(month_string)
-      return "Invalid Month" unless month_string
+      return I18n.t("planning.errors.invalid_month") unless month_string
 
       year, month_num = month_string.split("-")
-      return "Invalid Month" unless year && month_num
+      return I18n.t("planning.errors.invalid_month") unless year && month_num
 
       date = Date.new(year.to_i, month_num.to_i)
       date.strftime("%B %Y")
     rescue ArgumentError, Date::Error
-      "Invalid Month"
+      I18n.t("planning.errors.invalid_month")
     end
   end
 end

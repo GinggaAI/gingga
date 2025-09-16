@@ -14,39 +14,28 @@ module Reels
       parsed_data = parse_planning_data
       if parsed_data.nil?
         Rails.logger.error "❌ Failed to parse planning data"
-        return failure_result("Invalid planning data format")
+        return failure_result(I18n.t("planning.smart_planning_preload_errors.invalid_planning_data_format"))
       end
-
-      Rails.logger.info "📊 Planning data keys: #{parsed_data.keys}"
-      Rails.logger.debug "📊 Full planning data: #{parsed_data}"
 
       # Preload scenes FIRST (before updating reel info to avoid validation conflicts)
       if shotplan_scenes_available?(parsed_data)
         scenes = parsed_data["shotplan"]["scenes"]
         Rails.logger.info "🎬 Found #{scenes.length} scenes to preload"
-        Rails.logger.debug "🎬 Scene data preview: #{scenes.map.with_index { |s, i| "Scene #{i+1}: #{s.keys}" }}"
 
         preload_result = preload_scenes(scenes)
-        if preload_result.success?
-          Rails.logger.info "✅ Scene preload completed successfully"
-        else
+        unless preload_result.success?
           Rails.logger.warn "⚠️ Scene preload had issues: #{preload_result.error}"
         end
-      else
-        Rails.logger.info "📋 No shotplan or scenes found in planning data - skipping scene creation"
-        Rails.logger.debug "📋 Shotplan structure: #{parsed_data['shotplan']&.keys}"
       end
 
       # Update reel basic info AFTER scenes are created (to satisfy validations)
-      Rails.logger.info "📝 Updating reel basic info..."
       update_reel_info(parsed_data)
 
-      Rails.logger.info "🎉 Smart planning preload completed"
-      success_result("Smart planning data preloaded successfully")
+      success_result(I18n.t("planning.smart_planning_preload_errors.smart_planning_data_preloaded_successfully"))
     rescue StandardError => e
       Rails.logger.error "💥 Failed to preload smart planning data: #{e.message}"
       Rails.logger.error "💥 Backtrace: #{e.backtrace.join("\n")}"
-      failure_result("Preload failed: #{e.message}")
+      failure_result(I18n.t("planning.smart_planning_preload_errors.preload_failed", error: e.message))
     end
 
     private
@@ -58,7 +47,7 @@ module Reels
 
       JSON.parse(planning_data)
     rescue JSON::ParserError => e
-      Rails.logger.error "Failed to parse smart planning data: #{e.message}"
+      Rails.logger.error "#{I18n.t('planning.smart_planning_preload_errors.failed_to_parse_smart_planning_data', error: e.message)}"
       Rails.logger.error "Raw planning data: #{planning_data}"
       nil
     end
@@ -67,8 +56,6 @@ module Reels
       title = parsed_data["title"] || parsed_data["content_name"]
       description = parsed_data["description"] || parsed_data["post_description"]
 
-      Rails.logger.debug "📝 Updating reel with - Title: '#{title}', Description: '#{description&.truncate(100)}'"
-
       # Use update instead of update! to avoid triggering scene validations during basic info update
       result = @reel.update(
         title: title,
@@ -76,10 +63,7 @@ module Reels
       )
 
       unless result
-        Rails.logger.warn "⚠️ Could not update reel basic info: #{@reel.errors.full_messages.join(', ')}"
-        Rails.logger.debug "⚠️ Reel current state - Scenes count: #{@reel.reel_scenes.count}, Template: #{@reel.template}"
-      else
-        Rails.logger.info "✅ Reel basic info updated successfully"
+        Rails.logger.warn "⚠️ #{I18n.t('planning.smart_planning_preload_errors.could_not_update_reel_basic_info', errors: @reel.errors.full_messages.join(', '))}"
       end
     end
 
@@ -90,8 +74,6 @@ module Reels
     end
 
     def preload_scenes(scenes)
-      Rails.logger.info "🎭 Delegating scene preload to ScenesPreloadService..."
-
       result = ScenesPreloadService.new(
         reel: @reel,
         scenes: scenes,
@@ -99,9 +81,9 @@ module Reels
       ).call
 
       if result.success?
-        Rails.logger.info "🎯 ScenesPreloadService completed: #{result.data[:created_scenes]} scenes created out of #{result.data[:total_scenes]} provided"
+        Rails.logger.info "🎯 Created #{result.data[:created_scenes]} scenes from #{result.data[:total_scenes]} provided"
       else
-        Rails.logger.error "🔥 ScenesPreloadService failed: #{result.error}"
+        Rails.logger.error "🔥 #{I18n.t('planning.smart_planning_preload_errors.scenes_preload_service_failed', error: result.error)}"
       end
 
       result

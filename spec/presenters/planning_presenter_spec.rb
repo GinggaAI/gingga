@@ -870,41 +870,31 @@ RSpec.describe PlanningPresenter do
     let(:presenter) { described_class.new({}) }
 
     it 'returns correct CSS classes for each status' do
-      expect(presenter.status_css_classes_for('draft')).to eq('bg-gray-100 text-gray-700 border-l-4 border-gray-400')
-      expect(presenter.status_css_classes_for('in_production')).to eq('bg-blue-100 text-blue-700 border-l-4 border-blue-500')
-      expect(presenter.status_css_classes_for('ready_for_review')).to eq('bg-yellow-100 text-yellow-700 border-l-4 border-yellow-500')
-      expect(presenter.status_css_classes_for('approved')).to eq('bg-green-100 text-green-700 border-l-4 border-green-500')
+      expect(presenter.status_css_classes_for('draft')).to eq('content-status content-status--draft')
+      expect(presenter.status_css_classes_for('in_production')).to eq('content-status content-status--in-production')
+      expect(presenter.status_css_classes_for('ready_for_review')).to eq('content-status content-status--ready-for-review')
+      expect(presenter.status_css_classes_for('approved')).to eq('content-status content-status--approved')
     end
 
     it 'returns default draft styles for unknown status' do
-      expect(presenter.status_css_classes_for('unknown_status')).to eq('bg-gray-100 text-gray-700 border-l-4 border-gray-400')
-      expect(presenter.status_css_classes_for(nil)).to eq('bg-gray-100 text-gray-700 border-l-4 border-gray-400')
+      expect(presenter.status_css_classes_for('unknown_status')).to eq('content-status content-status--draft')
+      expect(presenter.status_css_classes_for(nil)).to eq('content-status content-status--draft')
     end
   end
 
   describe '#status_detail_colors_for' do
     let(:presenter) { described_class.new({}) }
 
-    it 'returns correct color details for each status' do
-      draft_colors = presenter.status_detail_colors_for('draft')
-      expect(draft_colors).to eq({ bg: 'bg-gray-100', text: 'text-gray-700', border: 'border-gray-500' })
-
-      production_colors = presenter.status_detail_colors_for('in_production')
-      expect(production_colors).to eq({ bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-500' })
-
-      review_colors = presenter.status_detail_colors_for('ready_for_review')
-      expect(review_colors).to eq({ bg: 'bg-yellow-100', text: 'text-yellow-800', border: 'border-yellow-500' })
-
-      approved_colors = presenter.status_detail_colors_for('approved')
-      expect(approved_colors).to eq({ bg: 'bg-green-100', text: 'text-green-800', border: 'border-green-500' })
+    it 'returns correct CSS classes for each status detail' do
+      expect(presenter.status_detail_colors_for('draft')).to eq('content-status-detail--draft')
+      expect(presenter.status_detail_colors_for('in_production')).to eq('content-status-detail--in-production')
+      expect(presenter.status_detail_colors_for('ready_for_review')).to eq('content-status-detail--ready-for-review')
+      expect(presenter.status_detail_colors_for('approved')).to eq('content-status-detail--approved')
     end
 
-    it 'returns default draft colors for unknown status' do
-      unknown_colors = presenter.status_detail_colors_for('unknown_status')
-      expect(unknown_colors).to eq({ bg: 'bg-gray-100', text: 'text-gray-700', border: 'border-gray-500' })
-
-      nil_colors = presenter.status_detail_colors_for(nil)
-      expect(nil_colors).to eq({ bg: 'bg-gray-100', text: 'text-gray-700', border: 'border-gray-500' })
+    it 'returns default draft CSS class for unknown status' do
+      expect(presenter.status_detail_colors_for('unknown_status')).to eq('content-status-detail--draft')
+      expect(presenter.status_detail_colors_for(nil)).to eq('content-status-detail--draft')
     end
   end
 

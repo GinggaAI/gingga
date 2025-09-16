@@ -30,7 +30,7 @@ module Reels
       end
     rescue StandardError => e
       Rails.logger.error "🚨 Form setup failed: #{e.message}"
-      failure_result("Failed to setup form: #{e.message}")
+      failure_result(I18n.t("planning.errors.failed_to_setup_form") + ": #{e.message}")
     end
 
     private

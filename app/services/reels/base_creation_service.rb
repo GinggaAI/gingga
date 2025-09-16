@@ -14,7 +14,7 @@ module Reels
       if reel.save
         success_result(reel)
       else
-        failure_result("Failed to initialize reel: #{reel.errors.full_messages.join(', ')}", reel)
+        failure_result(I18n.t("planning.errors.failed_to_initialize_reel_with_error", error: reel.errors.full_messages.join(", ")), reel)
       end
     end
 
@@ -26,7 +26,7 @@ module Reels
         trigger_video_generation(reel)
         success_result(reel)
       else
-        failure_result("Validation failed", reel)
+        failure_result(I18n.t("planning.errors.validation_failed"), reel)
       end
     end
 

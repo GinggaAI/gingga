@@ -236,8 +236,6 @@ RSpec.describe Reels::ScenesPreloadService do
 
       it 'handles the error gracefully and continues' do
         expect(Rails.logger).to receive(:error).with(/Unexpected error creating scene/).at_least(:once)
-        expect(Rails.logger).to receive(:error).with(/Scene data:/).at_least(:once)
-        expect(Rails.logger).to receive(:error).with(/Backtrace:/).at_least(:once)
 
         result = service.call
 

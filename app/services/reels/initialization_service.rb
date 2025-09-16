@@ -9,7 +9,7 @@ module Reels
     end
 
     def call
-      return failure_result("Invalid template") unless valid_template?
+      return failure_result(I18n.t("planning.errors.invalid_template")) unless valid_template?
 
       # Initialize the reel
       reel_result = ReelCreationService.new(user: @user, template: @template).initialize_reel
@@ -45,7 +45,7 @@ module Reels
     rescue StandardError => e
       Rails.logger.error "Reel initialization failed: #{e.message}"
       Rails.logger.error e.backtrace.join("\n")
-      failure_result("Failed to initialize reel: #{e.message}")
+      failure_result(I18n.t("planning.errors.failed_to_initialize_reel_with_error", error: e.message))
     end
 
     private

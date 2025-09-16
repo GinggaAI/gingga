@@ -33,7 +33,8 @@ class PlanningPresenter
     plan_hash["content_items"] = format_content_items(plan.creas_content_items)
     plan_hash["weekly_plan"] = format_weekly_plan_with_items(plan)
 
-    plan_hash.to_json.html_safe
+    # Return raw JSON - escaping will be handled at template level
+    plan_hash.to_json
   end
 
   # View logic encapsulation per CLAUDE.md line 84
@@ -99,26 +100,40 @@ class PlanningPresenter
 
   # Get CSS classes for content status
   def status_css_classes_for(status)
-    status_styles = {
-      "draft" => "bg-gray-100 text-gray-700 border-l-4 border-gray-400",
-      "in_production" => "bg-blue-100 text-blue-700 border-l-4 border-blue-500",
-      "ready_for_review" => "bg-yellow-100 text-yellow-700 border-l-4 border-yellow-500",
-      "approved" => "bg-green-100 text-green-700 border-l-4 border-green-500"
-    }
+    base_classes = "content-status"
+    status_class = case status
+    when "draft"
+                     "content-status--draft"
+    when "in_production"
+                     "content-status--in-production"
+    when "ready_for_review"
+                     "content-status--ready-for-review"
+    when "approved"
+                     "content-status--approved"
+    else
+                     "content-status--draft"
+    end
 
-    status_styles[status] || status_styles["draft"]
+    "#{base_classes} #{status_class}"
   end
 
   # Get detailed status colors for content details
   def status_detail_colors_for(status)
-    colors = {
-      "draft" => { bg: "bg-gray-100", text: "text-gray-700", border: "border-gray-500" },
-      "in_production" => { bg: "bg-blue-100", text: "text-blue-800", border: "border-blue-500" },
-      "ready_for_review" => { bg: "bg-yellow-100", text: "text-yellow-800", border: "border-yellow-500" },
-      "approved" => { bg: "bg-green-100", text: "text-green-800", border: "border-green-500" }
-    }
+    status_class = case status
+    when "draft"
+                     "content-status-detail--draft"
+    when "in_production"
+                     "content-status-detail--in-production"
+    when "ready_for_review"
+                     "content-status-detail--ready-for-review"
+    when "approved"
+                     "content-status-detail--approved"
+    else
+                     "content-status-detail--draft"
+    end
 
-    colors[status] || colors["draft"]
+    # Return single CSS class instead of hash for easier usage
+    status_class
   end
 
   # Format content title with truncation

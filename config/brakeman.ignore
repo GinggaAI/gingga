@@ -33,8 +33,42 @@
         79
       ],
       "note": "FALSE POSITIVE: ReelShowPresenter.status_badge_class uses a whitelisted hash (STATUS_BADGE_CLASSES) that only returns predefined CSS class strings. No user input can be injected. The method explicitly uses .html_safe on controlled values. This warning can be safely ignored."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "410345e0c5200cf1eff68ea41ec13d0e1dea7b40ba1abbc31da7da4b95f7d428",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped parameter value",
+      "file": "app/views/plannings/show.haml",
+      "line": 226,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": "Planning::DisplayService.new(:user => current_user, :brand => Planning::BrandResolver.call(current_user), :strategy => Planning::StrategyResolver.new(:brand => Planning::BrandResolver.call(current_user), :month => Planning::MonthResolver.new(params[:month]).call.month, :plan_id => params[:plan_id]).call, :params => (params)).call.current_plan_json.html_safe",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "PlanningsController",
+          "method": "show",
+          "line": 18,
+          "file": "app/controllers/plannings_controller.rb",
+          "rendered": {
+            "name": "plannings/show",
+            "file": "app/views/plannings/show.haml"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "plannings/show"
+      },
+      "user_input": "params",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "FALSE POSITIVE: PlanningPresenter.current_plan_json only outputs database records as JSON, never user parameters. The method (lines 27-38) uses plan.as_json, creas_content_items, and weekly_plan data from the database. Although params flows into the presenter constructor, current_plan_json doesn't use @params. This is safe JSON output for JavaScript context."
     }
   ],
-  "updated": "2025-09-10 17:03:32 +0100",
+  "updated": "2025-09-17 11:30:00 +0100",
   "brakeman_version": "7.1.0"
 }

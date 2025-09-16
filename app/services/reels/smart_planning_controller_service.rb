@@ -10,7 +10,7 @@ module Reels
       return success_result if @smart_planning_data.blank?
 
       planning_data = parse_planning_data
-      return failure_result("Invalid planning data format") unless planning_data
+      return failure_result(I18n.t("planning.smart_planning_errors.invalid_planning_data_format")) unless planning_data
 
       apply_basic_info(planning_data)
       apply_scenes(planning_data) if planning_data["shotplan"]&.dig("scenes")
@@ -18,7 +18,7 @@ module Reels
       success_result
     rescue StandardError => e
       Rails.logger.error "🚨 Smart planning preload failed: #{e.message}"
-      failure_result("Failed to preload planning data: #{e.message}")
+      failure_result(I18n.t("planning.smart_planning_errors.failed_to_preload_planning_data", error: e.message))
     end
 
     private
@@ -26,14 +26,13 @@ module Reels
     def parse_planning_data
       JSON.parse(@smart_planning_data)
     rescue JSON::ParserError => e
-      Rails.logger.error "❌ Invalid JSON in smart planning data: #{e.message}"
+      Rails.logger.error "❌ #{I18n.t('planning.smart_planning_errors.invalid_json_in_smart_planning_data', error: e.message)}"
       nil
     end
 
     def apply_basic_info(planning_data)
       @reel.title = planning_data["title"] || planning_data["content_name"]
       @reel.description = planning_data["description"] || planning_data["post_description"]
-      Rails.logger.info "✅ Applied basic info to reel"
     end
 
     def apply_scenes(planning_data)
@@ -53,7 +52,7 @@ module Reels
         end
       end
 
-      Rails.logger.info "🎬 Successfully built #{created_scenes}/#{scenes.length} scenes"
+      Rails.logger.info "🎬 Built #{created_scenes}/#{scenes.length} scenes"
     end
 
     def get_default_avatar_voice
@@ -78,10 +77,9 @@ module Reels
         video_type: "avatar"
       )
 
-      Rails.logger.info "✅ Built scene #{scene_number}"
       true
     rescue StandardError => e
-      Rails.logger.error "❌ Failed to build scene #{scene_number}: #{e.message}"
+      Rails.logger.error "❌ #{I18n.t('planning.smart_planning_errors.failed_to_build_scene', scene_number: scene_number, error: e.message)}"
       false
     end
 

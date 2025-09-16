@@ -37,8 +37,8 @@ module Planning
     end
 
     def validation_error
-      return Result.new(success?: false, error_message: "No strategy found to refine.") unless strategy
-      Result.new(success?: false, error_message: "Invalid week number. Please select a week between 1 and 4.")
+      return Result.new(success?: false, error_message: I18n.t("planning.errors.no_strategy_to_refine")) unless strategy
+      Result.new(success?: false, error_message: I18n.t("planning.errors.invalid_week_number"))
     end
 
     def perform_refinement
@@ -50,9 +50,9 @@ module Planning
 
     def success_result
       message = if target_week
-                  "Week #{target_week} content refinement has been started! Please come back to this page in a few minutes to see your refined content."
+                  I18n.t("planning.messages.week_refinement_started", week: target_week)
       else
-                  "Content refinement has been started! Please come back to this page in a few minutes to see your refined content."
+                  I18n.t("planning.messages.content_refinement_started")
       end
 
       Result.new(success?: true, success_message: message)
@@ -70,7 +70,7 @@ module Planning
 
     def generic_error_message
       context = target_week ? "week #{target_week} " : ""
-      "Failed to refine #{context}content. Please try again."
+      I18n.t("planning.messages.failed_to_refine_content", context: context)
     end
   end
 end
