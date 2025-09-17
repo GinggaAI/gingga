@@ -629,7 +629,7 @@ RSpec.describe PlanningPresenter do
       end
 
       it 'returns true when content has beats and is not draft' do
-        expect(presenter.send(:show_beats_for_content?, content_piece)).to be true
+        expect(presenter.show_beats_for_content?(content_piece)).to be true
       end
     end
 
@@ -642,7 +642,7 @@ RSpec.describe PlanningPresenter do
       end
 
       it 'returns false for draft status' do
-        expect(presenter.send(:show_beats_for_content?, content_piece)).to be false
+        expect(presenter.show_beats_for_content?(content_piece)).to be false
       end
     end
 
@@ -655,7 +655,7 @@ RSpec.describe PlanningPresenter do
       end
 
       it 'returns false when beats array is empty' do
-        expect(presenter.send(:show_beats_for_content?, content_piece)).to be false
+        expect(presenter.show_beats_for_content?(content_piece)).to be false
       end
     end
 
@@ -668,15 +668,272 @@ RSpec.describe PlanningPresenter do
       end
 
       it 'returns false when beats is nil' do
-        expect(presenter.send(:show_beats_for_content?, content_piece)).to be false
+        expect(presenter.show_beats_for_content?(content_piece)).to be false
       end
     end
 
     context 'with non-hash content piece' do
       it 'returns false for non-hash input' do
-        expect(presenter.send(:show_beats_for_content?, 'invalid')).to be false
-        expect(presenter.send(:show_beats_for_content?, nil)).to be false
-        expect(presenter.send(:show_beats_for_content?, [])).to be false
+        expect(presenter.show_beats_for_content?('invalid')).to be false
+        expect(presenter.show_beats_for_content?(nil)).to be false
+        expect(presenter.show_beats_for_content?([])).to be false
+      end
+    end
+  end
+
+  describe '#show_create_reel_button_for_content?' do
+    let(:presenter) { described_class.new({}) }
+
+    context 'with compatible template and refined status' do
+      let(:content_piece) do
+        {
+          'template' => 'only_avatars',
+          'status' => 'in_production'
+        }
+      end
+
+      it 'returns true for compatible template and refined status' do
+        expect(presenter.show_create_reel_button_for_content?(content_piece)).to be true
+      end
+    end
+
+    context 'with avatar_and_video template and refined status' do
+      let(:content_piece) do
+        {
+          'template' => 'avatar_and_video',
+          'status' => 'in_production'
+        }
+      end
+
+      it 'returns true for avatar_and_video template' do
+        expect(presenter.show_create_reel_button_for_content?(content_piece)).to be true
+      end
+    end
+
+    context 'with incompatible template' do
+      let(:content_piece) do
+        {
+          'template' => 'other_template',
+          'status' => 'in_production'
+        }
+      end
+
+      it 'returns false for incompatible template' do
+        expect(presenter.show_create_reel_button_for_content?(content_piece)).to be false
+      end
+    end
+
+    context 'with compatible template but wrong status' do
+      let(:content_piece) do
+        {
+          'template' => 'only_avatars',
+          'status' => 'draft'
+        }
+      end
+
+      it 'returns false for non-refined status' do
+        expect(presenter.show_create_reel_button_for_content?(content_piece)).to be false
+      end
+    end
+
+    context 'with non-hash content piece' do
+      it 'returns false for non-hash input' do
+        expect(presenter.show_create_reel_button_for_content?('invalid')).to be false
+        expect(presenter.show_create_reel_button_for_content?(nil)).to be false
+        expect(presenter.show_create_reel_button_for_content?([])).to be false
+      end
+    end
+
+    context 'with missing template' do
+      let(:content_piece) do
+        {
+          'status' => 'in_production'
+        }
+      end
+
+      it 'returns false when template is missing' do
+        expect(presenter.show_create_reel_button_for_content?(content_piece)).to be_falsey
+      end
+    end
+  end
+
+  describe '#format_content_for_reel_creation' do
+    let(:presenter) { described_class.new({}) }
+
+    context 'with valid content piece' do
+      let(:content_piece) do
+        {
+          'title' => 'Content Title',
+          'content_name' => 'Content Name',
+          'description' => 'Content Description',
+          'post_description' => 'Post Description',
+          'template' => 'only_avatars',
+          'scenes' => [
+            { 'scene_number' => 1, 'voiceover' => 'Scene 1' },
+            { 'scene_number' => 2, 'voiceover' => 'Scene 2' }
+          ]
+        }
+      end
+
+      it 'formats content piece for reel creation' do
+        result = presenter.format_content_for_reel_creation(content_piece)
+
+        expect(result).to eq({
+          title: 'Content Title',
+          content_name: 'Content Name',
+          description: 'Content Description',
+          post_description: 'Post Description',
+          template: 'only_avatars',
+          shotplan: {
+            scenes: [
+              { 'scene_number' => 1, 'voiceover' => 'Scene 1' },
+              { 'scene_number' => 2, 'voiceover' => 'Scene 2' }
+            ]
+          }
+        })
+      end
+    end
+
+    context 'with content piece using fallback fields' do
+      let(:content_piece) do
+        {
+          'content_name' => 'Fallback Name',
+          'post_description' => 'Fallback Description',
+          'template' => 'avatar_and_video'
+        }
+      end
+
+      it 'uses fallback fields when primary fields are missing' do
+        result = presenter.format_content_for_reel_creation(content_piece)
+
+        expect(result).to eq({
+          title: 'Fallback Name',
+          content_name: 'Fallback Name',
+          description: 'Fallback Description',
+          post_description: 'Fallback Description',
+          template: 'avatar_and_video',
+          shotplan: {
+            scenes: []
+          }
+        })
+      end
+    end
+
+    context 'with non-hash content piece' do
+      it 'returns empty hash for non-hash input' do
+        expect(presenter.format_content_for_reel_creation('invalid')).to eq({})
+        expect(presenter.format_content_for_reel_creation(nil)).to eq({})
+        expect(presenter.format_content_for_reel_creation([])).to eq({})
+      end
+    end
+  end
+
+  describe '#content_icon_for' do
+    let(:presenter) { described_class.new({}) }
+
+    context 'with content type specified' do
+      it 'returns type icon when content type is provided' do
+        expect(presenter.content_icon_for('Instagram', 'Reel')).to eq('🎬')
+        expect(presenter.content_icon_for('Instagram', 'Post')).to eq('📸')
+        expect(presenter.content_icon_for('Instagram', 'Story')).to eq('📱')
+        expect(presenter.content_icon_for('Instagram', 'Carousel')).to eq('🖼️')
+        expect(presenter.content_icon_for('Instagram', 'Video')).to eq('🎥')
+      end
+    end
+
+    context 'with platform but no content type' do
+      it 'returns platform icon when content type is not provided' do
+        expect(presenter.content_icon_for('Instagram', nil)).to eq('📸')
+        expect(presenter.content_icon_for('TikTok', nil)).to eq('🎵')
+        expect(presenter.content_icon_for('YouTube', nil)).to eq('🎥')
+        expect(presenter.content_icon_for('Facebook', nil)).to eq('👥')
+        expect(presenter.content_icon_for('Twitter', nil)).to eq('🐦')
+        expect(presenter.content_icon_for('LinkedIn', nil)).to eq('💼')
+      end
+    end
+
+    context 'with unknown platform and content type' do
+      it 'returns default reel icon for unknown platform' do
+        expect(presenter.content_icon_for('UnknownPlatform', nil)).to eq('🎬')
+        expect(presenter.content_icon_for(nil, nil)).to eq('🎬')
+      end
+    end
+
+    context 'with unknown content type' do
+      it 'falls back to platform icon for unknown content type' do
+        expect(presenter.content_icon_for('Instagram', 'UnknownType')).to eq('📸')
+      end
+    end
+  end
+
+  describe '#status_css_classes_for' do
+    let(:presenter) { described_class.new({}) }
+
+    it 'returns correct CSS classes for each status' do
+      expect(presenter.status_css_classes_for('draft')).to eq('content-status content-status--draft')
+      expect(presenter.status_css_classes_for('in_production')).to eq('content-status content-status--in-production')
+      expect(presenter.status_css_classes_for('ready_for_review')).to eq('content-status content-status--ready-for-review')
+      expect(presenter.status_css_classes_for('approved')).to eq('content-status content-status--approved')
+    end
+
+    it 'returns default draft styles for unknown status' do
+      expect(presenter.status_css_classes_for('unknown_status')).to eq('content-status content-status--draft')
+      expect(presenter.status_css_classes_for(nil)).to eq('content-status content-status--draft')
+    end
+  end
+
+  describe '#status_detail_colors_for' do
+    let(:presenter) { described_class.new({}) }
+
+    it 'returns correct CSS classes for each status detail' do
+      expect(presenter.status_detail_colors_for('draft')).to eq('content-status-detail--draft')
+      expect(presenter.status_detail_colors_for('in_production')).to eq('content-status-detail--in-production')
+      expect(presenter.status_detail_colors_for('ready_for_review')).to eq('content-status-detail--ready-for-review')
+      expect(presenter.status_detail_colors_for('approved')).to eq('content-status-detail--approved')
+    end
+
+    it 'returns default draft CSS class for unknown status' do
+      expect(presenter.status_detail_colors_for('unknown_status')).to eq('content-status-detail--draft')
+      expect(presenter.status_detail_colors_for(nil)).to eq('content-status-detail--draft')
+    end
+  end
+
+  describe '#formatted_title_for_content' do
+    let(:presenter) { described_class.new({}) }
+
+    context 'with title field' do
+      it 'uses short title without truncation' do
+        content_piece = { 'title' => 'Short Title' }
+        expect(presenter.formatted_title_for_content(content_piece)).to eq('Short Title')
+      end
+
+      it 'truncates titles that exceed max length' do
+        content_piece = { 'title' => 'This is a test title' }
+        expect(presenter.formatted_title_for_content(content_piece)).to eq('This is a test tit...')
+      end
+
+      it 'truncates long titles with custom max length' do
+        long_title = 'A' * 30
+        content_piece = { 'title' => long_title }
+        result = presenter.formatted_title_for_content(content_piece, 18)
+        expect(result).to eq('A' * 18 + '...')
+      end
+    end
+
+    context 'with fallback fields' do
+      it 'uses hook field when title is not available' do
+        content_piece = { 'hook' => 'Test Hook' }
+        expect(presenter.formatted_title_for_content(content_piece)).to eq('Test Hook')
+      end
+
+      it 'uses cta field when title and hook are not available' do
+        content_piece = { 'cta' => 'Test CTA' }
+        expect(presenter.formatted_title_for_content(content_piece)).to eq('Test CTA')
+      end
+
+      it 'uses Draft as ultimate fallback' do
+        content_piece = {}
+        expect(presenter.formatted_title_for_content(content_piece)).to eq('Draft')
       end
     end
   end

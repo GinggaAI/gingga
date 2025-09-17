@@ -1,0 +1,83 @@
+- content_id = "content-#{Time.current.to_i}-#{rand(1000)}"
+- title = content_piece["title"] || 'Content Draft'
+- platform = content_piece["platform"] || 'Instagram'
+- content_type = content_piece["type"] || content_piece["content_type"] || 'Post'
+- status = content_piece["status"] || 'draft'
+- pilar = content_piece["pilar"] || content_piece["pillar"] || ''
+- status_css_class = presenter.status_detail_colors_for(status)
+
+%div{id: content_id, class: "bg-white p-4 rounded shadow-sm #{status_css_class}"}
+  .flex.justify-between.items-start.mb-3
+    %div
+      %h4.text-lg.font-semibold.text-gray-900= title
+      .flex.items-center.gap-2.mt-1
+        %span{class: "text-xs px-2 py-1 rounded font-medium #{status_css_class}"}= status.humanize.upcase
+        %span.bg-gray-100.text-gray-700.text-xs.px-2.py-1.rounded= "#{platform} #{content_type}"
+        - if pilar.present?
+          %span.bg-indigo-100.text-indigo-700.text-xs.px-2.py-1.rounded= "Pillar #{pilar}"
+    %button.text-gray-400.hover:text-gray-600.text-lg.font-bold{onclick: "this.closest('.bg-white').remove()"} &times;
+
+  .grid.grid-cols-1.md:grid-cols-2.gap-4
+    / Left Column: Core Content
+    .space-y-3
+      - if content_piece["hook"].present?
+        .bg-blue-50.p-3.rounded
+          %h5.font-medium.text-gray-900.mb-1 🎣 #{t('planning.content_pieces.hook_label')}
+          %p.text-sm.text-gray-700= content_piece["hook"]
+
+      - if content_piece["description"].present?
+        .bg-yellow-50.p-3.rounded
+          %h5.font-medium.text-gray-900.mb-1 📝 #{t('planning.content_pieces.description')}
+          %p.text-sm.text-gray-700= content_piece["description"]
+
+      - if content_piece["cta"].present?
+        .bg-green-50.p-3.rounded
+          %h5.font-medium.text-gray-900.mb-1 📢 #{t('planning.content_pieces.call_to_action')}
+          %p.text-sm.text-gray-700= content_piece["cta"]
+
+      - if content_piece["text_base"].present?
+        .bg-slate-50.p-3.rounded
+          %h5.font-medium.text-gray-900.mb-1 📄 #{t('planning.content_pieces.text_base')}
+          %p.text-sm.text-gray-700.whitespace-pre-line= content_piece["text_base"]
+
+    / Right Column: Production Details
+    .space-y-3
+      - if content_piece["visual_notes"].present?
+        .bg-purple-50.p-3.rounded
+          %h5.font-medium.text-gray-900.mb-1 🎨 #{t('planning.content_pieces.visual_notes')}
+          %p.text-sm.text-gray-700= content_piece["visual_notes"]
+
+      - if content_piece["template"].present?
+        .bg-indigo-50.p-3.rounded
+          %h5.font-medium.text-gray-900.mb-1 🎬 #{t('planning.content_pieces.template')}
+          %p.text-sm.text-gray-700= content_piece["template"].humanize
+
+      - if content_piece["hashtags"].present?
+        .bg-cyan-50.p-3.rounded
+          %h5.font-medium.text-gray-900.mb-1 #️⃣ #{t('planning.content_pieces.hashtags')}
+          %p.text-sm.text-gray-700= content_piece["hashtags"]
+
+      - if content_piece["kpi_focus"].present?
+        .bg-orange-50.p-3.rounded
+          %h5.font-medium.text-gray-900.mb-1 🎯 #{t('planning.content_pieces.kpi_focus')}
+          %p.text-sm.text-gray-700= content_piece["kpi_focus"]
+
+      - if content_piece["success_criteria"].present?
+        .bg-teal-50.p-3.rounded
+          %h5.font-medium.text-gray-900.mb-1 📊 #{t('planning.content_pieces.success_criteria')}
+          %p.text-sm.text-gray-700= content_piece["success_criteria"]
+
+  - if content_piece["publish_date"] || content_piece["scheduled_day"]
+    .mt-4.p-3.bg-blue-50.rounded
+      %h5.font-medium.text-gray-900.mb-2 📅 #{t('planning.content_pieces.scheduling')}
+      .flex.gap-4.text-sm
+        - if content_piece["publish_date"]
+          %span.text-gray-700
+            %strong #{t('planning.content_pieces.publish_date')}:
+            = content_piece["publish_date"]
+        - if content_piece["scheduled_day"]
+          %span.text-gray-700
+            %strong #{t('planning.content_pieces.day')}:
+            = content_piece["scheduled_day"]
+
+  = render Ui::PlanningComponent.new(content_piece: content_piece, presenter: presenter)

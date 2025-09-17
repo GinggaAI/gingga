@@ -33,7 +33,144 @@ class PlanningPresenter
     plan_hash["content_items"] = format_content_items(plan.creas_content_items)
     plan_hash["weekly_plan"] = format_weekly_plan_with_items(plan)
 
-    plan_hash.to_json.html_safe
+    # Return raw JSON - escaping will be handled at template level
+    plan_hash.to_json
+  end
+
+  # View logic encapsulation per CLAUDE.md line 84
+  # Business logic for whether to show beats section
+  def show_beats_for_content?(content_piece)
+    return false unless content_piece.is_a?(Hash)
+    return false unless content_piece["beats"]&.any?
+    return false if content_piece["status"] == "draft"
+
+    true
+  end
+
+  # Business logic for whether to show create reel button
+  def show_create_reel_button_for_content?(content_piece)
+    return false unless content_piece.is_a?(Hash)
+
+    compatible_templates = [ "only_avatars", "avatar_and_video" ]
+    has_compatible_template = content_piece["template"] && compatible_templates.include?(content_piece["template"])
+    is_refined = content_piece["status"] == "in_production"
+
+    has_compatible_template && is_refined
+  end
+
+  # Format content piece data for reel creation
+  def format_content_for_reel_creation(content_piece)
+    return {} unless content_piece.is_a?(Hash)
+
+    {
+      title: content_piece["title"] || content_piece["content_name"],
+      content_name: content_piece["content_name"],
+      description: content_piece["description"] || content_piece["post_description"],
+      post_description: content_piece["post_description"],
+      template: content_piece["template"],
+      shotplan: {
+        scenes: content_piece["scenes"] || []
+      }
+    }
+  end
+
+  # Get content icon based on platform and type
+  def content_icon_for(platform, content_type)
+    platform_icons = {
+      "Instagram" => "📸",
+      "TikTok" => "🎵",
+      "YouTube" => "🎥",
+      "Facebook" => "👥",
+      "Twitter" => "🐦",
+      "LinkedIn" => "💼"
+    }
+
+    type_icons = {
+      "Reel" => "🎬",
+      "Post" => "📸",
+      "Story" => "📱",
+      "Carousel" => "🖼️",
+      "Video" => "🎥"
+    }
+
+    # Since all content is reels for now, prioritize reel icon
+    return type_icons[content_type] if content_type && type_icons[content_type]
+    platform_icons[platform] || "🎬"
+  end
+
+  # Get CSS classes for content status
+  def status_css_classes_for(status)
+    base_classes = "content-status"
+    status_class = case status
+    when "draft"
+                     "content-status--draft"
+    when "in_production"
+                     "content-status--in-production"
+    when "ready_for_review"
+                     "content-status--ready-for-review"
+    when "approved"
+                     "content-status--approved"
+    else
+                     "content-status--draft"
+    end
+
+    "#{base_classes} #{status_class}"
+  end
+
+  # Get detailed status colors for content details
+  def status_detail_colors_for(status)
+    status_class = case status
+    when "draft"
+                     "content-status-detail--draft"
+    when "in_production"
+                     "content-status-detail--in-production"
+    when "ready_for_review"
+                     "content-status-detail--ready-for-review"
+    when "approved"
+                     "content-status-detail--approved"
+    else
+                     "content-status-detail--draft"
+    end
+
+    # Return single CSS class instead of hash for easier usage
+    status_class
+  end
+
+  # Format content title with truncation
+  def formatted_title_for_content(content_piece, max_length = 18)
+    title = content_piece["title"] || content_piece["hook"] || content_piece["cta"] || "Draft"
+    title.length > max_length ? "#{title[0...max_length]}..." : title
+  end
+
+  def current_plan
+    # If a plan was passed from the controller, use it
+    return @current_plan if @current_plan
+
+    return nil unless @brand
+
+    # Check if we have a specific plan_id parameter
+    if @params[:plan_id]
+      return @brand.creas_strategy_plans.find_by(id: @params[:plan_id])
+    end
+
+    # If there's a month parameter but it's invalid, return nil (don't fallback to current month)
+    if @params[:month].present? && safe_month_param.nil?
+      return nil
+    end
+
+    # Use the month parameter if available, otherwise use current month
+    month_to_search = safe_month_param || current_month
+
+    # Try exact match first
+    plan = @brand.creas_strategy_plans.where(month: month_to_search).order(created_at: :desc).first
+
+    # Try normalized format if not found
+    if plan.nil?
+      normalized_month = normalize_month_format(month_to_search)
+      plan = @brand.creas_strategy_plans.where(month: normalized_month).order(created_at: :desc).first
+    end
+
+    plan
   end
 
   private
@@ -110,45 +247,18 @@ class PlanningPresenter
     weekly_plan
   end
 
-  def current_plan
-    # If a plan was passed from the controller, use it
-    return @current_plan if @current_plan
-
-    return nil unless @brand
-
-    # Check if we have a specific plan_id parameter
-    if @params[:plan_id]
-      return @brand.creas_strategy_plans.find_by(id: @params[:plan_id])
-    end
-
-    # If there's a month parameter but it's invalid, return nil (don't fallback to current month)
-    if @params[:month].present? && safe_month_param.nil?
-      return nil
-    end
-
-    # Use the month parameter if available, otherwise use current month
-    month_to_search = safe_month_param || current_month
-
-    # Try exact match first
-    plan = @brand.creas_strategy_plans.where(month: month_to_search).order(created_at: :desc).first
-
-    # Try normalized format if not found
-    if plan.nil?
-      normalized_month = normalize_month_format(month_to_search)
-      plan = @brand.creas_strategy_plans.where(month: normalized_month).order(created_at: :desc).first
-    end
-
-    plan
-  end
-
-  private
-
   def safe_month_param
     month = @params[:month]
     return nil unless month.is_a?(String)
 
-    # Only allow YYYY-MM or YYYY-M format
-    return month if month.match?(/\A\d{4}-\d{1,2}\z/)
+    # Only allow YYYY-MM or YYYY-M format and validate it's a real date
+    return nil unless month.match?(/\A\d{4}-\d{1,2}\z/)
+
+    # Additional validation to ensure it's a valid date
+    year, month_num = month.split("-")
+    Date.new(year.to_i, month_num.to_i)
+    month
+  rescue ArgumentError, Date::Error
     nil
   end
 
@@ -177,15 +287,5 @@ class PlanningPresenter
     else
       "#{year}-#{month_num.to_i}"
     end
-  end
-
-  # View logic encapsulation per CLAUDE.md line 84
-  # Business logic for whether to show beats section
-  def show_beats_for_content?(content_piece)
-    return false unless content_piece.is_a?(Hash)
-    return false unless content_piece["beats"]&.any?
-    return false if content_piece["status"] == "draft"
-
-    true
   end
 end

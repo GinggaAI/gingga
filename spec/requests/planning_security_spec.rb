@@ -23,8 +23,8 @@ RSpec.describe "Planning Security", type: :request do
         expect(response).to have_http_status(:success)
         # The malicious script should NOT appear in the response
         expect(response.body).not_to include("alert('xss')")
-        # The JavaScript should contain the safe fallback
-        expect(response.body).to include("window.currentMonth = '#{Date.current.strftime("%Y-%-m")}'")
+        # The JavaScript should contain the safe fallback (JSON format)
+        expect(response.body).to include("window.currentMonth = \"#{Date.current.strftime("%Y-%-m")}\";")
       end
 
       it "displays safe fallback text in the month display" do
@@ -54,7 +54,7 @@ RSpec.describe "Planning Security", type: :request do
 
         expect(response).to have_http_status(:success)
         expect(response.body).to include("August 2025")
-        expect(response.body).to include("window.currentMonth = '2025-08'")
+        expect(response.body).to include("window.currentMonth = \"2025-08\";")
       end
     end
   end

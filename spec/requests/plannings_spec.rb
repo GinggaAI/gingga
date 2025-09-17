@@ -101,7 +101,7 @@ RSpec.describe PlanningsController, type: :request do
     end
   end
 
-  describe "GET /planning/strategy_for_month" do
+  describe "GET /planning/strategies/for_month" do
     before { brand }
 
     context "when strategy exists for the month" do
@@ -115,7 +115,7 @@ RSpec.describe PlanningsController, type: :request do
       end
 
       it "returns the strategy as JSON" do
-        get strategy_for_month_planning_path, params: { month: "2024-8" }
+        get for_month_planning_strategies_path, params: { month: "2024-8" }
         expect(response).to have_http_status(:success)
 
         json_response = JSON.parse(response.body)
@@ -125,7 +125,7 @@ RSpec.describe PlanningsController, type: :request do
 
       it "handles different month formats" do
         # Test with zero-padded month
-        get strategy_for_month_planning_path, params: { month: "2024-08" }
+        get for_month_planning_strategies_path, params: { month: "2024-08" }
         expect(response).to have_http_status(:success)
 
         json_response = JSON.parse(response.body)
@@ -135,7 +135,7 @@ RSpec.describe PlanningsController, type: :request do
 
     context "when no strategy exists for the month" do
       it "returns 404 with error message" do
-        get strategy_for_month_planning_path, params: { month: "2024-7" }
+        get for_month_planning_strategies_path, params: { month: "2024-7" }
         expect(response).to have_http_status(:not_found)
 
         json_response = JSON.parse(response.body)
@@ -159,7 +159,7 @@ RSpec.describe PlanningsController, type: :request do
     end
 
     it "finds strategy with padded month when searching unpadded" do
-      get strategy_for_month_planning_path, params: { month: "2024-8" }
+      get for_month_planning_strategies_path, params: { month: "2024-8" }
       expect(response).to have_http_status(:success)
 
       json_response = JSON.parse(response.body)
@@ -167,7 +167,7 @@ RSpec.describe PlanningsController, type: :request do
     end
 
     it "finds strategy with unpadded month when searching padded" do
-      get strategy_for_month_planning_path, params: { month: "2024-07" }
+      get for_month_planning_strategies_path, params: { month: "2024-07" }
       expect(response).to have_http_status(:success)
 
       json_response = JSON.parse(response.body)
@@ -175,7 +175,7 @@ RSpec.describe PlanningsController, type: :request do
     end
   end
 
-  describe "POST /planning/voxa_refine" do
+  describe "POST /planning/content_refinements" do
     let!(:strategy_plan) do
       create(:creas_strategy_plan,
         user: user,
@@ -190,7 +190,7 @@ RSpec.describe PlanningsController, type: :request do
         # Mock the service to prevent actual job execution
         allow_any_instance_of(Creas::VoxaContentService).to receive(:call).and_return(strategy_plan)
 
-        post voxa_refine_planning_path, params: { plan_id: strategy_plan.id }
+        post planning_content_refinements_path, params: { plan_id: strategy_plan.id }
 
         expect(response).to redirect_to(planning_path(plan_id: strategy_plan.id))
         expect(flash[:notice]).to include("Content refinement has been started!")
@@ -204,7 +204,7 @@ RSpec.describe PlanningsController, type: :request do
       end
 
       it "shows alert about already processing" do
-        post voxa_refine_planning_path, params: { plan_id: strategy_plan.id }
+        post planning_content_refinements_path, params: { plan_id: strategy_plan.id }
 
         expect(response).to redirect_to(planning_path(plan_id: strategy_plan.id))
         expect(flash[:alert]).to include("already in progress")
@@ -214,7 +214,7 @@ RSpec.describe PlanningsController, type: :request do
 
     context "when no strategy is found" do
       it "shows error message" do
-        post voxa_refine_planning_path, params: { plan_id: "nonexistent" }
+        post planning_content_refinements_path, params: { plan_id: "nonexistent" }
 
         expect(response).to redirect_to(planning_path)
         expect(flash[:alert]).to include("No strategy found")
@@ -227,11 +227,11 @@ RSpec.describe PlanningsController, type: :request do
       end
 
       it "shows error message" do
-        post voxa_refine_planning_path, params: { plan_id: strategy_plan.id }
+        post planning_content_refinements_path, params: { plan_id: strategy_plan.id }
 
         expect(response).to redirect_to(planning_path(plan_id: strategy_plan.id))
         expect(flash[:alert]).to include("Failed to refine content")
-        expect(flash[:alert]).to include("Unexpected error")
+        expect(flash[:alert]).to include("Please try again")
       end
     end
   end

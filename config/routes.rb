@@ -7,16 +7,35 @@ Rails.application.routes.draw do
     resource :brand, only: [ :show, :edit, :update ]
     get "/my-brand", to: "brands#edit", as: "my_brand"
 
+    # Planning Display - Single Responsibility
     resource :planning, only: [ :show ] do
       member do
         get :strategy_for_month
-        post :voxa_refine
-        post :voxa_refine_week
       end
+    end
+
+    # Planning-related specialized controllers
+    namespace :planning do
+      # Strategy API endpoints
+      resources :strategies, only: [] do
+        collection do
+          get :for_month
+        end
+      end
+
+      # Content refinement operations
+      resources :content_refinements, only: [ :create ] do
+        collection do
+          post :week, action: :create  # For week-specific refinements
+        end
+      end
+
+      # Content details AJAX
+      resource :content_details, only: [ :show ]
     end
     get "/smart-planning", to: "plannings#smart_planning", as: "smart_planning"
 
-    resources :reels, only: [ :index, :new, :create, :show ] do
+    resources :reels, only: [ :index, :new, :create, :show, :edit ] do
       collection do
         get "scene-based", to: "reels#new", defaults: { template: "only_avatars" }, as: :scene_based
         get "narrative", to: "reels#new", defaults: { template: "narration_over_7_images" }, as: :narrative

@@ -24,6 +24,68 @@ es:
     account_subtitle: "Gestiona la configuración de tu cuenta y preferencias de idioma"
     language_settings: "Configuración de Idioma"
     language_subtitle: "Elige tu idioma preferido para la interfaz"
+
+    # Mensajes flash
+    flash:
+      success: "Éxito"
+      error: "Error"
+
+    # Pestañas
+    tabs:
+      api_integrations: "Integraciones API"
+      account: "Cuenta"
+      security: "Seguridad"
+
+    # Integraciones API
+    api:
+      overview_title: "Resumen de Integraciones API"
+      active_connections: "Conexiones Activas"
+      available_services: "Servicios Disponibles"
+      test_mode: "Modo de Prueba"
+
+      # OpenAI
+      openai:
+        title: "OpenAI"
+        description: "Generación de texto IA y creación de contenido"
+        not_configured: "No configurado"
+        get_api_key: "Obtener Clave API"
+        api_key_label: "Clave API"
+        api_key_placeholder: "Ingresa tu clave API de OpenAI..."
+        api_key_example: "Ejemplo: sk-proj-abc123..."
+        test_mode_label: "Modo de Prueba"
+        test_mode_description: "Usar para desarrollo y pruebas"
+        validate: "Validar"
+
+      # HeyGen
+      heygen:
+        title: "Heygen"
+        description: "Creación de avatares IA y generación de video"
+        api_key_label: "Clave API"
+        api_key_placeholder: "Ingresa tu clave API de HeyGen..."
+        api_key_example: "Ejemplo: hg_abc123..."
+        group_url_label: "URL de Grupo (Opcional)"
+        group_url_placeholder: "https://app.heygen.com/avatars?groupId=..."
+        group_url_help: "Deja vacío para sincronizar todos los avatares, o pega la URL del grupo HeyGen para sincronizar solo grupo específico"
+        voices_count_label: "Número de Voces a Sincronizar"
+        voices_count_help: "Elige cuántas voces sincronizar (1-30)"
+        save: "Guardar"
+        validate: "Validar"
+        validate_confirm: "Esto sincronizará tus avatares y voces de HeyGen. ¿Continuar?"
+        validating: "Validando..."
+
+      # Kling AI
+      kling:
+        title: "Kling AI"
+        description: "Renderizado de video cinemático y efectos"
+        api_key_label: "Clave API"
+        api_key_placeholder: "Ingresa tu clave API de Kling AI..."
+        api_key_example: "Ejemplo: kl_abc123..."
+        validate: "Validar"
+
+      # Aviso de seguridad
+      security_notice:
+        title: "Aviso de Seguridad"
+        message: "Las claves API se cifran y almacenan de forma segura. Nunca compartas tus claves API con otros."
     heygen:
       save_success: "¡Clave API de HeyGen guardada exitosamente!"
       save_failed: "Error al guardar la clave API de HeyGen: %{error}"
@@ -156,7 +218,88 @@ es:
     refine_with_voxa: "Refinar con Voxa"
     add_content: "Agregar Contenido"
     add_new_content: "Agregar Nuevo Contenido"
-    
+    overview: "Resumen"
+
+    # Navegación
+    navigation:
+      previous_month: "Mes anterior"
+      next_month: "Mes siguiente"
+
+    # Formulario de estrategia
+    strategy_form:
+      title: "🧠 Generar Nueva Estrategia de Contenido"
+      objective_label: "Objetivo del Mes"
+      monthly_themes: "Temas Mensuales"
+      frequency_per_week: "Frecuencia por Semana"
+      resources_override: "Anulación de Recursos"
+      cancel: "Cancelar"
+      generate_strategy: "Generar Estrategia"
+
+    # Calendario
+    calendar:
+      week_1: "Semana 1"
+      week_2: "Semana 2"
+      week_3: "Semana 3"
+      week_4: "Semana 4"
+      monday: "Lun"
+      tuesday: "Mar"
+      wednesday: "Mié"
+      thursday: "Jue"
+      friday: "Vie"
+      saturday: "Sáb"
+      sunday: "Dom"
+      goal: "Objetivo:"
+      awareness: "Conciencia"
+
+    # Content pieces
+    content_pieces:
+      create_reel: "Crear Reel"
+      create_reel_description: "Este contenido está listo para ser convertido en un reel con datos precargados."
+      shot_plan_scenes: "Plan de Rodaje - Escenas"
+      shot_plan_beats: "Plan de Rodaje - Beats"
+      hook: "Gancho:"
+      hook_label: "Gancho"
+      cta: "CTA:"
+      visual: "Visual:"
+      on_screen_text: "Texto en pantalla:"
+      voiceover: "Voz en off:"
+      visual_elements: "Elementos Visuales:"
+      avatar: "Avatar:"
+      voice: "Voz:"
+      image: "Imagen:"
+      scene: "Escena"
+      beat: "Beat"
+
+      # Content detail labels
+      description: "Descripción"
+      call_to_action: "Llamada a la Acción"
+      text_base: "Texto Base"
+      visual_notes: "Notas Visuales"
+      template: "Plantilla"
+      hashtags: "Hashtags"
+      kpi_focus: "Enfoque KPI"
+      success_criteria: "Criterios de Éxito"
+      scheduling: "Programación"
+      publish_date: "Fecha de Publicación"
+      day: "Día"
+
+    # Service errors and messages
+    errors:
+      invalid_content_data_format: "Formato de datos de contenido inválido"
+      failed_to_render_content_details: "Error al renderizar los detalles del contenido"
+      content_data_required: "Los datos de contenido son requeridos"
+      no_strategy_to_refine: "No se encontró estrategia para refinar."
+      invalid_week_number: "Número de semana inválido. Por favor selecciona una semana entre 1 y 4."
+      invalid_month: "Mes Inválido"
+      invalid_template: "Plantilla inválida"
+      validation_failed: "Validación fallida"
+      failed_to_initialize_reel: "Error al inicializar el reel"
+      failed_to_setup_form: "Error al configurar el formulario"
+      smart_planning_preload_failed: "Error al precargar planificación inteligente"
+      reel_initialization_failed: "Error en la inicialización del reel"
+      failed_to_initialize_reel_with_error: "Error al inicializar el reel: %{error}"
+
+
     # Navigation
     navigation:
       previous_month: "Mes anterior"
@@ -285,12 +428,89 @@ es:
       network_error: "Ocurrió un error de red. Por favor intenta de nuevo."
       failed_to_load: "Error al cargar el plan de estrategia"
       no_strategy_to_refine: "No se encontró plan de estrategia para refinar"
+      week_refinement_started: "¡Se ha iniciado el refinamiento del contenido de la semana %{week}! Por favor regresa a esta página en unos minutos para ver tu contenido refinado."
+      content_refinement_started: "¡Se ha iniciado el refinamiento del contenido! Por favor regresa a esta página en unos minutos para ver tu contenido refinado."
+      failed_to_refine_content: "Error al refinar %{context}contenido. Por favor intenta de nuevo."
+
+    # Errores del servicio de precarga de escenas
+    scene_errors:
+      scene_preload_failed: "Error en la precarga de escenas: %{error}"
+      no_script_content_found: "no se encontró contenido del guión"
+      script_too_short: "guión muy corto después de limpieza"
+      avatar_id_blank: "avatar_id está vacío"
+      voice_id_blank: "voice_id está vacío"
+      validation_failed_for_scene: "Validación falló para la escena %{scene_number}: %{errors}"
+      unexpected_error_creating_scene: "Error inesperado creando la escena %{scene_number}: %{error}"
+
+    # Contenido predeterminado de escena
+    default_scene:
+      voiceover: "Contenido predeterminado de la escena %{scene_number}. Por favor edita este guión."
+      description: "Escena predeterminada %{scene_number}"
+
+    # Errores del servicio controlador de planificación inteligente
+    smart_planning_errors:
+      invalid_planning_data_format: "Formato de datos de planificación inválido"
+      failed_to_preload_planning_data: "Error al precargar datos de planificación: %{error}"
+      invalid_json_in_smart_planning_data: "JSON inválido en datos de planificación inteligente: %{error}"
+      failed_to_build_scene: "Error al construir escena %{scene_number}: %{error}"
+
+    # Errores del servicio de precarga de planificación inteligente
+    smart_planning_preload_errors:
+      invalid_planning_data_format: "Formato de datos de planificación inválido"
+      smart_planning_data_preloaded_successfully: "Datos de planificación inteligente precargados exitosamente"
+      preload_failed: "Precarga falló: %{error}"
+      failed_to_parse_smart_planning_data: "Error al analizar datos de planificación inteligente: %{error}"
+      could_not_update_reel_basic_info: "No se pudo actualizar información básica del reel: %{errors}"
+      scenes_preload_service_failed: "ScenesPreloadService falló: %{error}"
+
+    # Mensajes adicionales de JavaScript
+    js_messages:
+      strategy_generation_in_progress: "Generación de Estrategia en Progreso"
+      strategy_being_created: "Tu estrategia de contenido está siendo creada. Esto puede tomar unos momentos."
+      no_strategy_for_month: "Sin Estrategia para %{month}"
+      missing_information_required: "Información Requerida Faltante"
+      brand_profile_missing_info: "A tu perfil de marca le falta información crítica necesaria para generar la estrategia. Por favor completa la configuración de tu marca para continuar."
+      loading_content_details: "Cargando detalles del contenido..."
+      error_loading_content_details: "Error al cargar detalles del contenido"
+      failed_to_load_content_details: "Error al cargar detalles del contenido"
+      invalid_week_number: "Número de semana inválido"
+      refining_week: "Refinando Semana %{week}..."
+      strategy_being_created_alert: "¡La estrategia está siendo creada! Esto puede tomar unos momentos. La página se actualizará automáticamente cuando esté lista."
 
   # Reels
   reels:
     create_reel: "Crear Reel"
     description: "Elige tu método de creación preferido y genera contenido de video atractivo"
     choose_creation_method: "Elige Método de Creación"
+
+    # Página de índice
+    index:
+      title: "Mis Videos"
+      subtitle: "Gestiona y visualiza tu contenido de video creado"
+      create_video: "Crear Video"
+      edit: "Editar"
+      view: "Ver"
+      created_ago: "Creado hace %{time}"
+      scenes_count:
+        one: "%{count} escena"
+        other: "%{count} escenas"
+      no_videos_title: "Aún no hay videos"
+      no_videos_description: "Crea tu primer video para comenzar con la generación de contenido impulsada por IA"
+      create_first_video: "Crear Tu Primer Video"
+
+    # Página de visualización
+    show:
+      my_reels: "Mis Reels"
+      video_status: "Estado del Video: %{status}"
+      your_generated_video: "Tu Video Generado"
+      video_not_supported: "Tu navegador no soporta la etiqueta de video."
+      reel_details: "Detalles del Reel"
+      template: "Plantilla:"
+      created: "Creado:"
+      heygen_video_id: "ID de Video HeyGen:"
+      scenes: "Escenas"
+      scene_number: "Escena %{number}"
+      type: "Tipo: %{type}"
     
     # Tabs
     tabs:
@@ -406,3 +626,4 @@ es:
     # Errors
     errors:
       fix_following: "Por favor corrige los siguientes errores:"
+      invalid_template: "Plantilla inválida o no autorizada solicitada"

@@ -12,8 +12,8 @@ class Reel < ApplicationRecord
   }
   validates :status, inclusion: { in: %w[draft processing completed failed] }
 
-  validate :must_have_exactly_three_scenes, if: -> { template.in?(%w[only_avatars avatar_and_video]) }
-  validate :all_scenes_must_be_complete, if: -> { requires_scenes? }
+  validate :must_have_exactly_three_scenes, if: -> { template.in?(%w[only_avatars avatar_and_video]) && status != "draft" }
+  validate :all_scenes_must_be_complete, if: -> { requires_scenes? && status != "draft" }
 
   scope :by_template, ->(template) { where(template: template) }
   scope :by_status, ->(status) { where(status: status) }
@@ -60,12 +60,14 @@ class Reel < ApplicationRecord
 
   def must_have_exactly_three_scenes
     return unless persisted? # Skip validation for new records
+    return if status == "draft" # Skip validation for draft reels
 
     errors.add(:reel_scenes, "must have exactly 3 scenes for #{template} template") if reel_scenes.count != 3
   end
 
   def all_scenes_must_be_complete
     return unless persisted?
+    return if status == "draft" # Skip validation for draft reels
 
     incomplete_scenes = reel_scenes.reject(&:complete?)
     if incomplete_scenes.any?

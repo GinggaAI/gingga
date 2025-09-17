@@ -25,6 +25,9 @@ RSpec.describe Reel, type: :model do
           create(:reel_scene, reel: reel, scene_number: 1)
           create(:reel_scene, reel: reel, scene_number: 2)
 
+          # Change status to non-draft to trigger validations
+          reel.update_column(:status, 'processing')
+
           expect(reel.reload.valid?).to be false
           reel.reload.valid?
           expect(reel.errors[:reel_scenes]).to include('must have exactly 3 scenes for only_avatars template')
@@ -46,6 +49,9 @@ RSpec.describe Reel, type: :model do
           # Update scenes to be incomplete using update_column to bypass validations
           reel.reel_scenes.by_scene_number(2).first.update_column(:script, '')
           reel.reel_scenes.by_scene_number(3).first.update_column(:script, nil)
+
+          # Change status to non-draft to trigger validations
+          reel.update_column(:status, 'processing')
 
           expect(reel.reload.valid?).to be false
           reel.reload.valid?

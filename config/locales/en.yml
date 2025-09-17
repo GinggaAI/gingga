@@ -53,6 +53,68 @@ en:
     account_subtitle: "Manage your account settings and language preferences"
     language_settings: "Language Settings"
     language_subtitle: "Choose your preferred language for the interface"
+
+    # Flash messages
+    flash:
+      success: "Success"
+      error: "Error"
+
+    # Tabs
+    tabs:
+      api_integrations: "API Integrations"
+      account: "Account"
+      security: "Security"
+
+    # API Integrations
+    api:
+      overview_title: "API Integrations Overview"
+      active_connections: "Active Connections"
+      available_services: "Available Services"
+      test_mode: "Test Mode"
+
+      # OpenAI
+      openai:
+        title: "OpenAI"
+        description: "AI text generation and content creation"
+        not_configured: "Not configured"
+        get_api_key: "Get API Key"
+        api_key_label: "API Key"
+        api_key_placeholder: "Enter your OpenAI API key..."
+        api_key_example: "Example: sk-proj-abc123..."
+        test_mode_label: "Test Mode"
+        test_mode_description: "Use for development and testing"
+        validate: "Validate"
+
+      # HeyGen
+      heygen:
+        title: "Heygen"
+        description: "AI avatar creation and video generation"
+        api_key_label: "API Key"
+        api_key_placeholder: "Enter your HeyGen API key..."
+        api_key_example: "Example: hg_abc123..."
+        group_url_label: "Group URL (Optional)"
+        group_url_placeholder: "https://app.heygen.com/avatars?groupId=..."
+        group_url_help: "Leave empty to sync all avatars, or paste HeyGen group URL to sync only specific group"
+        voices_count_label: "Number of Voices to Sync"
+        voices_count_help: "Choose how many voices to synchronize (1-30)"
+        save: "Save"
+        validate: "Validate"
+        validate_confirm: "This will synchronize your HeyGen avatars and voices. Continue?"
+        validating: "Validating..."
+
+      # Kling AI
+      kling:
+        title: "Kling AI"
+        description: "Cinematic video rendering and effects"
+        api_key_label: "API Key"
+        api_key_placeholder: "Enter your Kling AI API key..."
+        api_key_example: "Example: kl_abc123..."
+        validate: "Validate"
+
+      # Security notice
+      security_notice:
+        title: "Security Notice"
+        message: "API keys are encrypted and stored securely. Never share your API keys with others."
     heygen:
       save_success: "HeyGen API key saved successfully!"
       save_failed: "Failed to save HeyGen API key: %{error}"
@@ -188,6 +250,118 @@ en:
     refine_with_voxa: "Refine with Voxa"
     add_content: "Add Content"
     add_new_content: "Add New Content"
+    overview: "Overview"
+
+    # Navigation
+    navigation:
+      previous_month: "Previous month"
+      next_month: "Next month"
+
+    # Strategy form
+    strategy_form:
+      title: "🧠 Generate New Content Strategy"
+      objective_label: "Objective of the Month"
+      objective_details_label: "Objective Details"
+      objective_details_placeholder: "Describe what you want to achieve this month..."
+      objective_details_help: "Be specific about your goals - this helps create better content"
+      monthly_themes_label: "Monthly Themes"
+      monthly_themes: "Monthly Themes"
+      monthly_themes_placeholder: "e.g., Innovation, Sustainability, Customer Stories..."
+      monthly_themes_help: "Separate multiple themes with commas"
+      frequency_label: "Frequency per Week"
+      frequency_per_week: "Frequency per Week"
+      frequency_placeholder: "How many posts per week?"
+      resources_title: "Content Resources & Tools"
+      resources_subtitle: "Tell us about your available resources to create more realistic strategies"
+      budget_label: "Monthly Content Budget"
+      budget_options:
+        none: "No budget specified"
+        low: "$500 - Basic tools and resources"
+        medium: "$1,000 - Professional tools"
+        high: "$2,500 - Premium tools and outsourcing"
+        premium: "$5,000+ - Full service approach"
+      team_size_label: "Content Team Size"
+      team_size_options:
+        none: "Not specified"
+        solo: "Just me (1 person)"
+        small: "Small team (2 people)"
+        medium: "Medium team (3-4 people)"
+        large: "Large team (5+ people)"
+      design_tools_label: "Available Design Tools"
+      design_tools_help: "Check all tools you have access to"
+      content_resources_label: "Available Content Resources"
+      use_ai_avatars: "AI Avatars (HeyGen, etc.)"
+      use_stock_photos: "Stock Photos/Videos"
+      create_custom_graphics: "Custom Graphics Creation"
+      resources_override: "Resources Override"
+      cancel: "Cancel"
+      generate_strategy: "Generate Strategy"
+      generating: "Generating..."
+
+    # Calendar
+    calendar:
+      week_1: "Week 1"
+      week_2: "Week 2"
+      week_3: "Week 3"
+      week_4: "Week 4"
+      monday: "Mon"
+      tuesday: "Tue"
+      wednesday: "Wed"
+      thursday: "Thu"
+      friday: "Fri"
+      saturday: "Sat"
+      sunday: "Sun"
+      goal: "Goal:"
+      awareness: "Awareness"
+
+    # Content pieces
+    content_pieces:
+      create_reel: "Create Reel"
+      create_reel_description: "This content is ready to be converted to a reel with preloaded data."
+      shot_plan_scenes: "Shot Plan - Scenes"
+      shot_plan_beats: "Shot Plan - Beats"
+      hook: "Hook:"
+      hook_label: "Hook"
+      cta: "CTA:"
+      visual: "Visual:"
+      on_screen_text: "On-screen text:"
+      voiceover: "Voiceover:"
+      visual_elements: "Visual Elements:"
+      avatar: "Avatar:"
+      voice: "Voice:"
+      image: "Image:"
+      scene: "Scene"
+      beat: "Beat"
+
+      # Content detail labels
+      description: "Description"
+      call_to_action: "Call to Action"
+      text_base: "Text Base"
+      visual_notes: "Visual Notes"
+      template: "Template"
+      hashtags: "Hashtags"
+      kpi_focus: "KPI Focus"
+      success_criteria: "Success Criteria"
+      scheduling: "Scheduling"
+      publish_date: "Publish Date"
+      day: "Day"
+
+    # Service errors and messages
+    errors:
+      invalid_content_data_format: "Invalid content data format"
+      failed_to_render_content_details: "Failed to render content details"
+      content_data_required: "Content data is required"
+      no_strategy_to_refine: "No strategy found to refine."
+      invalid_week_number: "Invalid week number. Please select a week between 1 and 4."
+      invalid_month: "Invalid Month"
+      invalid_template: "Invalid template"
+      validation_failed: "Validation failed"
+      failed_to_initialize_reel: "Failed to initialize reel"
+      failed_to_setup_form: "Failed to setup form"
+      smart_planning_preload_failed: "Smart planning preload failed"
+      reel_initialization_failed: "Reel initialization failed"
+      failed_to_initialize_reel_with_error: "Failed to initialize reel: %{error}"
+
     
     # Navigation
     navigation:
@@ -317,12 +491,89 @@ en:
       network_error: "Network error occurred. Please try again."
       failed_to_load: "Failed to load strategy plan"
       no_strategy_to_refine: "No strategy plan found to refine"
+      week_refinement_started: "Week %{week} content refinement has been started! Please come back to this page in a few minutes to see your refined content."
+      content_refinement_started: "Content refinement has been started! Please come back to this page in a few minutes to see your refined content."
+      failed_to_refine_content: "Failed to refine %{context}content. Please try again."
+
+    # Scene preload service errors
+    scene_errors:
+      scene_preload_failed: "Scene preload failed: %{error}"
+      no_script_content_found: "no script content found"
+      script_too_short: "script too short after cleaning"
+      avatar_id_blank: "avatar_id is blank"
+      voice_id_blank: "voice_id is blank"
+      validation_failed_for_scene: "Validation failed for scene %{scene_number}: %{errors}"
+      unexpected_error_creating_scene: "Unexpected error creating scene %{scene_number}: %{error}"
+
+    # Default scene content
+    default_scene:
+      voiceover: "Default scene %{scene_number} content. Please edit this script."
+      description: "Default scene %{scene_number}"
+
+    # Smart planning controller service errors
+    smart_planning_errors:
+      invalid_planning_data_format: "Invalid planning data format"
+      failed_to_preload_planning_data: "Failed to preload planning data: %{error}"
+      invalid_json_in_smart_planning_data: "Invalid JSON in smart planning data: %{error}"
+      failed_to_build_scene: "Failed to build scene %{scene_number}: %{error}"
+
+    # Smart planning preload service errors
+    smart_planning_preload_errors:
+      invalid_planning_data_format: "Invalid planning data format"
+      smart_planning_data_preloaded_successfully: "Smart planning data preloaded successfully"
+      preload_failed: "Preload failed: %{error}"
+      failed_to_parse_smart_planning_data: "Failed to parse smart planning data: %{error}"
+      could_not_update_reel_basic_info: "Could not update reel basic info: %{errors}"
+      scenes_preload_service_failed: "ScenesPreloadService failed: %{error}"
+
+    # Additional JavaScript messages
+    js_messages:
+      strategy_generation_in_progress: "Strategy Generation In Progress"
+      strategy_being_created: "Your content strategy is being created. This may take a few moments."
+      no_strategy_for_month: "No Strategy for %{month}"
+      missing_information_required: "Missing Information Required"
+      brand_profile_missing_info: "Your brand profile is missing some critical information needed to generate the strategy. Please complete your brand setup to proceed."
+      loading_content_details: "Loading content details..."
+      error_loading_content_details: "Error loading content details"
+      failed_to_load_content_details: "Failed to load content details"
+      invalid_week_number: "Invalid week number"
+      refining_week: "Refining Week %{week}..."
+      strategy_being_created_alert: "Strategy is being created! This may take a few moments. The page will update automatically when ready."
 
   # Reels
   reels:
     create_reel: "Create Reel"
     description: "Choose your preferred creation method and generate engaging video content"
     choose_creation_method: "Choose Creation Method"
+
+    # Index page
+    index:
+      title: "My Videos"
+      subtitle: "Manage and view your created video content"
+      create_video: "Create Video"
+      edit: "Edit"
+      view: "View"
+      created_ago: "Created %{time} ago"
+      scenes_count:
+        one: "%{count} scene"
+        other: "%{count} scenes"
+      no_videos_title: "No videos yet"
+      no_videos_description: "Create your first video to get started with AI-powered content generation"
+      create_first_video: "Create Your First Video"
+
+    # Show page
+    show:
+      my_reels: "My Reels"
+      video_status: "Video Status: %{status}"
+      your_generated_video: "Your Generated Video"
+      video_not_supported: "Your browser does not support the video tag."
+      reel_details: "Reel Details"
+      template: "Template:"
+      created: "Created:"
+      heygen_video_id: "HeyGen Video ID:"
+      scenes: "Scenes"
+      scene_number: "Scene %{number}"
+      type: "Type: %{type}"
     
     # Tabs
     tabs:
@@ -438,3 +689,4 @@ en:
     # Errors
     errors:
       fix_following: "Please fix the following errors:"
+      invalid_template: "Invalid or unauthorized template requested"

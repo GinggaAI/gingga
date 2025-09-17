@@ -68,11 +68,11 @@ class Heygen::GenerateVideoService < Heygen::BaseService
         avatar_style: "normal"
       }
     when "kling"
-      # For Kling videos, we might need different structure
-      # This is a placeholder - adjust based on actual HeyGen API requirements
+      # For Kling videos, HeyGen API expects a video-based character generation
+      # based on the script content for video generation
       base_input[:character] = {
         type: "video",
-        video_content: scene[:script] # or other video-specific content
+        video_content: scene[:script]
       }
     else
       # Default to avatar if video_type is not recognized

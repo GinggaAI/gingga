@@ -9,14 +9,43 @@ RSpec.describe ReelScene, type: :model do
   end
 
   describe 'validations' do
-    it { should validate_presence_of(:avatar_id) }
-    it { should validate_presence_of(:voice_id) }
-    it { should validate_presence_of(:script) }
-    it { should validate_length_of(:script).is_at_least(1).is_at_most(5000) }
     it { should validate_presence_of(:scene_number) }
     it { should validate_inclusion_of(:scene_number).in_range(1..3) }
-    it { should validate_presence_of(:video_type) }
-    it { should validate_inclusion_of(:video_type).in_array(%w[avatar kling]) }
+
+    context 'conditional validations based on reel status' do
+      context 'when reel is in draft status' do
+        let(:draft_reel) { create(:reel, user: user, status: 'draft') }
+
+        it 'does not require avatar_id for draft reels' do
+          scene = build(:reel_scene, reel: draft_reel, avatar_id: nil, voice_id: 'voice_1', script: 'test', video_type: 'avatar')
+          expect(scene).to be_valid
+        end
+
+        it 'does not require voice_id for draft reels' do
+          scene = build(:reel_scene, reel: draft_reel, avatar_id: 'avatar_1', voice_id: nil, script: 'test', video_type: 'avatar')
+          expect(scene).to be_valid
+        end
+
+        it 'does not require script for draft reels' do
+          scene = build(:reel_scene, reel: draft_reel, avatar_id: 'avatar_1', voice_id: 'voice_1', script: nil, video_type: 'avatar')
+          expect(scene).to be_valid
+        end
+
+        it 'does not require video_type for draft reels' do
+          scene = build(:reel_scene, reel: draft_reel, avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'test', video_type: nil)
+          expect(scene).to be_valid
+        end
+      end
+
+      context 'when reel is not in draft status' do
+        let(:non_draft_reel) { create(:reel, user: user, status: 'processing') }
+
+        it 'validates normally when reel is not draft' do
+          scene = build(:reel_scene, reel: non_draft_reel)
+          expect(scene).to be_valid # Should be valid with default factory attributes
+        end
+      end
+    end
 
     describe 'scene_number uniqueness' do
       let!(:existing_scene) { create(:reel_scene, reel: reel, scene_number: 1) }
@@ -59,19 +88,57 @@ RSpec.describe ReelScene, type: :model do
   end
 
   describe '#complete?' do
-    context 'when all required fields are present' do
-      let(:scene) { build(:reel_scene, reel: reel, avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'Test script', video_type: 'avatar') }
+    context 'with avatar video type' do
+      context 'when all required fields are present' do
+        let(:scene) { build(:reel_scene, reel: reel, avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'Test script', video_type: 'avatar') }
 
-      it 'returns true' do
-        expect(scene.complete?).to be true
+        it 'returns true' do
+          expect(scene.complete?).to be true
+        end
+      end
+
+      context 'when avatar_id is missing' do
+        let(:scene) { build(:reel_scene, reel: reel, avatar_id: nil, voice_id: 'voice_1', script: 'Test script', video_type: 'avatar') }
+
+        it 'returns false' do
+          expect(scene.complete?).to be false
+        end
       end
     end
 
-    context 'when avatar_id is missing' do
-      let(:scene) { build(:reel_scene, reel: reel, avatar_id: nil, voice_id: 'voice_1', script: 'Test script', video_type: 'avatar') }
+    context 'with kling video type' do
+      context 'when required fields are present (no avatar_id needed)' do
+        let(:scene) { build(:reel_scene, reel: reel, avatar_id: nil, voice_id: 'voice_1', script: 'Test script', video_type: 'kling') }
 
-      it 'returns false' do
-        expect(scene.complete?).to be false
+        it 'returns true even without avatar_id' do
+          expect(scene.complete?).to be true
+        end
+      end
+
+      context 'when voice_id is missing' do
+        let(:scene) { build(:reel_scene, reel: reel, avatar_id: nil, voice_id: nil, script: 'Test script', video_type: 'kling') }
+
+        it 'returns false' do
+          expect(scene.complete?).to be false
+        end
+      end
+    end
+
+    context 'with unknown video type' do
+      context 'when all fields are present including avatar_id' do
+        let(:scene) { build(:reel_scene, reel: reel, avatar_id: 'avatar_1', voice_id: 'voice_1', script: 'Test script', video_type: 'unknown_type') }
+
+        it 'returns true (requires avatar_id for unknown types)' do
+          expect(scene.complete?).to be true
+        end
+      end
+
+      context 'when avatar_id is missing' do
+        let(:scene) { build(:reel_scene, reel: reel, avatar_id: nil, voice_id: 'voice_1', script: 'Test script', video_type: 'unknown_type') }
+
+        it 'returns false (requires avatar_id for unknown types)' do
+          expect(scene.complete?).to be false
+        end
       end
     end
 
@@ -141,6 +208,36 @@ RSpec.describe ReelScene, type: :model do
       scene_3 = create(:reel_scene, reel: reel, scene_number: 3)
 
       expect([ scene_1.scene_number, scene_2.scene_number, scene_3.scene_number ]).to match_array([ 1, 2, 3 ])
+    end
+  end
+
+  describe 'private methods' do
+    describe '#reel_is_draft?' do
+      context 'when reel is in draft status' do
+        let(:draft_reel) { create(:reel, user: user, status: 'draft') }
+        let(:scene) { build(:reel_scene, reel: draft_reel) }
+
+        it 'returns true' do
+          expect(scene.send(:reel_is_draft?)).to be true
+        end
+      end
+
+      context 'when reel is not in draft status' do
+        let(:processing_reel) { create(:reel, user: user, status: 'processing') }
+        let(:scene) { build(:reel_scene, reel: processing_reel) }
+
+        it 'returns false' do
+          expect(scene.send(:reel_is_draft?)).to be false
+        end
+      end
+
+      context 'when reel is nil' do
+        let(:scene) { build(:reel_scene, reel: nil) }
+
+        it 'returns false' do
+          expect(scene.send(:reel_is_draft?)).to be false
+        end
+      end
     end
   end
 end

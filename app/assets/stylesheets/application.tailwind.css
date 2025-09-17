@@ -5,6 +5,7 @@
 @import "./tokens.css";
 @import "./utilities.css";
 @import "./components/status_badge.css";
+@import "./components/content_status.css";
 
 /* Toast Component Styles */
 .ui-toast {

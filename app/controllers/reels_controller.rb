@@ -1,6 +1,6 @@
 class ReelsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_reel, only: [ :show ]
+  before_action :set_reel, only: [ :show, :edit ]
 
   def index
     @reels = current_user.reels.order(created_at: :desc)
@@ -10,31 +10,53 @@ class ReelsController < ApplicationController
     # Show individual reel
   end
 
-  def new
-    template = params[:template]
-    return redirect_to reels_path, alert: "Invalid template" unless valid_template?(template)
+  def edit
+    return error_handler.handle_edit_access_error unless @reel.status == "draft"
 
-    result = ReelCreationService.new(user: current_user, template: template).initialize_reel
+    presenter_result = setup_presenter_for_reel(@reel)
 
-    if result[:success]
-      @reel = result[:reel]
-      setup_presenter(template)
-      render_template_view(template)
+    if presenter_result.success?
+      @presenter = presenter_result.data[:presenter]
+      render presenter_result.data[:view_template]
     else
-      redirect_to reels_path, alert: result[:error]
+      redirect_to reels_path, alert: "Error loading reel for editing: #{presenter_result.error}"
+    end
+  end
+
+  def new
+    # Validate template parameter against allowed templates to prevent dynamic render attacks
+    unless valid_template?(params[:template])
+      redirect_to reels_path, alert: I18n.t("reels.errors.invalid_template")
+      return
+    end
+
+    form_result = Reels::FormSetupService.new(
+      user: current_user,
+      template: params[:template],
+      smart_planning_data: params[:smart_planning_data]
+    ).call
+
+    if form_result[:success]
+      @reel = form_result[:data][:reel]
+      @presenter = form_result[:data][:presenter]
+      # Use safe render with validated template path
+      render_safe_template(form_result[:data][:view_template])
+    else
+      error_handler.handle_form_setup_error(form_result[:error])
     end
   end
 
   def create
-    result = ReelCreationService.new(user: current_user, params: reel_params).call
+    creation_result = ReelCreationService.new(
+      user: current_user,
+      params: reel_params
+    ).call
 
-    if result[:success]
-      redirect_to result[:reel], notice: "Reel created successfully! Your video is being generated with HeyGen and will be ready shortly."
+    if creation_result[:success]
+      redirect_to creation_result[:reel],
+        notice: "Reel created successfully! Your video is being generated with HeyGen and will be ready shortly."
     else
-      @reel = result[:reel]
-      template = @reel&.template || reel_params[:template]
-      setup_presenter(template)
-      render_template_view(template, status: :unprocessable_entity)
+      error_handler.handle_creation_error(creation_result, reel_params)
     end
   end
 
@@ -52,28 +74,33 @@ class ReelsController < ApplicationController
     )
   end
 
+  def setup_presenter_for_reel(reel)
+    Reels::PresenterService.new(
+      reel: reel,
+      template: reel.template,
+      current_user: current_user
+    ).call
+  end
+
+  def error_handler
+    @error_handler ||= Reels::ErrorHandlingService.new(controller: self)
+  end
+
+  # Security: Validate template parameter against whitelist
   def valid_template?(template)
-    %w[only_avatars avatar_and_video narration_over_7_images one_to_three_videos].include?(template)
+    allowed_templates = %w[only_avatars avatar_and_video one_to_three_videos narration_over_7_images]
+    allowed_templates.include?(template)
   end
 
-  def render_template_view(template, **options)
-    case template
-    when "only_avatars", "avatar_and_video", "one_to_three_videos"
-      render "reels/scene_based", **options
-    when "narration_over_7_images"
-      render "reels/narrative", **options
+  # Security: Safe template rendering with path validation
+  def render_safe_template(view_template)
+    allowed_view_templates = %w[reels/scene_based reels/narrative]
+
+    if allowed_view_templates.include?(view_template)
+      render view_template
     else
-      # This should never happen due to validation, but add safety net
-      redirect_to reels_path, alert: "Invalid template"
-    end
-  end
-
-  def setup_presenter(template)
-    case template
-    when "only_avatars", "avatar_and_video", "one_to_three_videos"
-      @presenter = ReelSceneBasedPresenter.new(reel: @reel, current_user: current_user)
-    when "narration_over_7_images"
-      @presenter = ReelNarrativePresenter.new(reel: @reel, current_user: current_user)
+      Rails.logger.error "Security: Attempted to render unauthorized template: #{view_template}"
+      redirect_to reels_path, alert: I18n.t("reels.errors.invalid_template")
     end
   end
 end
