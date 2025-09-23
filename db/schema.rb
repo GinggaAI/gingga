@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_23_145717) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_23_162111) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -236,6 +236,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_23_145717) do
     t.string "status", default: "pending"
     t.text "error_message"
     t.text "objective_details"
+    t.jsonb "selected_templates"
     t.index ["brand_id", "month"], name: "index_creas_strategy_plans_on_brand_id_and_month"
     t.index ["brand_id"], name: "index_creas_strategy_plans_on_brand_id"
     t.index ["status"], name: "index_creas_strategy_plans_on_status"

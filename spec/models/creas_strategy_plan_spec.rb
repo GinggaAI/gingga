@@ -54,6 +54,57 @@ RSpec.describe CreasStrategyPlan, type: :model do
     end
   end
 
+  describe 'selected_templates validation' do
+    let(:strategy_plan) { build(:creas_strategy_plan) }
+
+    it 'is valid with allowed templates' do
+      strategy_plan.selected_templates = [ 'only_avatars', 'avatar_and_video' ]
+      expect(strategy_plan).to be_valid
+    end
+
+    it 'is invalid with empty array when completed' do
+      strategy_plan.selected_templates = []
+      strategy_plan.status = 'completed'
+      expect(strategy_plan).not_to be_valid
+      expect(strategy_plan.errors[:selected_templates]).to include("can't be blank")
+    end
+
+    it 'is invalid with disallowed templates' do
+      strategy_plan.selected_templates = [ 'invalid_template' ]
+      expect(strategy_plan).not_to be_valid
+      expect(strategy_plan.errors[:selected_templates]).to include('contains invalid templates: invalid_template')
+    end
+
+    it 'is invalid when not an array' do
+      strategy_plan.selected_templates = 'not_an_array'
+      expect(strategy_plan).not_to be_valid
+      expect(strategy_plan.errors[:selected_templates]).to include('must be an array')
+    end
+
+    it 'allows nil when pending' do
+      strategy_plan.selected_templates = nil
+      strategy_plan.status = 'pending'
+      expect(strategy_plan).to be_valid
+    end
+
+    it 'is invalid with empty array when provided' do
+      strategy_plan.selected_templates = []
+      expect(strategy_plan).not_to be_valid
+      expect(strategy_plan.errors[:selected_templates]).to include('cannot be empty when provided')
+    end
+  end
+
+  describe 'scopes' do
+    let!(:older_plan) { create(:creas_strategy_plan, created_at: 1.day.ago) }
+    let!(:newer_plan) { create(:creas_strategy_plan, created_at: 1.hour.ago) }
+
+    describe '.recent' do
+      it 'orders plans by created_at descending' do
+        expect(CreasStrategyPlan.recent).to eq([ newer_plan, older_plan ])
+      end
+    end
+  end
+
   describe 'JSONB defaults' do
     let(:strategy_plan) { create(:creas_strategy_plan) }
 

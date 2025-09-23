@@ -7,7 +7,7 @@ FactoryBot.define do
     objective_of_the_month { "Increase brand awareness" }
     frequency_per_week { 3 }
     monthly_themes { [ "innovation", "technology" ] }
-    resources_override { {} }
+    selected_templates { [ "only_avatars" ] }
     content_distribution { {} }
     weekly_plan { [] }
     remix_duet_plan { {} }

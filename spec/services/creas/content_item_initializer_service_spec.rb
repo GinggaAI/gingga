@@ -672,7 +672,11 @@ RSpec.describe Creas::ContentItemInitializerService do
     end
 
     describe '#normalize_template' do
-      let(:service) { described_class.new(strategy_plan: strategy_plan) }
+      let(:strategy_plan_with_all_templates) do
+        build(:creas_strategy_plan,
+              selected_templates: %w[only_avatars avatar_and_video narration_over_7_images remix one_to_three_videos])
+      end
+      let(:service) { described_class.new(strategy_plan: strategy_plan_with_all_templates) }
 
       it 'normalizes various template variations' do
         expect(service.send(:normalize_template, 'solo_avatar')).to eq('only_avatars')
@@ -682,7 +686,7 @@ RSpec.describe Creas::ContentItemInitializerService do
         expect(service.send(:normalize_template, 'remix_video')).to eq('remix')
       end
 
-      it 'defaults unknown templates to only_avatars' do
+      it 'defaults unknown templates to first selected template' do
         expect(service.send(:normalize_template, 'unknown_template')).to eq('only_avatars')
         expect(service.send(:normalize_template, nil)).to eq('only_avatars')
         expect(service.send(:normalize_template, '')).to eq('only_avatars')

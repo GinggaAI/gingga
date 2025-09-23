@@ -45,7 +45,8 @@ class CreateStrategyService
       objective_of_the_month: @strategy_params[:objective_of_the_month],
       objective_details: @strategy_params[:objective_details],
       frequency_per_week: parsed_frequency,
-      monthly_themes: parsed_themes
+      monthly_themes: parsed_themes,
+      selected_templates: parsed_templates
     }
   end
 
@@ -65,7 +66,19 @@ class CreateStrategyService
   end
 
 
+  def parsed_templates
+    templates = @strategy_params[:selected_templates]
+    return default_templates unless templates.present?
+
+    valid_templates = Array(templates).select { |t| CreasStrategyPlan::ALLOWED_TEMPLATES.include?(t) }
+    valid_templates.presence || default_templates
+  end
+
   def default_themes
     [ "Brand awareness", "Product showcase", "Community engagement" ]
+  end
+
+  def default_templates
+    [ "only_avatars" ]
   end
 end

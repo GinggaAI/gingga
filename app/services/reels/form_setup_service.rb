@@ -29,7 +29,6 @@ module Reels
         failure_result(presenter_result.error)
       end
     rescue StandardError => e
-      Rails.logger.error "🚨 Form setup failed: #{e.message}"
       failure_result(I18n.t("planning.errors.failed_to_setup_form") + ": #{e.message}")
     end
 
@@ -55,7 +54,7 @@ module Reels
       ).call
 
       unless result[:success]
-        Rails.logger.warn "⚠️ Smart planning preload failed: #{result[:error]}"
+        # Smart planning failures are non-critical and handled gracefully
       end
     end
 

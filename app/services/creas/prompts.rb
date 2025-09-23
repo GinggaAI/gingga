@@ -154,13 +154,19 @@ module Creas
 
     # === GPT-2: CREAS Creator (Voxa) ===
     def voxa_system(strategy_plan_data:)
+      # Extract selected templates from strategy plan data, fallback to all templates
+      selected_templates = strategy_plan_data.dig(:strategy, :selected_templates) ||
+                          [ "only_avatars", "avatar_and_video", "narration_over_7_images", "remix", "one_to_three_videos" ]
+
+      templates_list = selected_templates.join(" | ")
+
       <<~SYS
       You are CREAS Creator (Voxa). Convert normalized strategy data from StrategyPlanFormatter + brand context into ready-to-produce content items. You must output STRICT JSON ONLY, with no prose or markdown.
 
       Scope
         Output only Reels (vertical 9:16).
         Default platform: "Instagram Reels".
-        Choose exactly one template per item: only_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos.
+        Choose exactly one template per item from the following allowed templates: #{templates_list}.
 
       Input
         strategy_plan_data: Normalized output from StrategyPlanFormatter with structure:
@@ -182,7 +188,7 @@ module Creas
                     "description": "...",
                     "platform": "Instagram Reels",
                     "pilar": "C",
-                    "recommended_template": "only_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos",
+                    "recommended_template": "#{templates_list}",
                     "video_source": "none | external | kling"
                   }
                 ]
@@ -232,7 +238,7 @@ module Creas
         "subtitles": { "mode": "platform_auto", "languages": ["en-US"] },
         "dubbing": { "enabled": false, "languages": [] },
         "pilar": "C | R | E | A | S",
-        "template": "only_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos",
+        "template": "#{templates_list}",
         "video_source": "none | external | kling",
         "post_description": "...",       // what viewer sees + structure
         "text_base": "...",              // final caption/copy
@@ -268,48 +274,7 @@ module Creas
       }
 
       CRITICAL TEMPLATE RULES (apply strictly - failure to follow = invalid output)
-        only_avatars
-          • "video_source": "none"
-          • shotplan.scenes: EXACTLY 3 scenes, all type:"avatar"#{' '}
-          • Each scene MUST have: avatar_id, voice_id, voiceover
-          • shotplan.beats: empty array []
-      #{'    '}
-        avatar_and_video
-          • Mix avatar + video in EXACTLY 3 scenes
-          • At least one scene type:"video" in Hook or Development
-          • Close scene MUST be type:"avatar"
-          • If scene is type:"video": include video_url (external) or video_prompt (kling)
-          • shotplan.beats: empty array []
-      #{'    '}
-        narration_over_7_images ⚠️  SPECIAL FORMAT
-          • "video_source": "none"
-          • shotplan.scenes: empty array [] (NO SCENES AT ALL)
-          • shotplan.beats: EXACTLY 7 beat objects, each with:
-            - "idx": 1-7 (sequential numbers)
-            - "image_prompt": "..." (≤140 chars, detailed visual description for image generation)
-            - "voiceover": "..." (≤140 chars, what narrator says over this image)
-          • This template tells a story through 7 sequential images with narration
-      #{'    '}
-          EXAMPLE narration_over_7_images beats structure:
-          "beats": [
-            {"idx": 1, "image_prompt": "Close-up of person looking frustrated at phone with low engagement numbers", "voiceover": "Still getting terrible reach on Instagram?"},
-            {"idx": 2, "image_prompt": "Hand holding phone showing Instagram analytics dashboard", "voiceover": "These 3 mistakes are killing your content"},
-            {"idx": 3, "image_prompt": "Split screen: bland generic post vs engaging specific post", "voiceover": "Mistake 1: Your hooks are too generic"},
-            {"idx": 4, "image_prompt": "Person posting at 3am timestamp visible", "voiceover": "Mistake 2: You're posting at dead hours"},
-            {"idx": 5, "image_prompt": "Post with no call-to-action vs post with clear CTA", "voiceover": "Mistake 3: No clear call to action"},
-            {"idx": 6, "image_prompt": "Before/after analytics showing improvement", "voiceover": "Fix these and watch your reach explode"},
-            {"idx": 7, "image_prompt": "Person smiling with phone showing viral post", "voiceover": "Try it today and tag me in your results!"}
-          ]
-      #{'    '}
-        remix
-          • Only when idea suggests reacting/remixing
-          • "video_source": "external" with video_url
-          • post_description must describe reaction style: "reaction" | "pip" | "caption-overlay"
-      #{'    '}
-        one_to_three_videos
-          • 1–3 clips structure
-          • "video_source": "external" → video_urls[1..3] OR "kling" → video_prompts[1..3]
-          • Map Hook/Body/CTA in shotplan.scenes
+      #{build_template_rules(selected_templates)}
 
       CONTENT QUALITY REQUIREMENTS
         Hook (0–3s): Strong POV/question/promise/stat that stops scrolling
@@ -342,14 +307,7 @@ module Creas
         ✅ Root keys present; else ask.
         ✅ Each item has all required fields: id, origin_id, week, content_name, status, dates, platform, aspect_ratio, language, pilar, template, video_source, post_description, text_base, hashtags.
         ✅ TEMPLATE-SPECIFIC VALIDATION:
-          • only_avatars → shotplan.scenes = 3 items, shotplan.beats = []
-          • avatar_and_video → shotplan.scenes = 3 items, shotplan.beats = []
-          • narration_over_7_images → shotplan.scenes = [], shotplan.beats = 7 items
-          • remix → has video_url
-          • one_to_three_videos → has video_urls[] or video_prompts[]
-        ✅ If template uses video, each type:"video" scene has correct source field
-        ✅ narration_over_7_images → EXACTLY 7 beats with idx:1-7, NO scenes
-        ✅ avatar_and_video → Close scene is type:"avatar"
+#{build_template_validations(selected_templates)}
         ✅ hashtags = 3–5 items, space-separated, no # duplicates
         ✅ publish_date between month start and month end when feasible
         ✅ No nulls; omit unknown optional fields
@@ -370,6 +328,91 @@ module Creas
       # Brand Context
       #{brand_context.to_json}
       USR
+    end
+
+    def build_template_rules(selected_templates)
+      template_rules = {
+        "only_avatars" => <<~RULES,
+          only_avatars
+            • "video_source": "none"
+            • shotplan.scenes: EXACTLY 3 scenes, all type:"avatar"#{' '}
+            • Each scene MUST have: avatar_id, voice_id, voiceover
+            • shotplan.beats: empty array []
+        RULES
+
+        "avatar_and_video" => <<~RULES,
+          avatar_and_video
+            • Mix avatar + video in EXACTLY 3 scenes
+            • At least one scene type:"video" in Hook or Development
+            • Close scene MUST be type:"avatar"
+            • If scene is type:"video": include video_url (external) or video_prompt (kling)
+            • shotplan.beats: empty array []
+        RULES
+
+        "narration_over_7_images" => <<~RULES,
+          narration_over_7_images ⚠️  SPECIAL FORMAT
+            • "video_source": "none"
+            • shotplan.scenes: empty array [] (NO SCENES AT ALL)
+            • shotplan.beats: EXACTLY 7 beat objects, each with:
+              - "idx": 1-7 (sequential numbers)
+              - "image_prompt": "..." (≤140 chars, detailed visual description for image generation)
+              - "voiceover": "..." (≤140 chars, what narrator says over this image)
+            • This template tells a story through 7 sequential images with narration
+        #{'    '}
+            EXAMPLE narration_over_7_images beats structure:
+            "beats": [
+              {"idx": 1, "image_prompt": "Close-up of person looking frustrated at phone with low engagement numbers", "voiceover": "Still getting terrible reach on Instagram?"},
+              {"idx": 2, "image_prompt": "Hand holding phone showing Instagram analytics dashboard", "voiceover": "These 3 mistakes are killing your content"},
+              {"idx": 3, "image_prompt": "Split screen: bland generic post vs engaging specific post", "voiceover": "Mistake 1: Your hooks are too generic"},
+              {"idx": 4, "image_prompt": "Person posting at 3am timestamp visible", "voiceover": "Mistake 2: You're posting at dead hours"},
+              {"idx": 5, "image_prompt": "Post with no call-to-action vs post with clear CTA", "voiceover": "Mistake 3: No clear call to action"},
+              {"idx": 6, "image_prompt": "Before/after analytics showing improvement", "voiceover": "Fix these and watch your reach explode"},
+              {"idx": 7, "image_prompt": "Person smiling with phone showing viral post", "voiceover": "Try it today and tag me in your results!"}
+            ]
+        RULES
+
+        "remix" => <<~RULES,
+          remix
+            • Only when idea suggests reacting/remixing
+            • "video_source": "external" with video_url
+            • post_description must describe reaction style: "reaction" | "pip" | "caption-overlay"
+        RULES
+
+        "one_to_three_videos" => <<~RULES
+          one_to_three_videos
+            • 1–3 clips structure
+            • "video_source": "external" → video_urls[1..3] OR "kling" → video_prompts[1..3]
+            • Map Hook/Body/CTA in shotplan.scenes
+        RULES
+      }
+
+      selected_templates.map { |template| template_rules[template] }.compact.join("\n    ")
+    end
+
+    def build_template_validations(selected_templates)
+      validation_rules = {
+        "only_avatars" => "          • only_avatars → shotplan.scenes = 3 items, shotplan.beats = []",
+        "avatar_and_video" => "          • avatar_and_video → shotplan.scenes = 3 items, shotplan.beats = []",
+        "narration_over_7_images" => "          • narration_over_7_images → shotplan.scenes = [], shotplan.beats = 7 items",
+        "remix" => "          • remix → has video_url",
+        "one_to_three_videos" => "          • one_to_three_videos → has video_urls[] or video_prompts[]"
+      }
+
+      template_specific = selected_templates.map { |template| validation_rules[template] }.compact.join("\n")
+
+      # Add conditional validations based on selected templates
+      additional_validations = []
+      if selected_templates.any? { |t| [ "avatar_and_video", "remix", "one_to_three_videos" ].include?(t) }
+        additional_validations << "        ✅ If template uses video, each type:\"video\" scene has correct source field"
+      end
+      if selected_templates.include?("narration_over_7_images")
+        additional_validations << "        ✅ narration_over_7_images → EXACTLY 7 beats with idx:1-7, NO scenes"
+      end
+      if selected_templates.include?("avatar_and_video")
+        additional_validations << "        ✅ avatar_and_video → Close scene is type:\"avatar\""
+      end
+
+      ([ template_specific ] + additional_validations).compact.join("\n")
     end
   end
 end

@@ -55,6 +55,7 @@ class CreasStrategistController < ApplicationController
       objective_details: plan.objective_details,
       frequency_per_week: plan.frequency_per_week,
       monthly_themes: plan.monthly_themes,
+      selected_templates: plan.selected_templates,
       content_distribution: plan.content_distribution,
       weekly_plan: plan.weekly_plan
     }
@@ -63,12 +64,24 @@ class CreasStrategistController < ApplicationController
   def strategy_form_params
     return {} unless params[:strategy_form]
 
-    params.require(:strategy_form).permit(
+    permitted_params = params.require(:strategy_form).permit(
       :primary_objective,
       :objective_of_the_month,
       :objective_details,
       :frequency_per_week,
-      :monthly_themes
+      :monthly_themes,
+      :selected_templates
     )
+
+    # Parse selected_templates JSON string to array
+    if permitted_params[:selected_templates].present?
+      begin
+        permitted_params[:selected_templates] = JSON.parse(permitted_params[:selected_templates])
+      rescue JSON::ParserError
+        permitted_params[:selected_templates] = []
+      end
+    end
+
+    permitted_params
   end
 end

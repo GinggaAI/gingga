@@ -27,9 +27,56 @@ module PlanningHelper
     ]
   }.freeze
 
+  # Available reel generation templates with their descriptions
+  REEL_TEMPLATES = {
+    "only_avatars" => "Only Avatars - AI-generated characters speaking directly",
+    "avatar_and_video" => "Avatar + Video - Combine AI avatars with background video",
+    "narration_over_7_images" => "Narration over Images - Voiceover with 7 rotating images",
+    "remix" => "Remix - Repurpose existing content with new format",
+    "one_to_three_videos" => "Multiple Videos - Combine 1-3 video clips"
+  }.freeze
+
   # Returns recommended themes for a given objective
   def recommended_themes_for(objective)
     OBJECTIVE_THEMES[objective.to_s] || []
+  end
+
+  # Returns all available templates with their descriptions
+  def available_templates
+    REEL_TEMPLATES
+  end
+
+  # Renders a template chip component
+  def template_chip(template_key, template_description, selected: false)
+    css_classes = [
+      "inline-flex", "items-center", "gap-2", "px-3", "py-2", "rounded-lg",
+      "text-sm", "cursor-pointer", "transition-colors",
+      "border", "select-none", "max-w-xs"
+    ]
+
+    if selected
+      css_classes += [ "bg-purple-100", "text-purple-800", "border-purple-300" ]
+    else
+      css_classes += [ "bg-gray-100", "text-gray-600", "border-gray-300", "hover:bg-gray-200" ]
+    end
+
+    content_tag(:div, class: css_classes.join(" "), data: { template: template_key, selected: selected }) do
+      chip_content = []
+
+      # Add checkmark for selected templates
+      if selected
+        chip_content << content_tag(:span, "✓", class: "text-xs")
+      end
+
+      chip_content << content_tag(:div, class: "flex flex-col") do
+        template_content = []
+        template_content << content_tag(:span, template_description.split(" - ").first, class: "font-medium")
+        template_content << content_tag(:span, template_description.split(" - ").last, class: "text-xs opacity-75")
+        safe_join(template_content)
+      end
+
+      safe_join(chip_content)
+    end
   end
 
   # Renders a theme chip component

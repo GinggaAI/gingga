@@ -78,6 +78,21 @@
 
               %p.text-xs.text-gray-500.mt-1= t('planning.strategy_form.monthly_themes_help')
 
+          .col-span-full
+            = form.label "strategy_form[selected_templates]", "Reel Templates",
+                class: "block text-sm font-medium mb-1 text-gray-700"
+
+            #templates-container.space-y-3
+              %p.text-xs.text-gray-500.mb-3 Select one or more templates for generating your reels
+
+              #available-templates.grid.grid-cols-1.md:grid-cols-2.lg:grid-cols-3.gap-3.mb-3
+                - available_templates.each do |template_key, template_description|
+                  = template_chip(template_key, template_description, selected: template_key == 'only_avatars')
+
+              / Hidden input to store selected templates as JSON array
+              = form.hidden_field "strategy_form[selected_templates]", id: "selected-templates-hidden", value: '["only_avatars"]'
+
+          .grid.grid-cols-1.md:grid-cols-2.gap-4.mb-4
             .col-span-1
               = form.label "strategy_form[frequency_per_week]", t('planning.strategy_form.frequency_label'),
                   class: "block text-sm font-medium mb-1 text-gray-700"
@@ -402,8 +417,17 @@
       });
     }
 
+    // Handle template chip clicks
+    document.addEventListener('click', function(e) {
+      if (e.target.closest('[data-template]')) {
+        toggleTemplateChip(e.target.closest('[data-template]'));
+        updateTemplatesHiddenInput();
+      }
+    });
+
     // Initialize with current selection
     updateHiddenInput();
+    updateTemplatesHiddenInput();
   }
 
   function updateRecommendedThemes(objective) {
@@ -546,6 +570,64 @@
     const themes = Array.from(selectedChips).map(chip => chip.getAttribute('data-theme'));
 
     hiddenInput.value = themes.join(', ');
+  }
+
+  function toggleTemplateChip(chip) {
+    const isSelected = chip.getAttribute('data-selected') === 'true';
+    const template = chip.getAttribute('data-template');
+
+    // Get template description from the available templates
+    const templateDescriptions = {
+      'only_avatars': 'Only Avatars - AI-generated characters speaking directly',
+      'avatar_and_video': 'Avatar + Video - Combine AI avatars with background video',
+      'narration_over_7_images': 'Narration over Images - Voiceover with 7 rotating images',
+      'remix': 'Remix - Repurpose existing content with new format',
+      'one_to_three_videos': 'Multiple Videos - Combine 1-3 video clips'
+    };
+
+    const description = templateDescriptions[template] || '';
+    const [title, subtitle] = description.split(' - ');
+
+    // Toggle selection state
+    chip.setAttribute('data-selected', (!isSelected).toString());
+
+    // Update visual state and rebuild content
+    if (!isSelected) {
+      // Select the chip
+      chip.classList.remove('bg-gray-100', 'text-gray-600', 'border-gray-300');
+      chip.classList.add('bg-purple-100', 'text-purple-800', 'border-purple-300');
+
+      // Rebuild content with checkmark
+      chip.innerHTML = `
+        <span class="text-xs">✓</span>
+        <div class="flex flex-col">
+          <span class="font-medium">${title}</span>
+          <span class="text-xs opacity-75">${subtitle}</span>
+        </div>
+      `;
+    } else {
+      // Deselect the chip
+      chip.classList.remove('bg-purple-100', 'text-purple-800', 'border-purple-300');
+      chip.classList.add('bg-gray-100', 'text-gray-600', 'border-gray-300');
+
+      // Rebuild content without checkmark
+      chip.innerHTML = `
+        <div class="flex flex-col">
+          <span class="font-medium">${title}</span>
+          <span class="text-xs opacity-75">${subtitle}</span>
+        </div>
+      `;
+    }
+  }
+
+  function updateTemplatesHiddenInput() {
+    const hiddenInput = document.getElementById('selected-templates-hidden');
+    if (!hiddenInput) return;
+
+    const selectedChips = document.querySelectorAll('[data-template][data-selected="true"]');
+    const templates = Array.from(selectedChips).map(chip => chip.getAttribute('data-template'));
+
+    hiddenInput.value = JSON.stringify(templates);
   }
 
   function handleFormSubmit(e) {

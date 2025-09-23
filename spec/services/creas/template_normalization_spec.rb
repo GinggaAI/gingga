@@ -7,6 +7,7 @@ RSpec.describe 'Template Normalization', type: :service do
     create(:creas_strategy_plan,
       user: user,
       brand: brand,
+      selected_templates: %w[only_avatars avatar_and_video narration_over_7_images remix one_to_three_videos],
       weekly_plan: [
         {
           "ideas" => [
@@ -82,6 +83,7 @@ RSpec.describe 'Template Normalization', type: :service do
       problematic_strategy = create(:creas_strategy_plan,
         user: user,
         brand: brand,
+        selected_templates: %w[only_avatars avatar_and_video narration_over_7_images remix one_to_three_videos],
         weekly_plan: [
           {
             "ideas" => [
@@ -138,6 +140,7 @@ RSpec.describe 'Template Normalization', type: :service do
       create(:creas_strategy_plan,
         user: user,
         brand: brand,
+        selected_templates: %w[only_avatars avatar_and_video narration_over_7_images remix one_to_three_videos],
         weekly_plan: [
           {
             "ideas" => [

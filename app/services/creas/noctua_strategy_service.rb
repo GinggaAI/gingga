@@ -25,7 +25,8 @@ module Creas
           objective_of_the_month: @strategy_form[:objective_of_the_month] || @strategy_form[:primary_objective],
           objective_details: @strategy_form[:objective_details],
           frequency_per_week: @strategy_form[:frequency_per_week],
-          monthly_themes: @strategy_form[:monthly_themes] || []
+          monthly_themes: @strategy_form[:monthly_themes] || [],
+          selected_templates: @strategy_form[:selected_templates] || [ "only_avatars" ]
         )
       end
 
