@@ -61,56 +61,6 @@
                   class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
                   required: true
 
-          .mb-4
-            %h3.block.text-sm.font-medium.mb-3.text-gray-700= t('planning.strategy_form.resources_title')
-            %p.text-xs.text-gray-500.mb-3= t('planning.strategy_form.resources_subtitle')
-
-            .grid.grid-cols-1.md:grid-cols-2.gap-4.mb-3
-              .col-span-1
-                %label.block.text-sm.font-medium.mb-1.text-gray-600= t('planning.strategy_form.budget_label')
-                %select#budget-select.w-full.p-2.border.border-gray-300.rounded-md.focus:ring-2.focus:ring-blue-500.focus:border-blue-500
-                  %option{value: ""}= t('planning.strategy_form.budget_options.none')
-                  %option{value: "500"}= t('planning.strategy_form.budget_options.low')
-                  %option{value: "1000"}= t('planning.strategy_form.budget_options.medium')
-                  %option{value: "2500"}= t('planning.strategy_form.budget_options.high')
-                  %option{value: "5000"}= t('planning.strategy_form.budget_options.premium')
-
-              .col-span-1
-                %label.block.text-sm.font-medium.mb-1.text-gray-600= t('planning.strategy_form.team_size_label')
-                %select#team-size-select.w-full.p-2.border.border-gray-300.rounded-md.focus:ring-2.focus:ring-blue-500.focus:border-blue-500
-                  %option{value: ""}= t('planning.strategy_form.team_size_options.none')
-                  %option{value: "1"}= t('planning.strategy_form.team_size_options.solo')
-                  %option{value: "2"}= t('planning.strategy_form.team_size_options.small')
-                  %option{value: "3"}= t('planning.strategy_form.team_size_options.medium')
-                  %option{value: "5"}= t('planning.strategy_form.team_size_options.large')
-
-            .grid.grid-cols-1.md:grid-cols-2.gap-4.mb-3
-              .col-span-1
-                %label.block.text-sm.font-medium.mb-1.text-gray-600= t('planning.strategy_form.design_tools_label')
-                %select#tools-select.w-full.p-2.border.border-gray-300.rounded-md.focus:ring-2.focus:ring-blue-500.focus:border-blue-500{multiple: true, size: "3"}
-                  %option{value: "Canva"} Canva
-                  %option{value: "Photoshop"} Adobe Photoshop
-                  %option{value: "Figma"} Figma
-                  %option{value: "Sketch"} Sketch
-                  %option{value: "After Effects"} After Effects
-                  %option{value: "Premiere Pro"} Premiere Pro
-                  %option{value: "Final Cut"} Final Cut Pro
-                %p.text-xs.text-gray-500.mt-1= t('planning.strategy_form.design_tools_help')
-
-              .col-span-1
-                %label.block.text-sm.font-medium.mb-1.text-gray-600= t('planning.strategy_form.content_resources_label')
-                .space-y-2
-                  %label.flex.items-center
-                    %input#ai-avatars-checkbox.mr-2{type: "checkbox"}
-                    %span.text-sm= t('planning.strategy_form.use_ai_avatars')
-                  %label.flex.items-center
-                    %input#stock-photos-checkbox.mr-2{type: "checkbox"}
-                    %span.text-sm= t('planning.strategy_form.use_stock_photos')
-                  %label.flex.items-center
-                    %input#custom-graphics-checkbox.mr-2{type: "checkbox"}
-                    %span.text-sm= t('planning.strategy_form.create_custom_graphics')
-
-            = form.hidden_field "strategy_form[resources_override]", id: "resources-override-json"
 
           .flex.justify-between.items-center
             %button#cancel-form.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.border.border-input.bg-background.hover:bg-accent.hover:text-accent-foreground.h-9.px-3.rounded-xl{type: "button"}
@@ -296,8 +246,6 @@
       button.addEventListener('click', handleVoxaRefineWeek);
     });
 
-    // Resources Override form handling
-    setupResourcesOverrideHandlers();
 
     // Initialize with existing plan if available
     if (window.currentPlan) {
@@ -983,75 +931,6 @@
     }
   }
 
-  function setupResourcesOverrideHandlers() {
-    const budgetSelect = document.getElementById('budget-select');
-    const teamSizeSelect = document.getElementById('team-size-select');
-    const toolsSelect = document.getElementById('tools-select');
-    const aiAvatarsCheckbox = document.getElementById('ai-avatars-checkbox');
-    const stockPhotosCheckbox = document.getElementById('stock-photos-checkbox');
-    const customGraphicsCheckbox = document.getElementById('custom-graphics-checkbox');
-    const hiddenInput = document.getElementById('resources-override-json');
-
-    const elements = [budgetSelect, teamSizeSelect, toolsSelect, aiAvatarsCheckbox, stockPhotosCheckbox, customGraphicsCheckbox];
-
-    elements.forEach(element => {
-      if (element) {
-        const eventType = element.type === 'checkbox' ? 'change' : 'change';
-        element.addEventListener(eventType, updateResourcesOverrideJSON);
-      }
-    });
-
-    // Initialize with empty JSON
-    if (hiddenInput) {
-      hiddenInput.value = '{}';
-    }
-  }
-
-  function updateResourcesOverrideJSON() {
-    const budgetSelect = document.getElementById('budget-select');
-    const teamSizeSelect = document.getElementById('team-size-select');
-    const toolsSelect = document.getElementById('tools-select');
-    const aiAvatarsCheckbox = document.getElementById('ai-avatars-checkbox');
-    const stockPhotosCheckbox = document.getElementById('stock-photos-checkbox');
-    const customGraphicsCheckbox = document.getElementById('custom-graphics-checkbox');
-    const hiddenInput = document.getElementById('resources-override-json');
-
-    if (!hiddenInput) return;
-
-    const resourcesData = {};
-
-    // Budget
-    if (budgetSelect && budgetSelect.value) {
-      resourcesData.budget = parseInt(budgetSelect.value, 10);
-    }
-
-    // Team Size
-    if (teamSizeSelect && teamSizeSelect.value) {
-      resourcesData.team_size = parseInt(teamSizeSelect.value, 10);
-    }
-
-    // Tools (multiple select)
-    if (toolsSelect) {
-      const selectedTools = Array.from(toolsSelect.selectedOptions).map(option => option.value);
-      if (selectedTools.length > 0) {
-        resourcesData.tools = selectedTools;
-      }
-    }
-
-    // Content Resources
-    if (aiAvatarsCheckbox && aiAvatarsCheckbox.checked) {
-      resourcesData.ai_avatars = true;
-    }
-    if (stockPhotosCheckbox && stockPhotosCheckbox.checked) {
-      resourcesData.stock = true;
-    }
-    if (customGraphicsCheckbox && customGraphicsCheckbox.checked) {
-      resourcesData.custom_graphics = true;
-    }
-
-    // Update hidden field with JSON
-    hiddenInput.value = JSON.stringify(resourcesData);
-  }
 
   function updateVoxaButton() {
     const voxaBtn = document.getElementById('voxa-refine');

@@ -273,7 +273,6 @@ class GenerateNoctuaStrategyBatchJob < ApplicationJob
       objective_of_the_month: objective,
       frequency_per_week: frequency_per_week,
       monthly_themes: ai_strategy_info["monthly_themes"] || strategy_plan.monthly_themes || [],
-      resources_override: strategy_plan.resources_override || {},
       content_distribution: ai_strategy_info["content_distribution"] || strategy_plan.content_distribution || {},
       weekly_plan: weekly_plan,
       remix_duet_plan: ai_strategy_info["remix_duet_plan"] || strategy_plan.remix_duet_plan || {},

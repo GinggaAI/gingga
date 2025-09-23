@@ -67,8 +67,7 @@ class CreasStrategistController < ApplicationController
       :objective_of_the_month,
       :objective_details,
       :frequency_per_week,
-      :monthly_themes,
-      :resources_override
+      :monthly_themes
     )
   end
 end

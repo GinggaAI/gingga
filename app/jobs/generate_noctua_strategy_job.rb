@@ -57,7 +57,6 @@ class GenerateNoctuaStrategyJob < ApplicationJob
         objective_of_the_month: parsed.fetch("objective_of_the_month"),
         frequency_per_week: parsed.fetch("frequency_per_week"),
         monthly_themes: parsed["monthly_themes"] || [],
-        resources_override: parsed["resources_override"] || {},
         content_distribution: parsed["content_distribution"] || {},
         weekly_plan: validated_payload["weekly_plan"] || [],
         remix_duet_plan: parsed["remix_duet_plan"] || {},

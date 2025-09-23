@@ -24,8 +24,7 @@ module Creas
         strategy_plan_attrs.merge!(
           objective_of_the_month: @strategy_form[:objective_of_the_month] || @strategy_form[:primary_objective],
           frequency_per_week: @strategy_form[:frequency_per_week],
-          monthly_themes: @strategy_form[:monthly_themes] || [],
-          resources_override: @strategy_form[:resources_override] || {}
+          monthly_themes: @strategy_form[:monthly_themes] || []
         )
       end
 

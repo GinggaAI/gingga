@@ -42,14 +42,14 @@ RSpec.describe "Planning UI Components", type: :request do
       expect(response.body).to include(I18n.t('planning.strategy_form.objective_label'))
       expect(response.body).to include(I18n.t('planning.strategy_form.monthly_themes_label'))
       expect(response.body).to include(I18n.t('planning.strategy_form.frequency_label'))
-      expect(response.body).to include(I18n.t('planning.strategy_form.resources_title'))
+      expect(response.body).to include(I18n.t('planning.strategy_form.objective_details_label'))
     end
 
     it "includes form input elements with proper attributes" do
       expect(response.body).to include('name="strategy_form[objective_of_the_month]"')
       expect(response.body).to include('name="strategy_form[monthly_themes]"')
       expect(response.body).to include('name="strategy_form[frequency_per_week]"')
-      expect(response.body).to include('name="strategy_form[resources_override]"')
+      expect(response.body).to include('name="strategy_form[objective_details]"')
     end
 
     it "shows the cancel and submit buttons in the form" do
@@ -88,9 +88,9 @@ RSpec.describe "Planning UI Components", type: :request do
         month: "2025-08",
         strategy_form: {
           objective_of_the_month: "Test objective",
+          objective_details: "Detailed description of the objective",
           monthly_themes: "Theme1, Theme2",
-          frequency_per_week: "3",
-          resources_override: "{}"
+          frequency_per_week: "3"
         }
       }
 

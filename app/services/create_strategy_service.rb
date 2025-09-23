@@ -45,8 +45,7 @@ class CreateStrategyService
       objective_of_the_month: @strategy_params[:objective_of_the_month],
       objective_details: @strategy_params[:objective_details],
       frequency_per_week: parsed_frequency,
-      monthly_themes: parsed_themes,
-      resources_override: parsed_resources
+      monthly_themes: parsed_themes
     }
   end
 
@@ -65,19 +64,6 @@ class CreateStrategyService
     end.presence || default_themes
   end
 
-  def parsed_resources
-    resources = @strategy_params[:resources_override]
-    return {} unless resources.present?
-
-    if resources.is_a?(String)
-      JSON.parse(resources)
-    else
-      resources.to_h
-    end
-  rescue JSON::ParserError => e
-    Rails.logger.warn "Invalid JSON in resources_override: #{e.message}"
-    {}
-  end
 
   def default_themes
     [ "Brand awareness", "Product showcase", "Community engagement" ]
