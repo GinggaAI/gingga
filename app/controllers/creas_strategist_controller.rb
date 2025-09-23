@@ -52,6 +52,7 @@ class CreasStrategistController < ApplicationController
       strategy_name: plan.strategy_name,
       month: plan.month,
       objective_of_the_month: plan.objective_of_the_month,
+      objective_details: plan.objective_details,
       frequency_per_week: plan.frequency_per_week,
       monthly_themes: plan.monthly_themes,
       content_distribution: plan.content_distribution,

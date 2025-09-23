@@ -129,6 +129,12 @@
         / Separator
         .w-full.h-px.bg-gray-200.mb-6
 
+        / Objective Details Section
+        #objective-details-section.mb-6{style: "display: none;"}
+          .space-y-3
+            %h3.text-lg.font-bold.text-gray-800= t('planning.strategy_result.objective_details_title')
+            #strategy-objective-details.text-gray-700.leading-relaxed -
+
         / Content Themes
         .space-y-3
           %h3.text-lg.font-bold.text-gray-800= t('planning.strategy_result.content_themes_title')
@@ -553,12 +559,12 @@
     // Show loading state
     setLoadingState(true, submitBtn, submitText, loadingSpinner);
     hideMessages();
-    
+
     // Update no-strategy message to indicate process started
     updateNoStrategyMessage(true);
 
     const formData = new FormData(form);
-    
+
     // Form data prepared for submission
 
     // Create AbortController for timeout handling
@@ -588,7 +594,7 @@
       if (data.success) {
         // Show immediate feedback to user
         alert('#{t('planning.js_messages.strategy_being_created_alert')}');
-        
+
         // Check if the plan is immediately completed (sync) or pending (async)
         if (data.plan.status === 'completed') {
           // Handle completed plan immediately
@@ -611,7 +617,7 @@
           // Handle pending plan - show processing UI and start polling
           showProcessingStrategy(data.plan);
           startPollingStrategy(data.plan.id);
-          
+
           // Update URL with plan_id
           if (data.plan && data.plan.id) {
             const newUrl = new URL(window.location);
@@ -656,7 +662,7 @@
     if (!resultDiv || !plan) return;
 
     // Restore original title when showing strategy
-    const titleEl = resultDiv.querySelector('h3');
+    const titleEl = resultDiv.querySelector('h2');
     if (titleEl) {
       titleEl.textContent = '#{t('planning.strategy_result.title')}';
       titleEl.className = 'text-lg font-semibold text-green-800';
@@ -675,6 +681,18 @@
     document.getElementById('strategy-total').textContent =
       plan.frequency_per_week ? (plan.frequency_per_week * 4) : '-';
     document.getElementById('strategy-objective').textContent = plan.objective_of_the_month || '-';
+
+    // Update objective details section
+    const objectiveDetailsEl = document.getElementById('strategy-objective-details');
+    const objectiveDetailsSection = document.getElementById('objective-details-section');
+    if (objectiveDetailsEl && objectiveDetailsSection) {
+      if (plan.objective_details && plan.objective_details.trim()) {
+        objectiveDetailsEl.textContent = plan.objective_details;
+        objectiveDetailsSection.style.display = 'block';
+      } else {
+        objectiveDetailsSection.style.display = 'none';
+      }
+    }
 
     // Update themes - extract from content_distribution or use monthly_themes
     const themesEl = document.getElementById('strategy-themes');
@@ -756,15 +774,15 @@
     const titleElement = document.getElementById('no-strategy-title');
     const descriptionElement = document.getElementById('no-strategy-description');
     const buttonElement = document.getElementById('create-strategy-btn');
-    
+
     if (!titleElement || !descriptionElement || !buttonElement) return;
-    
+
     if (isProcessing) {
       titleElement.textContent = '#{t('planning.js_messages.strategy_generation_in_progress')}';
       descriptionElement.textContent = '#{t('planning.js_messages.strategy_being_created')}';
       buttonElement.style.display = 'none';
     } else {
-      // Restore original text (this will be handled by page refresh in practice)  
+      // Restore original text (this will be handled by page refresh in practice)
       titleElement.textContent = `No Strategy for ${window.currentMonth || 'this month'}`;
       descriptionElement.textContent = 'There is no content strategy for this month yet.';
       buttonElement.style.display = 'inline-flex';
@@ -960,7 +978,7 @@
     // Different styling based on status
     const statusStyles = {
       'draft': 'bg-gray-100 text-gray-700 border-l-4 border-gray-400',
-      'in_production': 'bg-blue-100 text-blue-700 border-l-4 border-blue-500', 
+      'in_production': 'bg-blue-100 text-blue-700 border-l-4 border-blue-500',
       'ready_for_review': 'bg-yellow-100 text-yellow-700 border-l-4 border-yellow-500',
       'approved': 'bg-green-100 text-green-700 border-l-4 border-green-500'
     };
@@ -970,7 +988,7 @@
 
     const contentDiv = document.createElement('div');
     contentDiv.className = `${statusStyle} text-xs p-2 rounded mb-2 cursor-pointer hover:opacity-80 transition-all`;
-    
+
     // For in_production posts, show hook and CTA if available
     let cardContent = `${statusBadge}${icon} ${title.length > 18 ? title.substring(0, 18) + '...' : title}`;
     if (status === 'in_production') {
@@ -985,9 +1003,9 @@
         cardContent += `<div class="mt-1 text-[10px] opacity-75">${extraInfo.join('<br>')}</div>`;
       }
     }
-    
+
     contentDiv.innerHTML = cardContent;
-    
+
     // Enhanced tooltip for in_production posts
     let tooltipText = `${title} (${status.replace('_', ' ')})`;
     if (status === 'in_production') {
@@ -1080,15 +1098,15 @@
 
     // Use Rails AJAX endpoint to render content details
     const detailsGrid = weekDetails.querySelector('.content-details-grid');
-    
+
     // Show loading state
     detailsGrid.innerHTML = '<div class="p-4 text-center text-gray-500">#{t('planning.js_messages.loading_content_details')}</div>';
-    
+
     // Make AJAX request to Rails controller
     const params = new URLSearchParams({
       content_data: JSON.stringify(contentPiece)
     });
-    
+
     fetch(`/planning/content_details?${params}`, {
       method: 'GET',
       headers: {
@@ -1192,14 +1210,14 @@
   function updateVoxaButton() {
     const voxaBtn = document.getElementById('voxa-refine');
     const weekRefineButtons = document.querySelectorAll('.voxa-refine-week');
-    
+
     const shouldShow = window.currentPlan && window.currentPlan.id;
-    
+
     // Update main Voxa button
     if (voxaBtn) {
       voxaBtn.style.display = shouldShow ? 'inline-block' : 'none';
     }
-    
+
     // Update week-specific Voxa buttons
     weekRefineButtons.forEach(button => {
       button.style.display = shouldShow ? 'inline-flex' : 'none';
@@ -1259,7 +1277,7 @@
     }
 
     const weekNumber = e.target.closest('button').getAttribute('data-week');
-    
+
     if (!weekNumber) {
       showError('#{t('planning.js_messages.invalid_week_number')}');
       return;
@@ -1333,16 +1351,16 @@
     const strategyCard = document.getElementById('strategy-card');
     const strategyTitle = document.getElementById('strategy-title');
     const strategyDescription = document.getElementById('strategy-description');
-    
+
     if (strategyCard) {
       strategyCard.style.display = 'block';
       strategyCard.className = 'bg-yellow-50 border border-yellow-200 p-6 rounded-xl shadow-sm';
     }
-    
+
     if (strategyTitle) {
       strategyTitle.innerHTML = '<span class="animate-pulse">🔄 #{t("planning.strategy.processing")}</span>';
     }
-    
+
     if (strategyDescription) {
       strategyDescription.innerHTML = `
         <div class="text-center py-8">
@@ -1360,7 +1378,7 @@
     if (strategyForm) {
       strategyForm.style.display = 'none';
     }
-    
+
     // Store current plan for polling
     window.currentPlan = plan;
   }
@@ -1368,16 +1386,16 @@
   function startPollingStrategy(planId) {
     let pollCount = 0;
     const maxPolls = 60; // Poll for up to 5 minutes (5 second intervals)
-    
+
     const pollInterval = setInterval(() => {
       pollCount++;
-      
+
       if (pollCount >= maxPolls) {
         clearInterval(pollInterval);
         showError('#{t("planning.messages.generation_timeout")}');
         return;
       }
-      
+
       fetch(`/strategy_plan_status/${planId}`, {
         method: 'GET',
         headers: {
@@ -1395,21 +1413,21 @@
       .then(data => {
         if (data.completed) {
           clearInterval(pollInterval);
-          
+
           // Update current plan with completed data
           window.currentPlan = data.plan;
-          
+
           // Display the completed strategy
           displayStrategyResult(data.plan, true);
           populateCalendarWithStrategy(data.plan);
-          
+
           // Update UI states
           updateButtonText();
           updateOverviewButton();
           updateVoxaButton();
         } else if (data.failed) {
           clearInterval(pollInterval);
-          
+
           // Check if this is an incomplete brief error
           if (data.meta && data.meta.error_type === 'incomplete_brief') {
             showIncompleteBriefAlert(data.error_message);

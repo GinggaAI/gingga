@@ -271,6 +271,7 @@ class GenerateNoctuaStrategyBatchJob < ApplicationJob
       status: :completed,
       strategy_name: strategy_name,
       objective_of_the_month: objective,
+      objective_details: strategy_plan.objective_details, # Preserve user input
       frequency_per_week: frequency_per_week,
       monthly_themes: ai_strategy_info["monthly_themes"] || strategy_plan.monthly_themes || [],
       content_distribution: ai_strategy_info["content_distribution"] || strategy_plan.content_distribution || {},

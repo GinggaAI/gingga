@@ -12,9 +12,9 @@ RSpec.describe CreasStrategistController, type: :request do
       month: "2025-08",
       strategy_form: {
         objective_of_the_month: "awareness",
+        objective_details: "Launch new product line with focus on brand awareness",
         frequency_per_week: 4,
-        monthly_themes: "product launch",
-        resources_override: '{"ai_avatars": true}'
+        monthly_themes: "product launch"
       }
     }
   end
@@ -67,6 +67,7 @@ RSpec.describe CreasStrategistController, type: :request do
         expect(completed_plan).to have_attributes(
           month: "2025-08",
           objective_of_the_month: "awareness",
+          objective_details: "Launch new product line with focus on brand awareness",
           frequency_per_week: 4,
           status: "completed"
         )

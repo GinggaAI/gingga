@@ -23,6 +23,7 @@ module Creas
       if @strategy_form.present? && @strategy_form.any?
         strategy_plan_attrs.merge!(
           objective_of_the_month: @strategy_form[:objective_of_the_month] || @strategy_form[:primary_objective],
+          objective_details: @strategy_form[:objective_details],
           frequency_per_week: @strategy_form[:frequency_per_week],
           monthly_themes: @strategy_form[:monthly_themes] || []
         )
