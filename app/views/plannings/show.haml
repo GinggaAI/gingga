@@ -34,8 +34,8 @@
           .grid.grid-cols-1.md:grid-cols-2.gap-4.mb-4
             .col-span-1
               = form.label "strategy_form[objective_of_the_month]", t('planning.strategy_form.objective_label'), class: "block text-sm font-medium mb-1 text-gray-700"
-              - options = options_for_select([['Awareness - Build brand recognition', 'awareness'], ['Engagement - Foster community interaction', 'engagement'], ['Sales - Drive conversions and revenue', 'sales'], ['Community - Strengthen customer relationships', 'community']], 'awareness')
-              = form.select "strategy_form[objective_of_the_month]", options, {}, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              - options = options_for_select(strategy_objectives, 'awareness')
+              = form.select "strategy_form[objective_of_the_month]", options, {}, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500", id: "objective-select"
 
             .col-span-1
               = form.label "strategy_form[objective_details]", t('planning.strategy_form.objective_details_label'),
@@ -48,9 +48,34 @@
             .col-span-1
               = form.label "strategy_form[monthly_themes]", t('planning.strategy_form.monthly_themes_label'),
                   class: "block text-sm font-medium mb-1 text-gray-700"
-              = form.text_field "strategy_form[monthly_themes]",
-                  placeholder: t('planning.strategy_form.monthly_themes_placeholder'),
-                  class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+
+              #monthly-themes-container.space-y-3
+                / Recommended themes will be populated by JavaScript based on objective selection
+                #recommended-themes.flex.flex-wrap.gap-2.mb-3
+                  / Initial themes for 'awareness' objective
+                  - recommended_themes_for('awareness').each do |theme|
+                    = theme_chip(theme, selected: true)
+
+                / Custom themes section
+                #custom-themes.flex.flex-wrap.gap-2.mb-3
+
+                / Add custom theme chip
+                = add_custom_theme_chip
+
+                / Custom theme input (hidden by default)
+                #custom-theme-input.mt-2{style: "display: none;"}
+                  .flex.gap-2.items-center
+                    %input#custom-theme-text.flex-1.p-2.border.border-gray-300.rounded-md.focus:ring-2.focus:ring-blue-500.focus:border-blue-500{
+                      type: "text",
+                      placeholder: "Enter custom theme...",
+                      maxlength: "50"
+                    }
+                    %button#add-custom-theme-btn.px-3.py-2.bg-blue-600.text-white.rounded-md.hover:bg-blue-700{type: "button"} Add
+                    %button#cancel-custom-theme-btn.px-3.py-2.text-gray-600.hover:text-gray-800{type: "button"} Cancel
+
+              / Hidden input to store selected themes as comma-separated string
+              = form.hidden_field "strategy_form[monthly_themes]", id: "monthly-themes-hidden"
+
               %p.text-xs.text-gray-500.mt-1= t('planning.strategy_form.monthly_themes_help')
 
             .col-span-1
@@ -283,7 +308,239 @@
     if (planId && (!window.currentPlan || window.currentPlan.id != planId)) {
       loadStrategyPlan(planId);
     }
+
+    // Monthly themes chip functionality
+    initializeThemeChips();
   });
+
+  // Theme mapping configuration - mirrors the Rails helper
+  const OBJECTIVE_THEMES = {
+    'awareness': [
+      'Brand Story & Origin',
+      'Product/Service Showcase',
+      'Industry Trends',
+      'Community Spotlights'
+    ],
+    'engagement': [
+      'Q&A / Behind the Scenes',
+      'User-Generated Content',
+      'Interactive Polls & Challenges',
+      'Community Highlights'
+    ],
+    'sales': [
+      'Product Benefits & Use Cases',
+      'Comparisons / Alternatives',
+      'Social Proof',
+      'Offers & Promotions'
+    ],
+    'community': [
+      'Educational / How-to Tips',
+      'Advanced Product Use Cases',
+      'Customer Appreciation',
+      'Referral & Loyalty Programs'
+    ]
+  };
+
+  function initializeThemeChips() {
+    const objectiveSelect = document.getElementById('objective-select');
+    const monthlyThemesHidden = document.getElementById('monthly-themes-hidden');
+
+    if (!objectiveSelect || !monthlyThemesHidden) return;
+
+    // Handle objective changes
+    objectiveSelect.addEventListener('change', function() {
+      updateRecommendedThemes(this.value);
+      updateHiddenInput();
+    });
+
+    // Handle theme chip clicks
+    document.addEventListener('click', function(e) {
+      if (e.target.closest('[data-theme]')) {
+        toggleThemeChip(e.target.closest('[data-theme]'));
+        updateHiddenInput();
+      }
+
+      if (e.target.closest('[data-action="add-custom-theme"]')) {
+        showCustomThemeInput();
+      }
+
+      if (e.target.closest('[data-action="remove-theme"]')) {
+        e.stopPropagation();
+        removeCustomTheme(e.target.closest('[data-theme]'));
+        updateHiddenInput();
+      }
+    });
+
+    // Handle custom theme input
+    const addBtn = document.getElementById('add-custom-theme-btn');
+    const cancelBtn = document.getElementById('cancel-custom-theme-btn');
+    const customInput = document.getElementById('custom-theme-text');
+
+    if (addBtn) {
+      addBtn.addEventListener('click', addCustomTheme);
+    }
+
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', hideCustomThemeInput);
+    }
+
+    if (customInput) {
+      customInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addCustomTheme();
+        }
+        if (e.key === 'Escape') {
+          hideCustomThemeInput();
+        }
+      });
+    }
+
+    // Initialize with current selection
+    updateHiddenInput();
+  }
+
+  function updateRecommendedThemes(objective) {
+    const recommendedContainer = document.getElementById('recommended-themes');
+    if (!recommendedContainer) return;
+
+    const themes = OBJECTIVE_THEMES[objective] || [];
+    recommendedContainer.innerHTML = '';
+
+    themes.forEach(theme => {
+      const chip = createThemeChip(theme, true, false);
+      recommendedContainer.appendChild(chip);
+    });
+  }
+
+  function createThemeChip(theme, selected = false, custom = false) {
+    const chip = document.createElement('div');
+    const baseClasses = [
+      'inline-flex', 'items-center', 'gap-2', 'px-3', 'py-1.5', 'rounded-full',
+      'text-sm', 'font-medium', 'cursor-pointer', 'transition-colors',
+      'border', 'select-none'
+    ];
+
+    if (selected) {
+      if (custom) {
+        chip.className = baseClasses.concat(['bg-green-100', 'text-green-800', 'border-green-300']).join(' ');
+      } else {
+        chip.className = baseClasses.concat(['bg-blue-100', 'text-blue-800', 'border-blue-300']).join(' ');
+      }
+    } else {
+      chip.className = baseClasses.concat(['bg-gray-100', 'text-gray-600', 'border-gray-300', 'hover:bg-gray-200']).join(' ');
+    }
+
+    chip.setAttribute('data-theme', theme);
+    chip.setAttribute('data-selected', selected);
+
+    const content = [];
+
+    if (selected) {
+      const checkmark = document.createElement('span');
+      checkmark.textContent = '✓';
+      checkmark.className = 'text-xs';
+      content.push(checkmark);
+    }
+
+    const label = document.createElement('span');
+    label.textContent = theme;
+    content.push(label);
+
+    if (custom) {
+      const removeBtn = document.createElement('button');
+      removeBtn.textContent = '×';
+      removeBtn.type = 'button';
+      removeBtn.className = 'ml-1 text-xs hover:text-red-600';
+      removeBtn.setAttribute('data-action', 'remove-theme');
+      content.push(removeBtn);
+    }
+
+    content.forEach(el => chip.appendChild(el));
+    return chip;
+  }
+
+  function toggleThemeChip(chip) {
+    const isSelected = chip.getAttribute('data-selected') === 'true';
+    const theme = chip.getAttribute('data-theme');
+    const isCustom = chip.closest('#custom-themes') !== null;
+
+    if (isSelected) {
+      // Deselect
+      chip.setAttribute('data-selected', 'false');
+      const newChip = createThemeChip(theme, false, isCustom);
+      chip.parentNode.replaceChild(newChip, chip);
+    } else {
+      // Select
+      chip.setAttribute('data-selected', 'true');
+      const newChip = createThemeChip(theme, true, isCustom);
+      chip.parentNode.replaceChild(newChip, chip);
+    }
+  }
+
+  function showCustomThemeInput() {
+    const input = document.getElementById('custom-theme-input');
+    const textInput = document.getElementById('custom-theme-text');
+    const addChip = document.getElementById('add-custom-theme-chip');
+
+    if (input && addChip) {
+      input.style.display = 'block';
+      addChip.style.display = 'none';
+      if (textInput) {
+        textInput.focus();
+      }
+    }
+  }
+
+  function hideCustomThemeInput() {
+    const input = document.getElementById('custom-theme-input');
+    const textInput = document.getElementById('custom-theme-text');
+    const addChip = document.getElementById('add-custom-theme-chip');
+
+    if (input && addChip && textInput) {
+      input.style.display = 'none';
+      addChip.style.display = 'inline-flex';
+      textInput.value = '';
+    }
+  }
+
+  function addCustomTheme() {
+    const textInput = document.getElementById('custom-theme-text');
+    const customContainer = document.getElementById('custom-themes');
+
+    if (!textInput || !customContainer) return;
+
+    const theme = textInput.value.trim();
+    if (!theme) return;
+
+    // Check if theme already exists
+    const existing = document.querySelector(`[data-theme="${CSS.escape(theme)}"]`);
+    if (existing) {
+      hideCustomThemeInput();
+      return;
+    }
+
+    // Create and add custom theme chip
+    const chip = createThemeChip(theme, true, true);
+    customContainer.appendChild(chip);
+
+    hideCustomThemeInput();
+    updateHiddenInput();
+  }
+
+  function removeCustomTheme(chip) {
+    chip.remove();
+  }
+
+  function updateHiddenInput() {
+    const hiddenInput = document.getElementById('monthly-themes-hidden');
+    if (!hiddenInput) return;
+
+    const selectedChips = document.querySelectorAll('[data-theme][data-selected="true"]');
+    const themes = Array.from(selectedChips).map(chip => chip.getAttribute('data-theme'));
+
+    hiddenInput.value = themes.join(', ');
+  }
 
   function handleFormSubmit(e) {
     e.preventDefault();
