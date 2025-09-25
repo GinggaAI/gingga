@@ -15,11 +15,25 @@ class BrandsController < ApplicationController
     })
   end
 
-  def update
-    @brand = current_user_brand || current_user.brands.create
+  def create
+    result = Brands::CreationService.new(user: current_user).call
 
-    if @brand.update(brand_params)
-      redirect_to edit_brand_path, notice: "Brand profile updated successfully!"
+    if result[:success]
+      redirect_to edit_brand_path(brand_id: result[:data][:brand].id), notice: "New brand created successfully!"
+    else
+      redirect_to edit_brand_path, alert: result[:error]
+    end
+  end
+
+  def update
+    if params[:brand_id].present?
+      @brand = current_user.brands.find(params[:brand_id])
+    else
+      @brand = current_user.brands.first || current_user.brands.create
+    end
+
+    if @brand&.update(brand_params)
+      redirect_to edit_brand_path(brand_id: @brand.id), notice: "Brand profile updated successfully!"
     else
       @brands = current_user.brands.order(:created_at)
       @presenter = BrandPresenter.new(@brand, {

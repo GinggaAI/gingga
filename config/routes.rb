@@ -4,7 +4,7 @@ Rails.application.routes.draw do
 
   # Routes with optional locale scope
   scope "(:locale)", locale: /en|es/ do
-    resource :brand, only: [ :show, :edit, :update ]
+    resource :brand, only: [ :show, :edit, :update, :create ]
     get "/my-brand", to: "brands#edit", as: "my_brand"
 
     # Planning Display - Single Responsibility
