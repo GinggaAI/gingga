@@ -9,11 +9,8 @@ module Reels
     end
 
     def call
-      Rails.logger.info "🎬 Starting scene preload for reel #{@reel.id}"
-
       # Ensure reel is saved before creating scenes
       unless @reel.persisted?
-        Rails.logger.warn "⚠️ CRITICAL: Reel not persisted, performing emergency save"
         @reel.save!
       end
 
@@ -21,7 +18,6 @@ module Reels
       existing_count = @reel.reel_scenes.count
       @reel.reel_scenes.delete_all  # Use delete_all instead of destroy_all for performance
       @reel.reel_scenes.reset  # Reset the association cache
-      Rails.logger.info "🧹 Cleared #{existing_count} existing scenes" if existing_count > 0
 
       # Get user's default avatar and voice
       default_avatar_id, default_voice_id = resolve_default_avatar_and_voice
@@ -33,23 +29,16 @@ module Reels
       @scenes.each_with_index do |scene_data, index|
         if valid_scene_data?(scene_data)
           valid_scenes_data << { data: scene_data, original_index: index }
-        else
-          Rails.logger.warn "⚠️ Scene #{index + 1} has invalid data - skipping"
         end
       end
 
-      Rails.logger.info "📊 Found #{valid_scenes_data.length} valid scenes out of #{@scenes.length} total"
-
       # Ensure we have at least 3 valid scenes for templates that require them
       if @reel.requires_scenes? && valid_scenes_data.length < 3
-        Rails.logger.warn "⚠️ Only #{valid_scenes_data.length} valid scenes found, but template '#{@reel.template}' requires 3"
-
         # Fill with default scenes if needed
         while valid_scenes_data.length < 3
           default_scene_data = create_default_scene_data(valid_scenes_data.length + 1)
           valid_scenes_data << { data: default_scene_data, original_index: -1 }
         end
-        Rails.logger.info "➕ Added #{3 - @scenes.length} default scenes"
       end
 
       # Create exactly the number of scenes we need (max 3 for scene-based templates)
@@ -59,8 +48,6 @@ module Reels
         scene_result = create_scene(scene_info[:data], index, default_avatar_id, default_voice_id)
         created_scenes += 1 if scene_result
       end
-
-      Rails.logger.info "🎯 Successfully created #{created_scenes} scenes from #{@scenes.length} input scenes"
 
       success_result(created_scenes: created_scenes, total_scenes: @scenes.length)
     rescue StandardError => e
@@ -81,8 +68,6 @@ module Reels
       default_avatar_id = user_avatar&.avatar_id || "avatar_001"
       default_voice_id = user_voice&.voice_id || "voice_001"
 
-      Rails.logger.info "🎭 Using defaults - Avatar: '#{default_avatar_id}' (#{user_avatar ? 'user' : 'system'}), Voice: '#{default_voice_id}' (#{user_voice ? 'user' : 'system'})"
-
       # Validate that defaults are not blank
       if default_avatar_id.blank?
         Rails.logger.error "❌ CRITICAL: default_avatar_id is blank! User avatar: #{user_avatar.inspect}"
@@ -93,6 +78,8 @@ module Reels
         Rails.logger.error "❌ CRITICAL: default_voice_id is blank! User voice: #{user_voice.inspect}"
         default_voice_id = "voice_001"  # Force fallback
       end
+
+      Rails.logger.info "🎭 Using defaults - Avatar: '#{default_avatar_id}' (#{user_avatar ? 'user' : 'system'}), Voice: '#{default_voice_id}' (#{user_voice ? 'user' : 'system'})"
 
       [ default_avatar_id, default_voice_id ]
     end
@@ -105,14 +92,12 @@ module Reels
 
       # Validate script content
       if script.blank?
-        Rails.logger.warn "⚠️ Skipping scene #{scene_number}: #{I18n.t('planning.scene_errors.no_script_content_found')}"
         return false
       end
 
       # Clean and validate script
       cleaned_script = script.strip
       if cleaned_script.length < 1
-        Rails.logger.warn "⚠️ Skipping scene #{scene_number}: #{I18n.t('planning.scene_errors.script_too_short')}"
         return false
       end
 

@@ -85,6 +85,7 @@ Follow these fundamental Rails principles:
    - Extract all conditional logic from views into presenter objects
    - Views should only contain display logic and simple iteration
    - Use presenters to encapsulate complex view logic and formatting
+   - **CRITICAL**: Helpers are for data transformation, ViewComponents are for UI generation (see `/doc/frontend/viewcomponent_vs_helper_refactor_2025_09.md`)
 
 5. **Rails-First Development (JavaScript Guidelines)**
    - **CORE PRINCIPLE**: Business logic MUST be in Ruby/Rails, NOT JavaScript
@@ -347,10 +348,10 @@ For external API calls, use the centralized HTTP client pattern:
 - **Component-specific CSS**: Co-located with ViewComponents when needed
 - **Build process**: `npm run build:css` compiles to `app/assets/builds/application.css`
 
-### ViewComponent Guidelines  
+### ViewComponent Guidelines
 ```ruby
 # app/components/ui/button_component.rb
-class UI::ButtonComponent < ViewComponent::Base
+class Ui::ButtonComponent < ViewComponent::Base
   def initialize(variant: :primary, size: :medium, **options)
     @variant = variant
     @size = size
@@ -362,6 +363,9 @@ class UI::ButtonComponent < ViewComponent::Base
   attr_reader :variant, :size, :options
 end
 ```
+
+**CRITICAL RULE**: Use ViewComponents for any HTML generation or complex UI logic. Never put HTML generation in helpers!
+- **See**: `/doc/frontend/viewcomponent_vs_helper_refactor_2025_09.md` for complete guidelines
 
 ### JavaScript (Stimulus Controllers)
 ```javascript

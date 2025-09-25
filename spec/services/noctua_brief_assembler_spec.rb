@@ -14,8 +14,7 @@ RSpec.describe NoctuaBriefAssembler do
         objective_of_the_month: 'Increase overall product awareness',
         objective_details: 'Launch new product line with 25% increase in revenue',
         monthly_themes: [ 'product launch', 'customer success' ],
-        frequency_per_week: 4,
-        resources_override: { ai_avatars: true, stock: false }
+        frequency_per_week: 4
       }
     end
 
@@ -36,8 +35,7 @@ RSpec.describe NoctuaBriefAssembler do
         objective_of_the_month: 'sales', # Uses primary_objective
         objective_details: 'Launch new product line with 25% increase in revenue',
         monthly_themes: [ 'product launch', 'customer success' ],
-        frequency_per_week: 4,
-        resources_override: { ai_avatars: true, stock: false }
+        frequency_per_week: 4
       )
     end
 
@@ -104,7 +102,6 @@ RSpec.describe NoctuaBriefAssembler do
         expect(subject[:objective_details]).to be_nil
         expect(subject[:monthly_themes]).to eq([])
         expect(subject[:frequency_per_week]).to be_nil
-        expect(subject[:resources_override]).to eq({})
       end
     end
 

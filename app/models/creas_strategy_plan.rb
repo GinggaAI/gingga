@@ -15,8 +15,18 @@ class CreasStrategyPlan < ApplicationRecord
 
   validates :month, presence: true
   validates :objective_of_the_month, :frequency_per_week, presence: true, if: :completed?
+  validates :selected_templates, presence: true, if: :completed?
+  validate :validate_selected_templates
 
   scope :recent, -> { order(created_at: :desc) }
+
+  ALLOWED_TEMPLATES = %w[
+    only_avatars
+    avatar_and_video
+    narration_over_7_images
+    remix
+    one_to_three_videos
+  ].freeze
 
   def content_stats
     creas_content_items.group(:status, :template, :video_source).count
@@ -31,6 +41,25 @@ class CreasStrategyPlan < ApplicationRecord
 
   private
 
+  def validate_selected_templates
+    return if selected_templates.nil?
+
+    unless selected_templates.is_a?(Array)
+      errors.add(:selected_templates, "must be an array")
+      return
+    end
+
+    if selected_templates.empty?
+      errors.add(:selected_templates, "cannot be empty when provided")
+      return
+    end
+
+    invalid_templates = selected_templates - ALLOWED_TEMPLATES
+    if invalid_templates.any?
+      errors.add(:selected_templates, "contains invalid templates: #{invalid_templates.join(', ')}")
+    end
+  end
+
   def calculate_current_week
     return nil unless month.present?
 
@@ -41,8 +70,7 @@ class CreasStrategyPlan < ApplicationRecord
       return nil if current_date < month_start || current_date > month_start.end_of_month
 
       ((current_date - month_start).to_i / 7) + 1
-    rescue Date::Error => e
-      Rails.logger.warn "CreasStrategyPlan #{id}: Failed to calculate current week from month '#{month}': #{e.message}"
+    rescue Date::Error
       nil
     end
   end

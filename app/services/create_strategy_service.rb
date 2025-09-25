@@ -46,7 +46,7 @@ class CreateStrategyService
       objective_details: @strategy_params[:objective_details],
       frequency_per_week: parsed_frequency,
       monthly_themes: parsed_themes,
-      resources_override: parsed_resources
+      selected_templates: parsed_templates
     }
   end
 
@@ -65,21 +65,20 @@ class CreateStrategyService
     end.presence || default_themes
   end
 
-  def parsed_resources
-    resources = @strategy_params[:resources_override]
-    return {} unless resources.present?
 
-    if resources.is_a?(String)
-      JSON.parse(resources)
-    else
-      resources.to_h
-    end
-  rescue JSON::ParserError => e
-    Rails.logger.warn "Invalid JSON in resources_override: #{e.message}"
-    {}
+  def parsed_templates
+    templates = @strategy_params[:selected_templates]
+    return default_templates unless templates.present?
+
+    valid_templates = Array(templates).select { |t| CreasStrategyPlan::ALLOWED_TEMPLATES.include?(t) }
+    valid_templates.presence || default_templates
   end
 
   def default_themes
     [ "Brand awareness", "Product showcase", "Community engagement" ]
+  end
+
+  def default_templates
+    [ "only_avatars" ]
   end
 end

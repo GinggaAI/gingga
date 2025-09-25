@@ -433,6 +433,7 @@ en:
     strategy_result:
       title: "Strategy Generated Successfully!"
       content_themes_title: "Content Themes"
+      objective_details_title: "Specific Goals & Details"
       strategy_name_label: "Strategy Name"
       content_strategy_label: "Content Strategy"
       posts_per_week_label: "Posts per Week"

@@ -92,8 +92,7 @@ RSpec.describe Creas::NoctuaStrategyService do
           objective_of_the_month: 'sales',
           primary_objective: 'awareness',
           frequency_per_week: 5,
-          monthly_themes: [ 'theme1', 'theme2' ],
-          resources_override: { ai_avatars: true, stock: false }
+          monthly_themes: [ 'theme1', 'theme2' ]
         }
       end
 
@@ -103,7 +102,6 @@ RSpec.describe Creas::NoctuaStrategyService do
         expect(plan.objective_of_the_month).to eq('sales') # Uses objective_of_the_month first
         expect(plan.frequency_per_week).to eq(5)
         expect(plan.monthly_themes).to eq([ 'theme1', 'theme2' ])
-        expect(plan.resources_override).to eq({ 'ai_avatars' => true, 'stock' => false })
       end
 
       context 'when objective_of_the_month is nil but primary_objective is present' do

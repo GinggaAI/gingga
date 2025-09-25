@@ -35,6 +35,7 @@ module Creas
           month: @plan.month,
           objective_of_the_month: @plan.objective_of_the_month,
           frequency_per_week: @plan.frequency_per_week,
+          selected_templates: @plan.selected_templates || [ "only_avatars" ],
           post_types: extract_post_types,
           weekly_plan: format_weekly_plan_for_voxa
         }
@@ -51,6 +52,7 @@ module Creas
           month: @plan.month,
           objective_of_the_month: @plan.objective_of_the_month,
           frequency_per_week: @plan.frequency_per_week,
+          selected_templates: @plan.selected_templates || [ "only_avatars" ],
           post_types: extract_post_types
         },
         batch_content: format_content_items_for_voxa_batch(content_items)

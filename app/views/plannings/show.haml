@@ -34,8 +34,8 @@
           .grid.grid-cols-1.md:grid-cols-2.gap-4.mb-4
             .col-span-1
               = form.label "strategy_form[objective_of_the_month]", t('planning.strategy_form.objective_label'), class: "block text-sm font-medium mb-1 text-gray-700"
-              - options = options_for_select([['Awareness - Build brand recognition', 'awareness'], ['Engagement - Foster community interaction', 'engagement'], ['Sales - Drive conversions and revenue', 'sales'], ['Community - Strengthen customer relationships', 'community']], 'awareness')
-              = form.select "strategy_form[objective_of_the_month]", options, {}, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              - options = options_for_select(strategy_objectives, 'awareness')
+              = form.select "strategy_form[objective_of_the_month]", options, {}, class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500", id: "objective-select"
 
             .col-span-1
               = form.label "strategy_form[objective_details]", t('planning.strategy_form.objective_details_label'),
@@ -48,11 +48,51 @@
             .col-span-1
               = form.label "strategy_form[monthly_themes]", t('planning.strategy_form.monthly_themes_label'),
                   class: "block text-sm font-medium mb-1 text-gray-700"
-              = form.text_field "strategy_form[monthly_themes]",
-                  placeholder: t('planning.strategy_form.monthly_themes_placeholder'),
-                  class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+
+              #monthly-themes-container.space-y-3
+                / Recommended themes will be populated by JavaScript based on objective selection
+                #recommended-themes.flex.flex-wrap.gap-2.mb-3
+                  / Initial themes for 'awareness' objective
+                  - recommended_themes_for('awareness').each do |theme|
+                    = render(Ui::ThemeChipComponent.new(theme: theme, selected: true))
+
+                / Custom themes section
+                #custom-themes.flex.flex-wrap.gap-2.mb-3
+
+                / Add custom theme chip
+                = render(Ui::AddCustomThemeChipComponent.new)
+
+                / Custom theme input (hidden by default)
+                #custom-theme-input.mt-2{style: "display: none;"}
+                  .flex.gap-2.items-center
+                    %input#custom-theme-text.flex-1.p-2.border.border-gray-300.rounded-md.focus:ring-2.focus:ring-blue-500.focus:border-blue-500{
+                      type: "text",
+                      placeholder: "Enter custom theme...",
+                      maxlength: "50"
+                    }
+                    %button#add-custom-theme-btn.px-3.py-2.bg-blue-600.text-white.rounded-md.hover:bg-blue-700{type: "button"} Add
+                    %button#cancel-custom-theme-btn.px-3.py-2.text-gray-600.hover:text-gray-800{type: "button"} Cancel
+
+              / Hidden input to store selected themes as comma-separated string
+              = form.hidden_field "strategy_form[monthly_themes]", id: "monthly-themes-hidden"
+
               %p.text-xs.text-gray-500.mt-1= t('planning.strategy_form.monthly_themes_help')
 
+          .col-span-full
+            = form.label "strategy_form[selected_templates]", "Reel Templates",
+                class: "block text-sm font-medium mb-1 text-gray-700"
+
+            #templates-container.space-y-3
+              %p.text-xs.text-gray-500.mb-3 Select one or more templates for generating your reels
+
+              #available-templates.grid.grid-cols-1.md:grid-cols-2.lg:grid-cols-3.gap-3.mb-3
+                - available_templates.each do |template_key, template_description|
+                  = render(Ui::TemplateChipComponent.new(template_key: template_key, template_description: template_description, selected: template_key == 'only_avatars'))
+
+              / Hidden input to store selected templates as JSON array
+              = form.hidden_field "strategy_form[selected_templates]", id: "selected-templates-hidden", value: '["only_avatars"]'
+
+          .grid.grid-cols-1.md:grid-cols-2.gap-4.mb-4
             .col-span-1
               = form.label "strategy_form[frequency_per_week]", t('planning.strategy_form.frequency_label'),
                   class: "block text-sm font-medium mb-1 text-gray-700"
@@ -61,56 +101,6 @@
                   class: "w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
                   required: true
 
-          .mb-4
-            %h3.block.text-sm.font-medium.mb-3.text-gray-700= t('planning.strategy_form.resources_title')
-            %p.text-xs.text-gray-500.mb-3= t('planning.strategy_form.resources_subtitle')
-
-            .grid.grid-cols-1.md:grid-cols-2.gap-4.mb-3
-              .col-span-1
-                %label.block.text-sm.font-medium.mb-1.text-gray-600= t('planning.strategy_form.budget_label')
-                %select#budget-select.w-full.p-2.border.border-gray-300.rounded-md.focus:ring-2.focus:ring-blue-500.focus:border-blue-500
-                  %option{value: ""}= t('planning.strategy_form.budget_options.none')
-                  %option{value: "500"}= t('planning.strategy_form.budget_options.low')
-                  %option{value: "1000"}= t('planning.strategy_form.budget_options.medium')
-                  %option{value: "2500"}= t('planning.strategy_form.budget_options.high')
-                  %option{value: "5000"}= t('planning.strategy_form.budget_options.premium')
-
-              .col-span-1
-                %label.block.text-sm.font-medium.mb-1.text-gray-600= t('planning.strategy_form.team_size_label')
-                %select#team-size-select.w-full.p-2.border.border-gray-300.rounded-md.focus:ring-2.focus:ring-blue-500.focus:border-blue-500
-                  %option{value: ""}= t('planning.strategy_form.team_size_options.none')
-                  %option{value: "1"}= t('planning.strategy_form.team_size_options.solo')
-                  %option{value: "2"}= t('planning.strategy_form.team_size_options.small')
-                  %option{value: "3"}= t('planning.strategy_form.team_size_options.medium')
-                  %option{value: "5"}= t('planning.strategy_form.team_size_options.large')
-
-            .grid.grid-cols-1.md:grid-cols-2.gap-4.mb-3
-              .col-span-1
-                %label.block.text-sm.font-medium.mb-1.text-gray-600= t('planning.strategy_form.design_tools_label')
-                %select#tools-select.w-full.p-2.border.border-gray-300.rounded-md.focus:ring-2.focus:ring-blue-500.focus:border-blue-500{multiple: true, size: "3"}
-                  %option{value: "Canva"} Canva
-                  %option{value: "Photoshop"} Adobe Photoshop
-                  %option{value: "Figma"} Figma
-                  %option{value: "Sketch"} Sketch
-                  %option{value: "After Effects"} After Effects
-                  %option{value: "Premiere Pro"} Premiere Pro
-                  %option{value: "Final Cut"} Final Cut Pro
-                %p.text-xs.text-gray-500.mt-1= t('planning.strategy_form.design_tools_help')
-
-              .col-span-1
-                %label.block.text-sm.font-medium.mb-1.text-gray-600= t('planning.strategy_form.content_resources_label')
-                .space-y-2
-                  %label.flex.items-center
-                    %input#ai-avatars-checkbox.mr-2{type: "checkbox"}
-                    %span.text-sm= t('planning.strategy_form.use_ai_avatars')
-                  %label.flex.items-center
-                    %input#stock-photos-checkbox.mr-2{type: "checkbox"}
-                    %span.text-sm= t('planning.strategy_form.use_stock_photos')
-                  %label.flex.items-center
-                    %input#custom-graphics-checkbox.mr-2{type: "checkbox"}
-                    %span.text-sm= t('planning.strategy_form.create_custom_graphics')
-
-            = form.hidden_field "strategy_form[resources_override]", id: "resources-override-json"
 
           .flex.justify-between.items-center
             %button#cancel-form.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.border.border-input.bg-background.hover:bg-accent.hover:text-accent-foreground.h-9.px-3.rounded-xl{type: "button"}
@@ -153,6 +143,12 @@
 
         / Separator
         .w-full.h-px.bg-gray-200.mb-6
+
+        / Objective Details Section
+        #objective-details-section.mb-6{style: "display: none;"}
+          .space-y-3
+            %h3.text-lg.font-bold.text-gray-800= t('planning.strategy_result.objective_details_title')
+            #strategy-objective-details.text-gray-700.leading-relaxed -
 
         / Content Themes
         .space-y-3
@@ -296,8 +292,6 @@
       button.addEventListener('click', handleVoxaRefineWeek);
     });
 
-    // Resources Override form handling
-    setupResourcesOverrideHandlers();
 
     // Initialize with existing plan if available
     if (window.currentPlan) {
@@ -335,7 +329,306 @@
     if (planId && (!window.currentPlan || window.currentPlan.id != planId)) {
       loadStrategyPlan(planId);
     }
+
+    // Monthly themes chip functionality
+    initializeThemeChips();
   });
+
+  // Theme mapping configuration - mirrors the Rails helper
+  const OBJECTIVE_THEMES = {
+    'awareness': [
+      'Brand Story & Origin',
+      'Product/Service Showcase',
+      'Industry Trends',
+      'Community Spotlights'
+    ],
+    'engagement': [
+      'Q&A / Behind the Scenes',
+      'User-Generated Content',
+      'Interactive Polls & Challenges',
+      'Community Highlights'
+    ],
+    'sales': [
+      'Product Benefits & Use Cases',
+      'Comparisons / Alternatives',
+      'Social Proof',
+      'Offers & Promotions'
+    ],
+    'community': [
+      'Educational / How-to Tips',
+      'Advanced Product Use Cases',
+      'Customer Appreciation',
+      'Referral & Loyalty Programs'
+    ]
+  };
+
+  function initializeThemeChips() {
+    const objectiveSelect = document.getElementById('objective-select');
+    const monthlyThemesHidden = document.getElementById('monthly-themes-hidden');
+
+    if (!objectiveSelect || !monthlyThemesHidden) return;
+
+    // Handle objective changes
+    objectiveSelect.addEventListener('change', function() {
+      updateRecommendedThemes(this.value);
+      updateHiddenInput();
+    });
+
+    // Handle theme chip clicks
+    document.addEventListener('click', function(e) {
+      if (e.target.closest('[data-theme]')) {
+        toggleThemeChip(e.target.closest('[data-theme]'));
+        updateHiddenInput();
+      }
+
+      if (e.target.closest('[data-action="add-custom-theme"]')) {
+        showCustomThemeInput();
+      }
+
+      if (e.target.closest('[data-action="remove-theme"]')) {
+        e.stopPropagation();
+        removeCustomTheme(e.target.closest('[data-theme]'));
+        updateHiddenInput();
+      }
+    });
+
+    // Handle custom theme input
+    const addBtn = document.getElementById('add-custom-theme-btn');
+    const cancelBtn = document.getElementById('cancel-custom-theme-btn');
+    const customInput = document.getElementById('custom-theme-text');
+
+    if (addBtn) {
+      addBtn.addEventListener('click', addCustomTheme);
+    }
+
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', hideCustomThemeInput);
+    }
+
+    if (customInput) {
+      customInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addCustomTheme();
+        }
+        if (e.key === 'Escape') {
+          hideCustomThemeInput();
+        }
+      });
+    }
+
+    // Handle template chip clicks
+    document.addEventListener('click', function(e) {
+      if (e.target.closest('[data-template]')) {
+        toggleTemplateChip(e.target.closest('[data-template]'));
+        updateTemplatesHiddenInput();
+      }
+    });
+
+    // Initialize with current selection
+    updateHiddenInput();
+    updateTemplatesHiddenInput();
+  }
+
+  function updateRecommendedThemes(objective) {
+    const recommendedContainer = document.getElementById('recommended-themes');
+    if (!recommendedContainer) return;
+
+    const themes = OBJECTIVE_THEMES[objective] || [];
+    recommendedContainer.innerHTML = '';
+
+    themes.forEach(theme => {
+      const chip = createThemeChip(theme, true, false);
+      recommendedContainer.appendChild(chip);
+    });
+  }
+
+  function createThemeChip(theme, selected = false, custom = false) {
+    const chip = document.createElement('div');
+    const baseClasses = [
+      'inline-flex', 'items-center', 'gap-2', 'px-3', 'py-1.5', 'rounded-full',
+      'text-sm', 'font-medium', 'cursor-pointer', 'transition-colors',
+      'border', 'select-none'
+    ];
+
+    if (selected) {
+      if (custom) {
+        chip.className = baseClasses.concat(['bg-green-100', 'text-green-800', 'border-green-300']).join(' ');
+      } else {
+        chip.className = baseClasses.concat(['bg-blue-100', 'text-blue-800', 'border-blue-300']).join(' ');
+      }
+    } else {
+      chip.className = baseClasses.concat(['bg-gray-100', 'text-gray-600', 'border-gray-300', 'hover:bg-gray-200']).join(' ');
+    }
+
+    chip.setAttribute('data-theme', theme);
+    chip.setAttribute('data-selected', selected);
+
+    const content = [];
+
+    if (selected) {
+      const checkmark = document.createElement('span');
+      checkmark.textContent = '✓';
+      checkmark.className = 'text-xs';
+      content.push(checkmark);
+    }
+
+    const label = document.createElement('span');
+    label.textContent = theme;
+    content.push(label);
+
+    if (custom) {
+      const removeBtn = document.createElement('button');
+      removeBtn.textContent = '×';
+      removeBtn.type = 'button';
+      removeBtn.className = 'ml-1 text-xs hover:text-red-600';
+      removeBtn.setAttribute('data-action', 'remove-theme');
+      content.push(removeBtn);
+    }
+
+    content.forEach(el => chip.appendChild(el));
+    return chip;
+  }
+
+  function toggleThemeChip(chip) {
+    const isSelected = chip.getAttribute('data-selected') === 'true';
+    const theme = chip.getAttribute('data-theme');
+    const isCustom = chip.closest('#custom-themes') !== null;
+
+    if (isSelected) {
+      // Deselect
+      chip.setAttribute('data-selected', 'false');
+      const newChip = createThemeChip(theme, false, isCustom);
+      chip.parentNode.replaceChild(newChip, chip);
+    } else {
+      // Select
+      chip.setAttribute('data-selected', 'true');
+      const newChip = createThemeChip(theme, true, isCustom);
+      chip.parentNode.replaceChild(newChip, chip);
+    }
+  }
+
+  function showCustomThemeInput() {
+    const input = document.getElementById('custom-theme-input');
+    const textInput = document.getElementById('custom-theme-text');
+    const addChip = document.getElementById('add-custom-theme-chip');
+
+    if (input && addChip) {
+      input.style.display = 'block';
+      addChip.style.display = 'none';
+      if (textInput) {
+        textInput.focus();
+      }
+    }
+  }
+
+  function hideCustomThemeInput() {
+    const input = document.getElementById('custom-theme-input');
+    const textInput = document.getElementById('custom-theme-text');
+    const addChip = document.getElementById('add-custom-theme-chip');
+
+    if (input && addChip && textInput) {
+      input.style.display = 'none';
+      addChip.style.display = 'inline-flex';
+      textInput.value = '';
+    }
+  }
+
+  function addCustomTheme() {
+    const textInput = document.getElementById('custom-theme-text');
+    const customContainer = document.getElementById('custom-themes');
+
+    if (!textInput || !customContainer) return;
+
+    const theme = textInput.value.trim();
+    if (!theme) return;
+
+    // Check if theme already exists
+    const existing = document.querySelector(`[data-theme="${CSS.escape(theme)}"]`);
+    if (existing) {
+      hideCustomThemeInput();
+      return;
+    }
+
+    // Create and add custom theme chip
+    const chip = createThemeChip(theme, true, true);
+    customContainer.appendChild(chip);
+
+    hideCustomThemeInput();
+    updateHiddenInput();
+  }
+
+  function removeCustomTheme(chip) {
+    chip.remove();
+  }
+
+  function updateHiddenInput() {
+    const hiddenInput = document.getElementById('monthly-themes-hidden');
+    if (!hiddenInput) return;
+
+    const selectedChips = document.querySelectorAll('[data-theme][data-selected="true"]');
+    const themes = Array.from(selectedChips).map(chip => chip.getAttribute('data-theme'));
+
+    hiddenInput.value = themes.join(', ');
+  }
+
+  function toggleTemplateChip(chip) {
+    const isSelected = chip.getAttribute('data-selected') === 'true';
+    const template = chip.getAttribute('data-template');
+
+    // Get template description from the available templates
+    const templateDescriptions = {
+      'only_avatars': 'Only Avatars - AI-generated characters speaking directly',
+      'avatar_and_video': 'Avatar + Video - Combine AI avatars with background video',
+      'narration_over_7_images': 'Narration over Images - Voiceover with 7 rotating images',
+      'remix': 'Remix - Repurpose existing content with new format',
+      'one_to_three_videos': 'Multiple Videos - Combine 1-3 video clips'
+    };
+
+    const description = templateDescriptions[template] || '';
+    const [title, subtitle] = description.split(' - ');
+
+    // Toggle selection state
+    chip.setAttribute('data-selected', (!isSelected).toString());
+
+    // Update visual state and rebuild content
+    if (!isSelected) {
+      // Select the chip
+      chip.classList.remove('bg-gray-100', 'text-gray-600', 'border-gray-300');
+      chip.classList.add('bg-purple-100', 'text-purple-800', 'border-purple-300');
+
+      // Rebuild content with checkmark
+      chip.innerHTML = `
+        <span class="text-xs">✓</span>
+        <div class="flex flex-col">
+          <span class="font-medium">${title}</span>
+          <span class="text-xs opacity-75">${subtitle}</span>
+        </div>
+      `;
+    } else {
+      // Deselect the chip
+      chip.classList.remove('bg-purple-100', 'text-purple-800', 'border-purple-300');
+      chip.classList.add('bg-gray-100', 'text-gray-600', 'border-gray-300');
+
+      // Rebuild content without checkmark
+      chip.innerHTML = `
+        <div class="flex flex-col">
+          <span class="font-medium">${title}</span>
+          <span class="text-xs opacity-75">${subtitle}</span>
+        </div>
+      `;
+    }
+  }
+
+  function updateTemplatesHiddenInput() {
+    const hiddenInput = document.getElementById('selected-templates-hidden');
+    if (!hiddenInput) return;
+
+    const selectedChips = document.querySelectorAll('[data-template][data-selected="true"]');
+    const templates = Array.from(selectedChips).map(chip => chip.getAttribute('data-template'));
+
+    hiddenInput.value = JSON.stringify(templates);
+  }
 
   function handleFormSubmit(e) {
     e.preventDefault();
@@ -348,12 +641,12 @@
     // Show loading state
     setLoadingState(true, submitBtn, submitText, loadingSpinner);
     hideMessages();
-    
+
     // Update no-strategy message to indicate process started
     updateNoStrategyMessage(true);
 
     const formData = new FormData(form);
-    
+
     // Form data prepared for submission
 
     // Create AbortController for timeout handling
@@ -383,7 +676,7 @@
       if (data.success) {
         // Show immediate feedback to user
         alert('#{t('planning.js_messages.strategy_being_created_alert')}');
-        
+
         // Check if the plan is immediately completed (sync) or pending (async)
         if (data.plan.status === 'completed') {
           // Handle completed plan immediately
@@ -406,7 +699,7 @@
           // Handle pending plan - show processing UI and start polling
           showProcessingStrategy(data.plan);
           startPollingStrategy(data.plan.id);
-          
+
           // Update URL with plan_id
           if (data.plan && data.plan.id) {
             const newUrl = new URL(window.location);
@@ -451,7 +744,7 @@
     if (!resultDiv || !plan) return;
 
     // Restore original title when showing strategy
-    const titleEl = resultDiv.querySelector('h3');
+    const titleEl = resultDiv.querySelector('h2');
     if (titleEl) {
       titleEl.textContent = '#{t('planning.strategy_result.title')}';
       titleEl.className = 'text-lg font-semibold text-green-800';
@@ -470,6 +763,18 @@
     document.getElementById('strategy-total').textContent =
       plan.frequency_per_week ? (plan.frequency_per_week * 4) : '-';
     document.getElementById('strategy-objective').textContent = plan.objective_of_the_month || '-';
+
+    // Update objective details section
+    const objectiveDetailsEl = document.getElementById('strategy-objective-details');
+    const objectiveDetailsSection = document.getElementById('objective-details-section');
+    if (objectiveDetailsEl && objectiveDetailsSection) {
+      if (plan.objective_details && plan.objective_details.trim()) {
+        objectiveDetailsEl.textContent = plan.objective_details;
+        objectiveDetailsSection.style.display = 'block';
+      } else {
+        objectiveDetailsSection.style.display = 'none';
+      }
+    }
 
     // Update themes - extract from content_distribution or use monthly_themes
     const themesEl = document.getElementById('strategy-themes');
@@ -551,15 +856,15 @@
     const titleElement = document.getElementById('no-strategy-title');
     const descriptionElement = document.getElementById('no-strategy-description');
     const buttonElement = document.getElementById('create-strategy-btn');
-    
+
     if (!titleElement || !descriptionElement || !buttonElement) return;
-    
+
     if (isProcessing) {
       titleElement.textContent = '#{t('planning.js_messages.strategy_generation_in_progress')}';
       descriptionElement.textContent = '#{t('planning.js_messages.strategy_being_created')}';
       buttonElement.style.display = 'none';
     } else {
-      // Restore original text (this will be handled by page refresh in practice)  
+      // Restore original text (this will be handled by page refresh in practice)
       titleElement.textContent = `No Strategy for ${window.currentMonth || 'this month'}`;
       descriptionElement.textContent = 'There is no content strategy for this month yet.';
       buttonElement.style.display = 'inline-flex';
@@ -755,7 +1060,7 @@
     // Different styling based on status
     const statusStyles = {
       'draft': 'bg-gray-100 text-gray-700 border-l-4 border-gray-400',
-      'in_production': 'bg-blue-100 text-blue-700 border-l-4 border-blue-500', 
+      'in_production': 'bg-blue-100 text-blue-700 border-l-4 border-blue-500',
       'ready_for_review': 'bg-yellow-100 text-yellow-700 border-l-4 border-yellow-500',
       'approved': 'bg-green-100 text-green-700 border-l-4 border-green-500'
     };
@@ -765,7 +1070,7 @@
 
     const contentDiv = document.createElement('div');
     contentDiv.className = `${statusStyle} text-xs p-2 rounded mb-2 cursor-pointer hover:opacity-80 transition-all`;
-    
+
     // For in_production posts, show hook and CTA if available
     let cardContent = `${statusBadge}${icon} ${title.length > 18 ? title.substring(0, 18) + '...' : title}`;
     if (status === 'in_production') {
@@ -780,9 +1085,9 @@
         cardContent += `<div class="mt-1 text-[10px] opacity-75">${extraInfo.join('<br>')}</div>`;
       }
     }
-    
+
     contentDiv.innerHTML = cardContent;
-    
+
     // Enhanced tooltip for in_production posts
     let tooltipText = `${title} (${status.replace('_', ' ')})`;
     if (status === 'in_production') {
@@ -875,15 +1180,15 @@
 
     // Use Rails AJAX endpoint to render content details
     const detailsGrid = weekDetails.querySelector('.content-details-grid');
-    
+
     // Show loading state
     detailsGrid.innerHTML = '<div class="p-4 text-center text-gray-500">#{t('planning.js_messages.loading_content_details')}</div>';
-    
+
     // Make AJAX request to Rails controller
     const params = new URLSearchParams({
       content_data: JSON.stringify(contentPiece)
     });
-    
+
     fetch(`/planning/content_details?${params}`, {
       method: 'GET',
       headers: {
@@ -983,87 +1288,18 @@
     }
   }
 
-  function setupResourcesOverrideHandlers() {
-    const budgetSelect = document.getElementById('budget-select');
-    const teamSizeSelect = document.getElementById('team-size-select');
-    const toolsSelect = document.getElementById('tools-select');
-    const aiAvatarsCheckbox = document.getElementById('ai-avatars-checkbox');
-    const stockPhotosCheckbox = document.getElementById('stock-photos-checkbox');
-    const customGraphicsCheckbox = document.getElementById('custom-graphics-checkbox');
-    const hiddenInput = document.getElementById('resources-override-json');
-
-    const elements = [budgetSelect, teamSizeSelect, toolsSelect, aiAvatarsCheckbox, stockPhotosCheckbox, customGraphicsCheckbox];
-
-    elements.forEach(element => {
-      if (element) {
-        const eventType = element.type === 'checkbox' ? 'change' : 'change';
-        element.addEventListener(eventType, updateResourcesOverrideJSON);
-      }
-    });
-
-    // Initialize with empty JSON
-    if (hiddenInput) {
-      hiddenInput.value = '{}';
-    }
-  }
-
-  function updateResourcesOverrideJSON() {
-    const budgetSelect = document.getElementById('budget-select');
-    const teamSizeSelect = document.getElementById('team-size-select');
-    const toolsSelect = document.getElementById('tools-select');
-    const aiAvatarsCheckbox = document.getElementById('ai-avatars-checkbox');
-    const stockPhotosCheckbox = document.getElementById('stock-photos-checkbox');
-    const customGraphicsCheckbox = document.getElementById('custom-graphics-checkbox');
-    const hiddenInput = document.getElementById('resources-override-json');
-
-    if (!hiddenInput) return;
-
-    const resourcesData = {};
-
-    // Budget
-    if (budgetSelect && budgetSelect.value) {
-      resourcesData.budget = parseInt(budgetSelect.value, 10);
-    }
-
-    // Team Size
-    if (teamSizeSelect && teamSizeSelect.value) {
-      resourcesData.team_size = parseInt(teamSizeSelect.value, 10);
-    }
-
-    // Tools (multiple select)
-    if (toolsSelect) {
-      const selectedTools = Array.from(toolsSelect.selectedOptions).map(option => option.value);
-      if (selectedTools.length > 0) {
-        resourcesData.tools = selectedTools;
-      }
-    }
-
-    // Content Resources
-    if (aiAvatarsCheckbox && aiAvatarsCheckbox.checked) {
-      resourcesData.ai_avatars = true;
-    }
-    if (stockPhotosCheckbox && stockPhotosCheckbox.checked) {
-      resourcesData.stock = true;
-    }
-    if (customGraphicsCheckbox && customGraphicsCheckbox.checked) {
-      resourcesData.custom_graphics = true;
-    }
-
-    // Update hidden field with JSON
-    hiddenInput.value = JSON.stringify(resourcesData);
-  }
 
   function updateVoxaButton() {
     const voxaBtn = document.getElementById('voxa-refine');
     const weekRefineButtons = document.querySelectorAll('.voxa-refine-week');
-    
+
     const shouldShow = window.currentPlan && window.currentPlan.id;
-    
+
     // Update main Voxa button
     if (voxaBtn) {
       voxaBtn.style.display = shouldShow ? 'inline-block' : 'none';
     }
-    
+
     // Update week-specific Voxa buttons
     weekRefineButtons.forEach(button => {
       button.style.display = shouldShow ? 'inline-flex' : 'none';
@@ -1123,7 +1359,7 @@
     }
 
     const weekNumber = e.target.closest('button').getAttribute('data-week');
-    
+
     if (!weekNumber) {
       showError('#{t('planning.js_messages.invalid_week_number')}');
       return;
@@ -1197,16 +1433,16 @@
     const strategyCard = document.getElementById('strategy-card');
     const strategyTitle = document.getElementById('strategy-title');
     const strategyDescription = document.getElementById('strategy-description');
-    
+
     if (strategyCard) {
       strategyCard.style.display = 'block';
       strategyCard.className = 'bg-yellow-50 border border-yellow-200 p-6 rounded-xl shadow-sm';
     }
-    
+
     if (strategyTitle) {
       strategyTitle.innerHTML = '<span class="animate-pulse">🔄 #{t("planning.strategy.processing")}</span>';
     }
-    
+
     if (strategyDescription) {
       strategyDescription.innerHTML = `
         <div class="text-center py-8">
@@ -1224,7 +1460,7 @@
     if (strategyForm) {
       strategyForm.style.display = 'none';
     }
-    
+
     // Store current plan for polling
     window.currentPlan = plan;
   }
@@ -1232,16 +1468,16 @@
   function startPollingStrategy(planId) {
     let pollCount = 0;
     const maxPolls = 60; // Poll for up to 5 minutes (5 second intervals)
-    
+
     const pollInterval = setInterval(() => {
       pollCount++;
-      
+
       if (pollCount >= maxPolls) {
         clearInterval(pollInterval);
         showError('#{t("planning.messages.generation_timeout")}');
         return;
       }
-      
+
       fetch(`/strategy_plan_status/${planId}`, {
         method: 'GET',
         headers: {
@@ -1259,21 +1495,21 @@
       .then(data => {
         if (data.completed) {
           clearInterval(pollInterval);
-          
+
           // Update current plan with completed data
           window.currentPlan = data.plan;
-          
+
           // Display the completed strategy
           displayStrategyResult(data.plan, true);
           populateCalendarWithStrategy(data.plan);
-          
+
           // Update UI states
           updateButtonText();
           updateOverviewButton();
           updateVoxaButton();
         } else if (data.failed) {
           clearInterval(pollInterval);
-          
+
           // Check if this is an incomplete brief error
           if (data.meta && data.meta.error_type === 'incomplete_brief') {
             showIncompleteBriefAlert(data.error_message);

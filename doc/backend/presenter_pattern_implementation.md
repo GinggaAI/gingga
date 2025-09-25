@@ -371,6 +371,11 @@ def display_title
 end
 ```
 
+## Related Documentation
+
+- **ViewComponent vs Helper Refactor (2025-09)**: See `/doc/frontend/viewcomponent_vs_helper_refactor_2025_09.md` for critical guidance on when to use ViewComponents vs Helpers vs Presenters
+- **Key Rule**: Helpers are for data transformation, ViewComponents are for UI generation, Presenters are for complex view logic
+
 ## Future Enhancements
 
 1. **ViewComponent Integration**: Consider converting presenters to ViewComponents for better encapsulation

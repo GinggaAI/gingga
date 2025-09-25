@@ -55,9 +55,9 @@ class GenerateNoctuaStrategyJob < ApplicationJob
         status: :completed,
         strategy_name: parsed["strategy_name"],
         objective_of_the_month: parsed.fetch("objective_of_the_month"),
+        objective_details: strategy_plan.objective_details, # Preserve user input
         frequency_per_week: parsed.fetch("frequency_per_week"),
         monthly_themes: parsed["monthly_themes"] || [],
-        resources_override: parsed["resources_override"] || {},
         content_distribution: parsed["content_distribution"] || {},
         weekly_plan: validated_payload["weekly_plan"] || [],
         remix_duet_plan: parsed["remix_duet_plan"] || {},

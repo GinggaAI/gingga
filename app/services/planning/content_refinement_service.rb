@@ -59,13 +59,11 @@ module Planning
     end
 
     def log_service_error(error)
-      context = target_week ? "Week #{target_week} " : ""
-      Rails.logger.error "ContentRefinementService: #{context}Voxa refinement failed for strategy #{strategy.id}: #{error.message}"
+      # Error details are captured in the service result and bubbled up to controller
     end
 
     def log_unexpected_error(error)
-      context = target_week ? "week #{target_week} " : ""
-      Rails.logger.error "ContentRefinementService: Unexpected error during #{context}Voxa refinement for strategy #{strategy.id}: #{error.message}"
+      # Error details are captured in the service result and bubbled up to controller
     end
 
     def generic_error_message

@@ -391,4 +391,98 @@ RSpec.describe Creas::Prompts do
       expect(voxa).to include(objectives)
     end
   end
+
+  describe '.build_template_rules' do
+    context 'with single template' do
+      it 'returns rules for only_avatars' do
+        selected_templates = [ 'only_avatars' ]
+        result = described_class.build_template_rules(selected_templates)
+
+        expect(result).to include('only_avatars')
+        expect(result).to include('video_source": "none"')
+        expect(result).to include('EXACTLY 3 scenes')
+        expect(result).not_to include('avatar_and_video')
+        expect(result).not_to include('remix')
+      end
+    end
+
+    context 'with multiple templates' do
+      it 'returns rules for selected templates only' do
+        selected_templates = [ 'only_avatars', 'remix' ]
+        result = described_class.build_template_rules(selected_templates)
+
+        expect(result).to include('only_avatars')
+        expect(result).to include('remix')
+        expect(result).to include('video_source": "external"')
+        expect(result).not_to include('avatar_and_video')
+        expect(result).not_to include('narration_over_7_images')
+        expect(result).not_to include('one_to_three_videos')
+      end
+    end
+
+    context 'with all templates' do
+      it 'returns rules for all templates' do
+        selected_templates = [ 'only_avatars', 'avatar_and_video', 'narration_over_7_images', 'remix', 'one_to_three_videos' ]
+        result = described_class.build_template_rules(selected_templates)
+
+        expect(result).to include('only_avatars')
+        expect(result).to include('avatar_and_video')
+        expect(result).to include('narration_over_7_images')
+        expect(result).to include('remix')
+        expect(result).to include('one_to_three_videos')
+        expect(result).to include('EXACTLY 7 beat objects')
+      end
+    end
+
+    context 'with empty array' do
+      it 'returns empty string' do
+        result = described_class.build_template_rules([])
+        expect(result.strip).to eq('')
+      end
+    end
+  end
+
+  describe '.voxa_system with selected_templates' do
+    let(:strategy_plan_data) do
+      {
+        strategy: {
+          brand_name: 'Test Brand',
+          selected_templates: [ 'only_avatars', 'remix' ]
+        }
+      }
+    end
+
+    it 'includes only selected templates in allowed list' do
+      result = described_class.voxa_system(strategy_plan_data: strategy_plan_data)
+
+      expect(result).to include('only_avatars | remix')
+      expect(result).not_to include('avatar_and_video | narration_over_7_images | one_to_three_videos')
+    end
+
+    it 'includes rules only for selected templates' do
+      result = described_class.voxa_system(strategy_plan_data: strategy_plan_data)
+
+      # Check that template rules section contains only selected templates
+      template_rules_section = result.split('CRITICAL TEMPLATE RULES')[1].split('CONTENT QUALITY REQUIREMENTS')[0]
+
+      expect(template_rules_section).to include('only_avatars')
+      expect(template_rules_section).to include('remix')
+      expect(template_rules_section).not_to include('avatar_and_video')
+      expect(template_rules_section).not_to include('narration_over_7_images')
+      expect(template_rules_section).not_to include('one_to_three_videos')
+    end
+
+    context 'with no selected templates in data' do
+      let(:strategy_plan_data) { { strategy: { brand_name: 'Test Brand' } } }
+
+      it 'falls back to all templates' do
+        result = described_class.voxa_system(strategy_plan_data: strategy_plan_data)
+
+        expect(result).to include('only_avatars | avatar_and_video | narration_over_7_images | remix | one_to_three_videos')
+        expect(result).to include('only_avatars')
+        expect(result).to include('avatar_and_video')
+        expect(result).to include('remix')
+      end
+    end
+  end
 end

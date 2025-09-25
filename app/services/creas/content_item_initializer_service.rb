@@ -606,9 +606,10 @@ module Creas
     end
 
     def apply_basic_recovery_fixes(item)
-      # Fix template validation
+      # Fix template validation - use selected templates instead of hardcoded default
+      selected_templates = @plan.selected_templates || [ "only_avatars" ]
       if item.errors[:template].any? || !%w[only_avatars avatar_and_video narration_over_7_images remix one_to_three_videos].include?(item.template)
-        item.template = "only_avatars"
+        item.template = selected_templates.first
       end
 
       # Fix pilar validation
@@ -644,9 +645,10 @@ module Creas
 
       case attempt
       when 1
-        # Attempt 1: Fix template validation
+        # Attempt 1: Fix template validation - use selected templates
         if item.errors[:template].any?
-          item.template = "only_avatars"
+          selected_templates = @plan.selected_templates || [ "only_avatars" ]
+          item.template = selected_templates.first
         end
 
         # Fix pilar validation
@@ -690,13 +692,14 @@ module Creas
 
       when 3
         # Attempt 3: Nuclear option - minimize all content to essential fields only
+        selected_templates = @plan.selected_templates || [ "only_avatars" ]
         item.content_name = "Emergency Recovery Content W#{week_number}-#{timestamp}"
         item.content_id = "EMERGENCY-#{week_number}-#{retry_index}-#{timestamp}"
         item.origin_id = item.content_id
         item.post_description = "Emergency recovery content for week #{week_number}. Original content could not be saved due to validation conflicts."
         item.text_base = "This is emergency recovery content generated to ensure the content plan is complete."
         item.hashtags = ""
-        item.template = "only_avatars"
+        item.template = selected_templates.first
         item.pilar = "C"
         item.status = "draft"
         item.video_source = "none"
@@ -714,13 +717,19 @@ module Creas
     end
 
     def normalize_template(template)
+      # Get user's selected templates - this is critical for respecting user preferences
+      selected_templates = @plan.selected_templates || [ "only_avatars" ]
+
       # Valid templates according to CreasContentItem model validation
       valid_templates = %w[only_avatars avatar_and_video narration_over_7_images remix one_to_three_videos]
 
-      return "only_avatars" if template.blank?
+      # If template is blank, use the first selected template
+      return selected_templates.first if template.blank?
 
-      # If template is already valid, return it
-      return template if valid_templates.include?(template)
+      # If template is already valid and in selected templates, return it
+      if valid_templates.include?(template) && selected_templates.include?(template)
+        return template
+      end
 
       # Template normalization mapping for common variations
       template_mappings = {
@@ -751,13 +760,16 @@ module Creas
 
       # Try to normalize the template
       normalized_template = template_mappings[template.downcase.strip]
-      if normalized_template
+
+      # If normalized template exists and is in selected templates, use it
+      if normalized_template && selected_templates.include?(normalized_template)
         return normalized_template
       end
 
-      # If no mapping found, log the unknown template and default to solo_avatars
-      Rails.logger.warn "ContentItemInitializerService: Unknown template '#{template}', defaulting to 'only_avatars'"
-      "only_avatars"
+      # If no valid mapping found or normalized template not in selected templates,
+      # log and default to the first selected template
+      Rails.logger.warn "ContentItemInitializerService: Template '#{template}' not found in selected templates #{selected_templates}, defaulting to '#{selected_templates.first}'"
+      selected_templates.first
     end
   end
 end
