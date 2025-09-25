@@ -54,13 +54,13 @@
                 #recommended-themes.flex.flex-wrap.gap-2.mb-3
                   / Initial themes for 'awareness' objective
                   - recommended_themes_for('awareness').each do |theme|
-                    = theme_chip(theme, selected: true)
+                    = render(Ui::ThemeChipComponent.new(theme: theme, selected: true))
 
                 / Custom themes section
                 #custom-themes.flex.flex-wrap.gap-2.mb-3
 
                 / Add custom theme chip
-                = add_custom_theme_chip
+                = render(Ui::AddCustomThemeChipComponent.new)
 
                 / Custom theme input (hidden by default)
                 #custom-theme-input.mt-2{style: "display: none;"}
@@ -87,7 +87,7 @@
 
               #available-templates.grid.grid-cols-1.md:grid-cols-2.lg:grid-cols-3.gap-3.mb-3
                 - available_templates.each do |template_key, template_description|
-                  = template_chip(template_key, template_description, selected: template_key == 'only_avatars')
+                  = render(Ui::TemplateChipComponent.new(template_key: template_key, template_description: template_description, selected: template_key == 'only_avatars'))
 
               / Hidden input to store selected templates as JSON array
               = form.hidden_field "strategy_form[selected_templates]", id: "selected-templates-hidden", value: '["only_avatars"]'
