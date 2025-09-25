@@ -79,6 +79,8 @@ module Reels
         default_voice_id = "voice_001"  # Force fallback
       end
 
+      Rails.logger.info "🎭 Using defaults - Avatar: '#{default_avatar_id}' (#{user_avatar ? 'user' : 'system'}), Voice: '#{default_voice_id}' (#{user_voice ? 'user' : 'system'})"
+
       [ default_avatar_id, default_voice_id ]
     end
 

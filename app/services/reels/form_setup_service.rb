@@ -54,6 +54,7 @@ module Reels
       ).call
 
       unless result[:success]
+        Rails.logger.warn "⚠️ Smart planning preload failed: #{result[:error]}"
         # Smart planning failures are non-critical and handled gracefully
       end
     end
