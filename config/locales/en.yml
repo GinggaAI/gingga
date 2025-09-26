@@ -29,7 +29,10 @@
 
 en:
   hello: "Hello world"
-  
+
+  app:
+    dashboard: "Dashboard"
+
   # Navigation and Common
   nav:
     my_brand: "My Brand"
@@ -151,6 +154,12 @@ en:
     managing_label: "Managing:"
     add_new_brand: "Add New Brand"
     untitled_brand: "Untitled Brand"
+    no_brand_selected: "No Brand Selected"
+    current_brand: "Current Brand"
+    select_brand: "Select a Brand"
+    create_your_first_brand: "Create Your First Brand"
+    get_started_with_brand: "Get started by creating a brand"
+    create_new_brand: "Create New Brand"
     fix_errors: "Please fix the following errors:"
     brand_identity: "Brand Identity"
     brand_identity_desc: "Core information about your brand"

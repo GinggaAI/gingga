@@ -94,4 +94,17 @@
               %line{x1: "21", x2: "9", y1: "12", y2: "12"}
             = t('nav.logout')
       .flex-1.overflow-y-auto.bg-background
-        = yield
+        .sticky.top-0.z-40.bg-background.border-b.border-gray-200.px-6.py-4
+          .flex.items-center.justify-between
+            .flex.items-center.gap-4
+              %h1.text-xl.font-semibold.text-gray-900
+                - if content_for?(:page_title)
+                  = content_for(:page_title)
+                - else
+                  = t('app.dashboard')
+            .flex.items-center.gap-4
+              - if user_signed_in?
+                = render Ui::GlobalBrandSwitcherComponent.new(current_user: current_user)
+              = render Ui::LanguageSwitcherComponent.new
+        .p-6
+          = yield

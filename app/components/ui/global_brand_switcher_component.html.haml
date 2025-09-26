@@ -1,0 +1,119 @@
+.relative.group
+  - if show_create_brand_cta?
+    = link_to brand_path, method: :post, data: { turbo_method: :post }, class: "flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors" do
+      .w-8.h-8.rounded-lg.bg-gradient-to-r.from-blue-500.to-purple-600.flex.items-center.justify-center
+        %svg.w-4.h-4.text-white{fill: "none", stroke: "currentColor", "stroke-width": "2", viewbox: "0 0 24 24"}
+          %path{d: "M12 6v6m0 0v6m0-6h6m-6 0H6"}
+      .text-left
+        .font-medium= t('brands.create_your_first_brand')
+        .text-xs.text-gray-500= t('brands.get_started_with_brand')
+  - else
+    %button.flex.items-center.gap-3.px-4.py-2.text-sm.font-medium.text-gray-700.hover:bg-gray-100.rounded-lg.transition-colors.w-full.text-left{type: "button", data: { "brand-switcher-trigger": true }}
+      - if current_brand
+        .w-8.h-8.rounded-lg.bg-gradient-to-r.from-blue-500.to-purple-600.flex.items-center.justify-center
+          %span.text-white.text-sm.font-bold= current_brand.name.first.upcase
+        .flex-1
+          .font-medium= current_brand_name
+          .text-xs.text-gray-500= t('brands.current_brand')
+      - else
+        .w-8.h-8.rounded-lg.bg-gray-300.flex.items-center.justify-center
+          %svg.w-4.h-4.text-gray-600{fill: "none", stroke: "currentColor", "stroke-width": "2", viewbox: "0 0 24 24"}
+            %path{d: "M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"}
+            %circle{cx: "12", cy: "7", r: "4"}
+        .flex-1
+          .font-medium= current_brand_name
+          .text-xs.text-gray-500= t('brands.select_brand')
+      %svg.w-4.h-4.text-gray-400.transition-transform.group-hover:text-gray-600{fill: "none", stroke: "currentColor", "stroke-width": "2", viewbox: "0 0 24 24", data: { "chevron": true }}
+        %path{d: "M6 9l6 6 6-6"}
+
+    .absolute.top-full.left-0.w-full.mt-1.bg-white.rounded-lg.shadow-lg.border.z-50.opacity-0.invisible.transition-all.duration-200.group-hover:opacity-100.group-hover:visible{data: { "brand-dropdown": true }}
+      .p-1
+        - user_brands.each do |brand|
+          %button.flex.items-center.gap-3.w-full.px-3.py-2.text-sm.text-gray-700.hover:bg-gray-100.rounded-md.transition-colors{type: "button", data: { "brand-option": brand.id, "brand-slug": brand.slug }}
+            .w-6.h-6.rounded-md.bg-gradient-to-r.from-blue-500.to-purple-600.flex.items-center.justify-center
+              %span.text-white.text-xs.font-bold= brand.name.first.upcase
+            .flex-1.text-left
+              .font-medium= brand.name
+              .text-xs.text-gray-500= pluralize(brand.audiences.count, 'audience') + ", " + pluralize(brand.products.count, 'product')
+            - if brand == current_brand
+              %svg.w-4.h-4.text-green-600{fill: "none", stroke: "currentColor", "stroke-width": "2", viewbox: "0 0 24 24"}
+                %path{d: "M20 6L9 17l-5-5"}
+
+        .border-t.mt-1.pt-1
+          = link_to brand_path, method: :post, data: { turbo_method: :post }, class: "flex items-center gap-3 w-full px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-md transition-colors" do
+            %svg.w-4.h-4{fill: "none", stroke: "currentColor", "stroke-width": "2", viewbox: "0 0 24 24"}
+              %path{d: "M12 6v6m0 0v6m0-6h6m-6 0H6"}
+            = t('brands.create_new_brand')
+
+:javascript
+  document.addEventListener('DOMContentLoaded', function() {
+    const trigger = document.querySelector('[data-brand-switcher-trigger]');
+    const dropdown = document.querySelector('[data-brand-dropdown]');
+    const chevron = document.querySelector('[data-chevron]');
+    const brandOptions = document.querySelectorAll('[data-brand-option]');
+
+    if (trigger && dropdown) {
+      let isOpen = false;
+
+      function toggleDropdown() {
+        isOpen = !isOpen;
+        if (isOpen) {
+          dropdown.classList.remove('opacity-0', 'invisible');
+          dropdown.classList.add('opacity-100', 'visible');
+          chevron.style.transform = 'rotate(180deg)';
+        } else {
+          dropdown.classList.add('opacity-0', 'invisible');
+          dropdown.classList.remove('opacity-100', 'visible');
+          chevron.style.transform = 'rotate(0deg)';
+        }
+      }
+
+      function closeDropdown() {
+        if (isOpen) {
+          dropdown.classList.add('opacity-0', 'invisible');
+          dropdown.classList.remove('opacity-100', 'visible');
+          chevron.style.transform = 'rotate(0deg)';
+          isOpen = false;
+        }
+      }
+
+      trigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        toggleDropdown();
+      });
+
+      // Close when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!trigger.contains(e.target) && !dropdown.contains(e.target)) {
+          closeDropdown();
+        }
+      });
+
+      // Handle brand selection
+      brandOptions.forEach(option => {
+        option.addEventListener('click', function() {
+          const brandId = this.getAttribute('data-brand-option');
+          const brandSlug = this.getAttribute('data-brand-slug');
+
+          // Make request to switch brand
+          fetch('/switch_brand', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': document.querySelector('[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+              brand_id: brandId
+            })
+          }).then(response => {
+            if (response.ok) {
+              // Redirect to brand dashboard or current page with brand context
+              window.location.reload();
+            }
+          }).catch(error => {
+            console.error('Error switching brand:', error);
+          });
+        });
+      });
+    }
+  });

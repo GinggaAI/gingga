@@ -23,15 +23,15 @@ class BrandPresenter
   end
 
   def has_audiences?
-    audiences.exists?
+    @brand.audiences.exists?
   end
 
   def has_products?
-    products.exists?
+    @brand.products.exists?
   end
 
   def has_brand_channels?
-    brand_channels.exists?
+    @brand.brand_channels.exists?
   end
 
   def missing_requirements

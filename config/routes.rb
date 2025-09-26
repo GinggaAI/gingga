@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   scope "(:locale)", locale: /en|es/ do
     resource :brand, only: [ :show, :edit, :update, :create ]
     get "/my-brand", to: "brands#edit", as: "my_brand"
+    post "/switch_brand", to: "brands#switch", as: "switch_brand"
 
     # Planning Display - Single Responsibility
     resource :planning, only: [ :show ] do
