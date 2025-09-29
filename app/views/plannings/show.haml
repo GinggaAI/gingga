@@ -1189,7 +1189,7 @@
       content_data: JSON.stringify(contentPiece)
     });
 
-    fetch(`/planning/content_details?${params}`, {
+    fetch(`/#{@brand.slug}/#{I18n.locale}/planning/content_details?${params}`, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
