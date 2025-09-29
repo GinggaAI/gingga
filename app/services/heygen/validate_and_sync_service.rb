@@ -3,7 +3,7 @@ require "ostruct"
 class Heygen::ValidateAndSyncService
   def initialize(user:, brand: nil, voices_count: nil)
     @user = user
-    @brand = brand || user.current_brand
+    @brand = brand || (user&.current_brand)
     @voices_count = voices_count
   end
 
