@@ -1,0 +1,36 @@
+- if show_create_brand_cta?
+  = link_to brand_path, method: :post, data: { turbo_method: :post }, class: "flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-white hover:bg-opacity-10 rounded-lg transition-colors" do
+    %svg.w-4.h-4{fill: "none", stroke: "currentColor", "stroke-width": "2", viewbox: "0 0 24 24"}
+      %path{d: "M12 6v6m0 0v6m0-6h6m-6 0H6"}
+    = t('brands.create_your_first_brand')
+- else
+  .relative{data: { controller: "dropdown" }}
+    %button.flex.items-center.gap-2.w-full.px-3.py-2.text-sm.text-gray-300.hover:text-white.hover:bg-white.hover:bg-opacity-10.rounded-lg.transition-colors{type: "button", data: { action: "click->dropdown#toggle" }}
+      - if current_brand
+        .w-6.h-6.rounded.bg-gradient-to-r.from-blue-500.to-purple-600.flex.items-center.justify-center
+          %span.text-white.text-xs.font-bold= current_brand.name.first.upcase
+        .flex-1.text-left.truncate= current_brand_name
+      - else
+        %svg.w-4.h-4{fill: "none", stroke: "currentColor", "stroke-width": "2", viewbox: "0 0 24 24"}
+          %path{d: "M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"}
+          %circle{cx: "12", cy: "7", r: "4"}
+        .flex-1.text-left.truncate= current_brand_name
+      %svg.w-4.h-4.transition-transform{fill: "none", stroke: "currentColor", "stroke-width": "2", viewbox: "0 0 24 24", data: { "dropdown-target": "chevron" }}
+        %path{d: "M6 9l6 6 6-6"}
+
+    .absolute.top-full.left-0.w-full.mt-1.bg-slate-900.rounded-lg.shadow-xl.border.border-slate-600.z-50.hidden{data: { "dropdown-target": "menu" }, style: "background-color: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px);"}
+      .p-1
+        - user_brands.each do |brand|
+          %button.flex.items-center.gap-2.w-full.px-2.py-2.text-sm.text-gray-300.hover:text-white.hover:bg-gray-700.rounded.transition-colors{type: "button", data: { "brand-option": brand.id, action: "click->dropdown#selectBrand" }}
+            .w-5.h-5.rounded.bg-gradient-to-r.from-blue-500.to-purple-600.flex.items-center.justify-center
+              %span.text-white.text-xs.font-bold= brand.name.first.upcase
+            .flex-1.text-left.truncate= brand.name
+            - if brand == current_brand
+              %svg.w-4.h-4.text-green-400{fill: "none", stroke: "currentColor", "stroke-width": "2", viewbox: "0 0 24 24"}
+                %path{d: "M20 6L9 17l-5-5"}
+
+        .border-t.border-gray-700.mt-1.pt-1
+          = link_to brand_path, method: :post, data: { turbo_method: :post }, class: "flex items-center gap-2 w-full px-2 py-2 text-sm text-blue-400 hover:text-blue-300 hover:bg-gray-700 rounded transition-colors" do
+            %svg.w-4.h-4{fill: "none", stroke: "currentColor", "stroke-width": "2", viewbox: "0 0 24 24"}
+              %path{d: "M12 6v6m0 0v6m0-6h6m-6 0H6"}
+            = t('brands.create_new_brand')

@@ -81,6 +81,19 @@
                   %circle{cx: "12", cy: "12", r: "3"}
                 = t('nav.settings')
         .p-4.space-y-4
+          / Brand Selector in Sidebar
+          - if user_signed_in?
+            .space-y-2
+              %label.text-xs.font-medium.text-gray-400.uppercase.tracking-wider
+                = t('brands.current_brand')
+              = render Ui::SidebarBrandSwitcherComponent.new(current_user: current_user)
+
+          / Language Selector in Sidebar
+          .space-y-2
+            %label.text-xs.font-medium.text-gray-400.uppercase.tracking-wider
+              = t('nav.language')
+            = render Ui::SidebarLanguageSwitcherComponent.new
+
           = link_to viral_ideas_path, class: "flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl text-white font-medium", style: "background: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%)" do
             %svg.w-4.h-4{fill: "none", stroke: "currentColor", "stroke-width": "2", viewbox: "0 0 24 24"}
               %path{d: "M12 2L2 7l10 5 10-5-10-5z"}
@@ -103,8 +116,5 @@
                 - else
                   = t('app.dashboard')
             .flex.items-center.gap-4
-              - if user_signed_in?
-                = render Ui::GlobalBrandSwitcherComponent.new(current_user: current_user)
-              = render Ui::LanguageSwitcherComponent.new
         .p-6
           = yield
