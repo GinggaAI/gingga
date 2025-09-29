@@ -127,7 +127,7 @@ RSpec.describe Brands::RetrievalService do
 
       brands = described_class.collection_for_user(user: user)
 
-      expect(brands).to eq([older_brand, newer_brand])
+      expect(brands).to eq([ older_brand, newer_brand ])
       expect(brands.first.association(:audiences)).not_to be_loaded
     end
   end

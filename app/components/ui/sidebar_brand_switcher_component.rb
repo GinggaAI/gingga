@@ -18,7 +18,7 @@ module Ui
     end
 
     def current_brand_name
-      current_brand&.name || t('brands.no_brand_selected')
+      current_brand&.name || t("brands.no_brand_selected")
     end
 
     def show_create_brand_cta?

@@ -190,7 +190,7 @@ RSpec.describe Planning::ContentRefinementService do
       end
 
       it 'returns false for invalid week numbers' do
-        [0, 5, -1, 10].each do |week|
+        [ 0, 5, -1, 10 ].each do |week|
           service = described_class.new(strategy: strategy, target_week: week, user: user)
           expect(service.send(:valid?)).to be false
         end
@@ -221,14 +221,14 @@ RSpec.describe Planning::ContentRefinementService do
     end
 
     it 'returns false for weeks outside 1-4' do
-      [0, 5, -1, 10].each do |week|
+      [ 0, 5, -1, 10 ].each do |week|
         service = described_class.new(strategy: strategy, target_week: week, user: user)
         expect(service.send(:valid_week_number?)).to be false
       end
     end
 
     it 'returns false for non-integer values' do
-      ["week1", 1.5, "2", nil].each do |week|
+      [ "week1", 1.5, "2", nil ].each do |week|
         next if week.nil? # nil is handled separately and returns true
         service = described_class.new(strategy: strategy, target_week: week, user: user)
         expect(service.send(:valid_week_number?)).to be false

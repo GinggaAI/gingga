@@ -90,8 +90,8 @@ Rails.application.routes.draw do
     get "/select-brand", to: "brand_selection#show", as: "select_brand"
   end
 
-  # Default root without locale or brand (redirects to select brand)
-  get "/", to: "brand_selection#show", constraints: lambda { |req| req.format.html? }
+  # Default root without locale or brand (shows landing page)
+  get "/", to: "home#show", constraints: lambda { |req| req.format.html? }
 
 
   if Rails.env.development?

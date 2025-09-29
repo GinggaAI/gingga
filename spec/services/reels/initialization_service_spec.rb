@@ -6,6 +6,10 @@ RSpec.describe Reels::InitializationService do
   let(:template) { "only_avatars" }
   let(:smart_planning_data) { nil }
 
+  before do
+    I18n.locale = :en
+  end
+
   subject(:service) do
     described_class.new(
       user: user,

@@ -34,27 +34,33 @@ class Ui::LanguageSwitcherComponent < ViewComponent::Base
   def switch_locale_path(locale)
     if respond_to?(:request) && request.present?
       begin
-        # Try to maintain current path with locale switch
+        # Parse current path to extract brand_slug and path
         current_path = request.path
-        # Remove existing locale prefix if present
-        current_path = current_path.sub(%r{^/(en|es)/?}, "/")
-        # Remove leading slash for processing
-        current_path = current_path.sub(%r{^/}, "")
 
-        # Always include locale prefix to ensure session is set correctly
-        if current_path.empty?
-          locale == I18n.default_locale.to_s ? "/" : "/#{locale}/"
+        # Handle brand_slug/locale/path format: /brand-slug/locale/path
+        if current_path.match(%r{^/([^/]+)/(en|es)(/.*)?$})
+          brand_slug = $1
+          current_locale = $2
+          path_after_locale = $3 || ""
+
+          # Reconstruct URL with new locale: /brand-slug/new-locale/path
+          "/#{brand_slug}/#{locale}#{path_after_locale}"
+        elsif current_path.match(%r{^/(en|es)(/.*)?$})
+          # Handle locale-only format: /locale/path (fallback)
+          path_after_locale = $2 || ""
+          "/#{locale}#{path_after_locale}"
         else
-          "/#{locale}/#{current_path}"
+          # Fallback for unknown format
+          "/#{locale}/"
         end
       rescue StandardError => e
         Rails.logger.warn "LanguageSwitcherComponent: Failed to generate path for locale #{locale}: #{e.message}"
         # Fallback if path processing fails
-        locale == I18n.default_locale.to_s ? "/" : "/#{locale}/"
+        "/#{locale}/"
       end
     else
       # Fallback for tests without request context
-      locale == I18n.default_locale.to_s ? "/" : "/#{locale}/"
+      "/#{locale}/"
     end
   end
 end

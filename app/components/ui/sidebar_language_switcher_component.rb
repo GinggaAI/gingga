@@ -37,12 +37,12 @@ class Ui::SidebarLanguageSwitcherComponent < ViewComponent::Base
 
   def locale_flag(locale_code)
     case locale_code
-    when 'en'
-      '🇺🇸'
-    when 'es'
-      '🇪🇸'
+    when "en"
+      "🇺🇸"
+    when "es"
+      "🇪🇸"
     else
-      '🌐'
+      "🌐"
     end
   end
 
@@ -50,12 +50,12 @@ class Ui::SidebarLanguageSwitcherComponent < ViewComponent::Base
     if respond_to?(:request) && request.present?
       begin
         # Parse current path to extract brand_slug and path segments
-        path_parts = request.path.split('/').reject(&:blank?)
+        path_parts = request.path.split("/").reject(&:blank?)
 
         # If we have brand_slug and current locale, reconstruct with new locale
         if path_parts.length >= 2 && path_parts[1].match?(/^(en|es)$/)
           brand_slug = path_parts[0]
-          remaining_path = path_parts[2..-1]&.join('/') || ''
+          remaining_path = path_parts[2..-1]&.join("/") || ""
           remaining_path = "/#{remaining_path}" unless remaining_path.empty?
           "/#{brand_slug}/#{locale}#{remaining_path}"
         else
