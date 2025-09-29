@@ -9,7 +9,7 @@ module Planning
     end
 
     def call
-      @user.brands.first
+      @user.current_brand
     end
 
     private
