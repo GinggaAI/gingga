@@ -1,6 +1,7 @@
 class ReelCreationService
-  def initialize(user:, template: nil, params: nil)
+  def initialize(user:, brand: nil, template: nil, params: nil)
     @user = user
+    @brand = brand
     @template = template
     @params = params
   end
@@ -9,7 +10,7 @@ class ReelCreationService
     return failure_result("Invalid template") unless valid_template?(@template)
 
     template_service = template_service_for(@template)
-    template_service.new(user: @user, template: @template).initialize_reel
+    template_service.new(user: @user, brand: @brand, template: @template).initialize_reel
   end
 
   def call
@@ -19,7 +20,7 @@ class ReelCreationService
     return failure_result("Invalid template") unless valid_template?(template)
 
     template_service = template_service_for(template)
-    template_service.new(user: @user, params: @params).call
+    template_service.new(user: @user, brand: @brand, params: @params).call
   end
 
   private

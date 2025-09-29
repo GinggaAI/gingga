@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_26_170912) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_29_163339) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -292,6 +292,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_26_170912) do
     t.boolean "use_ai_avatar"
     t.text "additional_instructions"
     t.integer "reel_scenes_count", default: 0, null: false
+    t.uuid "brand_id", null: false
+    t.index ["brand_id"], name: "index_reels_on_brand_id"
     t.index ["user_id"], name: "index_reels_on_user_id"
   end
 
@@ -465,6 +467,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_26_170912) do
   add_foreign_key "creas_strategy_plans", "users"
   add_foreign_key "products", "brands"
   add_foreign_key "reel_scenes", "reels"
+  add_foreign_key "reels", "brands"
   add_foreign_key "reels", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
