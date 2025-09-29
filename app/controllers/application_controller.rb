@@ -4,6 +4,10 @@ class ApplicationController < ActionController::Base
 
   before_action :authenticate_user!, unless: -> { Rails.env.test? }
   before_action :set_locale
+  before_action :set_current_brand_from_url
+
+  # Make current_brand available to all controllers and views
+  helper_method :current_brand
 
   # Placeholder for test environment when Devise methods aren't loaded
   def current_user
@@ -12,6 +16,10 @@ class ApplicationController < ActionController::Base
     else
       super
     end
+  end
+
+  def current_brand
+    current_user&.current_brand
   end
 
   private
@@ -45,7 +53,29 @@ class ApplicationController < ActionController::Base
     nil
   end
 
+  def set_current_brand_from_url
+    return unless user_signed_in? && params[:brand_slug].present?
+
+    # Find brand by slug that belongs to current user
+    brand = current_user.brands.find_by(slug: params[:brand_slug])
+
+    if brand && brand != current_user.current_brand
+      # Update user's current brand if URL brand is different
+      current_user.update_last_brand(brand)
+    elsif brand.nil?
+      # If brand slug doesn't belong to user, redirect to their current brand
+      redirect_to "/#{current_user.current_brand&.slug || 'select-brand'}/#{I18n.locale}#{request.path.split('/')[3..-1]&.join('/')}"
+    end
+  end
+
   def default_url_options(options = {})
-    { locale: I18n.locale }.merge(options)
+    base_options = { locale: I18n.locale }
+
+    # Include current brand slug in URLs when available
+    if user_signed_in? && current_brand
+      base_options[:brand_slug] = current_brand.slug
+    end
+
+    base_options.merge(options)
   end
 end

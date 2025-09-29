@@ -2,11 +2,10 @@ Rails.application.routes.draw do
   # Routes without locale (for backwards compatibility and health checks)
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Routes with optional locale scope
-  scope "(:locale)", locale: /en|es/ do
+  # Routes with brand slug and locale
+  scope "(:brand_slug)/:locale", brand_slug: /[a-z0-9\-]+/, locale: /en|es/ do
     resource :brand, only: [ :show, :edit, :update, :create ]
     get "/my-brand", to: "brands#edit", as: "my_brand"
-    post "/switch_brand", to: "brands#switch", as: "switch_brand"
 
     # Planning Display - Single Responsibility
     resource :planning, only: [ :show ] do
@@ -85,8 +84,14 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  # Default root without locale (redirects to home)
-  get "/", to: redirect("/#{I18n.default_locale}"), constraints: lambda { |req| req.format.html? }
+  # Routes without brand slug for initial access and fallbacks
+  scope "/:locale", locale: /en|es/ do
+    get "/", to: "home#show", as: "locale_root"
+    get "/select-brand", to: "brand_selection#show", as: "select_brand"
+  end
+
+  # Default root without locale or brand (redirects to select brand)
+  get "/", to: "brand_selection#show", constraints: lambda { |req| req.format.html? }
 
 
   if Rails.env.development?

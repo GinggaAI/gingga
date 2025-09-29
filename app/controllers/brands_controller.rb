@@ -19,30 +19,19 @@ class BrandsController < ApplicationController
     result = Brands::CreationService.new(user: current_user).call
 
     if result[:success]
-      redirect_to edit_brand_path(brand_id: result[:data][:brand].id), notice: "New brand created successfully!"
+      new_brand = result[:data][:brand]
+      redirect_to edit_brand_path(brand_slug: new_brand.slug, locale: I18n.locale, brand_id: new_brand.id), notice: "New brand created successfully!"
     else
-      redirect_to edit_brand_path, alert: result[:error]
+      redirect_to edit_brand_path(brand_slug: current_brand.slug, locale: I18n.locale), alert: result[:error]
     end
   end
 
-  def switch
-    result = Brands::SelectionService.new(
-      user: current_user,
-      brand_id: params[:brand_id]
-    ).call
-
-    if result[:success]
-      render json: { success: true, brand: result[:data][:brand].slice(:id, :name, :slug) }
-    else
-      render json: { success: false, error: result[:error] }, status: :unprocessable_entity
-    end
-  end
 
   def update
     @brand = find_brand_for_update
 
     if @brand&.update(brand_params)
-      redirect_to edit_brand_path(brand_id: @brand.id), notice: "Brand profile updated successfully!"
+      redirect_to edit_brand_path(brand_slug: @brand.slug, locale: I18n.locale, brand_id: @brand.id), notice: "Brand profile updated successfully!"
     else
       @brands = Brands::RetrievalService.collection_for_user(user: current_user)
       @presenter = BrandPresenter.new(@brand, {
@@ -64,7 +53,7 @@ class BrandsController < ApplicationController
     if params[:brand_id].present?
       current_user.brands.find(params[:brand_id])
     else
-      current_user.brands.first || current_user.brands.create
+      current_brand || current_user.brands.create
     end
   end
 
