@@ -20,9 +20,9 @@
               = t('brands.managing_label')
           .p-6.pt-0
             .flex.items-center.gap-4
-              %select{:onchange => "if(this.value) window.location.href='/my-brand?brand_id=' + this.value", :class => "flex h-10 w-full bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm rounded-xl border-2 border-gray-200 focus:border-[#FFC940]"}
+              %select{:onchange => "if(this.value) { const brand = this.selectedOptions[0]; window.location.href='/' + brand.dataset.slug + '/#{I18n.locale}/my-brand?brand_id=' + this.value; }", :class => "flex h-10 w-full bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm rounded-xl border-2 border-gray-200 focus:border-[#FFC940]"}
                 - @presenter.brands_collection.each do |brand|
-                  %option{:value => brand.id, :selected => ('selected' if brand == @brand)}= brand.name || t('brands.untitled_brand')
+                  %option{:value => brand.id, :selected => ('selected' if brand == @brand), "data-slug": brand.slug}= brand.name || t('brands.untitled_brand')
               = link_to brand_path, method: :post, data: { turbo_method: :post }, class: "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 rounded-xl" do
                 = t('brands.add_new_brand')
 

@@ -21,7 +21,7 @@
     .absolute.top-full.left-0.w-full.mt-1.bg-slate-900.rounded-lg.shadow-xl.border.border-slate-600.z-50.hidden{data: { "dropdown-target": "menu" }, style: "background-color: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px);"}
       .p-1
         - user_brands.each do |brand|
-          %button.flex.items-center.gap-2.w-full.px-2.py-2.text-sm.text-gray-300.hover:text-white.hover:bg-gray-700.rounded.transition-colors{type: "button", data: { "brand-option": brand.id, action: "click->dropdown#selectBrand" }}
+          = link_to "/#{brand.slug}/#{I18n.locale}#{request.path.split('/')[3..-1]&.any? ? '/' + request.path.split('/')[3..-1].join('/') : ''}", class: "flex items-center gap-2 w-full px-2 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-700 rounded transition-colors" do
             .w-5.h-5.rounded.bg-gradient-to-r.from-blue-500.to-purple-600.flex.items-center.justify-center
               %span.text-white.text-xs.font-bold= brand.name.first.upcase
             .flex-1.text-left.truncate= brand.name

@@ -49,27 +49,31 @@ class Ui::SidebarLanguageSwitcherComponent < ViewComponent::Base
   def switch_locale_path(locale)
     if respond_to?(:request) && request.present?
       begin
-        # Try to maintain current path with locale switch
-        current_path = request.path
-        # Remove existing locale prefix if present
-        current_path = current_path.sub(%r{^/(en|es)/?}, "/")
-        # Remove leading slash for processing
-        current_path = current_path.sub(%r{^/}, "")
+        # Parse current path to extract brand_slug and path segments
+        path_parts = request.path.split('/').reject(&:blank?)
 
-        # Always include locale prefix to ensure session is set correctly
-        if current_path.empty?
-          locale == I18n.default_locale.to_s ? "/" : "/#{locale}/"
+        # If we have brand_slug and current locale, reconstruct with new locale
+        if path_parts.length >= 2 && path_parts[1].match?(/^(en|es)$/)
+          brand_slug = path_parts[0]
+          remaining_path = path_parts[2..-1]&.join('/') || ''
+          remaining_path = "/#{remaining_path}" unless remaining_path.empty?
+          "/#{brand_slug}/#{locale}#{remaining_path}"
         else
-          "/#{locale}/#{current_path}"
+          # Fallback: try to include current brand if available
+          current_brand_slug = respond_to?(:current_brand) && current_brand&.slug
+          if current_brand_slug
+            "/#{current_brand_slug}/#{locale}"
+          else
+            "/#{locale}/"
+          end
         end
       rescue StandardError => e
         Rails.logger.warn "SidebarLanguageSwitcherComponent: Failed to generate path for locale #{locale}: #{e.message}"
-        # Fallback if path processing fails
-        locale == I18n.default_locale.to_s ? "/" : "/#{locale}/"
+        "/#{locale}/"
       end
     else
       # Fallback for tests without request context
-      locale == I18n.default_locale.to_s ? "/" : "/#{locale}/"
+      "/#{locale}/"
     end
   end
 end

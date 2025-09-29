@@ -22,7 +22,8 @@ module Brands
       brand = result[:data][:brand] if result[:success]
 
       # Return existing brand or fall back to new brand with initialized associations
-      brand || build_new_brand_with_associations(user)
+      # If no specific brand_id provided, use current_brand; if no current_brand, build new one
+      brand || user.current_brand || build_new_brand_with_associations(user)
     end
 
     def self.collection_for_user(user:)
@@ -40,7 +41,7 @@ module Brands
       if brand_id.present?
         user.brands.find(brand_id)
       else
-        user.brands.first
+        user.current_brand
       end
     end
 
