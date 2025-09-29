@@ -1,13 +1,14 @@
 class SettingsPresenter
-  def initialize(user, params = {})
+  def initialize(user, brand = nil, params = {})
     @user = user
+    @brand = brand || user.current_brand
     @params = params
     @flash = params[:flash] || {}
   end
 
   # HeyGen API Token Methods
   def heygen_token
-    @heygen_token ||= @user.active_token_for("heygen")
+    @heygen_token ||= @brand&.active_token_for("heygen")
   end
 
   def heygen_token_value
@@ -83,7 +84,7 @@ class SettingsPresenter
 
   # API Integrations Overview Stats
   def active_connections_count
-    @user.api_tokens.valid_tokens.count
+    @brand&.api_tokens&.valid_tokens&.count || 0
   end
 
   def available_services_count
@@ -92,7 +93,7 @@ class SettingsPresenter
   end
 
   def test_mode_count
-    @user.api_tokens.test_mode.count
+    @brand&.api_tokens&.test_mode&.count || 0
   end
 
   private

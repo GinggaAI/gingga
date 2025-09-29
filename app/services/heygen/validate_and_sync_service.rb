@@ -1,13 +1,16 @@
 require "ostruct"
 
 class Heygen::ValidateAndSyncService
-  def initialize(user:, voices_count: nil)
+  def initialize(user:, brand: nil, voices_count: nil)
     @user = user
+    @brand = brand || user.current_brand
     @voices_count = voices_count
   end
 
   def call
-    heygen_token = @user.active_token_for("heygen")
+    return failure_result("Brand is required") unless @brand
+
+    heygen_token = @brand.active_token_for("heygen")
     return failure_result("No valid HeyGen API token found") unless heygen_token
 
     group_url = heygen_token.group_url

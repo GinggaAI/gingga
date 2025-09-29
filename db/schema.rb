@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_29_163339) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_29_165253) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -65,6 +65,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_29_163339) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "group_url"
+    t.uuid "brand_id", null: false
+    t.index ["brand_id"], name: "index_api_tokens_on_brand_id"
     t.index ["user_id"], name: "index_api_tokens_on_user_id"
   end
 
@@ -453,6 +455,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_29_163339) do
 
   add_foreign_key "ai_responses", "users"
   add_foreign_key "api_responses", "users"
+  add_foreign_key "api_tokens", "brands"
   add_foreign_key "api_tokens", "users"
   add_foreign_key "audiences", "brands"
   add_foreign_key "avatars", "users"
