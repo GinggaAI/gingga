@@ -1326,7 +1326,7 @@
     // Create form and submit
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = '/planning/content_refinements';
+    form.action = '/#{@brand.slug}/#{I18n.locale}/planning/content_refinements';
 
     // Add CSRF token
     const csrfToken = document.querySelector('meta[name="csrf-token"]');
@@ -1377,7 +1377,7 @@
     // Create form and submit
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = '/planning/content_refinements/week';
+    form.action = '/#{@brand.slug}/#{I18n.locale}/planning/content_refinements/week';
 
     // Add CSRF token
     const csrfToken = document.querySelector('meta[name="csrf-token"]');
