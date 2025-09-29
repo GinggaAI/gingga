@@ -210,6 +210,7 @@ RSpec.describe Ui::LanguageSwitcherComponent, type: :component do
       component = Ui::LanguageSwitcherComponent.new
       allow(component).to receive(:request).and_return(double(path: '/en/test', present?: true))
       allow(component).to receive(:respond_to?).with(:request).and_return(true)
+      allow(component).to receive(:respond_to?).with(:current_brand).and_return(false)
 
       # Mock a StandardError during path processing
       allow(component.send(:request)).to receive(:path).and_raise(StandardError, 'Path processing failed')
@@ -222,6 +223,7 @@ RSpec.describe Ui::LanguageSwitcherComponent, type: :component do
       component = Ui::LanguageSwitcherComponent.new
       allow(component).to receive(:request).and_return(double(path: '/en/test', present?: true))
       allow(component).to receive(:respond_to?).with(:request).and_return(true)
+      allow(component).to receive(:respond_to?).with(:current_brand).and_return(false)
 
       # Mock a StandardError during path processing
       allow(component.send(:request)).to receive(:path).and_raise(StandardError, 'Path processing failed')
