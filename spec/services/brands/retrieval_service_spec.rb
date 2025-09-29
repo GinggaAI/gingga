@@ -48,16 +48,27 @@ RSpec.describe Brands::RetrievalService do
     end
 
     context 'with eager loading enabled' do
-      it 'preloads associations when eager_load is true' do
-        brand_with_audiences = create(:brand, user: user)
-        create(:audience, brand: brand_with_audiences)
+      it 'returns brand successfully (eager_load parameter now ignored)' do
+        brand_with_data = create(:brand, user: user)
+        create(:audience, brand: brand_with_data)
+        create(:product, brand: brand_with_data)
+        create(:brand_channel, brand: brand_with_data)
 
-        service = described_class.new(user: user, brand_id: brand_with_audiences.id, eager_load: true)
+        service = described_class.new(user: user, brand_id: brand_with_data.id, eager_load: true)
         result = service.call
 
         expect(result[:success]).to be true
         loaded_brand = result[:data][:brand]
-        expect(loaded_brand.association(:audiences)).to be_loaded
+
+        # Verify associations can be accessed (now lazy loaded)
+        expect(loaded_brand.audiences.order(:created_at).count).to eq(1)
+        expect(loaded_brand.products.order(:created_at).count).to eq(1)
+        expect(loaded_brand.brand_channels.order(:priority, :created_at).count).to eq(1)
+
+        # Counter cache should work
+        expect(loaded_brand.audiences_count).to eq(1)
+        expect(loaded_brand.products_count).to eq(1)
+        expect(loaded_brand.brand_channels_count).to eq(1)
       end
     end
 
@@ -75,14 +86,25 @@ RSpec.describe Brands::RetrievalService do
 
   describe '.for_edit' do
     context 'when user has brands' do
-      it 'returns brand with preloaded associations' do
+      it 'returns brand ready for edit form' do
         brand_with_data = create(:brand, user: user)
         create(:audience, brand: brand_with_data)
+        create(:product, brand: brand_with_data)
+        create(:brand_channel, brand: brand_with_data)
 
         result_brand = described_class.for_edit(user: user, brand_id: brand_with_data.id)
 
         expect(result_brand).to eq(brand_with_data)
-        expect(result_brand.association(:audiences)).to be_loaded
+
+        # Verify associations can be accessed and counter cache works
+        expect(result_brand.audiences.order(:created_at).count).to eq(1)
+        expect(result_brand.products.order(:created_at).count).to eq(1)
+        expect(result_brand.brand_channels.order(:priority, :created_at).count).to eq(1)
+
+        # Counter cache should work
+        expect(result_brand.audiences_count).to eq(1)
+        expect(result_brand.products_count).to eq(1)
+        expect(result_brand.brand_channels_count).to eq(1)
       end
     end
 
@@ -99,14 +121,14 @@ RSpec.describe Brands::RetrievalService do
   end
 
   describe '.collection_for_user' do
-    it 'returns brands with preloaded associations ordered by created_at' do
+    it 'returns brands ordered by created_at without preloading associations' do
       older_brand = create(:brand, user: user, created_at: 1.day.ago)
       newer_brand = create(:brand, user: user, created_at: 1.hour.ago)
 
       brands = described_class.collection_for_user(user: user)
 
       expect(brands).to eq([older_brand, newer_brand])
-      expect(brands.first.association(:audiences)).to be_loaded
+      expect(brands.first.association(:audiences)).not_to be_loaded
     end
   end
 end

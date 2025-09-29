@@ -241,9 +241,9 @@
 
 :javascript
   document.addEventListener('turbo:load', function() {
-    let audienceIndex = #{@brand.audiences.length};
-    let productIndex = #{@brand.products.length};
-    let channelIndex = #{@brand.brand_channels.length};
+    let audienceIndex = #{@presenter.audiences_count};
+    let productIndex = #{@presenter.products_count};
+    let channelIndex = #{@presenter.brand_channels_count};
 
     // Add Audience functionality
     const addAudienceBtn = document.getElementById('add-audience-btn');

@@ -26,8 +26,8 @@ module Brands
     end
 
     def self.collection_for_user(user:)
-      # Optimized method for getting brand collections
-      user.brands.includes(:audiences, :products, :brand_channels).order(:created_at)
+      # Optimized method for getting brand collections - no associations needed for dropdown
+      user.brands.order(:created_at)
     end
 
     private
@@ -35,12 +35,12 @@ module Brands
     attr_reader :user, :brand_id, :eager_load
 
     def find_brand
-      scope = eager_load ? user.brands.includes(:audiences, :products, :brand_channels) : user.brands
-
+      # No longer need eager loading since we use counter cache for has_* checks
+      # and forms will lazy load associations as needed
       if brand_id.present?
-        scope.find(brand_id)
+        user.brands.find(brand_id)
       else
-        scope.first
+        user.brands.first
       end
     end
 

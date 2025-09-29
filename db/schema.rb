@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_25_150150) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_26_170912) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -127,6 +127,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_25_150150) do
     t.jsonb "resources", default: {"kling" => false, "stock" => false, "budget" => false, "editing" => false, "ai_avatars" => false, "podcast_clips" => false}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "audiences_count", default: 0, null: false
+    t.integer "products_count", default: 0, null: false
+    t.integer "brand_channels_count", default: 0, null: false
     t.index ["user_id", "slug"], name: "index_brands_on_user_id_and_slug", unique: true
     t.index ["user_id"], name: "index_brands_on_user_id"
   end
