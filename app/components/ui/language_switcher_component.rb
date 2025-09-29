@@ -1,14 +1,15 @@
 # frozen_string_literal: true
 
 class Ui::LanguageSwitcherComponent < ViewComponent::Base
-  def initialize(current_locale: I18n.locale, **options)
+  def initialize(current_locale: I18n.locale, brand: nil, **options)
     @current_locale = current_locale.to_s
+    @brand = brand
     @options = options
   end
 
   private
 
-  attr_reader :current_locale, :options
+  attr_reader :current_locale, :brand, :options
 
   def available_locales
     I18n.available_locales.map do |locale|
@@ -34,33 +35,62 @@ class Ui::LanguageSwitcherComponent < ViewComponent::Base
   def switch_locale_path(locale)
     if respond_to?(:request) && request.present?
       begin
-        # Parse current path to extract brand_slug and path
-        current_path = request.path
+        # Parse current path to extract brand_slug and path segments
+        path_parts = request.path.split("/").reject(&:blank?)
 
-        # Handle brand_slug/locale/path format: /brand-slug/locale/path
-        if current_path.match(%r{^/([^/]+)/(en|es)(/.*)?$})
-          brand_slug = $1
-          current_locale = $2
-          path_after_locale = $3 || ""
+        # If we have brand_slug and current locale, reconstruct with new locale
+        if path_parts.length >= 2 && path_parts[1].match?(/^(en|es)$/)
+          brand_slug = path_parts[0]
+          remaining_path = path_parts[2..-1]&.join("/") || ""
+          if remaining_path.empty?
+            remaining_path = "/"
+          else
+            remaining_path = "/#{remaining_path}"
+          end
+          "/#{brand_slug}/#{locale}#{remaining_path}"
+        elsif path_parts.length >= 1 && path_parts[0].match?(/^(en|es)$/)
+          # Handle locale-only format: /locale/path
+          remaining_path = path_parts[1..-1]&.join("/") || ""
+          if remaining_path.empty?
+            remaining_path = "/"
+          else
+            remaining_path = "/#{remaining_path}"
+          end
 
-          # Reconstruct URL with new locale: /brand-slug/new-locale/path
-          "/#{brand_slug}/#{locale}#{path_after_locale}"
-        elsif current_path.match(%r{^/(en|es)(/.*)?$})
-          # Handle locale-only format: /locale/path (fallback)
-          path_after_locale = $2 || ""
-          "/#{locale}#{path_after_locale}"
+          # Try to include current brand if available
+          current_brand_slug = brand&.slug || (respond_to?(:current_brand) && current_brand&.slug)
+          if current_brand_slug
+            "/#{current_brand_slug}/#{locale}#{remaining_path}"
+          else
+            "/#{locale}#{remaining_path}"
+          end
         else
-          # Fallback for unknown format
-          "/#{locale}/"
+          # Fallback: try to include current brand if available
+          current_brand_slug = brand&.slug || (respond_to?(:current_brand) && current_brand&.slug)
+          if current_brand_slug
+            "/#{current_brand_slug}/#{locale}"
+          else
+            "/#{locale}/"
+          end
         end
       rescue StandardError => e
         Rails.logger.warn "LanguageSwitcherComponent: Failed to generate path for locale #{locale}: #{e.message}"
         # Fallback if path processing fails
-        "/#{locale}/"
+        current_brand_slug = brand&.slug || (respond_to?(:current_brand) && current_brand&.slug)
+        if current_brand_slug
+          "/#{current_brand_slug}/#{locale}"
+        else
+          "/#{locale}/"
+        end
       end
     else
       # Fallback for tests without request context
-      "/#{locale}/"
+      current_brand_slug = brand&.slug || (respond_to?(:current_brand) && current_brand&.slug)
+      if current_brand_slug
+        "/#{current_brand_slug}/#{locale}"
+      else
+        "/#{locale}/"
+      end
     end
   end
 end

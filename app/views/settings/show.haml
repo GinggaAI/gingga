@@ -282,5 +282,5 @@
                     .flex.flex-col
                       %h3.font-semibold.text-gray-900= t('settings.language_settings')
                       %p.text-sm.text-gray-600= t('settings.language_subtitle')
-                  = render Ui::LanguageSwitcherComponent.new(current_locale: I18n.locale)
+                  = render Ui::LanguageSwitcherComponent.new(current_locale: I18n.locale, brand: current_brand)
         .mt-2.ring-offset-background.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2{"aria-labelledby" => "radix-«r72»-trigger-security", "data-orientation" => "horizontal", "data-state" => "inactive", "data-tabs-target" => "panel", :hidden => "", :id => "radix-«r72»-content-security", :role => "tabpanel", :tabindex => "0"}

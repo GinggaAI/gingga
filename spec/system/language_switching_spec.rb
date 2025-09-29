@@ -52,8 +52,8 @@ RSpec.describe 'Language Switching', type: :system do
       account_panel = page.find('#radix-«r72»-content-account', visible: :all)
       account_html = account_panel.native.inner_html
 
-      # Should have link to Spanish settings and English settings
-      expect(account_html).to include('href="/es/settings"') # Spanish settings
+      # Should have link to Spanish settings and English settings with brand context
+      expect(account_html).to include("href=\"/#{brand.slug}/es/settings\"") # Spanish settings
       expect(account_html).to include("href=\"/#{brand.slug}/en/settings\"") # English settings
 
       # English should be marked as current (with styling)

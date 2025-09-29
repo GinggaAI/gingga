@@ -95,8 +95,8 @@ RSpec.describe "Planning UI Components", type: :request do
         }
       }
 
-      # Should redirect (PRG pattern) - Rails uses 302 by default, not 303
-      expect(response).to have_http_status(:found)
+      # Should redirect (PRG pattern) - Rails uses 303 for POST-redirect-GET
+      expect(response).to have_http_status(:see_other)
       expect(response.location).to include("/planning")
     end
   end

@@ -43,7 +43,7 @@ RSpec.describe Ui::LanguageSwitcherComponent, type: :component do
 
         # Check that links are generated with proper locale paths
         expect(page).to have_link('Spanish', href: '/es/')
-        expect(page).to have_link('English', href: '/')
+        expect(page).to have_link('English', href: '/en/')
       end
     end
 
@@ -167,6 +167,7 @@ RSpec.describe Ui::LanguageSwitcherComponent, type: :component do
         mock_request = double(path: '/en/complex/nested/path', present?: true)
         allow(component).to receive(:request).and_return(mock_request)
         allow(component).to receive(:respond_to?).with(:request).and_return(true)
+        allow(component).to receive(:respond_to?).with(:current_brand).and_return(false)
         allow(I18n).to receive(:default_locale).and_return(:en)
 
         result = component.send(:switch_locale_path, 'es')
@@ -185,7 +186,7 @@ RSpec.describe Ui::LanguageSwitcherComponent, type: :component do
         # Test default locale with empty path
         allow(mock_request).to receive(:path).and_return('/es/')
         result = component.send(:switch_locale_path, 'en')
-        expect(result).to eq('/')
+        expect(result).to eq('/en/')
       end
     end
   end
