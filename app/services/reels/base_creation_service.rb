@@ -22,9 +22,16 @@ module Reels
     end
 
     def call
-      return failure_result("Brand is required") unless @brand
+      # Create a reel object even if brand is missing, so we can show form with errors
+      if @brand
+        reel = @brand.reels.build(reel_params.merge(user: @user))
+      else
+        # Create reel without brand association for error display
+        reel = Reel.new(reel_params.merge(user: @user))
+        reel.errors.add(:brand, "is required")
+        return failure_result("Brand is required", reel)
+      end
 
-      reel = @brand.reels.build(reel_params.merge(user: @user))
       setup_template_specific_fields(reel) if reel.new_record?
 
       if reel.save

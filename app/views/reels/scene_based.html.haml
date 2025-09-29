@@ -4,7 +4,7 @@
   .p-8
     .max-w-4xl.mx-auto
       .flex.items-center.gap-2.mb-4
-        = link_to root_path, class: "text-gray-600 hover:text-gray-800 transition-colors" do
+        = link_to @presenter.back_path, class: "text-gray-600 hover:text-gray-800 transition-colors" do
           ←
         %span.text-gray-400 |
         %span.text-gray-600= @presenter.main_title
@@ -17,11 +17,11 @@
         .p-6
           %h2.text-xl.font-semibold.mb-4.text-center= t('reels.choose_creation_method')
           .flex.bg-gray-100.rounded-lg.p-1.max-w-md.mx-auto
-            = link_to scene_based_reels_path, class: "flex-1 px-4 py-2 text-center rounded-md font-medium transition-colors tab-active" do
+            = link_to scene_based_reels_path, class: @presenter.scene_based_tab_classes do
               %span.flex.items-center.justify-center.gap-2
                 📹
                 = t('reels.tabs.scene_based')
-            = link_to narrative_reels_path, class: "flex-1 px-4 py-2 text-center rounded-md font-medium transition-colors text-gray-600 hover:text-gray-900" do
+            = link_to narrative_reels_path, class: @presenter.narrative_tab_classes do
               %span.flex.items-center.justify-center.gap-2
                 📝
                 = t('reels.tabs.narrative')

@@ -9,6 +9,7 @@ module Planning
     end
 
     def call
+      return nil unless @user
       @user.current_brand
     end
 

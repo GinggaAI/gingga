@@ -5,9 +5,20 @@ class Brand < ApplicationRecord
   has_many :brand_channels, dependent: :destroy
   has_many :creas_strategy_plans, dependent: :destroy
   has_many :reels, dependent: :destroy
+  has_many :api_tokens, dependent: :destroy
 
   validates :name, :slug, :industry, :voice, presence: true
   validates :slug, uniqueness: { scope: :user_id }
+
+  # Get active API token for a specific provider, preferring production mode
+  def active_token_for(provider, preferred_mode = "production")
+    api_tokens
+      .where(provider: provider, is_valid: true, mode: preferred_mode)
+      .first ||
+      api_tokens
+        .where(provider: provider, is_valid: true, mode: "test")
+        .first
+  end
 
   # Nested attributes
   accepts_nested_attributes_for :audiences, allow_destroy: true, reject_if: :all_blank

@@ -55,10 +55,10 @@ RSpec.describe Reels::BaseCreationService do
 
   describe '#call' do
     context 'when reel creation succeeds' do
-      let(:reel) { build(:reel, user: user, template: template, status: 'draft') }
+      let(:reel) { build(:reel, user: user, brand: brand, template: template, status: 'draft') }
 
       before do
-        allow(user.reels).to receive(:build).and_return(reel)
+        allow(brand.reels).to receive(:build).and_return(reel)
         allow(reel).to receive(:save).and_return(true)
         allow(service).to receive(:trigger_video_generation)
       end
@@ -88,7 +88,7 @@ RSpec.describe Reels::BaseCreationService do
     end
 
     context 'when reel save fails' do
-      let(:reel) { build(:reel, user: user, template: template, status: 'draft') }
+      let(:reel) { build(:reel, user: user, brand: brand, template: template, status: 'draft') }
 
       before do
         allow(brand.reels).to receive(:build).and_return(reel)

@@ -3,14 +3,17 @@
 require 'rails_helper'
 
 RSpec.describe 'Settings Tabs', type: :system do
+  let(:user) { create(:user) }
+  let(:brand) { create(:brand, user: user) }
+
   before do
     driven_by(:rack_test)
-    # Create a user for the test (ApplicationController will use User.first in test env)
-    create(:user)
+    sign_in user, scope: :user
+    user.update_last_brand(brand)
   end
 
   it 'renders the settings page with all tabs' do
-    visit settings_path
+    visit settings_path(brand_slug: brand.slug, locale: :en)
 
     # Should show all tabs
     expect(page).to have_button('API Integrations')
@@ -27,8 +30,7 @@ RSpec.describe 'Settings Tabs', type: :system do
   end
 
   it 'has language switcher in Account tab content (hidden by default)' do
-    create(:user) # Create user for this test too
-    visit settings_path
+    visit settings_path(brand_slug: brand.slug, locale: :en)
 
     # Language switcher content should be present in the DOM (Account tab content exists but is hidden)
     expect(page).to have_css('#radix-«r72»-content-account', visible: :all)

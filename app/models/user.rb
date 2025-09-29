@@ -11,7 +11,7 @@ class User < ApplicationRecord
   has_many :voices, dependent: :destroy
   has_many :api_responses, dependent: :destroy
 
-  belongs_to :last_brand, class_name: 'Brand', optional: true
+  belongs_to :last_brand, class_name: "Brand", optional: true
 
   def active_token_for(provider, preferred_mode = "production")
     api_tokens

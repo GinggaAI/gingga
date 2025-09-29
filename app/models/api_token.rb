@@ -1,12 +1,13 @@
 class ApiToken < ApplicationRecord
   belongs_to :user
+  belongs_to :brand
 
   encrypts :encrypted_token
 
   validates :provider, presence: true, inclusion: { in: %w[openai heygen kling] }
   validates :mode, presence: true, inclusion: { in: %w[test production] }
   validates :encrypted_token, presence: true
-  validates :provider, uniqueness: { scope: [ :user_id, :mode ] }
+  validates :provider, uniqueness: { scope: [ :brand_id, :mode ] }
 
   scope :test_mode, -> { where(mode: "test") }
   scope :production_mode, -> { where(mode: "production") }

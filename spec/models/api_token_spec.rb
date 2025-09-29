@@ -18,7 +18,7 @@ RSpec.describe ApiToken, type: :model do
     it { is_expected.to validate_presence_of(:mode) }
     it { is_expected.to validate_inclusion_of(:mode).in_array(%w[test production]) }
     it { is_expected.to validate_presence_of(:encrypted_token) }
-    it { is_expected.to validate_uniqueness_of(:provider).scoped_to([ :user_id, :mode ]) }
+    it { is_expected.to validate_uniqueness_of(:provider).scoped_to([ :brand_id, :mode ]) }
   end
 
   describe 'encryption' do
@@ -90,10 +90,11 @@ RSpec.describe ApiToken, type: :model do
         .and_return({ valid: true })
     end
 
-    it 'allows one token per provider per mode per user' do
-      create(:api_token, user: user, provider: 'openai', mode: 'test')
+    it 'allows one token per provider per mode per brand' do
+      brand = create(:brand, user: user)
+      create(:api_token, user: user, brand: brand, provider: 'openai', mode: 'test')
 
-      duplicate = build(:api_token, user: user, provider: 'openai', mode: 'test')
+      duplicate = build(:api_token, user: user, brand: brand, provider: 'openai', mode: 'test')
       expect(duplicate).not_to be_valid
       expect(duplicate.errors[:provider]).to be_present
     end

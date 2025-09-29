@@ -2,10 +2,11 @@ require "ostruct"
 
 module Reels
   class PresenterService
-    def initialize(reel:, template:, current_user:)
+    def initialize(reel:, template:, current_user:, referrer: nil)
       @reel = reel
       @template = template
       @current_user = current_user
+      @referrer = referrer
     end
 
     def call
@@ -30,9 +31,9 @@ module Reels
     def build_presenter
       case @template
       when "only_avatars", "avatar_and_video", "one_to_three_videos"
-        ReelSceneBasedPresenter.new(reel: @reel, current_user: @current_user)
+        ReelSceneBasedPresenter.new(reel: @reel, current_user: @current_user, referrer: @referrer)
       when "narration_over_7_images"
-        ReelNarrativePresenter.new(reel: @reel, current_user: @current_user)
+        ReelNarrativePresenter.new(reel: @reel, current_user: @current_user, referrer: @referrer)
       end
     end
 

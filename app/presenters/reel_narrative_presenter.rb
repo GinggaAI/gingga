@@ -1,9 +1,12 @@
 class ReelNarrativePresenter
-  attr_reader :reel, :current_user
+  include BackNavigation
 
-  def initialize(reel:, current_user:)
+  attr_reader :reel, :current_user, :referrer
+
+  def initialize(reel:, current_user:, referrer: nil)
     @reel = reel
     @current_user = current_user
+    @referrer = referrer
   end
 
   def page_title

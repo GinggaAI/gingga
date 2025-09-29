@@ -2,10 +2,11 @@ require 'rails_helper'
 
 RSpec.describe Heygen::ValidateAndSyncService, type: :service do
   let(:user) { create(:user) }
+  let(:brand) { create(:brand, user: user) }
   let(:group_url) { "https://api.heygen.com/v1/group/test_group" }
 
-  subject { described_class.new(user: user) }
-  let(:subject_with_limit) { described_class.new(user: user, voices_count: 5) }
+  subject { described_class.new(user: user, brand: brand) }
+  let(:subject_with_limit) { described_class.new(user: user, brand: brand, voices_count: 5) }
 
   before do
     # Mock logger to avoid noise in tests
@@ -17,13 +18,13 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
 
   describe '#initialize' do
     it 'initializes with user' do
-      service = described_class.new(user: user)
+      service = described_class.new(user: user, brand: brand)
       expect(service.instance_variable_get(:@user)).to eq(user)
       expect(service.instance_variable_get(:@voices_count)).to be_nil
     end
 
     it 'initializes with user and voices_count' do
-      service = described_class.new(user: user, voices_count: 10)
+      service = described_class.new(user: user, brand: brand, voices_count: 10)
       expect(service.instance_variable_get(:@user)).to eq(user)
       expect(service.instance_variable_get(:@voices_count)).to eq(10)
     end
@@ -32,7 +33,7 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
   describe '#call' do
     context 'when user has no HeyGen API token' do
       before do
-        allow(user).to receive(:active_token_for).with("heygen").and_return(nil)
+        allow(brand).to receive(:active_token_for).with("heygen").and_return(nil)
       end
 
       it 'returns failure result with appropriate error message' do
@@ -52,7 +53,7 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
       let(:voices_sync_result) { double('voices_sync_result') }
 
       before do
-        allow(user).to receive(:active_token_for).with("heygen").and_return(api_token)
+        allow(brand).to receive(:active_token_for).with("heygen").and_return(api_token)
         allow(Heygen::SynchronizeAvatarsService).to receive(:new).with(user: user, group_url: group_url).and_return(avatars_sync_service_instance)
         allow(avatars_sync_service_instance).to receive(:call).and_return(avatars_sync_result)
         allow(Heygen::SynchronizeVoicesService).to receive(:new).with(user: user, voices_count: nil).and_return(voices_sync_service_instance)
@@ -172,7 +173,7 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
       let(:api_token) { double('api_token', group_url: group_url, encrypted_token: 'mock_token', mode: 'production') }
 
       before do
-        allow(user).to receive(:active_token_for).with("heygen").and_return(api_token)
+        allow(brand).to receive(:active_token_for).with("heygen").and_return(api_token)
         allow(Heygen::SynchronizeAvatarsService).to receive(:new).and_raise(StandardError, exception_message)
       end
 
@@ -189,7 +190,7 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
       let(:api_token) { double('api_token', group_url: group_url, encrypted_token: 'mock_token', mode: 'production') }
 
       before do
-        allow(user).to receive(:active_token_for).with("heygen").and_return(api_token)
+        allow(brand).to receive(:active_token_for).with("heygen").and_return(api_token)
         allow(Heygen::SynchronizeAvatarsService).to receive(:new).and_raise(NoMethodError, "undefined method")
       end
 
@@ -280,7 +281,7 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
     let(:sync_result) { double('sync_result', success?: true, data: { synchronized_count: 2 }, error: nil) }
 
     before do
-      allow(user).to receive(:active_token_for).with("heygen").and_return(api_token)
+      allow(brand).to receive(:active_token_for).with("heygen").and_return(api_token)
     end
 
     it 'calls SynchronizeAvatarsService with correct parameters' do
@@ -293,7 +294,7 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
     it 'passes group_url from API token to synchronization service' do
       different_group_url = "https://api.heygen.com/v1/group/another_group"
       api_token_with_different_url = double('api_token', group_url: different_group_url, encrypted_token: 'mock_token', mode: 'production')
-      allow(user).to receive(:active_token_for).with("heygen").and_return(api_token_with_different_url)
+      allow(brand).to receive(:active_token_for).with("heygen").and_return(api_token_with_different_url)
 
       expect(Heygen::SynchronizeAvatarsService).to receive(:new).with(user: user, group_url: different_group_url).and_return(sync_service_instance)
       expect(sync_service_instance).to receive(:call).and_return(sync_result)
@@ -308,7 +309,7 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
     let(:sync_result) { double('sync_result', success?: true, data: { synchronized_count: 3 }, error: nil) }
 
     before do
-      allow(user).to receive(:active_token_for).with("heygen").and_return(api_token)
+      allow(brand).to receive(:active_token_for).with("heygen").and_return(api_token)
       allow(Heygen::SynchronizeAvatarsService).to receive(:new).and_return(sync_service_instance)
       allow(sync_service_instance).to receive(:call).and_return(sync_result)
     end
@@ -347,7 +348,7 @@ RSpec.describe Heygen::ValidateAndSyncService, type: :service do
       let(:sync_result) { double('sync_result', success?: true, data: { synchronized_count: 1 }, error: nil) }
 
       before do
-        allow(user).to receive(:active_token_for).with("heygen").and_return(api_token)
+        allow(brand).to receive(:active_token_for).with("heygen").and_return(api_token)
         allow(Heygen::SynchronizeAvatarsService).to receive(:new).and_return(sync_service_instance)
         allow(sync_service_instance).to receive(:call).and_return(sync_result)
       end

@@ -16,8 +16,8 @@
     %link{ href: "/icon.svg", rel: "icon", type: "image/svg+xml" }/
     %link{ href: "/icon.png", rel: "apple-touch-icon" }/
     = stylesheet_link_tag "application", "data-turbo-track": "reload"
-    = javascript_include_tag "application", "data-turbo-track": "reload", type: "module"
-  %body
+    = javascript_include_tag "application", "data-turbo-track": "reload", defer: true
+  %body{data: { brand_slug: current_brand&.slug, locale: I18n.locale }}
     .flex.h-screen
       .w-64.flex.flex-col.sidebar{ style: "background-color: #0f172a" }
         .p-6.border-b.border-white.border-opacity-10

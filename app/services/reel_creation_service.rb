@@ -1,7 +1,7 @@
 class ReelCreationService
   def initialize(user:, brand: nil, template: nil, params: nil)
     @user = user
-    @brand = brand
+    @brand = brand || (user&.current_brand)
     @template = template
     @params = params
   end

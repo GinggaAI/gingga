@@ -2,9 +2,11 @@ require 'rails_helper'
 
 RSpec.describe "Reel Form Submission Integration", type: :request do
   let(:user) { create(:user) }
+  let(:brand) { create(:brand, user: user) }
 
   before do
     sign_in user, scope: :user
+    user.update_last_brand(brand)
   end
 
   describe "Scene-based reel form flow" do
@@ -12,7 +14,7 @@ RSpec.describe "Reel Form Submission Integration", type: :request do
 
     context "GET /reels/scene-based (form load)" do
       it "returns success and renders form" do
-        get scene_based_reels_path
+        get scene_based_reels_path(brand_slug: brand.slug, locale: :en)
 
         expect(response).to have_http_status(:success)
         expect(response.body).to include("Scene-Based")
@@ -21,13 +23,13 @@ RSpec.describe "Reel Form Submission Integration", type: :request do
 
       it "does not create any database records" do
         expect {
-          get scene_based_reels_path
-          get scene_based_reels_path # Multiple requests
+          get scene_based_reels_path(brand_slug: brand.slug, locale: :en)
+          get scene_based_reels_path(brand_slug: brand.slug, locale: :en) # Multiple requests
         }.not_to change(Reel, :count)
       end
 
       it "form has correct action and method attributes" do
-        get scene_based_reels_path
+        get scene_based_reels_path(brand_slug: brand.slug, locale: :en)
 
         # Parse the form to check its attributes
         doc = Nokogiri::HTML(response.body)
@@ -78,7 +80,7 @@ RSpec.describe "Reel Form Submission Integration", type: :request do
 
       it "successfully creates reel and redirects" do
         expect {
-          post scene_based_reels_path, params: valid_params
+          post scene_based_reels_path(brand_slug: brand.slug, locale: :en), params: valid_params
         }.to change(Reel, :count).by(1)
 
         expect(response).to have_http_status(:redirect)
@@ -92,7 +94,7 @@ RSpec.describe "Reel Form Submission Integration", type: :request do
       end
 
       it "handles route correctly - no 404 or routing errors" do
-        post scene_based_reels_path, params: valid_params
+        post scene_based_reels_path(brand_slug: brand.slug, locale: :en), params: valid_params
 
         # The bug caused this to return 404 (No route matches [PATCH])
         expect(response).not_to have_http_status(:not_found)
@@ -115,7 +117,7 @@ RSpec.describe "Reel Form Submission Integration", type: :request do
       end
 
       it "POST to scene-based path works (correct behavior)" do
-        post scene_based_reels_path, params: basic_params
+        post scene_based_reels_path(brand_slug: brand.slug, locale: :en), params: basic_params
 
         expect(response).to have_http_status(:redirect)
         expect(Reel.count).to eq(1)
@@ -139,7 +141,7 @@ RSpec.describe "Reel Form Submission Integration", type: :request do
 
     it "GET with smart_planning_data preloads form but doesn't save" do
       expect {
-        get scene_based_reels_path, params: { smart_planning_data: smart_planning_data }
+        get scene_based_reels_path(brand_slug: brand.slug, locale: :en), params: { smart_planning_data: smart_planning_data }
       }.not_to change(Reel, :count)
 
       expect(response).to have_http_status(:success)
@@ -148,10 +150,10 @@ RSpec.describe "Reel Form Submission Integration", type: :request do
 
     it "POST with preloaded data creates reel successfully" do
       # First load form with smart planning data
-      get scene_based_reels_path, params: { smart_planning_data: smart_planning_data }
+      get scene_based_reels_path(brand_slug: brand.slug, locale: :en), params: { smart_planning_data: smart_planning_data }
 
       # Then simulate form submission with that data
-      post scene_based_reels_path, params: {
+      post scene_based_reels_path(brand_slug: brand.slug, locale: :en), params: {
         reel: {
           template: "only_avatars",
           title: "Smart Planning Integration Test",
@@ -174,7 +176,7 @@ RSpec.describe "Reel Form Submission Integration", type: :request do
 
   describe "Error handling" do
     it "invalid template returns error" do
-      post scene_based_reels_path, params: {
+      post scene_based_reels_path(brand_slug: brand.slug, locale: :en), params: {
         reel: { template: "invalid_template", title: "Test" }
       }
 
@@ -185,7 +187,7 @@ RSpec.describe "Reel Form Submission Integration", type: :request do
     end
 
     it "missing required params handles gracefully" do
-      post scene_based_reels_path, params: { reel: {} }
+      post scene_based_reels_path(brand_slug: brand.slug, locale: :en), params: { reel: {} }
 
       # Should not crash, should handle gracefully
       expect(response).to have_http_status(:unprocessable_entity).or have_http_status(:redirect).or have_http_status(:bad_request)
@@ -196,7 +198,7 @@ RSpec.describe "Reel Form Submission Integration", type: :request do
     # These tests verify the routes are set up correctly
 
     it "GET /reels/scene-based maps to reels#new with template constraint" do
-      get scene_based_reels_path
+      get scene_based_reels_path(brand_slug: brand.slug, locale: :en)
 
       expect(controller.controller_name).to eq("reels")
       expect(controller.action_name).to eq("new")
@@ -204,7 +206,7 @@ RSpec.describe "Reel Form Submission Integration", type: :request do
     end
 
     it "POST /reels/scene-based maps to reels#create with template constraint" do
-      post scene_based_reels_path, params: {
+      post scene_based_reels_path(brand_slug: brand.slug, locale: :en), params: {
         reel: { template: "only_avatars", title: "Route Test" }
       }
 
@@ -214,8 +216,8 @@ RSpec.describe "Reel Form Submission Integration", type: :request do
 
     it "both routes exist and work correctly" do
       # This test would fail if routes were misconfigured
-      expect { get scene_based_reels_path }.not_to raise_error
-      expect { post scene_based_reels_path, params: { reel: { template: "only_avatars" } } }.not_to raise_error
+      expect { get scene_based_reels_path(brand_slug: brand.slug, locale: :en) }.not_to raise_error
+      expect { post scene_based_reels_path(brand_slug: brand.slug, locale: :en), params: { reel: { template: "only_avatars" } } }.not_to raise_error
     end
   end
 end

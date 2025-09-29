@@ -3,6 +3,7 @@ require 'ostruct'
 
 RSpec.describe ApiTokenUpdateService, type: :service do
   let(:user) { create(:user) }
+  let(:brand) { create(:brand, user: user) }
   let(:provider) { 'heygen' }
   let(:token_value) { 'test_token_123' }
   let(:mode) { 'production' }
@@ -12,6 +13,7 @@ RSpec.describe ApiTokenUpdateService, type: :service do
       it 'creates a new API token successfully' do
         service = described_class.new(
           user: user,
+          brand: brand,
           provider: provider,
           token_value: token_value,
           mode: mode
@@ -36,6 +38,7 @@ RSpec.describe ApiTokenUpdateService, type: :service do
         group_url = 'https://app.heygen.com/group/abc123'
         service = described_class.new(
           user: user,
+          brand: brand,
           provider: 'heygen',
           token_value: token_value,
           mode: mode,
@@ -56,6 +59,7 @@ RSpec.describe ApiTokenUpdateService, type: :service do
       it 'ignores empty group_url for heygen' do
         service = described_class.new(
           user: user,
+          brand: brand,
           provider: 'heygen',
           token_value: token_value,
           mode: mode,
@@ -78,7 +82,7 @@ RSpec.describe ApiTokenUpdateService, type: :service do
       let!(:existing_token) do
         # Skip the token validation callback to avoid API calls
         ApiToken.skip_callback(:save, :before, :validate_token_with_provider)
-        token = create(:api_token, :heygen, user: user, mode: mode, encrypted_token: 'old_token')
+        token = create(:api_token, :heygen, user: user, brand: brand, mode: mode, encrypted_token: 'old_token')
         ApiToken.set_callback(:save, :before, :validate_token_with_provider)
         token
       end
@@ -87,6 +91,7 @@ RSpec.describe ApiTokenUpdateService, type: :service do
         new_token_value = 'updated_token_456'
         service = described_class.new(
           user: user,
+          brand: brand,
           provider: provider,
           token_value: new_token_value,
           mode: mode
@@ -108,6 +113,7 @@ RSpec.describe ApiTokenUpdateService, type: :service do
         new_group_url = 'https://app.heygen.com/group/xyz789'
         service = described_class.new(
           user: user,
+          brand: brand,
           provider: 'heygen',
           token_value: token_value,
           mode: mode,
@@ -130,6 +136,7 @@ RSpec.describe ApiTokenUpdateService, type: :service do
       it 'returns failure result' do
         service = described_class.new(
           user: user,
+          brand: brand,
           provider: provider,
           token_value: '',
           mode: mode
@@ -145,6 +152,7 @@ RSpec.describe ApiTokenUpdateService, type: :service do
       it 'returns failure result for nil token value' do
         service = described_class.new(
           user: user,
+          brand: brand,
           provider: provider,
           token_value: nil,
           mode: mode
@@ -162,6 +170,7 @@ RSpec.describe ApiTokenUpdateService, type: :service do
       it 'returns failure result with validation errors' do
         service = described_class.new(
           user: user,
+          brand: brand,
           provider: '', # Invalid provider
           token_value: token_value,
           mode: mode
@@ -179,6 +188,7 @@ RSpec.describe ApiTokenUpdateService, type: :service do
       it 'returns failure result with error message' do
         service = described_class.new(
           user: user,
+          brand: brand,
           provider: provider,
           token_value: token_value,
           mode: mode
@@ -199,6 +209,7 @@ RSpec.describe ApiTokenUpdateService, type: :service do
         it "handles #{test_provider} provider" do
           service = described_class.new(
             user: user,
+            brand: brand,
             provider: test_provider,
             token_value: token_value,
             mode: mode
@@ -222,6 +233,7 @@ RSpec.describe ApiTokenUpdateService, type: :service do
         it "handles #{test_mode} mode" do
           service = described_class.new(
             user: user,
+            brand: brand,
             provider: provider,
             token_value: token_value,
             mode: test_mode
@@ -245,6 +257,7 @@ RSpec.describe ApiTokenUpdateService, type: :service do
     let(:service) do
       described_class.new(
         user: user,
+        brand: brand,
         provider: provider,
         token_value: token_value,
         mode: mode
@@ -255,7 +268,7 @@ RSpec.describe ApiTokenUpdateService, type: :service do
       it 'finds existing token' do
         # Skip the token validation callback to avoid API calls
         ApiToken.skip_callback(:save, :before, :validate_token_with_provider)
-        existing_token = create(:api_token, :heygen, user: user, mode: mode)
+        existing_token = create(:api_token, :heygen, user: user, brand: brand, mode: mode)
         ApiToken.set_callback(:save, :before, :validate_token_with_provider)
 
         found_token = service.send(:find_or_initialize_token)
@@ -286,6 +299,7 @@ RSpec.describe ApiTokenUpdateService, type: :service do
         group_url = 'https://app.heygen.com/group/test123'
         service = described_class.new(
           user: user,
+          brand: brand,
           provider: 'heygen',
           token_value: token_value,
           mode: mode,
@@ -301,6 +315,7 @@ RSpec.describe ApiTokenUpdateService, type: :service do
       it 'does not set group_url for non-heygen provider' do
         service = described_class.new(
           user: user,
+          brand: brand,
           provider: 'openai',
           token_value: token_value,
           mode: mode,

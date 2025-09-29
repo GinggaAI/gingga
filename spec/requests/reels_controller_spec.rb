@@ -2,9 +2,11 @@ require "rails_helper"
 
 RSpec.describe ReelsController, type: :request do
   let(:user) { create(:user) }
+  let(:brand) { create(:brand, user: user) }
 
   before do
     sign_in user, scope: :user
+    user.update_last_brand(brand)
   end
 
   describe "GET /en/reels/scene-based" do

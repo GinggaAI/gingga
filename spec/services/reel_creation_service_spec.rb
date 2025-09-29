@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe ReelCreationService do
   let(:user) { create(:user) }
+  let(:brand) { create(:brand, user: user) }
   let(:valid_template) { "only_avatars" }
   let(:valid_params) do
     {
@@ -16,6 +17,10 @@ RSpec.describe ReelCreationService do
       use_ai_avatar: false,
       additional_instructions: "Test instructions"
     }
+  end
+
+  before do
+    user.update_last_brand(brand)
   end
 
   describe '#initialize' do
@@ -56,7 +61,7 @@ RSpec.describe ReelCreationService do
 
       it 'delegates to the appropriate template service' do
         expect(Reels::OnlyAvatarsCreationService).to receive(:new)
-          .with(user: user, template: valid_template)
+          .with(user: user, brand: brand, template: valid_template)
           .and_return(double(initialize_reel: { success: true, reel: double, error: nil }))
 
         result = service.initialize_reel
@@ -123,10 +128,10 @@ RSpec.describe ReelCreationService do
 
       it 'delegates to the correct service class for each template' do
         templates_and_services.each do |template, service_class|
-          service = described_class.new(user: user, template: template)
+          service = described_class.new(user: user, brand: brand, template: template)
           mock_service_instance = double('service', initialize_reel: { success: true, reel: double, error: nil })
 
-          expect(service_class).to receive(:new).with(user: user, template: template).and_return(mock_service_instance)
+          expect(service_class).to receive(:new).with(user: user, brand: brand, template: template).and_return(mock_service_instance)
 
           result = service.initialize_reel
           expect(result[:success]).to be true
@@ -161,14 +166,14 @@ RSpec.describe ReelCreationService do
     end
 
     context 'with valid parameters' do
-      let(:service) { described_class.new(user: user, params: valid_params) }
+      let(:service) { described_class.new(user: user, brand: brand, params: valid_params) }
 
       it 'extracts template from params and delegates to appropriate service' do
         mock_reel = double('reel')
         mock_service = double('service', call: { success: true, reel: mock_reel, error: nil })
 
         expect(Reels::OnlyAvatarsCreationService).to receive(:new)
-          .with(user: user, params: valid_params)
+          .with(user: user, brand: brand, params: valid_params)
           .and_return(mock_service)
 
         result = service.call
@@ -218,10 +223,10 @@ RSpec.describe ReelCreationService do
       it 'delegates to the correct service class for each template' do
         templates_and_services.each do |template, service_class|
           params = valid_params.merge(template: template)
-          service = described_class.new(user: user, params: params)
+          service = described_class.new(user: user, brand: brand, params: params)
           mock_service_instance = double('service', call: { success: true, reel: double, error: nil })
 
-          expect(service_class).to receive(:new).with(user: user, params: params).and_return(mock_service_instance)
+          expect(service_class).to receive(:new).with(user: user, brand: brand, params: params).and_return(mock_service_instance)
 
           result = service.call
           expect(result[:success]).to be true

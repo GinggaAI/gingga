@@ -3,7 +3,8 @@ FactoryBot.define do
     provider { "openai" }
     mode { "production" }
     encrypted_token { "sk-test_token_#{SecureRandom.hex(8)}" }
-    user { association :user }
+    user
+    brand { create(:brand, user: user) }
     is_valid { true }
 
     trait :openai do

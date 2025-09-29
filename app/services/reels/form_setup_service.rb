@@ -1,9 +1,10 @@
 module Reels
   class FormSetupService
-    def initialize(user:, template:, smart_planning_data: nil)
+    def initialize(user:, template:, smart_planning_data: nil, referrer: nil)
       @user = user
       @template = template
       @smart_planning_data = smart_planning_data
+      @referrer = referrer
     end
 
     def call
@@ -63,7 +64,8 @@ module Reels
       PresenterService.new(
         reel: reel,
         template: @template,
-        current_user: @user
+        current_user: @user,
+        referrer: @referrer
       ).call
     end
 

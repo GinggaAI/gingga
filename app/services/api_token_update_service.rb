@@ -1,6 +1,7 @@
 class ApiTokenUpdateService
-  def initialize(user:, provider:, token_value:, mode: "production", **options)
+  def initialize(user:, brand:, provider:, token_value:, mode: "production", **options)
     @user = user
+    @brand = brand
     @provider = provider
     @token_value = token_value
     @mode = mode
@@ -9,6 +10,7 @@ class ApiTokenUpdateService
 
   def call
     return failure_result("Token value is required") if @token_value.blank?
+    return failure_result("Brand is required") unless @brand
 
     api_token = find_or_initialize_token
     update_token_attributes(api_token)
@@ -25,7 +27,8 @@ class ApiTokenUpdateService
   private
 
   def find_or_initialize_token
-    @user.api_tokens.find_or_initialize_by(
+    @brand.api_tokens.find_or_initialize_by(
+      user: @user,
       provider: @provider,
       mode: @mode
     )

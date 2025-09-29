@@ -560,4 +560,98 @@ RSpec.describe ReelSceneBasedPresenter, type: :presenter do
       end
     end
   end
+
+  describe 'back navigation' do
+    let(:brand) { create(:brand, user: user) }
+
+    before do
+      user.update_last_brand(brand)
+    end
+
+    describe '#back_path' do
+      context 'when coming from auto_creation' do
+        let(:presenter_with_referrer) do
+          described_class.new(
+            reel: reel,
+            current_user: user,
+            referrer: "http://www.example.com/#{brand.slug}/en/auto_creation"
+          )
+        end
+
+        it 'returns auto_creation path' do
+          expect(presenter_with_referrer.back_path).to eq("/#{brand.slug}/en/auto_creation")
+        end
+      end
+
+      context 'when coming from planning' do
+        let(:presenter_with_referrer) do
+          described_class.new(
+            reel: reel,
+            current_user: user,
+            referrer: "http://www.example.com/#{brand.slug}/en/planning"
+          )
+        end
+
+        it 'returns planning path' do
+          expect(presenter_with_referrer.back_path).to eq("/#{brand.slug}/en/planning")
+        end
+      end
+
+      context 'when coming from planning with query params' do
+        let(:presenter_with_referrer) do
+          described_class.new(
+            reel: reel,
+            current_user: user,
+            referrer: "http://www.example.com/#{brand.slug}/en/planning?month=2026-3"
+          )
+        end
+
+        it 'returns planning path without query params' do
+          expect(presenter_with_referrer.back_path).to eq("/#{brand.slug}/en/planning")
+        end
+      end
+
+      context 'when coming from unknown page' do
+        let(:presenter_with_referrer) do
+          described_class.new(
+            reel: reel,
+            current_user: user,
+            referrer: "http://www.example.com/#{brand.slug}/en/settings"
+          )
+        end
+
+        it 'returns root path' do
+          expect(presenter_with_referrer.back_path).to eq("/#{brand.slug}/en")
+        end
+      end
+
+      context 'when no referrer provided' do
+        let(:presenter_without_referrer) do
+          described_class.new(
+            reel: reel,
+            current_user: user,
+            referrer: nil
+          )
+        end
+
+        it 'returns root path' do
+          expect(presenter_without_referrer.back_path).to eq("/#{brand.slug}/en")
+        end
+      end
+
+      context 'when referrer has invalid URI' do
+        let(:presenter_with_invalid_referrer) do
+          described_class.new(
+            reel: reel,
+            current_user: user,
+            referrer: "not a valid uri"
+          )
+        end
+
+        it 'returns root path' do
+          expect(presenter_with_invalid_referrer.back_path).to eq("/#{brand.slug}/en")
+        end
+      end
+    end
+  end
 end
