@@ -88,7 +88,7 @@ end
 
 gem "devise", "~> 4.9"
 gem "httparty"
-gem "faraday", "~> 2.9"
+gem "faraday", "~> 2.14"
 gem "faraday-retry"
 gem "ruby-openai", "~> 8.2"
 
