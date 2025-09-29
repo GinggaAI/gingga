@@ -4,6 +4,7 @@ class Brand < ApplicationRecord
   has_many :products, dependent: :destroy
   has_many :brand_channels, dependent: :destroy
   has_many :creas_strategy_plans, dependent: :destroy
+  has_many :reels, dependent: :destroy
 
   validates :name, :slug, :industry, :voice, presence: true
   validates :slug, uniqueness: { scope: :user_id }

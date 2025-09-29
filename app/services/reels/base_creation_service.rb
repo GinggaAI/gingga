@@ -1,13 +1,16 @@
 module Reels
   class BaseCreationService
-    def initialize(user:, template: nil, params: nil)
+    def initialize(user:, brand: nil, template: nil, params: nil)
       @user = user
+      @brand = brand
       @template = template
       @params = params
     end
 
     def initialize_reel
-      reel = @user.reels.build(template: @template, status: "draft")
+      return failure_result("Brand is required") unless @brand
+
+      reel = @brand.reels.build(user: @user, template: @template, status: "draft")
       setup_template_specific_fields(reel)
 
       # Save the reel so it can have associated scenes created
@@ -19,7 +22,9 @@ module Reels
     end
 
     def call
-      reel = @user.reels.build(reel_params)
+      return failure_result("Brand is required") unless @brand
+
+      reel = @brand.reels.build(reel_params.merge(user: @user))
       setup_template_specific_fields(reel) if reel.new_record?
 
       if reel.save

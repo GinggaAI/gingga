@@ -1,6 +1,7 @@
 FactoryBot.define do
   factory :reel do
-    association :user
+    user
+    brand { create(:brand, user: user) }
     template { "only_avatars" }
     status { "draft" }
     title { "Test Reel" }
