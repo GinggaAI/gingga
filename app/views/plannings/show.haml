@@ -1380,13 +1380,13 @@
       console.log('Reel data being sent:', reelData);
 
       html += `
-        <div class="mt-4 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border-l-4 border-green-500">
+        <div class="mt-4 p-4" style="background: linear-gradient(to right, rgb(240 253 244), rgb(239 246 255)); border-left: 4px solid rgb(34 197 94); border-radius: 0.5rem;">
           <div class="flex items-center justify-between">
             <div>
               <h5 class="font-medium text-gray-900 mb-1">🎬 Create Reel</h5>
               <p class="text-sm text-gray-600">Create this reel from the planning data</p>
             </div>
-            <a href="/#{@brand.slug}/#{I18n.locale}/reels/new?template=${content.template}&smart_planning_data=${reelDataEncoded}" class="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2">
+            <a href="/#{@brand.slug}/#{I18n.locale}/reels/new?template=${content.template}&smart_planning_data=${reelDataEncoded}" class="inline-flex items-center gap-2 font-medium px-4 py-2 rounded-lg transition-colors duration-200" style="background-color: rgb(22 163 74); color: white;" onmouseover="this.style.backgroundColor='rgb(21 128 61)'" onmouseout="this.style.backgroundColor='rgb(22 163 74)'">
               <span>🚀</span>
               <span>Create Reel</span>
             </a>
