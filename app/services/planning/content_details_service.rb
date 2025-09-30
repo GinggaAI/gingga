@@ -52,7 +52,21 @@ module Planning
 
       Rails.logger.info "ContentDetailsService - content_piece keys: #{content_piece.keys}"
 
-      ApplicationController.renderer.render(
+      # Create renderer with routing context
+      brand = user_brand
+      renderer = ActionController::Base.renderer.new(
+        http_host: 'localhost:3000',
+        https: false
+      )
+
+      # Set default_url_options for the renderer
+      renderer.controller.singleton_class.class_eval do
+        define_method(:default_url_options) do
+          { locale: I18n.locale, brand_slug: brand&.slug }
+        end
+      end
+
+      renderer.render(
         partial: "plannings/content_detail",
         locals: { content_piece: content_piece, presenter: presenter },
         formats: [ :html ]
