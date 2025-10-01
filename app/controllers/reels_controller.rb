@@ -33,7 +33,8 @@ class ReelsController < ApplicationController
     form_result = Reels::FormSetupService.new(
       user: current_user,
       template: params[:template],
-      smart_planning_data: params[:smart_planning_data]
+      smart_planning_data: params[:smart_planning_data],
+      referrer: request.referer
     ).call
 
     if form_result[:success]

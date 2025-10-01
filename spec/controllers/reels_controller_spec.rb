@@ -89,4 +89,45 @@ RSpec.describe "ReelsController", type: :request do
       expect(response.body).to include("Preloaded Reel")
     end
   end
+
+  describe "Back navigation" do
+    it "presenter returns auto_creation path when coming from auto_creation" do
+      get scene_based_reels_path(brand_slug: brand.slug, locale: :en),
+          headers: { "HTTP_REFERER" => "http://www.example.com/#{brand.slug}/en/auto_creation" }
+
+      expect(response).to have_http_status(:success)
+      expect(assigns(:presenter).back_path).to eq("/#{brand.slug}/en/auto_creation")
+    end
+
+    it "presenter returns planning path when coming from planning" do
+      get scene_based_reels_path(brand_slug: brand.slug, locale: :en),
+          headers: { "HTTP_REFERER" => "http://www.example.com/#{brand.slug}/en/planning" }
+
+      expect(response).to have_http_status(:success)
+      expect(assigns(:presenter).back_path).to eq("/#{brand.slug}/en/planning")
+    end
+
+    it "presenter returns planning path when coming from planning with query params" do
+      get scene_based_reels_path(brand_slug: brand.slug, locale: :en),
+          headers: { "HTTP_REFERER" => "http://www.example.com/#{brand.slug}/en/planning?month=2026-3" }
+
+      expect(response).to have_http_status(:success)
+      expect(assigns(:presenter).back_path).to eq("/#{brand.slug}/en/planning")
+    end
+
+    it "presenter returns root path when coming from unknown page" do
+      get scene_based_reels_path(brand_slug: brand.slug, locale: :en),
+          headers: { "HTTP_REFERER" => "http://www.example.com/#{brand.slug}/en/settings" }
+
+      expect(response).to have_http_status(:success)
+      expect(assigns(:presenter).back_path).to eq("/#{brand.slug}/en")
+    end
+
+    it "presenter returns root path when no referrer" do
+      get scene_based_reels_path(brand_slug: brand.slug, locale: :en)
+
+      expect(response).to have_http_status(:success)
+      expect(assigns(:presenter).back_path).to eq("/#{brand.slug}/en")
+    end
+  end
 end

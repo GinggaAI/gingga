@@ -11,8 +11,9 @@
 3. [Root Causes](#root-causes)
 4. [Solutions Implemented](#solutions-implemented)
 5. [Architecture Changes](#architecture-changes)
-6. [Lessons Learned](#lessons-learned)
-7. [Prevention Guidelines](#prevention-guidelines)
+6. [JavaScript Module Loading Issues](#javascript-module-loading-issues)
+7. [Lessons Learned](#lessons-learned)
+8. [Prevention Guidelines](#prevention-guidelines)
 
 ---
 
@@ -320,6 +321,226 @@ Done - instant display, no server call
 - Simple error handling (data already validated by server)
 - Fast, responsive UI
 - Follows Rails Doctrine
+
+---
+
+## JavaScript Module Loading Issues
+
+### Issue #4: JavaScript Module Not Loading (ESM vs IIFE)
+**Date:** September 30, 2025
+**Symptom:** After refactoring JavaScript to external modules, the code wasn't executing despite being in the compiled bundle.
+
+#### Problem Discovery Process
+
+1. **Initial Symptom:**
+   ```javascript
+   // In browser console:
+   typeof window.hideContentDetails // 'undefined'
+   typeof window.showContentDetails // 'undefined'
+   ```
+   Functions were not available globally despite being set in the module.
+
+2. **Verification Steps:**
+   - ✅ Code was present in `app/assets/builds/application.js`
+   - ✅ `npm run build` compiled successfully
+   - ❌ Console logs from the module never appeared
+   - ❌ Browser was loading an OLD version with different hash
+
+3. **Root Cause:**
+   The combination of **ESM format + Propshaft caching** was causing issues:
+   - esbuild compiled with `--format=esm` creates lazy-loaded modules
+   - ESM modules use `import` statements that don't auto-execute
+   - Propshaft was serving cached versions with old hash digests
+   - Browser loaded `application-590f8ed2.js` (old) instead of new bundle
+
+#### Solution Implemented
+
+**Step 1: Change esbuild format from ESM to IIFE**
+
+**File:** `package.json`
+```json
+{
+  "scripts": {
+    // ❌ BEFORE (ESM - doesn't auto-execute)
+    "build": "esbuild app/javascript/*.* --bundle --sourcemap --format=esm --outdir=app/assets/builds --public-path=/assets",
+
+    // ✅ AFTER (IIFE - executes immediately)
+    "build": "esbuild app/javascript/*.* --bundle --sourcemap --format=iife --outdir=app/assets/builds --public-path=/assets"
+  }
+}
+```
+
+**Why IIFE?**
+- IIFE = Immediately Invoked Function Expression
+- Wraps code in `(() => { /* code */ })()` which executes on load
+- No need for module imports or lazy loading
+- Perfect for browser environments
+
+**Step 2: Update script tag to remove type="module"**
+
+**File:** `app/views/layouts/application.html.haml`
+```haml
+# ❌ BEFORE (for ESM modules)
+= javascript_include_tag "application", "data-turbo-track": "reload", type: "module"
+
+# ✅ AFTER (for IIFE)
+= javascript_include_tag "application", "data-turbo-track": "reload", defer: true
+```
+
+**Step 3: Add asset manifest entry for JavaScript**
+
+**File:** `app/assets/config/manifest.js`
+```javascript
+// Before - only CSS was linked
+//= link_tree ../images
+//= link_directory ../stylesheets .css
+//= link_directory ../builds .css
+
+// After - Added JavaScript
+//= link_tree ../images
+//= link_directory ../stylesheets .css
+//= link_directory ../builds .css
+//= link_directory ../builds .js  // ← Added this
+```
+
+**Step 4: Clear Propshaft cache and rebuild**
+
+```bash
+# Clear all asset caches
+rails assets:clobber
+
+# Rebuild JavaScript with new IIFE format
+npm run build
+
+# Rebuild CSS (also deleted by clobber)
+npm run build:css
+
+# Clear Rails cache
+rm -rf tmp/cache
+
+# Restart server
+touch tmp/restart.txt
+```
+
+#### Verification Process
+
+1. **Check compiled bundle has IIFE wrapper:**
+   ```bash
+   head -10 app/assets/builds/application.js
+   # Should start with: (() => {
+   ```
+
+2. **Verify code is in bundle:**
+   ```bash
+   grep -c "planning_details.js module loaded" app/assets/builds/application.js
+   # Should output: 1
+   ```
+
+3. **Check browser loads NEW file:**
+   - Open DevTools → Network tab → Filter "JS"
+   - Reload page with Ctrl+Shift+R
+   - Look for `application-XXXXXXXX.js` (hash should be NEW)
+   - Click file → Response tab → Search for "planning_details"
+   - Should find the code in the response
+
+4. **Verify functions are available:**
+   ```javascript
+   // In browser console:
+   console.log(typeof window.hideContentDetails); // 'function'
+   console.log(typeof window.showContentDetails); // 'function'
+   ```
+
+#### Common Pitfalls & Solutions
+
+**Pitfall #1: Browser Cache**
+- **Problem:** Browser serves old JavaScript from cache
+- **Solution:** Hard reload with Ctrl+Shift+R (or Cmd+Shift+R)
+- **Prevention:** In DevTools → Network tab → Enable "Disable cache" during development
+
+**Pitfall #2: Propshaft Cache**
+- **Problem:** Rails serves old digested filename (e.g., `application-590f8ed2.js`)
+- **Solution:** Run `rails assets:clobber` to clear digests
+- **Prevention:** Always rebuild assets after changing build configuration
+
+**Pitfall #3: Rails Server Not Restarting**
+- **Problem:** Changes to `manifest.js` or layout not picked up
+- **Solution:** `touch tmp/restart.txt` or restart server manually
+- **Prevention:** Use file watchers or auto-restart tools in development
+
+**Pitfall #4: Missing CSS After Clobber**
+- **Problem:** `rails assets:clobber` deletes ALL compiled assets
+- **Solution:** Run both `npm run build` AND `npm run build:css`
+- **Prevention:** Create a combined script in `package.json`:
+  ```json
+  "scripts": {
+    "build:all": "npm run build && npm run build:css"
+  }
+  ```
+
+#### ESM vs IIFE: When to Use Which
+
+| Format | Use Case | Pros | Cons |
+|--------|----------|------|------|
+| **IIFE** | Traditional Rails apps, browser-only code | - Executes immediately<br>- No module loading complexity<br>- Works everywhere | - No tree-shaking<br>- All code loads at once<br>- Global namespace pollution possible |
+| **ESM** | Modern JS apps, Node.js, libraries | - Native browser support (modern)<br>- Tree-shaking<br>- Better code organization | - Requires module loading setup<br>- May not auto-execute<br>- Browser compatibility concerns |
+
+**For Rails + Propshaft:** Use **IIFE** for simplicity and reliability.
+
+#### Debug Checklist for Module Loading Issues
+
+When JavaScript modules aren't loading, check in this order:
+
+- [ ] **1. Is code in compiled bundle?**
+  ```bash
+  grep "your-function-name" app/assets/builds/application.js
+  ```
+
+- [ ] **2. Is Rails serving the compiled file?**
+  ```bash
+  curl http://localhost:3000/assets/application.js | grep "your-function-name"
+  ```
+
+- [ ] **3. Is browser loading the file?**
+  - DevTools → Network tab → Look for `application-*.js`
+  - Check Response tab for your code
+
+- [ ] **4. Is file format correct?**
+  - IIFE should start with `(() => {`
+  - ESM should start with `import` or `export`
+
+- [ ] **5. Are there JavaScript errors?**
+  - Console should be free of errors
+  - Check for syntax errors breaking execution
+
+- [ ] **6. Is manifest.js configured?**
+  ```javascript
+  // app/assets/config/manifest.js
+  //= link_directory ../builds .js
+  ```
+
+- [ ] **7. Is cache clear?**
+  ```bash
+  rails assets:clobber
+  rm -rf tmp/cache
+  ```
+
+#### Commands Quick Reference
+
+```bash
+# Full asset rebuild workflow
+rails assets:clobber           # Clear all compiled assets
+npm run build                  # Rebuild JavaScript
+npm run build:css              # Rebuild CSS
+rm -rf tmp/cache              # Clear Rails cache
+touch tmp/restart.txt         # Restart Rails server
+
+# Verify builds
+ls -lh app/assets/builds/     # Check files exist and timestamps
+head -10 app/assets/builds/application.js  # Verify IIFE format
+
+# Debug what browser sees
+curl http://localhost:3000/assets/application.js | head -100
+```
 
 ---
 
