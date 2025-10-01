@@ -17,7 +17,14 @@ class ReelsController < ApplicationController
 
     if presenter_result.success?
       @presenter = presenter_result.data[:presenter]
-      render presenter_result.data[:view_template]
+      # Whitelist allowed templates for security
+      template = presenter_result.data[:view_template]
+      case template
+      when "reels/scene_based", "reels/narrative"
+        render template
+      else
+        redirect_to reels_path, alert: "Invalid template: #{template}"
+      end
     else
       redirect_to reels_path, alert: "Error loading reel for editing: #{presenter_result.error}"
     end
