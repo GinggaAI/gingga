@@ -55,7 +55,7 @@ module Planning
       # Create renderer with routing context
       brand = user_brand
       renderer = ActionController::Base.renderer.new(
-        http_host: 'localhost:3000',
+        http_host: "localhost:3000",
         https: false
       )
 

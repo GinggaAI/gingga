@@ -23,8 +23,13 @@ RSpec.describe Planning::ContentDetailsController, type: :controller do
   end
 
   before do
-    sign_in user
+    sign_in user, scope: :user
     allow(user).to receive(:current_brand).and_return(brand)
+    I18n.locale = :en
+  end
+
+  after do
+    I18n.locale = I18n.default_locale
   end
 
   describe 'GET #show' do
@@ -41,7 +46,7 @@ RSpec.describe Planning::ContentDetailsController, type: :controller do
       end
 
       it 'returns successful response with HTML content' do
-        get :show, params: { content_data: valid_content_piece.to_json }, format: :json
+        get :show, params: { brand_slug: brand.slug, locale: :en, content_data: valid_content_piece.to_json }, format: :json
 
         expect(response).to have_http_status(:success)
         expect(response.content_type).to include('application/json')
@@ -52,7 +57,7 @@ RSpec.describe Planning::ContentDetailsController, type: :controller do
       end
 
       it 'includes content piece data in rendered HTML' do
-        get :show, params: { content_data: valid_content_piece.to_json }, format: :json
+        get :show, params: { brand_slug: brand.slug, locale: :en, content_data: valid_content_piece.to_json }, format: :json
 
         json_response = JSON.parse(response.body)
         html_content = json_response['html']
@@ -68,19 +73,19 @@ RSpec.describe Planning::ContentDetailsController, type: :controller do
           .with(content_data: valid_content_piece.to_json, user: user)
           .and_call_original
 
-        get :show, params: { content_data: valid_content_piece.to_json }, format: :json
+        get :show, params: { brand_slug: brand.slug, locale: :en, content_data: valid_content_piece.to_json }, format: :json
       end
 
       it 'uses correct brand context through BrandResolver' do
         expect(Planning::BrandResolver).to receive(:call).with(user).and_return(brand)
 
-        get :show, params: { content_data: valid_content_piece.to_json }, format: :json
+        get :show, params: { brand_slug: brand.slug, locale: :en, content_data: valid_content_piece.to_json }, format: :json
       end
     end
 
     context 'with invalid content data' do
       it 'returns error response for missing content_data' do
-        get :show, params: {}, format: :json
+        get :show, params: { brand_slug: brand.slug, locale: :en }, format: :json
 
         expect(response).to have_http_status(:bad_request)
 
@@ -90,7 +95,7 @@ RSpec.describe Planning::ContentDetailsController, type: :controller do
       end
 
       it 'returns error response for invalid JSON' do
-        get :show, params: { content_data: 'invalid json {' }, format: :json
+        get :show, params: { brand_slug: brand.slug, locale: :en, content_data: 'invalid json {' }, format: :json
 
         expect(response).to have_http_status(:bad_request)
 
@@ -103,7 +108,7 @@ RSpec.describe Planning::ContentDetailsController, type: :controller do
       before { sign_out user }
 
       it 'redirects to authentication' do
-        get :show, params: { content_data: valid_content_piece.to_json }, format: :json
+        get :show, params: { brand_slug: brand.slug, locale: :en, content_data: valid_content_piece.to_json }, format: :json
 
         expect(response).to have_http_status(:unauthorized)
       end
@@ -125,12 +130,12 @@ RSpec.describe Planning::ContentDetailsController, type: :controller do
           "success_criteria" => "≥10,000 views",
           "recommended_template" => "avatar_and_video",
           "video_source" => "kling",
-          "repurpose_to" => ["TikTok", "LinkedIn"]
+          "repurpose_to" => [ "TikTok", "LinkedIn" ]
         }
       end
 
       it 'renders all content fields correctly' do
-        get :show, params: { content_data: strategy_content_piece.to_json }, format: :json
+        get :show, params: { brand_slug: brand.slug, locale: :en, content_data: strategy_content_piece.to_json }, format: :json
 
         expect(response).to have_http_status(:success)
 
@@ -159,7 +164,7 @@ RSpec.describe Planning::ContentDetailsController, type: :controller do
           .with({}, brand: brand, current_plan: nil)
           .and_call_original
 
-        get :show, params: { content_data: valid_content_piece.to_json }, format: :json
+        get :show, params: { brand_slug: brand.slug, locale: :en, content_data: valid_content_piece.to_json }, format: :json
       end
 
       it 'does not access content from other brands' do
@@ -168,7 +173,7 @@ RSpec.describe Planning::ContentDetailsController, type: :controller do
 
         expect(Planning::BrandResolver).to receive(:call).with(user).and_return(other_brand)
 
-        get :show, params: { content_data: valid_content_piece.to_json }, format: :json
+        get :show, params: { brand_slug: other_brand.slug, locale: :en, content_data: valid_content_piece.to_json }, format: :json
 
         expect(response).to have_http_status(:success)
       end
@@ -178,7 +183,7 @@ RSpec.describe Planning::ContentDetailsController, type: :controller do
   describe 'AJAX behavior' do
     it 'accepts XMLHttpRequest properly' do
       get :show,
-          params: { content_data: valid_content_piece.to_json },
+          params: { brand_slug: brand.slug, locale: :en, content_data: valid_content_piece.to_json },
           format: :json,
           xhr: true
 
@@ -188,10 +193,11 @@ RSpec.describe Planning::ContentDetailsController, type: :controller do
 
     it 'includes correct CSRF token handling' do
       # This test ensures the controller properly handles CSRF for AJAX requests
+      request.headers['X-Requested-With'] = 'XMLHttpRequest'
+
       get :show,
-          params: { content_data: valid_content_piece.to_json },
-          format: :json,
-          headers: { 'X-Requested-With' => 'XMLHttpRequest' }
+          params: { brand_slug: brand.slug, locale: :en, content_data: valid_content_piece.to_json },
+          format: :json
 
       expect(response).to have_http_status(:success)
     end

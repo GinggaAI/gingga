@@ -214,9 +214,9 @@ RSpec.describe PlanningsController, type: :request do
 
     context "when no strategy is found" do
       it "shows error message" do
-        post planning_content_refinements_path, params: { plan_id: "nonexistent" }
+        post planning_content_refinements_path(brand_slug: brand.slug, locale: :en), params: { plan_id: "nonexistent" }
 
-        expect(response).to redirect_to(planning_path)
+        expect(response).to redirect_to(planning_path(brand_slug: brand.slug, locale: :en))
         expect(flash[:alert]).to include("No strategy found")
       end
     end

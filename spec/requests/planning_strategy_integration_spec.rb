@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe "Planning Strategy Integration", type: :request do
+  include ActiveJob::TestHelper
+
   let!(:user) { create(:user) }
   let!(:brand) { create(:brand, user: user) }
 
@@ -176,7 +178,9 @@ RSpec.describe "Planning Strategy Integration", type: :request do
       allow(mock_chat_client).to receive(:chat!).and_return(incomplete_response)
 
       expect {
-        post creas_strategist_index_path(brand_slug: brand.slug, locale: :en), params: { month: "2024-01" }
+        perform_enqueued_jobs do
+          post creas_strategist_index_path(brand_slug: brand.slug, locale: :en), params: { month: "2024-01" }
+        end
       }.to change(CreasStrategyPlan, :count).by(1)
 
       created_plan = CreasStrategyPlan.last

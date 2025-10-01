@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe 'Day of Week Content Placement', type: :integration do
+  include ActiveJob::TestHelper
+
   let(:user) { create(:user) }
   let(:brand) { create(:brand, user: user) }
   let(:strategy_plan) do
@@ -177,7 +179,9 @@ RSpec.describe 'Day of Week Content Placement', type: :integration do
 
       # Step 3: Run Voxa refinement
       expect {
-        Creas::VoxaContentService.new(strategy_plan: strategy_plan).call
+        perform_enqueued_jobs do
+          Creas::VoxaContentService.new(strategy_plan: strategy_plan).call
+        end
       }.not_to change(CreasContentItem, :count)
 
       # Step 4: Verify day assignment preserved during update

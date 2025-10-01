@@ -52,7 +52,8 @@ class Planning::ContentRefinementsController < ApplicationController
 
     unless @strategy
       Rails.logger.warn "ContentRefinementsController: No strategy found (user: #{current_user.id}, plan_id: #{params[:plan_id]})"
-      redirect_to planning_path, alert: "No strategy found to refine."
+      redirect_to planning_path(brand_slug: params[:brand_slug], locale: params[:locale]),
+                  alert: "No strategy found to refine."
       nil
     end
   end

@@ -566,6 +566,11 @@ RSpec.describe ReelSceneBasedPresenter, type: :presenter do
 
     before do
       user.update_last_brand(brand)
+      I18n.locale = :en
+    end
+
+    after do
+      I18n.locale = I18n.default_locale
     end
 
     describe '#back_path' do

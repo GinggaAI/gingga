@@ -47,7 +47,7 @@ RSpec.describe Planning::ContentRefinementsController, type: :controller do
   end
 
   before do
-    sign_in user
+    sign_in user, scope: :user
     allow(user).to receive(:current_brand).and_return(brand)
     allow(Planning::BrandResolver).to receive(:call).with(user).and_return(brand)
     allow(Planning::StrategyResolver).to receive(:new).and_return(double(call: strategy_plan))
@@ -55,7 +55,7 @@ RSpec.describe Planning::ContentRefinementsController, type: :controller do
 
   describe 'POST #create' do
     context 'full strategy refinement' do
-      let(:params) { { plan_id: strategy_plan.id } }
+      let(:params) { { brand_slug: brand.slug, locale: :en, plan_id: strategy_plan.id } }
 
       it 'calls ContentRefinementService with correct parameters' do
         service_double = double('ContentRefinementService')
@@ -109,7 +109,7 @@ RSpec.describe Planning::ContentRefinementsController, type: :controller do
     end
 
     context 'week-specific refinement' do
-      let(:params) { { plan_id: strategy_plan.id, week_number: 2 } }
+      let(:params) { { brand_slug: brand.slug, locale: :en, plan_id: strategy_plan.id, week_number: 2 } }
 
       it 'calls ContentRefinementService with target week' do
         service_double = double('ContentRefinementService')
@@ -133,7 +133,7 @@ RSpec.describe Planning::ContentRefinementsController, type: :controller do
       end
 
       it 'redirects with error message' do
-        post :create, params: { plan_id: 'nonexistent' }
+        post :create, params: { brand_slug: brand.slug, locale: :en, plan_id: 'nonexistent' }
 
         expect(response).to redirect_to(planning_path)
         expect(flash[:alert]).to eq('No strategy found to refine.')
@@ -144,7 +144,7 @@ RSpec.describe Planning::ContentRefinementsController, type: :controller do
       it 'handles unexpected errors gracefully' do
         allow(Planning::ContentRefinementService).to receive(:new).and_raise(StandardError.new('Unexpected error'))
 
-        post :create, params: { plan_id: strategy_plan.id }
+        post :create, params: { brand_slug: brand.slug, locale: :en, plan_id: strategy_plan.id }
 
         expect(response).to redirect_to(planning_path(plan_id: strategy_plan.id))
         expect(flash[:alert]).to include('Failed to refine content')
@@ -153,23 +153,18 @@ RSpec.describe Planning::ContentRefinementsController, type: :controller do
   end
 
   describe 'Brand isolation' do
-    let(:other_user) { create(:user) }
-    let(:other_brand) { create(:brand, user: other_user, slug: 'other-brand') }
-    let(:other_strategy) do
-      create(:creas_strategy_plan,
-             user: other_user,
-             brand: other_brand,
-             month: '2025-01',
-             status: 'completed')
-    end
-
     it 'does not allow refining strategies from other brands' do
-      # Try to refine strategy from another brand
-      allow(Planning::StrategyResolver).to receive(:new).and_return(double(call: nil))
+      # Reset the global mock to ensure our specific mock takes precedence
+      RSpec::Mocks.space.proxy_for(Planning::StrategyResolver).reset
 
-      post :create, params: { plan_id: other_strategy.id }
+      # Try to refine strategy from another brand - the StrategyResolver should return nil
+      # because it's scoped to the current user's brand
+      resolver_double = double('StrategyResolver', call: nil)
+      allow(Planning::StrategyResolver).to receive(:new).and_return(resolver_double)
 
-      expect(response).to redirect_to(planning_path)
+      post :create, params: { brand_slug: brand.slug, locale: :en, plan_id: 999999 }
+
+      expect(response).to redirect_to(planning_path(brand_slug: brand.slug, locale: :en))
       expect(flash[:alert]).to eq('No strategy found to refine.')
     end
 
@@ -177,9 +172,10 @@ RSpec.describe Planning::ContentRefinementsController, type: :controller do
       service_double = double('ContentRefinementService', call: double(success?: true, success_message: 'Success'))
       allow(Planning::ContentRefinementService).to receive(:new).and_return(service_double)
 
-      expect(Planning::BrandResolver).to receive(:call).with(user).and_return(brand)
+      # Don't reset the global mock, but verify it's called correctly
+      expect(Planning::BrandResolver).to receive(:call).with(user).and_call_original
 
-      post :create, params: { plan_id: strategy_plan.id }
+      post :create, params: { brand_slug: brand.slug, locale: :en, plan_id: strategy_plan.id }
     end
   end
 
@@ -218,7 +214,7 @@ RSpec.describe Planning::ContentRefinementsController, type: :controller do
     before { sign_out user }
 
     it 'requires user authentication' do
-      post :create, params: { plan_id: strategy_plan.id }
+      post :create, params: { brand_slug: brand.slug, locale: :en, plan_id: strategy_plan.id }
       expect(response).to have_http_status(:redirect) # Redirect to login
     end
   end
