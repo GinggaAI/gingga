@@ -44,7 +44,7 @@ gem "thruster", require: false
 # gem "image_processing", "~> 1.2"
 
 
-gem "haml-rails", "~> 2.0"
+gem "haml-rails", "~> 3.0"
 gem "redis", ">= 4.0.1"
 
 group :development, :test do
