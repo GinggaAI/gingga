@@ -116,6 +116,8 @@ es:
     page_title: "Mi Marca"
     edit_title: "Perfil de Marca"
     edit_subtitle: "Define la identidad de tu marca y preferencias de contenido"
+    new_title: "Crear Nueva Marca"
+    new_subtitle: "Configura la identidad de tu marca y preferencias de contenido"
     managing_label: "Gestionando:"
     add_new_brand: "Agregar Nueva Marca"
     untitled_brand: "Marca Sin Título"

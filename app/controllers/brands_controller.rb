@@ -6,6 +6,15 @@ class BrandsController < ApplicationController
     redirect_to edit_brand_path
   end
 
+  def new
+    @brand = current_user.brands.build
+    @brands = Brands::RetrievalService.collection_for_user(user: current_user)
+    @presenter = BrandPresenter.new(@brand, {
+      notice: flash[:notice],
+      brands_collection: @brands
+    })
+  end
+
   def edit
     @brand = Brands::RetrievalService.for_edit(user: current_user, brand_id: params[:brand_id])
     @brands = Brands::RetrievalService.collection_for_user(user: current_user)

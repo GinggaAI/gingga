@@ -26,6 +26,10 @@ module GinggaOpenAI
         content = resp.dig("choices", 0, "message", "content")
         raise "OpenAI empty response" if content.to_s.strip.empty?
         content
+      rescue Faraday::TooManyRequestsError => e
+        # Let ActiveJob retry handle rate limit errors with exponential backoff
+        Rails.logger.warn "OpenAI rate limit exceeded (429), will retry with exponential backoff via ActiveJob..."
+        raise e
       rescue Faraday::TimeoutError => e
         tries += 1
         if tries < 3
@@ -38,7 +42,7 @@ module GinggaOpenAI
         raise "Unable to connect to OpenAI API. Please check your network connection and API key."
       rescue => e
         tries += 1
-        if tries < 2 && !e.message.include?("timeout")
+        if tries < 2 && !e.message.include?("timeout") && !e.message.include?("429")
           Rails.logger.warn "OpenAI error (attempt #{tries}/2): #{e.message}"
           retry
         end

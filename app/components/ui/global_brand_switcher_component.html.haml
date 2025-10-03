@@ -1,6 +1,6 @@
 .relative.group
   - if show_create_brand_cta?
-    = link_to brand_path, method: :post, data: { turbo_method: :post }, class: "flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors" do
+    = link_to brand_path, class: "flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors" do
       .w-8.h-8.rounded-lg.bg-gradient-to-r.from-blue-500.to-purple-600.flex.items-center.justify-center
         %svg.w-4.h-4.text-white{fill: "none", stroke: "currentColor", "stroke-width": "2", viewbox: "0 0 24 24"}
           %path{d: "M12 6v6m0 0v6m0-6h6m-6 0H6"}
@@ -40,7 +40,7 @@
                 %path{d: "M20 6L9 17l-5-5"}
 
         .border-t.mt-1.pt-1
-          = link_to brand_path, method: :post, data: { turbo_method: :post }, class: "flex items-center gap-3 w-full px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-md transition-colors" do
+          = link_to brand_path, class: "flex items-center gap-3 w-full px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-md transition-colors" do
             %svg.w-4.h-4{fill: "none", stroke: "currentColor", "stroke-width": "2", viewbox: "0 0 24 24"}
               %path{d: "M12 6v6m0 0v6m0-6h6m-6 0H6"}
             = t('brands.create_new_brand')
@@ -109,11 +109,42 @@
             if (response.ok) {
               // Redirect to brand dashboard or current page with brand context
               window.location.reload();
+            } else {
+              showErrorMessage('Failed to switch brand. Please try again.');
             }
           }).catch(error => {
-            console.error('Error switching brand:', error);
+            showErrorMessage('Failed to switch brand. Please try again.');
           });
         });
       });
+
+      function showErrorMessage(message) {
+        // Create error notification element
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'fixed top-4 right-4 z-50 max-w-md bg-red-50 border border-red-200 rounded-lg shadow-lg p-4 flex items-start gap-3';
+        errorDiv.innerHTML = `
+          <svg class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+          <div class="flex-1">
+            <p class="text-sm font-medium text-red-800">${message}</p>
+          </div>
+          <button type="button" class="text-red-400 hover:text-red-600" onclick="this.parentElement.remove()">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        `;
+        document.body.appendChild(errorDiv);
+
+        // Auto-remove after 8 seconds
+        setTimeout(() => {
+          if (errorDiv.parentElement) {
+            errorDiv.style.transition = 'opacity 0.3s ease-out';
+            errorDiv.style.opacity = '0';
+            setTimeout(() => errorDiv.remove(), 300);
+          }
+        }, 8000);
+      }
     }
   });

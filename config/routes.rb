@@ -4,7 +4,7 @@ Rails.application.routes.draw do
 
   # Routes with brand slug and locale
   scope "(:brand_slug)/:locale", brand_slug: /[a-z0-9\-]+/, locale: /en|es/ do
-    resource :brand, only: [ :show, :edit, :update, :create ]
+    resource :brand, only: [ :show, :new, :edit, :update, :create ]
     get "/my-brand", to: "brands#edit", as: "my_brand"
 
     # Planning Display - Single Responsibility

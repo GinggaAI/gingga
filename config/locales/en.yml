@@ -151,6 +151,8 @@ en:
     page_title: "My Brand"
     edit_title: "Brand Profile"
     edit_subtitle: "Define your brand identity and content preferences"
+    new_title: "Create New Brand"
+    new_subtitle: "Set up your brand identity and content preferences"
     managing_label: "Managing:"
     add_new_brand: "Add New Brand"
     untitled_brand: "Untitled Brand"
