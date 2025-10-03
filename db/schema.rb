@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_23_162111) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_29_165253) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -65,6 +65,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_23_162111) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "group_url"
+    t.uuid "brand_id", null: false
+    t.index ["brand_id"], name: "index_api_tokens_on_brand_id"
     t.index ["user_id"], name: "index_api_tokens_on_user_id"
   end
 
@@ -127,6 +129,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_23_162111) do
     t.jsonb "resources", default: {"kling" => false, "stock" => false, "budget" => false, "editing" => false, "ai_avatars" => false, "podcast_clips" => false}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "audiences_count", default: 0, null: false
+    t.integer "products_count", default: 0, null: false
+    t.integer "brand_channels_count", default: 0, null: false
     t.index ["user_id", "slug"], name: "index_brands_on_user_id_and_slug", unique: true
     t.index ["user_id"], name: "index_brands_on_user_id"
   end
@@ -289,6 +294,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_23_162111) do
     t.boolean "use_ai_avatar"
     t.text "additional_instructions"
     t.integer "reel_scenes_count", default: 0, null: false
+    t.uuid "brand_id", null: false
+    t.index ["brand_id"], name: "index_reels_on_brand_id"
     t.index ["user_id"], name: "index_reels_on_user_id"
   end
 
@@ -421,7 +428,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_23_162111) do
     t.datetime "remember_created_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "last_brand_id"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["last_brand_id"], name: "index_users_on_last_brand_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
@@ -446,6 +455,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_23_162111) do
 
   add_foreign_key "ai_responses", "users"
   add_foreign_key "api_responses", "users"
+  add_foreign_key "api_tokens", "brands"
   add_foreign_key "api_tokens", "users"
   add_foreign_key "audiences", "brands"
   add_foreign_key "avatars", "users"
@@ -460,6 +470,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_23_162111) do
   add_foreign_key "creas_strategy_plans", "users"
   add_foreign_key "products", "brands"
   add_foreign_key "reel_scenes", "reels"
+  add_foreign_key "reels", "brands"
   add_foreign_key "reels", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
@@ -467,5 +478,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_23_162111) do
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "users", "brands", column: "last_brand_id", on_delete: :nullify
   add_foreign_key "voices", "users"
 end

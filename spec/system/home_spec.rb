@@ -7,13 +7,13 @@ RSpec.describe "Landing Page", type: :system do
 
   describe "main page content" do
     it "displays the main headline and CTA" do
-      visit root_path
+      visit "/"
       expect(page).to have_text("One place. All your content. Powered by AI, guided by your voice.")
       expect(page).to have_link("Get Started")
     end
 
     it "renders How Gingga Works steps" do
-      visit root_path
+      visit "/"
       expect(page).to have_text("Noctua maps your brand")
       expect(page).to have_text("Sagui spins prompts into ideas")
       expect(page).to have_text("Voxa crafts visuals")
@@ -21,7 +21,7 @@ RSpec.describe "Landing Page", type: :system do
     end
 
     it "displays all feature sections with proper headings" do
-      visit root_path
+      visit "/"
 
       # Check all main section headings
       expect(page).to have_text("What You Get")
@@ -32,7 +32,7 @@ RSpec.describe "Landing Page", type: :system do
     end
 
     it "shows feature cards with proper icons and descriptions" do
-      visit root_path
+      visit "/"
 
       # Feature cards - updated to new 4-box structure
       expect(page).to have_text("Noctua (The Strategist)")
@@ -45,7 +45,7 @@ RSpec.describe "Landing Page", type: :system do
 
 
     it "shows testimonials from customers" do
-      visit root_path
+      visit "/"
 
       expect(page).to have_text("I used to dread content days. Now it flows.")
       expect(page).to have_text("Camila — Wellness Coach")
@@ -54,7 +54,7 @@ RSpec.describe "Landing Page", type: :system do
     end
 
     it "displays pricing information" do
-      visit root_path
+      visit "/"
 
       expect(page).to have_text("£248/mo")
       expect(page).to have_text("£585/mo")
@@ -66,14 +66,14 @@ RSpec.describe "Landing Page", type: :system do
 
   describe "navigation and structure" do
     it "has proper navigation links" do
-      visit root_path
+      visit "/"
 
       expect(page).to have_link("How it works", href: "#how")
       expect(page).to have_link("Get Started")
     end
 
     it "has semantic HTML structure with proper sections" do
-      visit root_path
+      visit "/"
 
       expect(page).to have_css("header")
       expect(page).to have_css("section#how")
@@ -82,7 +82,7 @@ RSpec.describe "Landing Page", type: :system do
     end
 
     it "includes footer with company information" do
-      visit root_path
+      visit "/"
 
       expect(page).to have_text("Intelligence in Motion")
       expect(page).to have_link("Privacy Policy")
@@ -93,7 +93,7 @@ RSpec.describe "Landing Page", type: :system do
 
   describe "accessibility and usability" do
     it "has multiple CTA buttons for conversion" do
-      visit root_path
+      visit "/"
 
       # Should have Get Started and Start Now links
       expect(page).to have_link("Get Started")
@@ -102,7 +102,7 @@ RSpec.describe "Landing Page", type: :system do
     end
 
     it "displays brand identity consistently" do
-      visit root_path
+      visit "/"
 
       # Brand name should appear in nav and footer
       expect(page).to have_text("GINGGA", count: 2) # Nav and footer

@@ -2,10 +2,14 @@ require 'rails_helper'
 
 RSpec.describe Api::V1::ApiTokensController, type: :request do
   let(:user) { create(:user) }
+  let(:brand) { create(:brand, user: user) }
 
   before do
     # Clean api_tokens table before each test to avoid pollution
     ApiToken.delete_all
+
+    # Set up brand context
+    user.update_last_brand(brand)
 
     # Mock validation service for all tests
     allow_any_instance_of(ApiTokenValidatorService).to receive(:call)
@@ -19,6 +23,10 @@ RSpec.describe Api::V1::ApiTokensController, type: :request do
 
       def current_user
         @current_user ||= User.find_by(id: self.class.test_user_id)
+      end
+
+      def current_brand
+        current_user&.current_brand
       end
 
       class << self
@@ -35,8 +43,8 @@ RSpec.describe Api::V1::ApiTokensController, type: :request do
   end
 
   describe 'GET /api/v1/api_tokens' do
-    let!(:api_token1) { create(:api_token, :openai, user: user, mode: 'test') }
-    let!(:api_token2) { create(:api_token, :heygen, user: user, mode: 'production') }
+    let!(:api_token1) { create(:api_token, :openai, user: user, brand: brand, mode: 'test') }
+    let!(:api_token2) { create(:api_token, :heygen, user: user, brand: brand, mode: 'production') }
 
     it 'returns all user api tokens' do
       get '/api/v1/api_tokens'
@@ -50,7 +58,8 @@ RSpec.describe Api::V1::ApiTokensController, type: :request do
 
     it 'does not return other users tokens' do
       other_user = create(:user)
-      create(:api_token, user: other_user)
+      other_brand = create(:brand, user: other_user)
+      create(:api_token, user: other_user, brand: other_brand)
 
       get '/api/v1/api_tokens'
       json_response = JSON.parse(response.body)
@@ -59,7 +68,7 @@ RSpec.describe Api::V1::ApiTokensController, type: :request do
   end
 
   describe 'GET /api/v1/api_tokens/:id' do
-    let(:api_token) { create(:api_token, :openai, user: user, mode: 'test') }
+    let(:api_token) { create(:api_token, :openai, user: user, brand: brand, mode: 'test') }
 
     it 'returns the api token' do
       get "/api/v1/api_tokens/#{api_token.id}"
@@ -77,7 +86,8 @@ RSpec.describe Api::V1::ApiTokensController, type: :request do
 
     it 'returns 404 for other users token' do
       other_user = create(:user)
-      other_token = create(:api_token, user: other_user)
+      other_brand = create(:brand, user: other_user)
+      other_token = create(:api_token, user: other_user, brand: other_brand)
 
       get "/api/v1/api_tokens/#{other_token.id}"
       expect(response).to have_http_status(:not_found)
@@ -147,7 +157,7 @@ RSpec.describe Api::V1::ApiTokensController, type: :request do
   end
 
   describe 'PATCH /api/v1/api_tokens/:id' do
-    let(:api_token) { create(:api_token, :openai, user: user, mode: 'test') }
+    let(:api_token) { create(:api_token, :openai, user: user, brand: brand, mode: 'test') }
     let(:update_params) do
       {
         api_token: { mode: 'production' }
@@ -176,7 +186,8 @@ RSpec.describe Api::V1::ApiTokensController, type: :request do
 
     it 'returns 404 for other users token' do
       other_user = create(:user)
-      other_token = create(:api_token, user: other_user)
+      other_brand = create(:brand, user: other_user)
+      other_token = create(:api_token, user: other_user, brand: other_brand)
 
       patch "/api/v1/api_tokens/#{other_token.id}", params: { api_token: { mode: 'production' } }
       expect(response).to have_http_status(:not_found)
@@ -184,7 +195,7 @@ RSpec.describe Api::V1::ApiTokensController, type: :request do
   end
 
   describe 'DELETE /api/v1/api_tokens/:id' do
-    let(:api_token) { create(:api_token, :openai, user: user, mode: 'test') }
+    let(:api_token) { create(:api_token, :openai, user: user, brand: brand, mode: 'test') }
 
     it 'destroys the api token' do
       delete "/api/v1/api_tokens/#{api_token.id}"
@@ -195,7 +206,8 @@ RSpec.describe Api::V1::ApiTokensController, type: :request do
 
     it 'returns 404 for other users token' do
       other_user = create(:user)
-      other_token = create(:api_token, user: other_user)
+      other_brand = create(:brand, user: other_user)
+      other_token = create(:api_token, user: other_user, brand: other_brand)
 
       delete "/api/v1/api_tokens/#{other_token.id}"
       expect(response).to have_http_status(:not_found)

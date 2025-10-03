@@ -2,14 +2,16 @@ require 'rails_helper'
 
 RSpec.describe "ReelsController", type: :request do
   let(:user) { create(:user) }
+  let(:brand) { create(:brand, user: user) }
 
   before do
     sign_in user, scope: :user
+    user.update_last_brand(brand)
   end
 
   describe "GET scene-based reels (new action)" do
     it "returns success and shows form" do
-      get scene_based_reels_path
+      get scene_based_reels_path(brand_slug: brand.slug, locale: :en)
 
       expect(response).to have_http_status(:success)
       expect(response.body).to include('form')
@@ -18,14 +20,14 @@ RSpec.describe "ReelsController", type: :request do
     it "does not create database records during GET" do
       # This test prevents the regression that caused the original bug
       expect {
-        get scene_based_reels_path
-        get scene_based_reels_path # Multiple requests
+        get scene_based_reels_path(brand_slug: brand.slug, locale: :en)
+        get scene_based_reels_path(brand_slug: brand.slug, locale: :en) # Multiple requests
       }.not_to change(Reel, :count)
     end
 
     it "creates form with POST method, not PATCH" do
       # This would have caught the original bug
-      get scene_based_reels_path
+      get scene_based_reels_path(brand_slug: brand.slug, locale: :en)
 
       doc = Nokogiri::HTML(response.body)
       form = doc.css('form').first
@@ -51,7 +53,7 @@ RSpec.describe "ReelsController", type: :request do
 
     it "creates reel and redirects" do
       expect {
-        post scene_based_reels_path, params: valid_params
+        post scene_based_reels_path(brand_slug: brand.slug, locale: :en), params: valid_params
       }.to change(Reel, :count).by(1)
 
       expect(response).to have_http_status(:redirect)
@@ -59,7 +61,7 @@ RSpec.describe "ReelsController", type: :request do
 
     it "routes correctly - no 404 errors" do
       # This test verifies the bug is fixed
-      post scene_based_reels_path, params: valid_params
+      post scene_based_reels_path(brand_slug: brand.slug, locale: :en), params: valid_params
 
       expect(response).not_to have_http_status(:not_found)
       expect(response).not_to have_http_status(:method_not_allowed)
@@ -80,11 +82,52 @@ RSpec.describe "ReelsController", type: :request do
 
     it "handles smart planning data without creating records" do
       expect {
-        get scene_based_reels_path, params: { smart_planning_data: smart_planning_data }
+        get scene_based_reels_path(brand_slug: brand.slug, locale: :en), params: { smart_planning_data: smart_planning_data }
       }.not_to change(Reel, :count)
 
       expect(response).to have_http_status(:success)
       expect(response.body).to include("Preloaded Reel")
+    end
+  end
+
+  describe "Back navigation" do
+    it "presenter returns auto_creation path when coming from auto_creation" do
+      get scene_based_reels_path(brand_slug: brand.slug, locale: :en),
+          headers: { "HTTP_REFERER" => "http://www.example.com/#{brand.slug}/en/auto_creation" }
+
+      expect(response).to have_http_status(:success)
+      expect(assigns(:presenter).back_path).to eq("/#{brand.slug}/en/auto_creation")
+    end
+
+    it "presenter returns planning path when coming from planning" do
+      get scene_based_reels_path(brand_slug: brand.slug, locale: :en),
+          headers: { "HTTP_REFERER" => "http://www.example.com/#{brand.slug}/en/planning" }
+
+      expect(response).to have_http_status(:success)
+      expect(assigns(:presenter).back_path).to eq("/#{brand.slug}/en/planning")
+    end
+
+    it "presenter returns planning path when coming from planning with query params" do
+      get scene_based_reels_path(brand_slug: brand.slug, locale: :en),
+          headers: { "HTTP_REFERER" => "http://www.example.com/#{brand.slug}/en/planning?month=2026-3" }
+
+      expect(response).to have_http_status(:success)
+      expect(assigns(:presenter).back_path).to eq("/#{brand.slug}/en/planning")
+    end
+
+    it "presenter returns root path when coming from unknown page" do
+      get scene_based_reels_path(brand_slug: brand.slug, locale: :en),
+          headers: { "HTTP_REFERER" => "http://www.example.com/#{brand.slug}/en/settings" }
+
+      expect(response).to have_http_status(:success)
+      expect(assigns(:presenter).back_path).to eq("/#{brand.slug}/en")
+    end
+
+    it "presenter returns root path when no referrer" do
+      get scene_based_reels_path(brand_slug: brand.slug, locale: :en)
+
+      expect(response).to have_http_status(:success)
+      expect(assigns(:presenter).back_path).to eq("/#{brand.slug}/en")
     end
   end
 end

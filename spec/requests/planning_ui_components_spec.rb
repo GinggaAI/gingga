@@ -6,11 +6,12 @@ RSpec.describe "Planning UI Components", type: :request do
 
   before do
     sign_in user, scope: :user
+    user.update_last_brand(brand)
   end
 
   describe "Planning Page UI Elements" do
     before do
-      get planning_path
+      get planning_path(brand_slug: brand.slug, locale: :en)
     end
 
     it "renders the main planning interface" do
@@ -84,7 +85,7 @@ RSpec.describe "Planning UI Components", type: :request do
 
   describe "Form Behavior" do
     it "POST request creates form submission" do
-      post creas_strategist_index_path, params: {
+      post creas_strategist_index_path(brand_slug: brand.slug, locale: :en), params: {
         month: "2025-08",
         strategy_form: {
           objective_of_the_month: "Test objective",
@@ -94,8 +95,8 @@ RSpec.describe "Planning UI Components", type: :request do
         }
       }
 
-      # Should redirect (PRG pattern) - Rails uses 302 by default, not 303
-      expect(response).to have_http_status(:found)
+      # Should redirect (PRG pattern) - Rails uses 303 for POST-redirect-GET
+      expect(response).to have_http_status(:see_other)
       expect(response.location).to include("/planning")
     end
   end

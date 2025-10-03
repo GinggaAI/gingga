@@ -3,7 +3,7 @@ class ReelsController < ApplicationController
   before_action :set_reel, only: [ :show, :edit ]
 
   def index
-    @reels = current_user.reels.order(created_at: :desc)
+    @reels = current_brand&.reels&.order(created_at: :desc) || []
   end
 
   def show
@@ -17,7 +17,14 @@ class ReelsController < ApplicationController
 
     if presenter_result.success?
       @presenter = presenter_result.data[:presenter]
-      render presenter_result.data[:view_template]
+      # Whitelist allowed templates for security
+      template = presenter_result.data[:view_template]
+      case template
+      when "reels/scene_based", "reels/narrative"
+        render template
+      else
+        redirect_to reels_path, alert: "Invalid template: #{template}"
+      end
     else
       redirect_to reels_path, alert: "Error loading reel for editing: #{presenter_result.error}"
     end
@@ -33,7 +40,8 @@ class ReelsController < ApplicationController
     form_result = Reels::FormSetupService.new(
       user: current_user,
       template: params[:template],
-      smart_planning_data: params[:smart_planning_data]
+      smart_planning_data: params[:smart_planning_data],
+      referrer: request.referer
     ).call
 
     if form_result[:success]
@@ -49,6 +57,7 @@ class ReelsController < ApplicationController
   def create
     creation_result = ReelCreationService.new(
       user: current_user,
+      brand: current_brand,
       params: reel_params
     ).call
 
@@ -63,7 +72,8 @@ class ReelsController < ApplicationController
   private
 
   def set_reel
-    @reel = current_user.reels.find(params[:id])
+    @reel = current_brand&.reels&.find(params[:id])
+    redirect_to reels_path, alert: "Reel not found" unless @reel
   end
 
   def reel_params

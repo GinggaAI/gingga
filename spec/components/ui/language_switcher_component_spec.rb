@@ -43,7 +43,7 @@ RSpec.describe Ui::LanguageSwitcherComponent, type: :component do
 
         # Check that links are generated with proper locale paths
         expect(page).to have_link('Spanish', href: '/es/')
-        expect(page).to have_link('English', href: '/')
+        expect(page).to have_link('English', href: '/en/')
       end
     end
 
@@ -167,6 +167,7 @@ RSpec.describe Ui::LanguageSwitcherComponent, type: :component do
         mock_request = double(path: '/en/complex/nested/path', present?: true)
         allow(component).to receive(:request).and_return(mock_request)
         allow(component).to receive(:respond_to?).with(:request).and_return(true)
+        allow(component).to receive(:respond_to?).with(:current_brand).and_return(false)
         allow(I18n).to receive(:default_locale).and_return(:en)
 
         result = component.send(:switch_locale_path, 'es')
@@ -185,7 +186,52 @@ RSpec.describe Ui::LanguageSwitcherComponent, type: :component do
         # Test default locale with empty path
         allow(mock_request).to receive(:path).and_return('/es/')
         result = component.send(:switch_locale_path, 'en')
-        expect(result).to eq('/')
+        expect(result).to eq('/en/')
+      end
+
+      it 'handles brand_slug/locale/path format' do
+        mock_request = double(path: '/my-brand/en/planning', present?: true)
+        allow(component).to receive(:request).and_return(mock_request)
+        allow(component).to receive(:respond_to?).with(:request).and_return(true)
+        allow(component).to receive(:respond_to?).with(:current_brand).and_return(false)
+
+        result = component.send(:switch_locale_path, 'es')
+        expect(result).to eq('/my-brand/es/planning')
+      end
+
+      it 'handles brand_slug/locale format with empty remaining path' do
+        mock_request = double(path: '/my-brand/en', present?: true)
+        allow(component).to receive(:request).and_return(mock_request)
+        allow(component).to receive(:respond_to?).with(:request).and_return(true)
+        allow(component).to receive(:respond_to?).with(:current_brand).and_return(false)
+
+        result = component.send(:switch_locale_path, 'es')
+        expect(result).to eq('/my-brand/es/')
+      end
+
+      it 'uses brand from component when available' do
+        mock_brand = double(slug: 'test-brand')
+        component_with_brand = Ui::LanguageSwitcherComponent.new(brand: mock_brand)
+        render_inline(component_with_brand)
+
+        mock_request = double(path: '/unknown-path', present?: true)
+        allow(component_with_brand).to receive(:request).and_return(mock_request)
+        allow(component_with_brand).to receive(:respond_to?).with(:request).and_return(true)
+        allow(component_with_brand).to receive(:respond_to?).with(:current_brand).and_return(false)
+
+        result = component_with_brand.send(:switch_locale_path, 'es')
+        expect(result).to eq('/test-brand/es')
+      end
+
+      it 'uses current_brand from view context when brand not provided' do
+        mock_request = double(path: '/some/path', present?: true)
+        mock_brand = double(slug: 'context-brand')
+        allow(component).to receive(:request).and_return(mock_request)
+        allow(component).to receive(:respond_to?).and_return(true)
+        allow(component).to receive(:current_brand).and_return(mock_brand)
+
+        result = component.send(:switch_locale_path, 'es')
+        expect(result).to eq('/context-brand/es')
       end
     end
   end
@@ -209,6 +255,7 @@ RSpec.describe Ui::LanguageSwitcherComponent, type: :component do
       component = Ui::LanguageSwitcherComponent.new
       allow(component).to receive(:request).and_return(double(path: '/en/test', present?: true))
       allow(component).to receive(:respond_to?).with(:request).and_return(true)
+      allow(component).to receive(:respond_to?).with(:current_brand).and_return(false)
 
       # Mock a StandardError during path processing
       allow(component.send(:request)).to receive(:path).and_raise(StandardError, 'Path processing failed')
@@ -221,6 +268,7 @@ RSpec.describe Ui::LanguageSwitcherComponent, type: :component do
       component = Ui::LanguageSwitcherComponent.new
       allow(component).to receive(:request).and_return(double(path: '/en/test', present?: true))
       allow(component).to receive(:respond_to?).with(:request).and_return(true)
+      allow(component).to receive(:respond_to?).with(:current_brand).and_return(false)
 
       # Mock a StandardError during path processing
       allow(component.send(:request)).to receive(:path).and_raise(StandardError, 'Path processing failed')
@@ -229,6 +277,51 @@ RSpec.describe Ui::LanguageSwitcherComponent, type: :component do
       component.send(:switch_locale_path, 'es')
 
       expect(Rails.logger).to have_received(:warn).with(/LanguageSwitcherComponent: Failed to generate path for locale es/)
+    end
+
+    it 'falls back to brand slug when error occurs with brand available' do
+      mock_brand = double(slug: 'fallback-brand')
+      component = Ui::LanguageSwitcherComponent.new(brand: mock_brand)
+      render_inline(component)
+
+      allow(component).to receive(:request).and_return(double(path: '/en/test', present?: true))
+      allow(component).to receive(:respond_to?).with(:request).and_return(true)
+      allow(component).to receive(:respond_to?).with(:current_brand).and_return(false)
+
+      # Mock a StandardError during path processing
+      allow(component.send(:request)).to receive(:path).and_raise(StandardError, 'Path processing failed')
+      allow(Rails.logger).to receive(:warn)
+
+      result = component.send(:switch_locale_path, 'es')
+      expect(result).to eq('/fallback-brand/es')
+    end
+
+    it 'falls back to brand slug when error occurs with current_brand in view context' do
+      component = Ui::LanguageSwitcherComponent.new
+      render_inline(component)
+
+      mock_brand = double(slug: 'context-fallback-brand')
+      allow(component).to receive(:request).and_return(double(path: '/en/test', present?: true))
+      allow(component).to receive(:respond_to?).and_return(true)
+      allow(component).to receive(:current_brand).and_return(mock_brand)
+
+      # Mock a StandardError during path processing
+      allow(component.send(:request)).to receive(:path).and_raise(StandardError, 'Path processing failed')
+      allow(Rails.logger).to receive(:warn)
+
+      result = component.send(:switch_locale_path, 'es')
+      expect(result).to eq('/context-fallback-brand/es')
+    end
+
+    it 'handles fallback without request context when brand is present' do
+      mock_brand = double(slug: 'no-request-brand')
+      component = Ui::LanguageSwitcherComponent.new(brand: mock_brand)
+      render_inline(component)
+
+      allow(component).to receive(:respond_to?).with(:request).and_return(false)
+
+      result = component.send(:switch_locale_path, 'es')
+      expect(result).to eq('/no-request-brand/es')
     end
   end
 

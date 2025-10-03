@@ -22,11 +22,21 @@ class Ui::AudienceFormComponent < ViewComponent::Base
 
   def interests_value
     return "" unless audience.interests.present?
-    audience.interests.join(", ")
+
+    if audience.interests.is_a?(Array)
+      audience.interests.join(", ")
+    else
+      audience.interests.to_s
+    end
   end
 
   def digital_behavior_value
     return "" unless audience.digital_behavior.present?
-    audience.digital_behavior.join(", ")
+
+    if audience.digital_behavior.is_a?(Array)
+      audience.digital_behavior.join(", ")
+    else
+      audience.digital_behavior.to_s
+    end
   end
 end

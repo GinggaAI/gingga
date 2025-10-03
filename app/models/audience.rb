@@ -1,5 +1,5 @@
 class Audience < ApplicationRecord
-  belongs_to :brand
+  belongs_to :brand, counter_cache: true
 
   validates :name, presence: true
 

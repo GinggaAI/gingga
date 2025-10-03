@@ -1,14 +1,14 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["menu"]
+  static targets = ["menu", "chevron"]
 
   connect() {
     this.close = this.close.bind(this)
   }
 
   toggle() {
-    if (this.menuTarget.style.display === "none" || this.menuTarget.style.display === "") {
+    if (this.menuTarget.classList.contains("hidden")) {
       this.open()
     } else {
       this.close()
@@ -16,7 +16,10 @@ export default class extends Controller {
   }
 
   open() {
-    this.menuTarget.style.display = "block"
+    this.menuTarget.classList.remove("hidden")
+    if (this.hasChevronTarget) {
+      this.chevronTarget.style.transform = "rotate(180deg)"
+    }
     document.addEventListener("click", this.close)
   }
 
@@ -24,10 +27,14 @@ export default class extends Controller {
     if (event && this.element.contains(event.target)) {
       return
     }
-    
-    this.menuTarget.style.display = "none"
+
+    this.menuTarget.classList.add("hidden")
+    if (this.hasChevronTarget) {
+      this.chevronTarget.style.transform = "rotate(0deg)"
+    }
     document.removeEventListener("click", this.close)
   }
+
 
   disconnect() {
     document.removeEventListener("click", this.close)

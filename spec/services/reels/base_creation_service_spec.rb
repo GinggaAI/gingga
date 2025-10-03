@@ -2,12 +2,14 @@ require 'rails_helper'
 
 RSpec.describe Reels::BaseCreationService do
   let(:user) { create(:user) }
+  let(:brand) { create(:brand, user: user) }
   let(:template) { 'only_avatars' }
   let(:params) { { title: 'Test Reel', description: 'Test description' } }
 
   subject(:service) do
     described_class.new(
       user: user,
+      brand: brand,
       template: template,
       params: params
     )
@@ -53,10 +55,10 @@ RSpec.describe Reels::BaseCreationService do
 
   describe '#call' do
     context 'when reel creation succeeds' do
-      let(:reel) { build(:reel, user: user, template: template, status: 'draft') }
+      let(:reel) { build(:reel, user: user, brand: brand, template: template, status: 'draft') }
 
       before do
-        allow(user.reels).to receive(:build).and_return(reel)
+        allow(brand.reels).to receive(:build).and_return(reel)
         allow(reel).to receive(:save).and_return(true)
         allow(service).to receive(:trigger_video_generation)
       end
@@ -86,10 +88,10 @@ RSpec.describe Reels::BaseCreationService do
     end
 
     context 'when reel save fails' do
-      let(:reel) { build(:reel, user: user, template: template, status: 'draft') }
+      let(:reel) { build(:reel, user: user, brand: brand, template: template, status: 'draft') }
 
       before do
-        allow(user.reels).to receive(:build).and_return(reel)
+        allow(brand.reels).to receive(:build).and_return(reel)
         allow(reel).to receive(:save).and_return(false)
       end
 

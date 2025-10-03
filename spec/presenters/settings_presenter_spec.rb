@@ -2,8 +2,9 @@ require 'rails_helper'
 
 RSpec.describe SettingsPresenter do
   let(:user) { create(:user) }
+  let(:brand) { create(:brand, user: user) }
   let(:params) { {} }
-  let(:presenter) { described_class.new(user, params) }
+  let(:presenter) { described_class.new(user, brand, params) }
 
   before do
     # Mock the API token validation service to prevent actual API calls in tests
@@ -18,7 +19,7 @@ RSpec.describe SettingsPresenter do
     end
 
     context 'when user has a valid HeyGen token' do
-      let!(:api_token) { create(:api_token, :heygen, user: user, is_valid: true) }
+      let!(:api_token) { create(:api_token, :heygen, user: user, brand: brand, is_valid: true) }
 
       it 'returns the token' do
         expect(presenter.heygen_token).to eq(api_token)
@@ -47,7 +48,7 @@ RSpec.describe SettingsPresenter do
     end
 
     context 'when user has a token with encrypted value' do
-      let!(:api_token) { create(:api_token, :heygen, user: user, encrypted_token: 'test_key_123') }
+      let!(:api_token) { create(:api_token, :heygen, user: user, brand: brand, encrypted_token: 'test_key_123') }
 
       it 'returns the encrypted token value' do
         expect(presenter.heygen_token_value).to eq('test_key_123')
@@ -63,7 +64,7 @@ RSpec.describe SettingsPresenter do
     end
 
     context 'when user has a token with no group URL' do
-      let!(:api_token) { create(:api_token, :heygen, user: user, group_url: nil) }
+      let!(:api_token) { create(:api_token, :heygen, user: user, brand: brand, group_url: nil) }
 
       it 'returns nil' do
         expect(presenter.heygen_group_url_value).to be_nil
@@ -71,7 +72,7 @@ RSpec.describe SettingsPresenter do
     end
 
     context 'when user has a token with group URL' do
-      let!(:api_token) { create(:api_token, :heygen, user: user, group_url: 'https://app.heygen.com/avatars?groupId=123') }
+      let!(:api_token) { create(:api_token, :heygen, user: user, brand: brand, group_url: 'https://app.heygen.com/avatars?groupId=123') }
 
       it 'returns the group URL value' do
         expect(presenter.heygen_group_url_value).to eq('https://app.heygen.com/avatars?groupId=123')
@@ -81,7 +82,7 @@ RSpec.describe SettingsPresenter do
 
   describe '#show_group_url_field?' do
     context 'when HeyGen is configured' do
-      let!(:api_token) { create(:api_token, :heygen, user: user, is_valid: true) }
+      let!(:api_token) { create(:api_token, :heygen, user: user, brand: brand, is_valid: true) }
 
       it 'returns true' do
         expect(presenter.show_group_url_field?).to be true
@@ -116,7 +117,7 @@ RSpec.describe SettingsPresenter do
     end
 
     context 'when user has valid HeyGen token' do
-      let!(:api_token) { create(:api_token, :heygen, user: user, is_valid: true) }
+      let!(:api_token) { create(:api_token, :heygen, user: user, brand: brand, is_valid: true) }
 
       it 'returns true' do
         expect(presenter.heygen_configured?).to be true
@@ -126,7 +127,7 @@ RSpec.describe SettingsPresenter do
 
   describe '#heygen_configuration_status' do
     context 'when HeyGen is configured' do
-      let!(:api_token) { create(:api_token, :heygen, user: user, is_valid: true) }
+      let!(:api_token) { create(:api_token, :heygen, user: user, brand: brand, is_valid: true) }
 
       it 'returns "Configured"' do
         expect(presenter.heygen_configuration_status).to eq('Configured')
@@ -142,7 +143,7 @@ RSpec.describe SettingsPresenter do
 
   describe '#heygen_status_class' do
     context 'when HeyGen is configured' do
-      let!(:api_token) { create(:api_token, :heygen, user: user, is_valid: true) }
+      let!(:api_token) { create(:api_token, :heygen, user: user, brand: brand, is_valid: true) }
 
       it 'returns green status class' do
         expect(presenter.heygen_status_class).to include('bg-green-100 text-green-700')
@@ -158,7 +159,7 @@ RSpec.describe SettingsPresenter do
 
   describe '#show_validate_button?' do
     context 'when HeyGen is configured' do
-      let!(:api_token) { create(:api_token, :heygen, user: user, is_valid: true) }
+      let!(:api_token) { create(:api_token, :heygen, user: user, brand: brand, is_valid: true) }
 
       it 'returns true' do
         expect(presenter.show_validate_button?).to be true
@@ -174,7 +175,7 @@ RSpec.describe SettingsPresenter do
 
   describe '#show_disabled_validate_button?' do
     context 'when HeyGen is configured' do
-      let!(:api_token) { create(:api_token, :heygen, user: user, is_valid: true) }
+      let!(:api_token) { create(:api_token, :heygen, user: user, brand: brand, is_valid: true) }
 
       it 'returns false' do
         expect(presenter.show_disabled_validate_button?).to be false
@@ -259,10 +260,10 @@ RSpec.describe SettingsPresenter do
       end
 
       context 'when user has valid API tokens' do
-        let!(:heygen_token) { create(:api_token, :heygen, user: user, is_valid: true) }
-        let!(:openai_token) { create(:api_token, user: user, provider: 'openai', is_valid: true) }
+        let!(:heygen_token) { create(:api_token, :heygen, user: user, brand: brand, is_valid: true) }
+        let!(:openai_token) { create(:api_token, user: user, brand: brand, provider: 'openai', is_valid: true) }
         let!(:invalid_token) do
-          token = build(:api_token, user: user, provider: 'kling')
+          token = build(:api_token, user: user, brand: brand, provider: 'kling')
           token.save(validate: false)
           token.update_column(:is_valid, false)
           token
@@ -288,9 +289,9 @@ RSpec.describe SettingsPresenter do
       end
 
       context 'when user has test mode tokens' do
-        let!(:test_token1) { create(:api_token, user: user, provider: 'heygen', mode: 'test') }
-        let!(:test_token2) { create(:api_token, user: user, provider: 'openai', mode: 'test') }
-        let!(:prod_token) { create(:api_token, user: user, provider: 'kling', mode: 'production') }
+        let!(:test_token1) { create(:api_token, user: user, brand: brand, provider: 'heygen', mode: 'test') }
+        let!(:test_token2) { create(:api_token, user: user, brand: brand, provider: 'openai', mode: 'test') }
+        let!(:prod_token) { create(:api_token, user: user, brand: brand, provider: 'kling', mode: 'production') }
 
         it 'returns count of test mode tokens' do
           expect(presenter.test_mode_count).to eq(2)

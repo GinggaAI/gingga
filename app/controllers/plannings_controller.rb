@@ -19,7 +19,16 @@ class PlanningsController < ApplicationController
 
   # GET /plannings/smart_planning
   def smart_planning
+    @presenter = Planning::DisplayService.new(
+      user: current_user,
+      brand: @brand,
+      strategy: @current_strategy,
+      params: params
+    ).call
+
     @plans = Planning::WeeklyPlansBuilder.call(@current_strategy)
+
+    render :show
   end
 
   # GET /planning/strategy_for_month

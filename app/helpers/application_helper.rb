@@ -54,13 +54,34 @@ module ApplicationHelper
     "reel"
   end
 
+  # Safe path helpers that include brand_slug and locale
+  def safe_my_brand_path
+    return my_brand_path if current_brand.nil?
+    my_brand_path(brand_slug: current_brand.slug, locale: I18n.locale)
+  end
+
+  def safe_brand_path
+    return brand_path if current_brand.nil?
+    brand_path(brand_slug: current_brand.slug, locale: I18n.locale)
+  end
+
+  def safe_edit_brand_path
+    return edit_brand_path if current_brand.nil?
+    edit_brand_path(brand_slug: current_brand.slug, locale: I18n.locale)
+  end
+
+  def safe_planning_path
+    return planning_path if current_brand.nil?
+    planning_path(brand_slug: current_brand.slug, locale: I18n.locale)
+  end
+
   private
 
   def menu_item_active?(path)
     case path
-    when my_brand_path
+    when safe_my_brand_path
       # My Brand is active for both /brand, /brand/edit and /my-brand
-      current_page?(brand_path) || current_page?(edit_brand_path) || current_page?(my_brand_path)
+      current_page?(safe_brand_path) || current_page?(safe_edit_brand_path) || current_page?(safe_my_brand_path)
     else
       current_page?(path)
     end

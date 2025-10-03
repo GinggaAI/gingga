@@ -40,15 +40,12 @@ RSpec.describe Planning::ContentDetailsService do
       it 'renders the content_detail partial' do
         service = described_class.new(content_data: valid_content_data, user: user)
 
-        expect(ApplicationController.renderer).to receive(:render)
-          .with(
-            partial: "plannings/content_detail",
-            locals: hash_including(:content_piece, :presenter),
-            formats: [ :html ]
-          ).and_return("<div>rendered content</div>")
-
         result = service.call
-        expect(result.html).to eq("<div>rendered content</div>")
+
+        expect(result.success?).to be true
+        expect(result.html).to include("Content Title")
+        expect(result.html).to include("Content description")
+        expect(result.html).to include("Instagram Post")
       end
     end
 
@@ -101,8 +98,15 @@ RSpec.describe Planning::ContentDetailsService do
       it 'handles rendering errors gracefully' do
         service = described_class.new(content_data: valid_content_data, user: user)
 
-        allow(ApplicationController.renderer).to receive(:render)
+        # Mock ActionController::Base.renderer.new to return a renderer that raises an error
+        renderer_instance = double("renderer")
+        allow(renderer_instance).to receive(:controller).and_return(double("controller", singleton_class: Class.new))
+        allow(renderer_instance).to receive(:render)
           .and_raise(StandardError.new("Template not found"))
+
+        renderer_class = double("renderer_class")
+        allow(renderer_class).to receive(:new).and_return(renderer_instance)
+        allow(ActionController::Base).to receive(:renderer).and_return(renderer_class)
 
         result = service.call
 
@@ -115,7 +119,15 @@ RSpec.describe Planning::ContentDetailsService do
         service = described_class.new(content_data: valid_content_data, user: user)
         error = StandardError.new("Template not found")
 
-        allow(ApplicationController.renderer).to receive(:render).and_raise(error)
+        # Mock ActionController::Base.renderer.new to return a renderer that raises an error
+        renderer_instance = double("renderer")
+        allow(renderer_instance).to receive(:controller).and_return(double("controller", singleton_class: Class.new))
+        allow(renderer_instance).to receive(:render).and_raise(error)
+
+        renderer_class = double("renderer_class")
+        allow(renderer_class).to receive(:new).and_return(renderer_instance)
+        allow(ActionController::Base).to receive(:renderer).and_return(renderer_class)
+
         expect(Rails.logger).to receive(:error)
           .with(/ContentDetailsService: Error rendering content details/)
         expect(Rails.logger).to receive(:error)

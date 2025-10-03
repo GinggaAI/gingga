@@ -7,21 +7,33 @@ class BrandsController < ApplicationController
   end
 
   def edit
-    @brand = current_user_brand || current_user.brands.build
-    @brands = current_user.brands.order(:created_at)
+    @brand = Brands::RetrievalService.for_edit(user: current_user, brand_id: params[:brand_id])
+    @brands = Brands::RetrievalService.collection_for_user(user: current_user)
     @presenter = BrandPresenter.new(@brand, {
       notice: flash[:notice],
       brands_collection: @brands
     })
   end
 
-  def update
-    @brand = current_user_brand || current_user.brands.create
+  def create
+    result = Brands::CreationService.new(user: current_user).call
 
-    if @brand.update(brand_params)
-      redirect_to edit_brand_path, notice: "Brand profile updated successfully!"
+    if result[:success]
+      new_brand = result[:data][:brand]
+      redirect_to edit_brand_path(brand_slug: new_brand.slug, locale: I18n.locale, brand_id: new_brand.id), notice: "New brand created successfully!"
     else
-      @brands = current_user.brands.order(:created_at)
+      redirect_to edit_brand_path(brand_slug: current_brand.slug, locale: I18n.locale), alert: result[:error]
+    end
+  end
+
+
+  def update
+    @brand = find_brand_for_update
+
+    if @brand&.update(brand_params)
+      redirect_to edit_brand_path(brand_slug: @brand.slug, locale: I18n.locale, brand_id: @brand.id), notice: "Brand profile updated successfully!"
+    else
+      @brands = Brands::RetrievalService.collection_for_user(user: current_user)
       @presenter = BrandPresenter.new(@brand, {
         notice: flash[:notice],
         brands_collection: @brands
@@ -33,15 +45,15 @@ class BrandsController < ApplicationController
   private
 
   def set_brand
-    @brand = current_user_brand
+    result = Brands::RetrievalService.new(user: current_user, brand_id: params[:brand_id]).call
+    @brand = result[:success] ? result[:data][:brand] : nil
   end
 
-  def current_user_brand
-    # Get the primary/first brand or the brand specified in params
+  def find_brand_for_update
     if params[:brand_id].present?
       current_user.brands.find(params[:brand_id])
     else
-      current_user.brands.first
+      current_brand || current_user.brands.create
     end
   end
 

@@ -1,5 +1,6 @@
 class Reel < ApplicationRecord
   belongs_to :user
+  belongs_to :brand
   has_many :reel_scenes, dependent: :destroy
 
   accepts_nested_attributes_for :reel_scenes, allow_destroy: true

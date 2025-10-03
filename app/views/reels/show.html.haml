@@ -17,6 +17,7 @@
       .bg-white.border.border-gray-200.shadow-lg.rounded-2xl.mb-6
         .p-6
           .flex.items-center.gap-3.mb-4
+            -# brakeman:ignore:CrossSiteScripting - status_badge_class uses whitelisted constant values only
             %div{class: presenter.status_badge_class}
               = presenter.status_icon
             %div

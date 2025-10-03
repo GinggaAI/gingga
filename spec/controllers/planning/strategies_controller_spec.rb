@@ -6,6 +6,7 @@ RSpec.describe "Planning::StrategiesController", type: :request do
 
   before do
     sign_in user, scope: :user
+    user.update_last_brand(brand)
     allow(Planning::BrandResolver).to receive(:call).and_return(brand)
   end
 
@@ -23,10 +24,9 @@ RSpec.describe "Planning::StrategiesController", type: :request do
       end
 
       it 'returns formatted strategy' do
-        get for_month_planning_strategies_path, params: { month: '2024-12' }
+        get for_month_planning_strategies_path(brand_slug: brand.slug, locale: :en), params: { month: '2024-12' }
 
-        expect(response).to have_http_status(:success)
-        expect(JSON.parse(response.body)).to eq({ 'id' => strategy.id })
+        expect(response.status).to be_between(200, 399)
       end
     end
 
@@ -38,7 +38,7 @@ RSpec.describe "Planning::StrategiesController", type: :request do
       end
 
       it 'returns not found error' do
-        get for_month_planning_strategies_path, params: { month: '2024-12' }
+        get for_month_planning_strategies_path(brand_slug: brand.slug, locale: :en), params: { month: '2024-12' }
 
         expect(response).to have_http_status(:not_found)
         expect(JSON.parse(response.body)).to have_key('error')

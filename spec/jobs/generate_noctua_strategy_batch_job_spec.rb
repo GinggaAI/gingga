@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe GenerateNoctuaStrategyBatchJob do
+  include ActiveJob::TestHelper
+
   let(:user) { create(:user) }
   let(:brand) { create(:brand, user: user) }
   let(:strategy_plan) { create(:creas_strategy_plan, user: user, brand: brand, status: :pending) }
@@ -49,7 +51,9 @@ RSpec.describe GenerateNoctuaStrategyBatchJob do
         expect(strategy_plan.status).to eq("pending")
 
         expect {
-          described_class.perform_now(strategy_plan.id, brief, batch_number, total_batches, batch_id)
+          perform_enqueued_jobs do
+            described_class.perform_now(strategy_plan.id, brief, batch_number, total_batches, batch_id)
+          end
         }.to change(AiResponse, :count).by(4) # Creates AI responses for all 4 batches
 
         strategy_plan.reload
@@ -60,7 +64,9 @@ RSpec.describe GenerateNoctuaStrategyBatchJob do
     context 'successful batch processing' do
       it 'creates AI response records for all batches' do
         expect {
-          described_class.perform_now(strategy_plan.id, brief, batch_number, total_batches, batch_id)
+          perform_enqueued_jobs do
+            described_class.perform_now(strategy_plan.id, brief, batch_number, total_batches, batch_id)
+          end
         }.to change(AiResponse, :count).by(4)
 
         # Check the first AI response record
@@ -78,7 +84,9 @@ RSpec.describe GenerateNoctuaStrategyBatchJob do
       end
 
       it 'processes and merges weekly plan data correctly' do
-        described_class.perform_now(strategy_plan.id, brief, batch_number, total_batches, batch_id)
+        perform_enqueued_jobs do
+          described_class.perform_now(strategy_plan.id, brief, batch_number, total_batches, batch_id)
+        end
 
         strategy_plan.reload
         weekly_plan = strategy_plan.weekly_plan
@@ -95,7 +103,9 @@ RSpec.describe GenerateNoctuaStrategyBatchJob do
       end
 
       it 'updates batch processing metadata for final batch' do
-        described_class.perform_now(strategy_plan.id, brief, batch_number, total_batches, batch_id)
+        perform_enqueued_jobs do
+          described_class.perform_now(strategy_plan.id, brief, batch_number, total_batches, batch_id)
+        end
 
         strategy_plan.reload
         meta = strategy_plan.meta
@@ -208,7 +218,9 @@ RSpec.describe GenerateNoctuaStrategyBatchJob do
         end
 
         it 'handles missing keys by using empty ideas array' do
-          described_class.perform_now(strategy_plan.id, brief, batch_number, total_batches, batch_id)
+          perform_enqueued_jobs do
+            described_class.perform_now(strategy_plan.id, brief, batch_number, total_batches, batch_id)
+          end
 
           strategy_plan.reload
           # The job should complete successfully even with missing keys by using empty arrays

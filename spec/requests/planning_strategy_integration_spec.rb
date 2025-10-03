@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe "Planning Strategy Integration", type: :request do
+  include ActiveJob::TestHelper
+
   let!(:user) { create(:user) }
   let!(:brand) { create(:brand, user: user) }
 
@@ -83,6 +85,7 @@ RSpec.describe "Planning Strategy Integration", type: :request do
 
   before do
     sign_in user, scope: :user
+    user.update_last_brand(brand)
 
     # Mock OpenAI service to return structured data
     mock_chat_client = instance_double(GinggaOpenAI::ChatClient)
@@ -94,7 +97,7 @@ RSpec.describe "Planning Strategy Integration", type: :request do
     it "creates complete strategy and displays structured calendar data" do
       # Debug: Check what's happening with the request
       expect {
-        post creas_strategist_index_path, params: {
+        post creas_strategist_index_path(brand_slug: brand.slug, locale: :en), params: {
           month: "2024-01",
           strategy_form: {
             objective_of_the_month: "Test objective",
@@ -175,7 +178,9 @@ RSpec.describe "Planning Strategy Integration", type: :request do
       allow(mock_chat_client).to receive(:chat!).and_return(incomplete_response)
 
       expect {
-        post creas_strategist_index_path, params: { month: "2024-01" }
+        perform_enqueued_jobs do
+          post creas_strategist_index_path(brand_slug: brand.slug, locale: :en), params: { month: "2024-01" }
+        end
       }.to change(CreasStrategyPlan, :count).by(1)
 
       created_plan = CreasStrategyPlan.last
@@ -196,10 +201,10 @@ RSpec.describe "Planning Strategy Integration", type: :request do
         .and_raise(StandardError.new("OpenAI API Error"))
 
       expect {
-        post creas_strategist_index_path, params: { month: "2024-01" }
+        post creas_strategist_index_path(brand_slug: brand.slug, locale: :en), params: { month: "2024-01" }
       }.not_to change(CreasStrategyPlan, :count)
 
-      expect(response).to redirect_to(planning_path)
+      expect(response).to redirect_to(planning_path(brand_slug: brand.slug, locale: :en))
       follow_redirect!
       expect(response.body).to include("Smart Planning")
     end
@@ -225,7 +230,7 @@ RSpec.describe "Planning Strategy Integration", type: :request do
     end
 
     it "displays existing strategy when plan_id is provided" do
-      get planning_path(plan_id: existing_plan.id)
+      get planning_path(brand_slug: brand.slug, locale: :en, plan_id: existing_plan.id)
 
       expect(response).to have_http_status(:success)
       expect(response.body).to include("Smart Planning")

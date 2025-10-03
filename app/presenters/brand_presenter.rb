@@ -23,15 +23,15 @@ class BrandPresenter
   end
 
   def has_audiences?
-    audiences.exists?
+    @brand.audiences_count > 0
   end
 
   def has_products?
-    products.exists?
+    @brand.products_count > 0
   end
 
   def has_brand_channels?
-    brand_channels.exists?
+    @brand.brand_channels_count > 0
   end
 
   def missing_requirements
@@ -111,6 +111,19 @@ class BrandPresenter
 
   def validation_error_messages
     @brand.errors.full_messages
+  end
+
+  # JavaScript helper methods for form indices
+  def audiences_count
+    @brand.audiences_count
+  end
+
+  def products_count
+    @brand.products_count
+  end
+
+  def brand_channels_count
+    @brand.brand_channels_count
   end
 
   private

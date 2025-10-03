@@ -53,7 +53,9 @@ RSpec.describe CreasStrategistController, type: :request do
     context 'with valid parameters' do
       it 'creates a strategy plan and returns JSON response' do
         expect {
-          post '/creas_strategist', params: valid_params, headers: { 'Accept' => 'application/json' }
+          perform_enqueued_jobs do
+            post '/creas_strategist', params: valid_params, headers: { 'Accept' => 'application/json' }
+          end
         }.to change(CreasStrategyPlan, :count).by(1)
 
         expect(response).to have_http_status(:success)

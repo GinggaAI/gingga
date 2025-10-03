@@ -209,17 +209,28 @@
                         +
 
           .week-details.bg-gray-50.p-4.rounded.mt-4{style: "display: none;", id: "week-details-#{week_number - 1}"}
-            .text-lg.font-semibold.mb-3.text-gray-700 📋 #{t('planning.weeks.week_details', number: week_number)}
-            .content-details-grid.grid.grid-cols-1.gap-3
+            .flex.justify-between.items-center.mb-3
+              .text-lg.font-semibold.text-gray-700 📋 #{t('planning.weeks.week_details', number: week_number)}
+              %button.text-gray-500.hover:text-gray-700.text-xl{onclick: "hideContentDetails('week-details-#{week_number - 1}')"} &times;
+            .content-details-grid.grid.grid-cols-1.gap-3{"data-week-index": week_number - 1}
 
 :javascript
   // Rails-first approach: Business logic moved to PlanningPresenter
   // JavaScript only handles UI interactions
 
+  console.log('📍 Inline JavaScript in show.haml is loading');
+
   document.addEventListener('turbo:load', function() {
+    console.log('📍 turbo:load fired in show.haml inline JS');
+    console.log('📍 Checking if planning_details module functions are available:', {
+      hideContentDetails: typeof window.hideContentDetails,
+      showContentDetails: typeof window.showContentDetails
+    });
+
     // Initialize page variables with proper escaping
     window.currentMonth = #{@presenter.safe_month_for_js.to_json.html_safe};
     window.currentPlan = #{@presenter.current_plan_json.html_safe};
+    console.log('📍 window.currentPlan set:', window.currentPlan ? 'yes' : 'no');
     const toggleBtn = document.getElementById('toggle-form');
     const overviewBtn = document.getElementById('toggle-overview');
     const voxaBtn = document.getElementById('voxa-refine');
@@ -231,6 +242,10 @@
     const errorDiv = document.getElementById('error-message');
     const prevMonthBtn = document.getElementById('prev-month');
     const nextMonthBtn = document.getElementById('next-month');
+
+    // Event delegation for content piece cards is now handled in:
+    // app/javascript/planning_details.js via initializeContentDetailsHandlers()
+    // This is initialized in application.js on turbo:load
 
     // Form toggle button
     if (toggleBtn && form) {
@@ -1099,7 +1114,11 @@
       }
     }
     contentDiv.title = tooltipText;
-    contentDiv.onclick = () => showContentDetails(weekIndex, contentPiece);
+
+    // Store data attributes for event delegation
+    contentDiv.setAttribute('data-week-index', weekIndex);
+    contentDiv.setAttribute('data-content-piece', JSON.stringify(contentPiece));
+    contentDiv.classList.add('content-piece-card');
 
     // Insert before the + button
     const addButton = dayElement.querySelector('button');
@@ -1139,92 +1158,24 @@
     return platformIcons[platform] || '🎬';
   }
 
-  // Rails-first AJAX approach: Let server render content details
-  function showContentDetails(weekIndex, contentPiece) {
-    const weekDetailsId = `week-details-${weekIndex}`;
-    let weekDetails = document.getElementById(weekDetailsId);
+  // ============================================================================
+  // Content Details Functions
+  // ============================================================================
+  // These functions have been moved to app/javascript/planning_details.js
+  // for better code organization and maintainability.
+  //
+  // Functions moved:
+  // - showContentDetails(weekIndex, contentPiece)
+  // - buildContentDetailHTML(content)
+  // - hideContentDetails(weekDetailsId)
+  // - escapeHtml(unsafe)
+  //
+  // Event delegation is initialized in application.js via:
+  // import { initializeContentDetailsHandlers } from "./planning_details"
+  // ============================================================================
 
-    // If week details section doesn't exist, create it
-    if (!weekDetails) {
-      const weekElements = document.querySelectorAll('.space-y-6 > .bg-card.text-card-foreground.border-0.shadow-lg.rounded-2xl');
-      let actualWeekIndex = 0;
-      let weekElement = null;
-
-      for (let i = 0; i < weekElements.length; i++) {
-        const element = weekElements[i];
-        if (element.querySelector('.week-content-slot')) {
-          if (actualWeekIndex === weekIndex) {
-            weekElement = element;
-            break;
-          }
-          actualWeekIndex++;
-        }
-      }
-
-      if (!weekElement) return;
-
-      weekDetails = document.createElement('div');
-      weekDetails.id = weekDetailsId;
-      weekDetails.className = 'week-details bg-gray-50 p-4 rounded mt-4';
-      weekDetails.style.display = 'none';
-      weekDetails.innerHTML = `
-        <div class="flex justify-between items-center mb-3">
-          <div class="text-lg font-semibold text-gray-700">📋 Week ${weekIndex + 1} Details</div>
-          <button onclick="hideContentDetails('${weekDetailsId}')" class="text-gray-500 hover:text-gray-700 text-xl">&times;</button>
-        </div>
-        <div class="content-details-grid grid grid-cols-1 gap-3"></div>
-      `;
-
-      weekElement.appendChild(weekDetails);
-    }
-
-    // Use Rails AJAX endpoint to render content details
-    const detailsGrid = weekDetails.querySelector('.content-details-grid');
-
-    // Show loading state
-    detailsGrid.innerHTML = '<div class="p-4 text-center text-gray-500">#{t('planning.js_messages.loading_content_details')}</div>';
-
-    // Make AJAX request to Rails controller
-    const params = new URLSearchParams({
-      content_data: JSON.stringify(contentPiece)
-    });
-
-    fetch(`/planning/content_details?${params}`, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.html) {
-        // Server-rendered HTML replaces client-side template logic
-        detailsGrid.innerHTML = data.html;
-        weekDetails.style.display = 'block';
-        weekDetails.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } else {
-        detailsGrid.innerHTML = '<div class="p-4 text-center text-red-500">#{t('planning.js_messages.error_loading_content_details')}</div>';
-      }
-    })
-    .catch(error => {
-      console.error('Error fetching content details:', error);
-      detailsGrid.innerHTML = '<div class="p-4 text-center text-red-500">#{t('planning.js_messages.failed_to_load_content_details')}</div>';
-    });
-  }
-
-  function hideContentDetails(weekDetailsId) {
-    const weekDetails = document.getElementById(weekDetailsId);
-    if (weekDetails) {
-      weekDetails.style.display = 'none';
-      // Clear the content details
-      const detailsGrid = weekDetails.querySelector('.content-details-grid');
-      if (detailsGrid) {
-        detailsGrid.innerHTML = '';
-      }
-    }
-  }
+  // All content details functions have been moved to:
+  // app/javascript/planning_details.js
 
   function removeContentDetail(contentId) {
     const contentDetail = document.getElementById(contentId);
@@ -1326,7 +1277,7 @@
     // Create form and submit
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = '/planning/content_refinements';
+    form.action = '#{@presenter.content_refinements_url}';
 
     // Add CSRF token
     const csrfToken = document.querySelector('meta[name="csrf-token"]');
@@ -1377,7 +1328,7 @@
     // Create form and submit
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = '/planning/content_refinements/week';
+    form.action = '#{@presenter.week_content_refinements_url}';
 
     // Add CSRF token
     const csrfToken = document.querySelector('meta[name="csrf-token"]');

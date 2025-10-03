@@ -34,7 +34,7 @@ class CreasStrategistController < ApplicationController
   private
 
   def find_brand
-    @brand = current_user.brands.first
+    @brand = current_brand
 
     unless @brand
       respond_to do |format|

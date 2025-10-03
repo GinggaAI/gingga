@@ -173,6 +173,23 @@ class PlanningPresenter
     plan
   end
 
+  # URL helpers for forms - handles nil brand gracefully
+  def content_refinements_url
+    return "#" unless @brand
+    Rails.application.routes.url_helpers.planning_content_refinements_path(
+      brand_slug: @brand.slug,
+      locale: I18n.locale
+    )
+  end
+
+  def week_content_refinements_url
+    return "#" unless @brand
+    Rails.application.routes.url_helpers.week_planning_content_refinements_path(
+      brand_slug: @brand.slug,
+      locale: I18n.locale
+    )
+  end
+
   private
 
   def format_content_items(content_items)

@@ -113,12 +113,16 @@ RSpec.describe 'Frequency Per Week Content Generation', type: :integration do
         end
 
         it "generates exactly #{frequency * 4} content ideas (#{frequency} per week × 4 weeks)" do
-          result = CreateStrategyService.call(
-            user: user,
-            brand: brand,
-            month: month,
-            strategy_params: strategy_params
-          )
+          result = nil
+
+          perform_enqueued_jobs do
+            result = CreateStrategyService.call(
+              user: user,
+              brand: brand,
+              month: month,
+              strategy_params: strategy_params
+            )
+          end
 
           expect(result.success?).to be true
 

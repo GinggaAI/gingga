@@ -2,14 +2,16 @@ require 'rails_helper'
 
 RSpec.describe SettingsController, type: :request do
   let(:user) { create(:user) }
+  let(:brand) { create(:brand, user: user) }
 
   before do
     sign_in user, scope: :user
+    user.update_last_brand(brand)
   end
 
   describe 'GET #show' do
     it 'renders successfully' do
-      get settings_path
+      get settings_path(brand_slug: brand.slug, locale: :en)
       expect(response).to have_http_status(:success)
       expect(response.body).to include('API Integrations Overview')
     end
@@ -21,9 +23,9 @@ RSpec.describe SettingsController, type: :request do
         # Mock the API token validator to return success
         allow(ApiTokenValidatorService).to receive_message_chain(:new, :call).and_return({ valid: true })
 
-        patch settings_path, params: { heygen_api_key: 'test_api_key_123', mode: 'production' }
+        patch settings_path(brand_slug: brand.slug, locale: :en), params: { heygen_api_key: 'test_api_key_123', mode: 'production' }
 
-        expect(response).to redirect_to(settings_path)
+        expect(response).to redirect_to(settings_path(brand_slug: brand.slug, locale: :en))
 
         # Verify token was saved
         api_token = user.reload.api_tokens.find_by(provider: 'heygen', mode: 'production')
@@ -38,9 +40,9 @@ RSpec.describe SettingsController, type: :request do
 
     context 'with empty api key' do
       it 'redirects with error message' do
-        patch settings_path, params: { heygen_api_key: '', mode: 'production' }
+        patch settings_path(brand_slug: brand.slug, locale: :en), params: { heygen_api_key: '', mode: 'production' }
 
-        expect(response).to redirect_to(settings_path)
+        expect(response).to redirect_to(settings_path(brand_slug: brand.slug, locale: :en))
         follow_redirect!
 
         expect(response.body).to include('empty')
@@ -67,9 +69,9 @@ RSpec.describe SettingsController, type: :request do
         )
         allow(Heygen::ValidateAndSyncService).to receive_message_chain(:new, :call).and_return(mock_result)
 
-        post validate_heygen_api_settings_path
+        post validate_heygen_api_settings_path(brand_slug: brand.slug, locale: :en)
 
-        expect(response).to redirect_to(settings_path)
+        expect(response).to redirect_to(settings_path(brand_slug: brand.slug, locale: :en))
         follow_redirect!
 
         expect(response.body).to include('HeyGen group validation successful! 5 avatars synchronized from specific group.')
@@ -82,9 +84,9 @@ RSpec.describe SettingsController, type: :request do
         mock_result = OpenStruct.new(success?: false, error: 'Invalid API key')
         allow(Heygen::SynchronizeAvatarsService).to receive_message_chain(:new, :call).and_return(mock_result)
 
-        post validate_heygen_api_settings_path
+        post validate_heygen_api_settings_path(brand_slug: brand.slug, locale: :en)
 
-        expect(response).to redirect_to(settings_path)
+        expect(response).to redirect_to(settings_path(brand_slug: brand.slug, locale: :en))
         follow_redirect!
 
         expect(response.body).to include('HeyGen API validation failed:')
@@ -95,7 +97,7 @@ RSpec.describe SettingsController, type: :request do
   describe 'content duplication check' do
     it 'should not have duplicated content after form submissions' do
       # First get the page
-      get settings_path
+      get settings_path(brand_slug: brand.slug, locale: :en)
       original_content = response.body
       original_api_sections = original_content.scan(/API Integrations Overview/).length
 

@@ -14,7 +14,7 @@ module Api
       end
 
       def create
-        @api_token = current_user.api_tokens.build(api_token_params)
+        @api_token = current_user.api_tokens.build(api_token_params.merge(brand: current_brand))
 
         if @api_token.save
           render json: ApiTokenSerializer.new(@api_token).as_json, status: :created

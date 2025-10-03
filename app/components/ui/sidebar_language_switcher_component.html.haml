@@ -1,0 +1,18 @@
+.relative{data: { controller: "dropdown" }}
+  %button.flex.items-center.gap-2.w-full.px-3.py-2.text-sm.text-gray-300.hover:text-white.hover:bg-white.hover:bg-opacity-10.rounded-lg.transition-colors{type: "button", data: { action: "click->dropdown#toggle" }}
+    %span.text-base= locale_flag(current_locale_info[:code])
+    .flex-1.text-left= current_locale_info[:name]
+    %svg.w-4.h-4.transition-transform{fill: "none", stroke: "currentColor", "stroke-width": "2", viewbox: "0 0 24 24", data: { "dropdown-target": "chevron" }}
+      %path{d: "M6 9l6 6 6-6"}
+
+  .absolute.top-full.left-0.w-full.mt-1.bg-slate-900.rounded-lg.shadow-xl.border.border-slate-600.z-50.hidden{data: { "dropdown-target": "menu" }, style: "background-color: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px);"}
+    .p-1
+      - available_locales.each do |locale_info|
+        = link_to switch_locale_path(locale_info[:code]),
+            class: "#{locale_info[:current] ? 'bg-gray-700 text-white' : 'text-gray-300 hover:text-white hover:bg-gray-700'} flex items-center gap-2 w-full px-2 py-2 text-sm rounded transition-colors",
+            method: :get do
+          %span.text-base= locale_flag(locale_info[:code])
+          %span= locale_info[:name]
+          - if locale_info[:current]
+            %svg.w-4.h-4.text-green-400.ml-auto{fill: "none", stroke: "currentColor", "stroke-width": "2", viewbox: "0 0 24 24"}
+              %path{d: "M20 6L9 17l-5-5"}

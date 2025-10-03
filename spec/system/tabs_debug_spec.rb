@@ -8,6 +8,8 @@ RSpec.describe 'Settings Tabs Functionality', type: :system do
   before do
     driven_by(:rack_test)
     @user = create(:user)
+    @brand = create(:brand, user: @user)
+    @user.update_last_brand(@brand)
   end
 
   after do
@@ -16,7 +18,7 @@ RSpec.describe 'Settings Tabs Functionality', type: :system do
 
   it 'displays the settings page with correct tab structure' do
     login_as(@user, scope: :user)
-    visit settings_path
+    visit settings_path(brand_slug: @brand.slug, locale: :en)
 
     # Verify basic functionality
     expect(page).to have_content('Settings')
@@ -42,7 +44,7 @@ RSpec.describe 'Settings Tabs Functionality', type: :system do
 
   it 'contains the language switcher in the Account panel' do
     login_as(@user, scope: :user)
-    visit settings_path
+    visit settings_path(brand_slug: @brand.slug, locale: :en)
 
     # Verify Account panel contains language switcher HTML structure
     account_panel = page.find('#radix-«r72»-content-account', visible: :all)

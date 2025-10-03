@@ -1,13 +1,16 @@
 module Reels
   class BaseCreationService
-    def initialize(user:, template: nil, params: nil)
+    def initialize(user:, brand: nil, template: nil, params: nil)
       @user = user
+      @brand = brand
       @template = template
       @params = params
     end
 
     def initialize_reel
-      reel = @user.reels.build(template: @template, status: "draft")
+      return failure_result("Brand is required") unless @brand
+
+      reel = @brand.reels.build(user: @user, template: @template, status: "draft")
       setup_template_specific_fields(reel)
 
       # Save the reel so it can have associated scenes created
@@ -19,7 +22,16 @@ module Reels
     end
 
     def call
-      reel = @user.reels.build(reel_params)
+      # Create a reel object even if brand is missing, so we can show form with errors
+      if @brand
+        reel = @brand.reels.build(reel_params.merge(user: @user))
+      else
+        # Create reel without brand association for error display
+        reel = Reel.new(reel_params.merge(user: @user))
+        reel.errors.add(:brand, "is required")
+        return failure_result("Brand is required", reel)
+      end
+
       setup_template_specific_fields(reel) if reel.new_record?
 
       if reel.save

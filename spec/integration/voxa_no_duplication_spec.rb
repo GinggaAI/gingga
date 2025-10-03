@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe 'Voxa Content Refinement - No Duplication', type: :integration do
+  include ActiveJob::TestHelper
+
   let(:user) { create(:user) }
   let(:brand) { create(:brand, user: user) }
   let(:strategy_plan) do
@@ -76,7 +78,9 @@ RSpec.describe 'Voxa Content Refinement - No Duplication', type: :integration do
 
     # Step 3: Run Voxa refinement
     expect {
-      Creas::VoxaContentService.new(strategy_plan: strategy_plan).call
+      perform_enqueued_jobs do
+        Creas::VoxaContentService.new(strategy_plan: strategy_plan).call
+      end
     }.not_to change(CreasContentItem, :count)
 
     # Step 4: Verify the item was updated, not duplicated
@@ -128,7 +132,9 @@ RSpec.describe 'Voxa Content Refinement - No Duplication', type: :integration do
     allow(mock_chat_client).to receive(:chat!).and_return(different_voxa_response)
 
     expect {
-      Creas::VoxaContentService.new(strategy_plan: strategy_plan).call
+      perform_enqueued_jobs do
+        Creas::VoxaContentService.new(strategy_plan: strategy_plan).call
+      end
     }.to change(CreasContentItem, :count).by(1)
 
     new_item = CreasContentItem.find_by(content_id: "voxa-new-item")

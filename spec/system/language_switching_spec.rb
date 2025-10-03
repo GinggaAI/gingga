@@ -4,15 +4,17 @@ require 'rails_helper'
 
 RSpec.describe 'Language Switching', type: :system do
   let(:user) { create(:user) }
+  let(:brand) { create(:brand, user: user) }
 
   before do
     driven_by(:rack_test)
     sign_in user, scope: :user
+    user.update_last_brand(brand)
   end
 
   describe 'in settings page' do
     it 'contains language switcher in the HTML' do
-      visit settings_path
+      visit settings_path(brand_slug: brand.slug, locale: :en)
 
       # Should show English by default
       expect(page).to have_content('Settings')
@@ -26,15 +28,15 @@ RSpec.describe 'Language Switching', type: :system do
 
     it 'allows switching from Spanish back to English while staying on settings page' do
       # Start on Spanish settings page
-      visit "/es/settings"
+      visit settings_path(brand_slug: brand.slug, locale: :es)
       expect(page).to have_content('Configuración')
 
       # The language switcher should be in the Account panel with proper links
       account_panel = page.find('#radix-«r72»-content-account', visible: :all)
       account_html = account_panel.native.inner_html
 
-      # Should have a link to English settings
-      expect(account_html).to include('href="/en/settings"')
+      # Should have a link to English settings with brand context preserved
+      expect(account_html).to include("href=\"/#{brand.slug}/en/settings\"")
       # Should have English language option in Spanish (since we're on Spanish page)
       expect(account_html).to include('Inglés')
       # Should have Spanish language option
@@ -50,9 +52,9 @@ RSpec.describe 'Language Switching', type: :system do
       account_panel = page.find('#radix-«r72»-content-account', visible: :all)
       account_html = account_panel.native.inner_html
 
-      # Should have link to Spanish settings and English settings
-      expect(account_html).to include('href="/es/settings"') # Spanish settings
-      expect(account_html).to include('href="/en/settings"') # English settings
+      # Should have link to Spanish settings and English settings with brand context
+      expect(account_html).to include("href=\"/#{brand.slug}/es/settings\"") # Spanish settings
+      expect(account_html).to include("href=\"/#{brand.slug}/en/settings\"") # English settings
 
       # English should be marked as current (with styling)
       expect(account_html).to include('bg-indigo-100 border-indigo-200 text-indigo-700')
@@ -60,7 +62,7 @@ RSpec.describe 'Language Switching', type: :system do
 
     it 'navigates correctly between languages maintaining settings context' do
       # Start on Spanish settings page
-      visit "/es/settings"
+      visit settings_path(brand_slug: brand.slug, locale: :es)
       expect(page).to have_content('Configuración')
 
       # Extract the English link from the Account panel
@@ -68,7 +70,7 @@ RSpec.describe 'Language Switching', type: :system do
       account_html = account_panel.native.inner_html
 
       # Extract href for English link (should be /en/settings to set locale properly)
-      expect(account_html).to include('href="/en/settings"')
+      expect(account_html).to include("href=\"/#{brand.slug}/en/settings\"")
       english_href = "/en/settings"
 
       # Navigate to English settings
@@ -90,7 +92,7 @@ RSpec.describe 'Language Switching', type: :system do
 
   describe 'direct URL navigation' do
     it 'loads Spanish version when visiting Spanish URL' do
-      visit "/es/settings"
+      visit settings_path(brand_slug: brand.slug, locale: :es)
       expect(page).to have_content('Configuración')
       expect(page).to have_content('Gestiona las preferencias')
     end

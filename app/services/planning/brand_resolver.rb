@@ -9,7 +9,8 @@ module Planning
     end
 
     def call
-      @user.brands.first
+      return nil unless @user
+      @user.current_brand
     end
 
     private

@@ -3,13 +3,13 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 2,
-      "fingerprint": "489f861eea658a4f7722a0bc011bf12a2bf295081d5afc876d9ae522e4c7cb7a",
+      "fingerprint": "df723aebe2181e66d52082c9c18e7892518251142476b50d944b8dc69d2750e5",
       "check_name": "CrossSiteScripting",
-      "message": "Unescaped model attribute",
+      "message": "Unescaped parameter value",
       "file": "app/views/reels/show.html.haml",
-      "line": 20,
+      "line": 21,
       "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "::Haml::AttributeBuilder.build_class(true, ReelShowPresenter.new(current_user.reels.find(params[:id])).status_badge_class)",
+      "code": "::Haml::AttributeBuilder.build_class(true, ReelShowPresenter.new(current_brand.reels.find(params[:id])).status_badge_class)",
       "render_path": [
         {
           "type": "controller",
@@ -27,12 +27,12 @@
         "type": "template",
         "template": "reels/show"
       },
-      "user_input": "current_user.reels.find(params[:id])",
+      "user_input": "params[:id]",
       "confidence": "Weak",
       "cwe_id": [
         79
       ],
-      "note": "FALSE POSITIVE: ReelShowPresenter.status_badge_class uses a whitelisted hash (STATUS_BADGE_CLASSES) that only returns predefined CSS class strings. No user input can be injected. The method explicitly uses .html_safe on controlled values. This warning can be safely ignored."
+      "note": "FALSE POSITIVE: ReelShowPresenter.status_badge_class uses a whitelisted hash (STATUS_BADGE_CLASSES) that only returns predefined CSS class strings from a frozen constant. No user input can be injected into the class attribute. The method uses STATUS_BADGE_CLASSES.fetch() which only returns one of 4 predefined CSS strings. This is safe."
     },
     {
       "warning_type": "Cross-Site Scripting",

@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.feature "Home", type: :feature do
   scenario "User visits the home page and sees all landing page content" do
-    visit root_path
+    visit "/"
 
     # Hero section
     expect(page).to have_text("One place. All your content. Powered by AI, guided by your voice.")
@@ -66,7 +66,7 @@ RSpec.feature "Home", type: :feature do
   end
 
   scenario "User can interact with CTA buttons" do
-    visit root_path
+    visit "/"
 
     # Check for different CTA buttons
     expect(page).to have_link("Get Started") # Navigation
@@ -87,14 +87,14 @@ RSpec.feature "Home", type: :feature do
   end
 
   scenario "User can navigate using anchor links" do
-    visit root_path
+    visit "/"
 
     # Test navigation links exist and have proper href attributes
     expect(page).to have_link("How it works", href: "#how")
   end
 
   scenario "Page displays proper brand elements and styling" do
-    visit root_path
+    visit "/"
 
     # Check that brand elements are present
     expect(page).to have_text("GINGGA") # Brand logo in header and footer

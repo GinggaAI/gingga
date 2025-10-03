@@ -71,6 +71,7 @@ group :development, :test do
   gem "faker"
   gem "database_cleaner-active_record"
   gem "dotenv-rails"
+  gem "selenium-webdriver"
 end
 
 group :development do

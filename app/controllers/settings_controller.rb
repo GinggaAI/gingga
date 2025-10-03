@@ -2,7 +2,7 @@ class SettingsController < ApplicationController
   # Ensure CSRF protection is enabled
   protect_from_forgery with: :exception
   def show
-    @presenter = SettingsPresenter.new(current_user, {
+    @presenter = SettingsPresenter.new(current_user, current_brand, {
       flash: flash
     })
   end
@@ -10,6 +10,7 @@ class SettingsController < ApplicationController
   def update
     result = ApiTokenUpdateService.new(
       user: current_user,
+      brand: current_brand,
       provider: "heygen",
       token_value: params[:heygen_api_key],
       mode: params[:mode] || "development",
@@ -27,7 +28,7 @@ class SettingsController < ApplicationController
     voices_count = params[:voices_count]&.to_i
     voices_count = nil unless voices_count && voices_count.between?(1, 30)
 
-    result = Heygen::ValidateAndSyncService.new(user: current_user, voices_count: voices_count).call
+    result = Heygen::ValidateAndSyncService.new(user: current_user, brand: current_brand, voices_count: voices_count).call
 
     if result.success?
       count = result.data[:synchronized_count]

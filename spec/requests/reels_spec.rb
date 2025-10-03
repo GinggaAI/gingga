@@ -2,14 +2,16 @@ require "rails_helper"
 
 RSpec.describe "Reels", type: :request do
   let(:user) { create(:user) }
+  let(:brand) { create(:brand, user: user) }
 
   before do
     sign_in user, scope: :user
+    user.update_last_brand(brand)
   end
 
   describe "GET /en/reels/scene-based" do
     it "builds a new reel with scenes" do
-      get "/en/reels/scene-based"
+      get "/#{brand.slug}/en/reels/scene-based"
 
       expect(response).to have_http_status(:success)
       # In request specs, we can't easily access assigns, so we check for success
@@ -19,7 +21,7 @@ RSpec.describe "Reels", type: :request do
 
   describe "GET /en/reels/narrative" do
     it "builds a new narrative reel" do
-      get "/en/reels/narrative"
+      get "/#{brand.slug}/en/reels/narrative"
 
       expect(response).to have_http_status(:success)
       # In request specs, we check the response content instead of assigns
@@ -62,7 +64,7 @@ RSpec.describe "Reels", type: :request do
 
     it "creates a new scene-based reel" do
       expect {
-        post "/en/reels/scene-based", params: valid_params
+        post "/#{brand.slug}/en/reels/scene-based", params: valid_params
       }.to change(Reel, :count).by(1)
 
       expect(response).to redirect_to(Reel.last)
@@ -70,7 +72,7 @@ RSpec.describe "Reels", type: :request do
     end
 
     it "creates reel scenes" do
-      post "/en/reels/scene-based", params: valid_params
+      post "/#{brand.slug}/en/reels/scene-based", params: valid_params
 
       reel = Reel.last
       expect(reel.reel_scenes.count).to eq(3)
@@ -96,7 +98,7 @@ RSpec.describe "Reels", type: :request do
 
     it "creates a new narrative reel" do
       expect {
-        post "/en/reels/narrative", params: valid_params
+        post "/#{brand.slug}/en/reels/narrative", params: valid_params
       }.to change(Reel, :count).by(1)
 
       expect(response).to redirect_to(Reel.last)
@@ -104,7 +106,7 @@ RSpec.describe "Reels", type: :request do
     end
 
     it "sets correct mode and attributes" do
-      post "/en/reels/narrative", params: valid_params
+      post "/#{brand.slug}/en/reels/narrative", params: valid_params
 
       reel = Reel.last
       expect(reel.template).to eq('narration_over_7_images')
