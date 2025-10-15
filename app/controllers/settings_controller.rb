@@ -13,7 +13,7 @@ class SettingsController < ApplicationController
       brand: current_brand,
       provider: "heygen",
       token_value: params[:heygen_api_key],
-      mode: params[:mode] || "development",
+      mode: params[:mode] || "production",
       group_url: params[:heygen_group_url]
     ).call
 
