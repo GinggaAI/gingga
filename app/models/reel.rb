@@ -38,6 +38,21 @@ class Reel < ApplicationRecord
     template.in?(%w[only_avatars avatar_and_video])
   end
 
+  def video_url_expired?
+    return false unless video_url.present?
+
+    # Extract expiration timestamp from HeyGen signed URL
+    expires_match = video_url.match(/Expires=(\d+)/)
+    return false unless expires_match
+
+    expires_at = expires_match[1].to_i
+    Time.now.to_i >= expires_at
+  end
+
+  def needs_url_refresh?
+    status == "completed" && heygen_video_id.present? && video_url_expired?
+  end
+
   private
 
   def assign_scene_numbers

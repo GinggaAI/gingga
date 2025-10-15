@@ -1,0 +1,313 @@
+# Brand Questionnaire - My Brand Page Fields
+
+This document lists all fields collected on the "my-brand" page for brand profile setup.
+
+## Overview
+The my-brand page is accessible at: `/:brand_slug/:locale/my-brand`
+Controller: `BrandsController#edit`
+View: `app/views/brands/edit.html.haml`
+
+---
+
+## Field Categories and Details
+
+### 1. Brand Identity Section
+Fields that define the core brand identity:
+
+- **Brand Name** (required)
+  - Field: `brand[name]`
+  - Type: Text field
+  - Placeholder: Brand name
+
+- **Brand Handle (Slug)** (required)
+  - Field: `brand[slug]`
+  - Type: Text field
+  - Placeholder: Brand handle for URL
+
+- **Industry**
+  - Field: `brand[industry]`
+  - Type: Dropdown select
+  - Options:
+    * Technology
+    * Fashion & Beauty
+    * Food & Beverage
+    * Health & Fitness
+    * Education
+    * Entertainment
+    * Business & Finance
+    * Travel & Lifestyle
+    * Other
+
+- **Brand Voice**
+  - Field: `brand[voice]`
+  - Type: Dropdown select
+  - Options:
+    * Professional
+    * Friendly
+    * Authoritative
+    * Casual
+    * Inspirational
+    * Humorous
+    * Educational
+
+---
+
+### 2. Audience & Offer Section
+Fields describing what the brand offers and why:
+
+- **Value Proposition**
+  - Field: `brand[value_proposition]`
+  - Type: Textarea (4 rows)
+  - Description: What unique value does your brand provide?
+
+- **Mission/Purpose**
+  - Field: `brand[mission]`
+  - Type: Textarea (4 rows)
+  - Description: What is your brand's mission and purpose?
+
+---
+
+### 3. Content Preferences Section
+
+#### 3.1 Language & Region
+
+- **Content Language**
+  - Field: `brand[content_language]`
+  - Type: Dropdown select
+  - Options:
+    * English (en)
+    * Spanish (es)
+    * French (fr)
+    * German (de)
+    * Italian (it)
+    * Portuguese (pt)
+    * Other
+
+- **Primary Region**
+  - Field: `brand[region]`
+  - Type: Dropdown select
+  - Options:
+    * North America
+    * Europe
+    * Asia Pacific
+    * Latin America
+    * Middle East & Africa
+    * Global
+
+#### 3.2 Content Guidelines
+
+- **Tones to Avoid**
+  - Field: `brand[tone_no_go_list]`
+  - Type: Text field
+  - Format: Comma-separated values
+  - Example: "aggressive, overly salesy, condescending"
+
+- **Banned Words**
+  - Field: `brand[banned_words_list]`
+  - Type: Text field
+  - Format: Comma-separated values
+  - Example: "guarantee, revolutionary, miracle"
+
+- **Claims Rules**
+  - Field: `brand[claims_rules_text]`
+  - Type: Textarea (3 rows)
+  - Description: Guidelines for content claims and messaging
+
+#### 3.3 Brand Assets & Resources (Feature Flags)
+Checkboxes indicating available resources:
+
+- **Kling AI Video**
+  - Field: `brand[kling_enabled]`
+  - Type: Checkbox (boolean)
+
+- **Stock Content**
+  - Field: `brand[stock_enabled]`
+  - Type: Checkbox (boolean)
+
+- **Budget Available**
+  - Field: `brand[budget_enabled]`
+  - Type: Checkbox (boolean)
+
+- **Video Editing**
+  - Field: `brand[editing_enabled]`
+  - Type: Checkbox (boolean)
+
+- **AI Avatars**
+  - Field: `brand[ai_avatars_enabled]`
+  - Type: Checkbox (boolean)
+
+- **Podcast Clips**
+  - Field: `brand[podcast_clips_enabled]`
+  - Type: Checkbox (boolean)
+
+---
+
+### 4. Target Audiences Section
+Repeatable nested fields for defining target audience segments.
+Field: `brand[audiences_attributes][]`
+
+For each audience entry:
+
+- **Audience Name**
+  - Field: `audiences_attributes[n][name]`
+  - Type: Text field
+  - Example: "Young Professionals", "Tech Enthusiasts"
+
+- **Demographics** (stored as JSON in `demographic_profile`)
+  - Field: `audiences_attributes[n][demographic_profile]`
+  - Type: Hidden field containing JSON with these sub-fields:
+
+  - **Age Range**
+    - Options: 13-17, 18-24, 25-34, 35-44, 45-54, 55-64, 65+
+
+  - **Gender**
+    - Options: All genders, Male, Female, Non-binary, Other
+
+  - **Location Type**
+    - Options: Global, Urban areas, Suburban areas, Rural areas, Metropolitan areas
+
+  - **Specific Location**
+    - Type: Text field
+    - Example: "United States, Europe, Latin America"
+
+  - **Income Level**
+    - Options: Low income, Lower middle class, Middle class, Upper middle class, High income
+
+- **Interests**
+  - Field: `audiences_attributes[n][interests]`
+  - Type: Text field
+  - Format: Comma-separated values
+  - Example: "technology, fitness, travel, food"
+
+- **Digital Behavior**
+  - Field: `audiences_attributes[n][digital_behavior]`
+  - Type: Text field
+  - Format: Comma-separated values
+  - Example: "social_media_active, online_shopper"
+
+---
+
+### 5. Products & Services Section
+Repeatable nested fields for brand products/services.
+Field: `brand[products_attributes][]`
+
+For each product entry:
+
+- **Product Name**
+  - Field: `products_attributes[n][name]`
+  - Type: Text field
+  - Example: "Premium SaaS Platform"
+
+- **Pricing**
+  - Field: `products_attributes[n][pricing_info]`
+  - Type: Text field
+  - Example: "$99/month", "Free with premium options"
+
+- **Description**
+  - Field: `products_attributes[n][description]`
+  - Type: Textarea (3 rows)
+  - Description: What the product does and its key features
+
+- **Product URL**
+  - Field: `products_attributes[n][url]`
+  - Type: URL field
+  - Example: "https://yourproduct.com"
+
+---
+
+### 6. Social Media Channels Section
+Repeatable nested fields for social media presence.
+Field: `brand[brand_channels_attributes][]`
+
+For each channel entry:
+
+- **Platform**
+  - Field: `brand_channels_attributes[n][platform]`
+  - Type: Dropdown select
+  - Options:
+    * Instagram
+    * TikTok
+    * YouTube
+    * LinkedIn
+
+- **Handle/Username**
+  - Field: `brand_channels_attributes[n][handle]`
+  - Type: Text field
+  - Example: "@yourbrand"
+
+- **Priority**
+  - Field: `brand_channels_attributes[n][priority]`
+  - Type: Dropdown select
+  - Options:
+    * 1 - Highest Priority
+    * 2 - High Priority
+    * 3 - Medium Priority
+    * 4 - Low Priority
+    * 5 - Lowest Priority
+
+---
+
+## Field Summary
+
+### Total Field Count
+- **28 distinct field types**
+- **Nested repeatable sections:**
+  - Audiences: 6 sub-fields per entry (1 name + 5 demographic fields + 2 behavior fields)
+  - Products: 4 sub-fields per entry
+  - Social Channels: 3 sub-fields per entry
+
+### Required vs Optional
+Based on controller strong parameters and validation:
+- **Required fields** (must be filled for "strategy ready" status):
+  - Brand Name
+  - Brand Handle (Slug)
+  - Industry
+  - Voice
+  - Value Proposition
+  - Mission
+
+- **Optional fields**: All other fields are optional but recommended for better content generation
+
+### Data Storage
+- **Simple fields**: Stored directly in `brands` table
+- **Virtual attributes** (handled via accessors):
+  - `tone_no_go_list` → stored in `guardrails` JSON
+  - `banned_words_list` → stored in `guardrails` JSON
+  - `claims_rules_text` → stored in `guardrails` JSON
+- **Nested associations**:
+  - `audiences_attributes` → `audiences` table (has_many relationship)
+  - `products_attributes` → `products` table (has_many relationship)
+  - `brand_channels_attributes` → `brand_channels` table (has_many relationship)
+
+---
+
+## Technical Implementation Notes
+
+### Controller
+- Location: `app/controllers/brands_controller.rb`
+- Action: `edit` (GET), `update` (PATCH)
+- Service: `Brands::RetrievalService` for loading brand data
+- Presenter: `BrandPresenter` for view logic
+
+### Form Handling
+- Uses Rails `form_with` helper
+- Implements POST-REDIRECT-GET pattern
+- Nested forms use `accepts_nested_attributes_for`
+- JavaScript handlers for dynamic add/remove of nested items
+
+### Validation
+- Strategy readiness check requires minimum fields filled
+- Error display at top of form
+- Individual field validation on model level
+
+### Routes
+- Primary route: `/:brand_slug/:locale/my-brand`
+- Also accessible via: `/:brand_slug/:locale/brand/edit`
+- Both routes point to `brands#edit`
+
+---
+
+## Last Updated
+Generated: 2025-10-14
+Based on: app/views/brands/edit.html.haml
+Controller: app/controllers/brands_controller.rb

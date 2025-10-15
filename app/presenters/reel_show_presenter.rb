@@ -9,8 +9,10 @@ class ReelShowPresenter
     "failed" => "status-badge status-badge--failed"
   }.freeze
 
-  def initialize(reel)
+  def initialize(reel, user: nil)
     @reel = reel
+    @user = user || reel.user
+    refresh_video_url_if_needed
   end
 
   def title
@@ -102,5 +104,18 @@ class ReelShowPresenter
 
   def ordered_scenes
     @reel.reel_scenes.ordered
+  end
+
+  private
+
+  def refresh_video_url_if_needed
+    return unless @reel.needs_url_refresh?
+
+    # Refresh URL from HeyGen API
+    result = Heygen::CheckVideoStatusService.new(@user, @reel).call
+    @reel.reload if result[:success]
+  rescue StandardError => e
+    Rails.logger.error "Failed to refresh video URL for reel #{@reel.id}: #{e.message}"
+    # Don't raise - gracefully degrade to showing expired URL
   end
 end
