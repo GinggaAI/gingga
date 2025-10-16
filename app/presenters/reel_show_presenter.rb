@@ -34,8 +34,8 @@ class ReelShowPresenter
   def status_badge_class
     # Use whitelisted hash lookup for security - prevents any user input injection
     # Only predefined CSS classes can be returned, fallback to safe default
-    # Note: Removed .html_safe to let HAML handle escaping automatically
-    STATUS_BADGE_CLASSES.fetch(status.to_s.strip, STATUS_BADGE_CLASSES["draft"])
+    # Returns Array of CSS class strings for safe HAML attribute building
+    STATUS_BADGE_CLASSES.fetch(status.to_s.strip, STATUS_BADGE_CLASSES["draft"]).split
   end
 
   def status_icon

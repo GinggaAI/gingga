@@ -3,40 +3,6 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 2,
-      "fingerprint": "df723aebe2181e66d52082c9c18e7892518251142476b50d944b8dc69d2750e5",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped parameter value",
-      "file": "app/views/reels/show.html.haml",
-      "line": 21,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "::Haml::AttributeBuilder.build_class(true, ReelShowPresenter.new(current_brand.reels.find(params[:id])).status_badge_class)",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "ReelsController",
-          "method": "show",
-          "line": 10,
-          "file": "app/controllers/reels_controller.rb",
-          "rendered": {
-            "name": "reels/show",
-            "file": "app/views/reels/show.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "reels/show"
-      },
-      "user_input": "params[:id]",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": "FALSE POSITIVE: ReelShowPresenter.status_badge_class uses a whitelisted hash (STATUS_BADGE_CLASSES) that only returns predefined CSS class strings from a frozen constant. No user input can be injected into the class attribute. The method uses STATUS_BADGE_CLASSES.fetch() which only returns one of 4 predefined CSS strings. This is safe."
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
       "fingerprint": "410345e0c5200cf1eff68ea41ec13d0e1dea7b40ba1abbc31da7da4b95f7d428",
       "check_name": "CrossSiteScripting",
       "message": "Unescaped parameter value",

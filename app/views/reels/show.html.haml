@@ -17,9 +17,7 @@
       .bg-white.border.border-gray-200.shadow-lg.rounded-2xl.mb-6
         .p-6
           .flex.items-center.gap-3.mb-4
-            -# brakeman:ignore:CrossSiteScripting - status_badge_class uses whitelisted constant values only
-            %div{class: presenter.status_badge_class}
-              = presenter.status_icon
+            = render Reels::StatusBadgeComponent.new(status: presenter.status, icon: presenter.status_icon)
             %div
               %h3.text-lg.font-semibold.text-gray-900= t('reels.show.video_status', status: presenter.status_titleized)
               %p.text-sm.text-gray-600= presenter.status_description

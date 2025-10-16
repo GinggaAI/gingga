@@ -84,29 +84,29 @@ RSpec.describe ReelShowPresenter do
   end
 
   describe '#status_badge_class' do
-    it 'returns correct class for draft status' do
-      expect(presenter.status_badge_class).to eq('status-badge status-badge--draft')
+    it 'returns correct class array for draft status' do
+      expect(presenter.status_badge_class).to eq([ 'status-badge', 'status-badge--draft' ])
     end
 
-    it 'returns correct class for processing status' do
+    it 'returns correct class array for processing status' do
       reel.update!(status: 'processing')
-      expect(presenter.status_badge_class).to eq('status-badge status-badge--processing')
+      expect(presenter.status_badge_class).to eq([ 'status-badge', 'status-badge--processing' ])
     end
 
-    it 'returns correct class for completed status' do
+    it 'returns correct class array for completed status' do
       reel.update!(status: 'completed')
-      expect(presenter.status_badge_class).to eq('status-badge status-badge--completed')
+      expect(presenter.status_badge_class).to eq([ 'status-badge', 'status-badge--completed' ])
     end
 
-    it 'returns correct class for failed status' do
+    it 'returns correct class array for failed status' do
       reel.update!(status: 'failed')
-      expect(presenter.status_badge_class).to eq('status-badge status-badge--failed')
+      expect(presenter.status_badge_class).to eq([ 'status-badge', 'status-badge--failed' ])
     end
 
-    it 'returns safe fallback for unknown status' do
+    it 'returns safe fallback array for unknown status' do
       # Bypass validation to test fallback
       reel.update_column(:status, 'unknown')
-      expect(presenter.status_badge_class).to eq('status-badge status-badge--draft')
+      expect(presenter.status_badge_class).to eq([ 'status-badge', 'status-badge--draft' ])
     end
   end
 
