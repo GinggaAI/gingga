@@ -89,7 +89,7 @@
                         = t('settings.api.openai.get_api_key')
                 .p-6.pt-0.space-y-6
                   .space-y-4
-                    = form_with url: update_openai_settings_path, method: :patch, local: true, data: { turbo: false }, class: "space-y-4" do |form|
+                    = form_with url: api_integration_path(provider: 'openai', brand_slug: @presenter.user.current_brand.slug, locale: I18n.locale), method: :patch, local: true, data: { turbo: false }, class: "space-y-4" do |form|
                       %div
                         %label.peer-disabled:cursor-not-allowed.peer-disabled:opacity-70.text-sm.font-medium.text-gray-700{:for => "openai_api_key"}= t('settings.api.openai.api_key_label')
                         .relative.mt-1
@@ -107,7 +107,7 @@
                   / Validate section - OUTSIDE the main form
                   .mt-4
                     - if @presenter.show_openai_validate_button?
-                      %form{ action: validate_openai_api_settings_path, method: "post", style: "margin: 0;" }
+                      %form{ action: validate_api_integration_path(provider: 'openai', brand_slug: @presenter.user.current_brand.slug, locale: I18n.locale), method: "post", style: "margin: 0;" }
                         = hidden_field_tag :authenticity_token, form_authenticity_token
                         %button{type: "submit", class: "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 text-white rounded-xl [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-[#3AC8FF] hover:bg-[#3AC8FF]/90 border-0", data: { disable_with: t('settings.api.heygen.validating'), turbo: "false" }}
                           = t('settings.api.openai.validate')
@@ -156,7 +156,7 @@
                     %button.peer.inline-flex.h-6.w-11.shrink-0.cursor-pointer.items-center.rounded-full.border-2.border-transparent.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.focus-visible:ring-offset-background.disabled:cursor-not-allowed.disabled:opacity-50{"aria-checked" => "false", :class => "data-[state=checked]:bg-primary data-[state=unchecked]:bg-input", "data-state" => "unchecked", :role => "switch", :type => "button", :value => "on"}
                       %span.pointer-events-none.block.h-5.w-5.rounded-full.bg-background.shadow-lg.ring-0.transition-transform{:class => "data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0", "data-state" => "unchecked"}
                   .space-y-4
-                    = form_with url: settings_path, method: :patch, local: true, data: { turbo: false }, class: "space-y-4" do |form|
+                    = form_with url: api_integration_path(provider: 'heygen', brand_slug: @presenter.user.current_brand.slug, locale: I18n.locale), method: :patch, local: true, data: { turbo: false }, class: "space-y-4" do |form|
                       %div
                         %label.peer-disabled:cursor-not-allowed.peer-disabled:opacity-70.text-sm.font-medium.text-gray-700{:for => "heygen_api_key"} API Key
                         .relative.mt-1
@@ -181,7 +181,7 @@
                   / Validate section - OUTSIDE the main form
                   .mt-4
                     - if @presenter.show_validate_button?
-                      %form{ action: validate_heygen_api_settings_path, method: "post", style: "margin: 0;", onsubmit: "return confirm('This will synchronize your HeyGen avatars and voices. Continue?')" }
+                      %form{ action: validate_api_integration_path(provider: 'heygen', brand_slug: @presenter.user.current_brand.slug, locale: I18n.locale), method: "post", style: "margin: 0;", onsubmit: "return confirm('This will synchronize your HeyGen avatars and voices. Continue?')" }
                         = hidden_field_tag :authenticity_token, form_authenticity_token
                         .mb-4
                           %label.peer-disabled:cursor-not-allowed.peer-disabled:opacity-70.text-sm.font-medium.text-gray-700{:for => "voices_count"} Number of Voices to Sync

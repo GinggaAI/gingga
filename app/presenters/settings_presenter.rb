@@ -133,7 +133,15 @@ class SettingsPresenter
     @brand&.api_tokens&.test_mode&.count || 0
   end
 
+  def user
+    @user
+  end
+
+  def brand
+    @brand
+  end
+
   private
 
-  attr_reader :user, :params, :flash
+  attr_reader :params, :flash
 end
