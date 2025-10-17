@@ -218,6 +218,92 @@ RSpec.describe Reel, type: :model do
     end
   end
 
+  describe '#video_url_expired?' do
+    # Use narration_over_7_images template to avoid scene validation issues
+    let(:reel) { create(:reel, user: user, template: 'narration_over_7_images') }
+
+    context 'when video_url is not present' do
+      it 'returns false' do
+        reel.update!(video_url: nil)
+        expect(reel.video_url_expired?).to be false
+      end
+    end
+
+    context 'when video_url does not contain Expires parameter' do
+      it 'returns false' do
+        reel.update!(video_url: 'https://example.com/video.mp4')
+        expect(reel.video_url_expired?).to be false
+      end
+    end
+
+    context 'when video_url has expired timestamp' do
+      it 'returns true' do
+        # Set expiration to 1 hour ago
+        expired_time = 1.hour.ago.to_i
+        url = "https://example.com/video.mp4?Expires=#{expired_time}"
+        reel.update!(video_url: url)
+        expect(reel.video_url_expired?).to be true
+      end
+    end
+
+    context 'when video_url has future timestamp' do
+      it 'returns false' do
+        # Set expiration to 1 hour from now
+        future_time = 1.hour.from_now.to_i
+        url = "https://example.com/video.mp4?Expires=#{future_time}"
+        reel.update!(video_url: url)
+        expect(reel.video_url_expired?).to be false
+      end
+    end
+
+    context 'when video_url has timestamp at exact current time' do
+      it 'returns true (expired)' do
+        # Set to 1 second ago to ensure it's expired
+        current_time = 1.second.ago.to_i
+        url = "https://example.com/video.mp4?Expires=#{current_time}"
+        reel.update!(video_url: url)
+
+        expect(reel.video_url_expired?).to be true
+      end
+    end
+  end
+
+  describe '#needs_url_refresh?' do
+    # Use narration_over_7_images template to avoid scene validation issues
+    let(:reel) { create(:reel, user: user, template: 'narration_over_7_images') }
+
+    context 'when status is not completed' do
+      it 'returns false' do
+        reel.update!(status: 'draft', heygen_video_id: 'vid123', video_url: "https://example.com/video.mp4?Expires=#{1.hour.ago.to_i}")
+        expect(reel.needs_url_refresh?).to be false
+      end
+    end
+
+    context 'when heygen_video_id is not present' do
+      it 'returns false' do
+        future_time = 1.hour.from_now.to_i
+        reel.update!(status: 'completed', heygen_video_id: nil, video_url: "https://example.com/video.mp4?Expires=#{future_time}")
+        expect(reel.needs_url_refresh?).to be false
+      end
+    end
+
+    context 'when video_url is not expired' do
+      it 'returns false' do
+        future_time = 1.hour.from_now.to_i
+        reel.update!(status: 'completed', heygen_video_id: 'vid123', video_url: "https://example.com/video.mp4?Expires=#{future_time}")
+        expect(reel.needs_url_refresh?).to be false
+      end
+    end
+
+    context 'when all conditions are met (completed, has heygen_video_id, url expired)' do
+      it 'returns true' do
+        expired_time = 1.hour.ago.to_i
+        reel.update!(status: 'completed', heygen_video_id: 'vid123', video_url: "https://example.com/video.mp4?Expires=#{expired_time}")
+        expect(reel.needs_url_refresh?).to be true
+      end
+    end
+  end
+
   describe 'factory' do
     it 'creates a valid reel' do
       reel = create(:reel, user: user)

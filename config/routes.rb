@@ -49,9 +49,12 @@ Rails.application.routes.draw do
     resource :auto_creation, only: [ :show ]
     resource :analytics, only: [ :show ]
     resource :community, only: [ :show ]
-    resource :settings, only: [ :show, :update ] do
+    resource :settings, only: [ :show ]
+
+    # RESTful API Integrations - handles all providers generically
+    resources :api_integrations, only: [ :update ], param: :provider do
       member do
-        post :validate_heygen_api
+        post :validate
       end
     end
 

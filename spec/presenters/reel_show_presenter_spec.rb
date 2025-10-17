@@ -5,6 +5,57 @@ RSpec.describe ReelShowPresenter do
   let(:reel) { create(:reel, user: user, status: 'draft', title: 'Test Reel', description: 'Test description', template: 'narration_over_7_images') }
   let(:presenter) { described_class.new(reel) }
 
+  describe '#initialize' do
+    context 'when user parameter is provided' do
+      let(:custom_user) { create(:user) }
+      let(:presenter_with_user) { described_class.new(reel, user: custom_user) }
+
+      it 'uses the provided user' do
+        expect(presenter_with_user.instance_variable_get(:@user)).to eq(custom_user)
+      end
+    end
+
+    context 'when user parameter is not provided' do
+      it 'uses the reel user' do
+        expect(presenter.instance_variable_get(:@user)).to eq(user)
+      end
+    end
+
+    context 'when reel needs URL refresh' do
+      let(:expired_reel) do
+        create(:reel,
+          user: user,
+          status: 'completed',
+          heygen_video_id: 'vid123',
+          video_url: "https://example.com/video.mp4?Expires=#{1.hour.ago.to_i}"
+        )
+      end
+
+      it 'calls refresh_video_url_if_needed on initialization' do
+        # Stub the service to avoid actual API call
+        service_double = instance_double(Heygen::CheckVideoStatusService)
+        allow(Heygen::CheckVideoStatusService).to receive(:new).and_return(service_double)
+        allow(service_double).to receive(:call).and_return({ success: false })
+
+        # Create presenter - should trigger refresh attempt
+        described_class.new(expired_reel)
+
+        expect(Heygen::CheckVideoStatusService).to have_received(:new).with(user, expired_reel)
+        expect(service_double).to have_received(:call)
+      end
+    end
+
+    context 'when reel does not need URL refresh' do
+      it 'does not call the refresh service' do
+        allow(Heygen::CheckVideoStatusService).to receive(:new)
+
+        described_class.new(reel)
+
+        expect(Heygen::CheckVideoStatusService).not_to have_received(:new)
+      end
+    end
+  end
+
   describe '#title' do
     it 'returns the reel title when present' do
       expect(presenter.title).to eq('Test Reel')
@@ -33,29 +84,29 @@ RSpec.describe ReelShowPresenter do
   end
 
   describe '#status_badge_class' do
-    it 'returns correct class for draft status' do
-      expect(presenter.status_badge_class).to eq('status-badge status-badge--draft')
+    it 'returns correct class array for draft status' do
+      expect(presenter.status_badge_class).to eq([ 'status-badge', 'status-badge--draft' ])
     end
 
-    it 'returns correct class for processing status' do
+    it 'returns correct class array for processing status' do
       reel.update!(status: 'processing')
-      expect(presenter.status_badge_class).to eq('status-badge status-badge--processing')
+      expect(presenter.status_badge_class).to eq([ 'status-badge', 'status-badge--processing' ])
     end
 
-    it 'returns correct class for completed status' do
+    it 'returns correct class array for completed status' do
       reel.update!(status: 'completed')
-      expect(presenter.status_badge_class).to eq('status-badge status-badge--completed')
+      expect(presenter.status_badge_class).to eq([ 'status-badge', 'status-badge--completed' ])
     end
 
-    it 'returns correct class for failed status' do
+    it 'returns correct class array for failed status' do
       reel.update!(status: 'failed')
-      expect(presenter.status_badge_class).to eq('status-badge status-badge--failed')
+      expect(presenter.status_badge_class).to eq([ 'status-badge', 'status-badge--failed' ])
     end
 
-    it 'returns safe fallback for unknown status' do
+    it 'returns safe fallback array for unknown status' do
       # Bypass validation to test fallback
       reel.update_column(:status, 'unknown')
-      expect(presenter.status_badge_class).to eq('status-badge status-badge--draft')
+      expect(presenter.status_badge_class).to eq([ 'status-badge', 'status-badge--draft' ])
     end
   end
 
@@ -165,6 +216,89 @@ RSpec.describe ReelShowPresenter do
 
     it 'returns error message' do
       expect(presenter.error_message).to include('There was an error generating your video')
+    end
+  end
+
+  describe '#refresh_video_url_if_needed (private)' do
+    let(:expired_reel) do
+      create(:reel,
+        user: user,
+        status: 'completed',
+        heygen_video_id: 'vid123',
+        video_url: "https://example.com/video.mp4?Expires=#{1.hour.ago.to_i}"
+      )
+    end
+
+    context 'when service call is successful' do
+      it 'reloads the reel' do
+        service_double = instance_double(Heygen::CheckVideoStatusService)
+        allow(Heygen::CheckVideoStatusService).to receive(:new).and_return(service_double)
+        allow(service_double).to receive(:call).and_return({ success: true })
+
+        # Spy on reload
+        allow(expired_reel).to receive(:reload).and_call_original
+
+        described_class.new(expired_reel)
+
+        expect(expired_reel).to have_received(:reload)
+      end
+    end
+
+    context 'when service call fails' do
+      it 'does not reload the reel' do
+        service_double = instance_double(Heygen::CheckVideoStatusService)
+        allow(Heygen::CheckVideoStatusService).to receive(:new).and_return(service_double)
+        allow(service_double).to receive(:call).and_return({ success: false })
+
+        # Spy on reload
+        allow(expired_reel).to receive(:reload).and_call_original
+
+        described_class.new(expired_reel)
+
+        expect(expired_reel).not_to have_received(:reload)
+      end
+    end
+
+    context 'when service raises an error' do
+      it 'gracefully handles the error without raising' do
+        service_double = instance_double(Heygen::CheckVideoStatusService)
+        allow(Heygen::CheckVideoStatusService).to receive(:new).and_return(service_double)
+        allow(service_double).to receive(:call).and_raise(StandardError.new('API Error'))
+
+        # Should log error but not raise
+        allow(Rails.logger).to receive(:error)
+
+        expect {
+          described_class.new(expired_reel)
+        }.not_to raise_error
+
+        expect(Rails.logger).to have_received(:error).with(/Failed to refresh video URL/)
+      end
+
+      it 'logs the error message with reel id' do
+        service_double = instance_double(Heygen::CheckVideoStatusService)
+        allow(Heygen::CheckVideoStatusService).to receive(:new).and_return(service_double)
+        allow(service_double).to receive(:call).and_raise(StandardError.new('Connection timeout'))
+
+        allow(Rails.logger).to receive(:error)
+
+        described_class.new(expired_reel)
+
+        expect(Rails.logger).to have_received(:error).with(
+          "Failed to refresh video URL for reel #{expired_reel.id}: Connection timeout"
+        )
+      end
+    end
+
+    context 'when reel does not need refresh' do
+      it 'does not call the service' do
+        allow(Heygen::CheckVideoStatusService).to receive(:new)
+
+        # reel is draft status, so doesn't need refresh
+        described_class.new(reel)
+
+        expect(Heygen::CheckVideoStatusService).not_to have_received(:new)
+      end
     end
   end
 end

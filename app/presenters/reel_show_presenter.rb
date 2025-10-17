@@ -9,8 +9,10 @@ class ReelShowPresenter
     "failed" => "status-badge status-badge--failed"
   }.freeze
 
-  def initialize(reel)
+  def initialize(reel, user: nil)
     @reel = reel
+    @user = user || reel.user
+    refresh_video_url_if_needed
   end
 
   def title
@@ -32,8 +34,8 @@ class ReelShowPresenter
   def status_badge_class
     # Use whitelisted hash lookup for security - prevents any user input injection
     # Only predefined CSS classes can be returned, fallback to safe default
-    # Note: Removed .html_safe to let HAML handle escaping automatically
-    STATUS_BADGE_CLASSES.fetch(status.to_s.strip, STATUS_BADGE_CLASSES["draft"])
+    # Returns Array of CSS class strings for safe HAML attribute building
+    STATUS_BADGE_CLASSES.fetch(status.to_s.strip, STATUS_BADGE_CLASSES["draft"]).split
   end
 
   def status_icon
@@ -102,5 +104,18 @@ class ReelShowPresenter
 
   def ordered_scenes
     @reel.reel_scenes.ordered
+  end
+
+  private
+
+  def refresh_video_url_if_needed
+    return unless @reel.needs_url_refresh?
+
+    # Refresh URL from HeyGen API
+    result = Heygen::CheckVideoStatusService.new(@user, @reel).call
+    @reel.reload if result[:success]
+  rescue StandardError => e
+    Rails.logger.error "Failed to refresh video URL for reel #{@reel.id}: #{e.message}"
+    # Don't raise - gracefully degrade to showing expired URL
   end
 end
