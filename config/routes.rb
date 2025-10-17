@@ -52,6 +52,8 @@ Rails.application.routes.draw do
     resource :settings, only: [ :show, :update ] do
       member do
         post :validate_heygen_api
+        patch :update_openai
+        post :validate_openai_api
       end
     end
 

@@ -1,3 +1,5 @@
+require "ostruct"
+
 class ApiTokenUpdateService
   def initialize(user:, brand:, provider:, token_value:, mode: "production", **options)
     @user = user

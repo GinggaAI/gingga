@@ -82,6 +82,43 @@ class SettingsPresenter
     @flash[:alert]
   end
 
+  # OpenAI API Token Methods
+  def openai_token
+    @openai_token ||= @brand&.active_token_for("openai")
+  end
+
+  def openai_token_value
+    openai_token&.encrypted_token if openai_token&.encrypted_token.present?
+  end
+
+  def openai_configured?
+    openai_token&.is_valid || false
+  end
+
+  def openai_configuration_status
+    if openai_configured?
+      "Configured"
+    else
+      "Not configured"
+    end
+  end
+
+  def openai_status_class
+    if openai_configured?
+      "inline-flex items-center rounded-full border text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-green-100 text-green-700 px-2.5 py-0.5"
+    else
+      "inline-flex items-center rounded-full border text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground px-2.5 py-0.5 hover:bg-secondary/80"
+    end
+  end
+
+  def show_openai_validate_button?
+    openai_configured?
+  end
+
+  def show_disabled_openai_validate_button?
+    !openai_configured?
+  end
+
   # API Integrations Overview Stats
   def active_connections_count
     @brand&.api_tokens&.valid_tokens&.count || 0
