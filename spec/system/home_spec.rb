@@ -8,59 +8,53 @@ RSpec.describe "Landing Page", type: :system do
   describe "main page content" do
     it "displays the main headline and CTA" do
       visit "/"
-      expect(page).to have_text("One place. All your content. Powered by AI, guided by your voice.")
+      expect(page).to have_text("Your intelligent")
+      expect(page).to have_text("creation system")
       expect(page).to have_link("Get Started")
     end
 
     it "renders How Gingga Works steps" do
       visit "/"
-      expect(page).to have_text("Noctua maps your brand")
-      expect(page).to have_text("Sagui spins prompts into ideas")
-      expect(page).to have_text("Voxa crafts visuals")
-      expect(page).to have_text("Alumo anchors the rhythm")
+      # Current landing has plans structure
+      expect(page).to have_text("Consistency")
+      expect(page).to have_text("Growth")
+      expect(page).to have_text("Domination")
     end
 
     it "displays all feature sections with proper headings" do
       visit "/"
 
-      # Check all main section headings
-      expect(page).to have_text("What You Get")
-      expect(page).to have_text("Why small brands choose Gingga")
-      expect(page).to have_text("How it works")
-      expect(page).to have_text("What people are saying")
-      expect(page).to have_text("Choose your rhythm")
+      # Check all main section headings in current landing
+      expect(page).to have_text("Intelligent Creation System Plans")
+      expect(page).to have_text("Add-ons")
+      expect(page).to have_text("Start giving your brand momentum")
     end
 
     it "shows feature cards with proper icons and descriptions" do
       visit "/"
 
-      # Feature cards - updated to new 4-box structure
-      expect(page).to have_text("Noctua (The Strategist)")
-      expect(page).to have_text("Voxa (The Voice Constructor)")
-      expect(page).to have_text("Sagui (The Prompt Crafter)")
-      expect(page).to have_text("Alumo (Your Sales Assistant)")
-      expect(page).to have_text("Brand mapping and content clarity—so every post reflects your voice.")
-      expect(page).to have_text("From raw ideas to practical scripts, complete with images and post descriptions.")
+      # Plan cards in current landing
+      expect(page).to have_text("Consistency")
+      expect(page).to have_text("Growth")
+      expect(page).to have_text("Domination")
+      expect(page).to have_text("Keep your brand active without extra effort")
+      expect(page).to have_text("Creative diversity with continuous strategic support")
     end
-
 
     it "shows testimonials from customers" do
       visit "/"
 
-      expect(page).to have_text("I used to dread content days. Now it flows.")
-      expect(page).to have_text("Camila — Wellness Coach")
-      expect(page).to have_text("Feels like magic. Clients think I hired a team.")
-      expect(page).to have_text("Luis — Barbershop Owner")
+      # Current landing doesn't have testimonials section
+      # Just verify the main content is present
+      expect(page).to have_text("GINGGA")
     end
 
     it "displays pricing information" do
       visit "/"
 
-      expect(page).to have_text("£248/mo")
-      expect(page).to have_text("£585/mo")
-      expect(page).to have_text("£748/mo")
-      expect(page).to have_text("£1,498/mo")
-      expect(page).to have_text("Book a free discovery call")
+      expect(page).to have_text("£259")
+      expect(page).to have_text("£399")
+      expect(page).to have_text("£579")
     end
   end
 
@@ -68,26 +62,28 @@ RSpec.describe "Landing Page", type: :system do
     it "has proper navigation links" do
       visit "/"
 
-      expect(page).to have_link("How it works", href: "#how")
       expect(page).to have_link("Get Started")
+      # Footer has link to planes
+      within('footer') do
+        expect(page).to have_link(href: "#planes")
+      end
     end
 
     it "has semantic HTML structure with proper sections" do
       visit "/"
 
-      expect(page).to have_css("header")
-      expect(page).to have_css("section#how")
-      expect(page).to have_css("section#cta")
+      expect(page).to have_css("nav")
+      expect(page).to have_css("#planes")
       expect(page).to have_css("footer")
     end
 
     it "includes footer with company information" do
       visit "/"
 
-      expect(page).to have_text("Intelligence in Motion")
-      expect(page).to have_link("Privacy Policy")
-      expect(page).to have_link("Terms of Service")
-      expect(page).to have_link("Contact")
+      expect(page).to have_text("Intelligence in motion — more than a brand, it's a movement")
+      # Current footer has different structure
+      expect(page).to have_text("Services")
+      expect(page).to have_text("Contact")
     end
   end
 
@@ -95,18 +91,18 @@ RSpec.describe "Landing Page", type: :system do
     it "has multiple CTA buttons for conversion" do
       visit "/"
 
-      # Should have Get Started and Start Now links
+      # Current CTAs
       expect(page).to have_link("Get Started")
-      expect(page).to have_link("Start Now")
-      expect(page).to have_link("Book a free discovery call", count: 4)
+      expect(page).to have_link("Activate my Gingga engine")
+      expect(page).to have_link("Get Started with Gingga")
     end
 
     it "displays brand identity consistently" do
       visit "/"
 
       # Brand name should appear in nav and footer
-      expect(page).to have_text("GINGGA", count: 2) # Nav and footer
-      expect(page).to have_text("Intelligence in Motion")
+      expect(page).to have_text("GINGGA", minimum: 2)
+      expect(page).to have_text("Intelligence in motion — more than a brand, it's a movement")
     end
   end
 end

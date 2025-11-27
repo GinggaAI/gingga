@@ -635,7 +635,7 @@ es:
 
     # Hero
     hero:
-      title: "Tu sistema de creación"
+      title: "Tu sistema de creación "
       title_highlight: "inteligente"
       subtitle: "Convierte tu voz, tus ideas y tu presencia en un flujo constante de contenido profesional con IA. Gingga combina estrategia, creatividad y tecnología para mantenerte visible — sin fricción, sin burnout."
       cta_primary: "Activar mi motor Gingga 🚀"
@@ -667,37 +667,46 @@ es:
     # Phase 2
     phase_2:
       icon: "🔥"
-      title: "Fase 2 — Planes del Sistema de Creación Inteligente"
-      subtitle: "Activa tu motor mensual de contenido. Reels, ideas, textos o clips creados con IA, diseñados para mantener tu marca viva y creciendo cada semana."
+      title: "Planes del Sistema de Creación Inteligente"
+      subtitle: "Este no es un servicio de contenido tradicional. Es un sistema de visibilidad automatizado que trabaja para ti mes tras mes.\n\n<strong>Mes 1:</strong> grabación y configuración de tu identidad IA. <strong>Meses 2 y 3:</strong> entrega continua de contenido optimizado con IA. Tu marca en movimiento constante, sin fricción."
 
       # Plans
       consistency:
         name: "Consistency"
-        pieces: "4 piezas de contenido IA / mes"
-        feature_1: "Grilla de contenidos: 12 ideas"
-        feature_2: "Descripción paso a paso: ❌"
-        feature_3: "Estadísticas y análisis de resultados: ❌"
-        description: "Ideal para mantener presencia constante sin sobrecarga."
+        price: "£259/mes"
+        total: "Total: £777 / 3 meses"
+        pieces: "12 viral reels / mes (IA)"
+        feature_1: "Estrategia mensual de contenidos: 12 ideas"
+        feature_2: "Descripciones de post incluidas"
+        feature_3: "Descripción paso a paso: ❌"
+        feature_4: "Análisis y estadísticas: ❌"
+        description: "Mantén tu marca activa sin esfuerzo extra."
 
       growth:
         name: "Growth"
-        badge: "POPULAR"
-        pieces: "8 piezas de contenido IA / mes"
-        feature_1: "Grilla de contenidos: 16 ideas"
-        feature_2: "Descripción paso a paso: ✅"
-        feature_3: "Variatio Pack — variación de tono de comunicación: ✅"
-        feature_4: "Estadísticas y análisis de resultados: ✅"
-        description: "Escala visibilidad con acompañamiento estratégico y diversidad creativa."
+        badge: "RECOMENDADO"
+        price: "£399/mes"
+        total: "Total: £1,197 / 3 meses"
+        pieces: "16 viral reels / mes (IA)"
+        feature_1: "Estrategia mensual de contenidos: 16 ideas"
+        feature_2: "Descripciones de post incluidas"
+        feature_3: "Descripción paso a paso: ✅"
+        feature_4: "Variation Pack (tono/estilo): ✅"
+        feature_5: "Análisis y estadísticas: ✅"
+        description: "Diversidad creativa con acompañamiento estratégico continuo."
 
       domination:
         name: "Domination"
-        pieces: "12 piezas de contenido IA / mes"
-        feature_1: "Grilla de contenidos: 20 ideas"
-        feature_2: "Descripción paso a paso: ✅"
-        feature_3: "Variatio Pack — variación de tono de comunicación: ✅"
-        feature_4: "Estadísticas y análisis de resultados: ✅"
-        feature_5: "📊 Mini-guía de tendencias"
-        description: "Máximo rendimiento con estrategia continua y optimización basada en IA."
+        price: "£579/mes"
+        total: "Total: £1,737 / 3 meses"
+        pieces: "20 viral reels / mes (IA)"
+        feature_1: "Estrategia mensual de contenidos: 20 ideas"
+        feature_2: "Descripciones de post incluidas"
+        feature_3: "Descripción paso a paso: ✅"
+        feature_4: "Variation Pack: ✅"
+        feature_5: "Análisis y estadísticas: ✅"
+        feature_6: "Mini-guía de tendencias: ✅"
+        description: "Visibilidad de alto volumen con crecimiento estratégico continuo."
 
     # Add-ons
     addons:
@@ -709,16 +718,17 @@ es:
       table_header_price: "Precio"
       addon_1_name: "🎯 Creación de reel adicional"
       addon_1_desc: "Contenido adicional generado con IA según tu línea actual"
+      addon_1_price: "£48"
       addon_2_name: "✍️ Paquete de 10 guiones"
       addon_2_desc: "Redacción optimizada con IA para ideas virales y mensajes estratégicos"
-      addon_3_name: "⚡ Trending Topic Sprint"
-      addon_3_desc: "5 piezas creadas en 48h con base en tendencias actuales"
-      addon_4_name: "🌍 Multi-Plataforma Boost"
-      addon_4_desc: "Adaptación de contenido para YouTube, Instagram y TikTok"
+      addon_2_price: "£48"
+      addon_3_name: "🧠 Brand Intelligence Kit"
+      addon_3_desc: "1:1 clarity session, refinamiento de propuesta de valor, mini brand kit (paleta, logo, tipografía)"
+      addon_3_price: "£249"
 
     # CTA Final
     cta_final:
-      title: "Activa tu sistema de creación inteligente."
+      title: "Empieza a darle movimiento a tu marca"
       button: "Comenzar con Gingga"
       disclaimer: "*Precios en validación beta. Cupos limitados. Cancelación mensual con 15 días de aviso.*"
 

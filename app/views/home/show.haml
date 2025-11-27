@@ -1,78 +1,4 @@
-- content_for :head do
-  %link{ href: "https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600&display=swap", rel: "stylesheet" }
-  :css
-    body {
-      font-family: 'Inter', sans-serif;
-    }
-    h1, h2, h3, h4, h5, h6 {
-      font-family: 'Poppins', sans-serif;
-    }
-    .gradient-text {
-      background: linear-gradient(90deg, #B277F8, #79E9F2);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .gradient-bg {
-      background: linear-gradient(90deg, #B277F8, #79E9F2);
-    }
-    .glow-button {
-      box-shadow: 0 0 20px rgba(178, 119, 248, 0.4);
-      transition: all 0.3s ease;
-    }
-    .glow-button:hover {
-      box-shadow: 0 0 30px rgba(178, 119, 248, 0.6), 0 0 40px rgba(121, 233, 242, 0.4);
-      transform: translateY(-2px);
-    }
-    .card-glow {
-      box-shadow: 0 4px 20px rgba(178, 119, 248, 0.1);
-      transition: all 0.3s ease;
-    }
-    .card-glow:hover {
-      box-shadow: 0 8px 30px rgba(178, 119, 248, 0.2), 0 0 20px rgba(121, 233, 242, 0.1);
-      transform: translateY(-4px);
-    }
-    .gradient-border {
-      position: relative;
-      background: #1a1a2e;
-      border-radius: 1rem;
-    }
-    .gradient-border::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 1rem;
-      padding: 2px;
-      background: linear-gradient(90deg, #B277F8, #79E9F2);
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-    }
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
-    }
-    .float-animation {
-      animation: float 3s ease-in-out infinite;
-    }
-    .bg-card-dark {
-      background-color: #1a1a2e;
-    }
-    .text-cyan {
-      color: #79E9F2;
-    }
-    .text-purple {
-      color: #B277F8;
-    }
-    .hover-text-cyan:hover,
-    .hover\:text-cyan:hover {
-      color: #79E9F2;
-    }
-    .left-half {
-      left: 50%;
-    }
-
-.text-white{ style: "background-color: #151528;" }
+%div.text-white{ style: "background-color: #151528;" }
   / Navbar
   %nav.border-b.border-gray-800.sticky.top-0.z-50{ style: "background-color: rgba(21, 21, 40, 0.8); backdrop-filter: blur(12px);" }
     .max-w-7xl.mx-auto.px-6.py-4.flex.justify-between.items-center
@@ -83,223 +9,163 @@
       = link_to "https://calendly.com/guzman-vla/30min", class: "gradient-bg text-white px-6 py-2 rounded-full font-semibold glow-button", target: "_blank", rel: "noopener noreferrer" do
         = t('landing.cta_button')
 
-  %section.max-w-6xl.mx-auto.px-6.py-16
+  %section.max-w-6xl.mx-auto.px-6.py-20
     / HERO
-    .text-center.mb-20.float-animation
-      %h1.text-5xl.md:text-6xl.font-bold.mb-6.leading-tight
+    .text-center.mb-24.float-animation
+      %h1.text-5xl.md:text-6xl.font-bold.mb-8.leading-tight
         = t('landing.hero.title')
         %span.gradient-text= t('landing.hero.title_highlight')
-      %p.text-lg.md:text-xl.text-gray-300.mb-10.max-w-3xl.mx-auto.leading-relaxed
+      %p.text-lg.md:text-xl.text-gray-300.mb-12.max-w-3xl.mx-auto{ style: "line-height: 1.8;" }
         = t('landing.hero.subtitle')
 
-      .text-center.mb-12
+      .text-center.mb-10
         = link_to "https://calendly.com/guzman-vla/30min", class: "inline-block gradient-bg text-white px-10 py-4 rounded-full font-semibold text-lg glow-button", target: "_blank", rel: "noopener noreferrer" do
           = t('landing.hero.cta_primary')
 
-      %p.text-gray-400.text-lg.italic
+      %p.text-gray-400.text-base.italic
         = t('landing.hero.tagline_bottom')
 
-    / Fase 1
-    .mb-20
-      .flex.items-center.gap-3.mb-6
-        %span.text-4xl= t('landing.phase_1.icon')
-        %h2.text-3xl.md:text-4xl.font-bold.gradient-text
-          = t('landing.phase_1.title')
-      %p.text-gray-300.mb-8.max-w-3xl.text-lg.leading-relaxed
-        = t('landing.phase_1.subtitle')
-
-      .overflow-x-auto
-        .gradient-border.p-6.min-w-full
-          %table.w-full
-            %thead
-              %tr.border-b.border-gray-700
-                %th.p-4.text-left.text-gray-300.font-semibold= t('landing.phase_1.table_header_features')
-                %th.p-4.text-center.text-gray-300.font-semibold
-                  = t('landing.phase_1.table_header_standard')
-                  %br/
-                  %span.text-cyan.text-xl £279
-                %th.p-4.text-center.text-gray-300.font-semibold
-                  = t('landing.phase_1.table_header_plus')
-                  %br/
-                  %span.text-cyan.text-xl £449
-                %th.p-4.text-center.text-gray-300.font-semibold
-                  = t('landing.phase_1.table_header_premium')
-                  %br/
-                  %span.text-cyan.text-xl £619
-            %tbody.text-gray-300
-              %tr.border-b.border-gray-800
-                %td.p-4= t('landing.phase_1.feature_1')
-                %td.p-4.text-center ✅
-                %td.p-4.text-center ✅
-                %td.p-4.text-center ✅
-              %tr.border-b.border-gray-800
-                %td.p-4= t('landing.phase_1.feature_2')
-                %td.p-4.text-center ✅
-                %td.p-4.text-center ✅
-                %td.p-4.text-center ✅
-              %tr.border-b.border-gray-800
-                %td.p-4= t('landing.phase_1.feature_3')
-                %td.p-4.text-center 5
-                %td.p-4.text-center 8
-                %td.p-4.text-center 12
-              %tr.border-b.border-gray-800
-                %td.p-4= t('landing.phase_1.feature_4')
-                %td.p-4.text-center= t('landing.phase_1.template_base')
-                %td.p-4.text-center= t('landing.phase_1.personalized')
-                %td.p-4.text-center= t('landing.phase_1.personalized')
-              %tr.border-b.border-gray-800
-                %td.p-4= t('landing.phase_1.feature_5')
-                %td.p-4.text-center ❌
-                %td.p-4.text-center 5
-                %td.p-4.text-center 10
-              %tr.border-b.border-gray-800
-                %td.p-4= t('landing.phase_1.feature_6')
-                %td.p-4.text-center ❌
-                %td.p-4.text-center ✅
-                %td.p-4.text-center ✅
-              %tr
-                %td.p-4= t('landing.phase_1.feature_7')
-                %td.p-4.text-center= t('landing.phase_1.days_20')
-                %td.p-4.text-center= t('landing.phase_1.days_15')
-                %td.p-4.text-center
-                  %span.text-purple.font-semibold= t('landing.phase_1.days_7_priority')
-
-      %p.text-center.text-gray-400.text-sm.mt-6.italic
-        = t('landing.phase_1.footer_note')
-
     / Fase 2
-    .mb-20#planes
-      .flex.items-center.gap-3.mb-6
+    .mb-24#planes
+      .flex.items-center.gap-3.mb-8.justify-center
         %span.text-4xl= t('landing.phase_2.icon')
         %h2.text-3xl.md:text-4xl.font-bold.gradient-text
           = t('landing.phase_2.title')
-      %p.text-gray-300.mb-10.max-w-3xl.text-lg.leading-relaxed
-        = t('landing.phase_2.subtitle')
+      .text-gray-300.mb-12.max-w-4xl.mx-auto.text-center.text-base{ style: "line-height: 1.7;" }
+        = simple_format(t('landing.phase_2.subtitle'), {}, sanitize: false)
 
-      .grid.md:grid-cols-3.gap-8
+      .grid.md:grid-cols-3.gap-6.max-w-6xl.mx-auto
         / Consistency
-        .bg-card-dark.rounded-2xl.p-8.card-glow.border.border-gray-800
-          %h3.text-2xl.font-bold.mb-3.text-white= t('landing.phase_2.consistency.name')
-          %p.text-gray-400.mb-6.text-lg= t('landing.phase_2.consistency.pieces')
-          %ul.text-sm.mb-6.space-y-2.text-gray-300
-            %li.flex.items-start.gap-2
-              %span.text-cyan.mt-1 ▸
+        .bg-card-dark.rounded-2xl.p-6.card-glow.border.border-gray-800
+          %h3.text-xl.font-bold.mb-2.text-white= t('landing.phase_2.consistency.name')
+          %p.text-gray-400.mb-1.text-base.font-semibold= t('landing.phase_2.consistency.price')
+          %p.text-gray-400.mb-4.text-xs= t('landing.phase_2.consistency.total')
+          %p.text-gray-400.mb-4.text-sm= t('landing.phase_2.consistency.pieces')
+          %ul.text-xs.mb-4.space-y-1.text-gray-300
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
               %span= t('landing.phase_2.consistency.feature_1')
-            %li.flex.items-start.gap-2
-              %span.text-gray-600.mt-1 ▸
-              %span.text-gray-500= t('landing.phase_2.consistency.feature_2')
-            %li.flex.items-start.gap-2
-              %span.text-gray-600.mt-1 ▸
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
+              %span= t('landing.phase_2.consistency.feature_2')
+            %li.flex.items-center.gap-2
+              %span.text-gray-600 ▸
               %span.text-gray-500= t('landing.phase_2.consistency.feature_3')
-          %p.text-4xl.font-bold.mb-4.gradient-text £247
-          %p.text-sm.text-gray-400.leading-relaxed
+            %li.flex.items-center.gap-2
+              %span.text-gray-600 ▸
+              %span.text-gray-500= t('landing.phase_2.consistency.feature_4')
+          %p.text-xs.text-gray-400{ style: "line-height: 1.5;" }
             = t('landing.phase_2.consistency.description')
 
         / Growth
-        .bg-card-dark.rounded-2xl.p-8.card-glow.gradient-border.relative
-          .absolute.-top-3.left-half.gradient-bg.px-4.py-1.rounded-full.text-xs.font-semibold{ style: "transform: translateX(-50%)" }
+        .bg-card-dark.rounded-2xl.p-6.card-glow.relative{ style: "border: 2px solid; border-image: linear-gradient(90deg, #B277F8, #79E9F2) 1;" }
+          .absolute.-top-3.left-half.gradient-bg.px-3.py-1.rounded-full.text-xs.font-semibold{ style: "transform: translateX(-50%)" }
             = t('landing.phase_2.growth.badge')
-          %h3.text-2xl.font-bold.mb-3.gradient-text= t('landing.phase_2.growth.name')
-          %p.text-gray-400.mb-6.text-lg= t('landing.phase_2.growth.pieces')
-          %ul.text-sm.mb-6.space-y-2.text-gray-300
-            %li.flex.items-start.gap-2
-              %span.text-cyan.mt-1 ▸
+          %h3.text-xl.font-bold.mb-2.gradient-text= t('landing.phase_2.growth.name')
+          %p.text-gray-400.mb-1.text-base.font-semibold= t('landing.phase_2.growth.price')
+          %p.text-gray-400.mb-4.text-xs= t('landing.phase_2.growth.total')
+          %p.text-gray-400.mb-4.text-sm= t('landing.phase_2.growth.pieces')
+          %ul.text-xs.mb-4.space-y-1.text-gray-300
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
               %span= t('landing.phase_2.growth.feature_1')
-            %li.flex.items-start.gap-2
-              %span.text-cyan.mt-1 ▸
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
               %span= t('landing.phase_2.growth.feature_2')
-            %li.flex.items-start.gap-2
-              %span.text-cyan.mt-1 ▸
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
               %span= t('landing.phase_2.growth.feature_3')
-            %li.flex.items-start.gap-2
-              %span.text-cyan.mt-1 ▸
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
               %span= t('landing.phase_2.growth.feature_4')
-          %p.text-4xl.font-bold.mb-4.gradient-text £377
-          %p.text-sm.text-gray-400.leading-relaxed
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
+              %span= t('landing.phase_2.growth.feature_5')
+          %p.text-xs.text-gray-400{ style: "line-height: 1.5;" }
             = t('landing.phase_2.growth.description')
 
         / Domination
-        .bg-card-dark.rounded-2xl.p-8.card-glow.border.border-gray-800
-          %h3.text-2xl.font-bold.mb-3.text-cyan= t('landing.phase_2.domination.name')
-          %p.text-gray-400.mb-6.text-lg= t('landing.phase_2.domination.pieces')
-          %ul.text-sm.mb-6.space-y-2.text-gray-300
-            %li.flex.items-start.gap-2
-              %span.text-cyan.mt-1 ▸
+        .bg-card-dark.rounded-2xl.p-6.card-glow.border.border-gray-800
+          %h3.text-xl.font-bold.mb-2.text-cyan= t('landing.phase_2.domination.name')
+          %p.text-gray-400.mb-1.text-base.font-semibold= t('landing.phase_2.domination.price')
+          %p.text-gray-400.mb-4.text-xs= t('landing.phase_2.domination.total')
+          %p.text-gray-400.mb-4.text-sm= t('landing.phase_2.domination.pieces')
+          %ul.text-xs.mb-4.space-y-1.text-gray-300
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
               %span= t('landing.phase_2.domination.feature_1')
-            %li.flex.items-start.gap-2
-              %span.text-cyan.mt-1 ▸
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
               %span= t('landing.phase_2.domination.feature_2')
-            %li.flex.items-start.gap-2
-              %span.text-cyan.mt-1 ▸
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
               %span= t('landing.phase_2.domination.feature_3')
-            %li.flex.items-start.gap-2
-              %span.text-cyan.mt-1 ▸
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
               %span= t('landing.phase_2.domination.feature_4')
-            %li.flex.items-start.gap-2
-              %span.text-purple.mt-1 ▸
-              %span.text-purple= t('landing.phase_2.domination.feature_5')
-          %p.text-4xl.font-bold.mb-4.gradient-text £567
-          %p.text-sm.text-gray-400.leading-relaxed
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
+              %span= t('landing.phase_2.domination.feature_5')
+            %li.flex.items-center.gap-2
+              %span.text-purple ▸
+              %span.text-purple= t('landing.phase_2.domination.feature_6')
+          %p.text-xs.text-gray-400{ style: "line-height: 1.5;" }
             = t('landing.phase_2.domination.description')
 
     / Add-ons
     .mb-20
-      .flex.items-center.gap-3.mb-6
-        %span.text-4xl= t('landing.addons.icon')
-        %h2.text-3xl.md:text-4xl.font-bold.gradient-text= t('landing.addons.title')
-      %p.text-gray-300.mb-8.text-lg
+      .flex.items-center.gap-3.mb-4.justify-center
+        %span.text-3xl= t('landing.addons.icon')
+        %h2.text-2xl.md:text-3xl.font-bold.gradient-text= t('landing.addons.title')
+      %p.text-gray-300.mb-8.text-center.text-sm
         = t('landing.addons.subtitle')
 
-      .gradient-border.p-6
+      .gradient-border.p-4.max-w-5xl.mx-auto
         %table.w-full
           %thead
             %tr.border-b.border-gray-700
-              %th.p-4.text-left.text-gray-300.font-semibold= t('landing.addons.table_header_service')
-              %th.p-4.text-left.text-gray-300.font-semibold= t('landing.addons.table_header_description')
-              %th.p-4.text-left.text-gray-300.font-semibold= t('landing.addons.table_header_price')
+              %th.p-3.text-left.text-gray-300.font-semibold.text-sm= t('landing.addons.table_header_service')
+              %th.p-3.text-left.text-gray-300.font-semibold.text-sm= t('landing.addons.table_header_description')
+              %th.p-3.text-left.text-gray-300.font-semibold.text-sm= t('landing.addons.table_header_price')
           %tbody.text-gray-300
             %tr.border-b.border-gray-800
-              %td.p-4= t('landing.addons.addon_1_name')
-              %td.p-4= t('landing.addons.addon_1_desc')
-              %td.p-4.text-cyan.font-semibold £48
+              %td.p-3.text-sm= t('landing.addons.addon_1_name')
+              %td.p-3.text-xs= t('landing.addons.addon_1_desc')
+              %td.p-3.text-cyan.font-semibold.text-sm= t('landing.addons.addon_1_price')
             %tr.border-b.border-gray-800
-              %td.p-4= t('landing.addons.addon_2_name')
-              %td.p-4= t('landing.addons.addon_2_desc')
-              %td.p-4.text-cyan.font-semibold £48
-            %tr.border-b.border-gray-800
-              %td.p-4= t('landing.addons.addon_3_name')
-              %td.p-4= t('landing.addons.addon_3_desc')
-              %td.p-4.text-cyan.font-semibold £380
+              %td.p-3.text-sm= t('landing.addons.addon_2_name')
+              %td.p-3.text-xs= t('landing.addons.addon_2_desc')
+              %td.p-3.text-cyan.font-semibold.text-sm= t('landing.addons.addon_2_price')
             %tr
-              %td.p-4= t('landing.addons.addon_4_name')
-              %td.p-4= t('landing.addons.addon_4_desc')
-              %td.p-4.text-cyan.font-semibold £70
+              %td.p-3.text-sm= t('landing.addons.addon_3_name')
+              %td.p-3.text-xs= t('landing.addons.addon_3_desc')
+              %td.p-3.text-cyan.font-semibold.text-sm= t('landing.addons.addon_3_price')
 
     / CTA Final
-    .text-center.mt-16.mb-12
-      .rounded-3xl.p-12.border.border-gray-800{ style: "background: linear-gradient(to right, rgba(178, 119, 248, 0.1), rgba(121, 233, 242, 0.1))" }
-        %p.text-3xl.font-bold.mb-6.gradient-text
+    .text-center.mt-12.mb-16
+      .rounded-3xl.p-8.border.border-gray-800.max-w-4xl.mx-auto{ style: "background: linear-gradient(to right, rgba(178, 119, 248, 0.1), rgba(121, 233, 242, 0.1))" }
+        %p.text-2xl.font-bold.mb-6.gradient-text
           = t('landing.cta_final.title')
-        = link_to "https://calendly.com/guzman-vla/30min", class: "inline-block gradient-bg text-white px-12 py-4 rounded-full font-semibold text-lg glow-button", target: "_blank", rel: "noopener noreferrer" do
+        = link_to "https://calendly.com/guzman-vla/30min", class: "inline-block gradient-bg text-white px-10 py-3 rounded-full font-semibold text-base glow-button", target: "_blank", rel: "noopener noreferrer" do
           = t('landing.cta_final.button')
-        %p.text-gray-400.text-sm.mt-8
+        %p.text-gray-400.text-xs.mt-6
           = t('landing.cta_final.disclaimer')
 
   / Footer
-  %footer.border-t.border-gray-800.mt-20{ style: "background-color: #0d0d1a" }
-    .max-w-6xl.mx-auto.px-6.py-12
-      .grid.md:grid-cols-3.gap-8.mb-8
+  %footer.border-t.border-gray-800.mt-12{ style: "background-color: #0d0d1a" }
+    .max-w-6xl.mx-auto.px-6.py-8
+      .grid.md:grid-cols-3.gap-6.mb-6
         %div
-          .flex.items-center.gap-3.mb-4
-            .w-10.h-10.rounded-full.gradient-bg.flex.items-center.justify-center.font-bold.text-white
+          .flex.items-center.gap-2.mb-3
+            .w-8.h-8.rounded-full.gradient-bg.flex.items-center.justify-center.font-bold.text-white.text-sm
               G
-            %span.text-2xl.font-bold= t('landing.brand_name')
-          %p.text-gray-400.text-sm.leading-relaxed
+            %span.text-xl.font-bold= t('landing.brand_name')
+          %p.text-gray-400.text-xs{ style: "line-height: 1.5;" }
             = t('landing.footer.tagline')
 
         %div
-          %h4.font-semibold.mb-4.text-gray-300= t('landing.footer.services')
-          %ul.space-y-2.text-sm.text-gray-400
+          %h4.font-semibold.mb-3.text-gray-300.text-sm= t('landing.footer.services')
+          %ul.space-y-1.text-xs.text-gray-400
             %li
               = link_to "https://calendly.com/guzman-vla/30min", class: "hover:text-cyan transition", target: "_blank", rel: "noopener noreferrer" do
                 = t('landing.footer.setup_initial')
@@ -311,8 +177,8 @@
                 = t('landing.footer.addons')
 
         %div
-          %h4.font-semibold.mb-4.text-gray-300= t('landing.footer.contact')
-          %ul.space-y-2.text-sm.text-gray-400
+          %h4.font-semibold.mb-3.text-gray-300.text-sm= t('landing.footer.contact')
+          %ul.space-y-1.text-xs.text-gray-400
             %li
               = link_to "mailto:#{t('landing.footer.email')}", class: "hover:text-cyan transition" do
                 = t('landing.footer.email')
@@ -323,5 +189,5 @@
               = link_to "https://linkedin.com/company/gingga", class: "hover:text-cyan transition", target: "_blank", rel: "noopener noreferrer" do
                 = t('landing.footer.linkedin')
 
-      .border-t.border-gray-800.pt-8.text-center.text-sm.text-gray-500
+      .border-t.border-gray-800.pt-4.text-center.text-xs.text-gray-500
         %p= "© 2025 #{t('landing.brand_name')}. #{t('landing.footer.copyright')}"

@@ -1,0 +1,102 @@
+/* GINGGA Landing Page Styles */
+
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600&display=swap');
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(90deg, #b277f8, #79e9f2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Gradient Background */
+.gradient-bg {
+  background: linear-gradient(90deg, #b277f8, #79e9f2);
+}
+
+/* Glow Button */
+.glow-button {
+  box-shadow: 0 0 20px rgba(178, 119, 248, 0.4);
+  transition: all 0.3s ease;
+}
+
+.glow-button:hover {
+  box-shadow: 0 0 30px rgba(178, 119, 248, 0.6), 0 0 40px rgba(121, 233, 242, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Card Glow */
+.card-glow {
+  box-shadow: 0 4px 20px rgba(178, 119, 248, 0.1);
+  transition: all 0.3s ease;
+}
+
+.card-glow:hover {
+  box-shadow: 0 8px 30px rgba(178, 119, 248, 0.2), 0 0 20px rgba(121, 233, 242, 0.1);
+  transform: translateY(-4px);
+}
+
+/* Gradient Border */
+.gradient-border {
+  position: relative;
+  background: #1a1a2e;
+  border-radius: 1rem;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  padding: 2px;
+  background: linear-gradient(90deg, #b277f8, #79e9f2);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* Float Animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Utility Classes */
+.bg-card-dark {
+  background-color: #1a1a2e;
+}
+
+.text-cyan {
+  color: #79e9f2;
+}
+
+.text-purple {
+  color: #b277f8;
+}
+
+.hover-text-cyan:hover,
+.hover\:text-cyan:hover {
+  color: #79e9f2;
+}
+
+.left-half {
+  left: 50%;
+}

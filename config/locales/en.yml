@@ -751,37 +751,46 @@ en:
     # Phase 2
     phase_2:
       icon: "🔥"
-      title: "Phase 2 — Intelligent Creation System Plans"
-      subtitle: "Activate your monthly content engine. Reels, ideas, texts, or AI-created clips, designed to keep your brand alive and growing every week."
+      title: "Intelligent Creation System Plans"
+      subtitle: "This is not a traditional content service. It's an automated visibility system that works for you month after month.\n\n<strong>Month 1:</strong> recording and setup of your AI identity. <strong>Months 2 and 3:</strong> continuous delivery of AI-optimized content. Your brand in constant motion, without friction."
 
       # Plans
       consistency:
         name: "Consistency"
-        pieces: "4 AI content pieces / month"
-        feature_1: "Content grid: 12 ideas"
-        feature_2: "Step-by-step description: ❌"
-        feature_3: "Statistics and results analysis: ❌"
-        description: "Ideal for maintaining constant presence without overload."
+        price: "£259/month"
+        total: "Total: £777 / 3 months"
+        pieces: "12 viral reels / month (AI)"
+        feature_1: "Monthly content strategy: 12 ideas"
+        feature_2: "Post descriptions included"
+        feature_3: "Step-by-step description: ❌"
+        feature_4: "Analytics and statistics: ❌"
+        description: "Keep your brand active without extra effort."
 
       growth:
         name: "Growth"
-        badge: "POPULAR"
-        pieces: "8 AI content pieces / month"
-        feature_1: "Content grid: 16 ideas"
-        feature_2: "Step-by-step description: ✅"
-        feature_3: "Variatio Pack — communication tone variation: ✅"
-        feature_4: "Statistics and results analysis: ✅"
-        description: "Scale visibility with strategic support and creative diversity."
+        badge: "RECOMMENDED"
+        price: "£399/month"
+        total: "Total: £1,197 / 3 months"
+        pieces: "16 viral reels / month (AI)"
+        feature_1: "Monthly content strategy: 16 ideas"
+        feature_2: "Post descriptions included"
+        feature_3: "Step-by-step description: ✅"
+        feature_4: "Variation Pack (tone/style): ✅"
+        feature_5: "Analytics and statistics: ✅"
+        description: "Creative diversity with continuous strategic support."
 
       domination:
         name: "Domination"
-        pieces: "12 AI content pieces / month"
-        feature_1: "Content grid: 20 ideas"
-        feature_2: "Step-by-step description: ✅"
-        feature_3: "Variatio Pack — communication tone variation: ✅"
-        feature_4: "Statistics and results analysis: ✅"
-        feature_5: "📊 Trends mini-guide"
-        description: "Maximum performance with continuous strategy and AI-based optimization."
+        price: "£579/month"
+        total: "Total: £1,737 / 3 months"
+        pieces: "20 viral reels / month (AI)"
+        feature_1: "Monthly content strategy: 20 ideas"
+        feature_2: "Post descriptions included"
+        feature_3: "Step-by-step description: ✅"
+        feature_4: "Variation Pack: ✅"
+        feature_5: "Analytics and statistics: ✅"
+        feature_6: "Trends mini-guide: ✅"
+        description: "High-volume visibility with continuous strategic growth."
 
     # Add-ons
     addons:
@@ -793,16 +802,17 @@ en:
       table_header_price: "Price"
       addon_1_name: "🎯 Additional reel creation"
       addon_1_desc: "Additional content generated with AI according to your current line"
+      addon_1_price: "£48"
       addon_2_name: "✍️ Package of 10 scripts"
       addon_2_desc: "AI-optimized writing for viral ideas and strategic messages"
-      addon_3_name: "⚡ Trending Topic Sprint"
-      addon_3_desc: "5 pieces created in 48h based on current trends"
-      addon_4_name: "🌍 Multi-Platform Boost"
-      addon_4_desc: "Content adaptation for YouTube, Instagram and TikTok"
+      addon_2_price: "£48"
+      addon_3_name: "🧠 Brand Intelligence Kit"
+      addon_3_desc: "1:1 clarity session, value proposition refinement, mini brand kit (palette, logo, typography)"
+      addon_3_price: "£249"
 
     # CTA Final
     cta_final:
-      title: "Activate your intelligent creation system."
+      title: "Start giving your brand momentum"
       button: "Get Started with Gingga"
       disclaimer: "*Prices under beta validation. Limited spots. Monthly cancellation with 15 days notice.*"
 
