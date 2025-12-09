@@ -1,142 +1,197 @@
-- content_for :head do
-  %link{ href: "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap", rel: "stylesheet" }
-  :css
-    .how-it-works-number {
-      z-index: 10;
-      margin-left: -0.75rem;
-    }
+%div.text-white{ style: "background-color: #151528;" }
+  / Navbar
+  %nav.border-b.border-gray-800.sticky.top-0.z-50{ style: "background-color: rgba(21, 21, 40, 0.8); backdrop-filter: blur(12px);" }
+    .max-w-7xl.mx-auto.px-6.py-4.flex.justify-between.items-center
+      .flex.items-center.gap-3
+        .w-10.h-10.rounded-full.gradient-bg.flex.items-center.justify-center.font-bold.text-white
+          G
+        %span.text-2xl.font-bold= t('landing.brand_name')
+      = link_to "https://calendly.com/guzman-vla/30min", class: "gradient-bg text-white px-6 py-2 rounded-full font-semibold glow-button", target: "_blank", rel: "noopener noreferrer" do
+        = t('landing.cta_button')
 
-.font-sans.bg-white.text-black
-  / Sticky CTA for mobile
-  .md:hidden.fixed.bottom-0.inset-x-0.z-40.p-3
-    = link_to new_user_session_path, class: "block text-center bg-black text-white rounded-full py-3 font-semibold shadow-xl border border-black hover:bg-yellow-400 hover:text-black transition" do
-      Launch your content in 10 minutes
+  %section.max-w-6xl.mx-auto.px-6.py-20
+    / HERO
+    .text-center.mb-24.float-animation
+      %h1.text-5xl.md:text-6xl.font-bold.mb-8.leading-tight
+        = t('landing.hero.title')
+        %span.gradient-text= t('landing.hero.title_highlight')
+      %p.text-lg.md:text-xl.text-gray-300.mb-12.max-w-3xl.mx-auto{ style: "line-height: 1.8;" }
+        = t('landing.hero.subtitle')
 
-  / Header
-  %header.sticky.top-0.z-30.bg-white.backdrop-blur.border-b.border-black{ style: "background: rgba(255,255,255,0.8)" }
-    .max-w-6xl.mx-auto.px-4.py-4.flex.items-center.justify-between
-      .font-extrabold.tracking-tight.text-xl GINGGA
-      = link_to new_user_session_path, class: "hidden md:inline-flex bg-black text-white px-5 py-2 rounded-full border border-black hover:bg-yellow-400 hover:text-black transition" do
-        Get Started
+      .text-center.mb-10
+        = link_to "https://calendly.com/guzman-vla/30min", class: "inline-block gradient-bg text-white px-10 py-4 rounded-full font-semibold text-lg glow-button", target: "_blank", rel: "noopener noreferrer" do
+          = t('landing.hero.cta_primary')
 
-  / HERO Section
-  %section.relative.overflow-hidden.text-white{ id: "hero-section", style: "background-color: #2D3142" }
-    .max-w-6xl.mx-auto.px-6.md:px-8.py-20.md:py-32.grid.md:grid-cols-2.gap-10.items-center
-      %div
-        %p.uppercase.tracking-widest.text-xs.mb-3{ style: "color: rgba(255,255,255,0.6)" }
-          AI, Already Done For You
-        %h1.text-4xl.md:text-6xl.font-extrabold.leading-tight
-          One place. All your content. Powered by AI, guided by your voice.
-        %p.mt-6.text-lg.md:text-xl{ style: "color: rgba(255,255,255,0.8)" }
-          Gingga makes it easy for everyday creators to publish high-quality content fast—without being techy.
-        .mt-10.flex.gap-4
-          = link_to new_user_session_path, class: "px-8 py-3 rounded-full font-semibold shadow-xl border transition", style: "background-color: #FFC857; color: black; border-color: #FFC857" do
-            Start Now
-          %a.px-8.py-3.rounded-full.font-semibold.border.transition{ href: "#how", style: "border-color: rgba(255,255,255,0.3); color: white" }
-            How it works
+      %p.text-gray-400.text-base.italic
+        = t('landing.hero.tagline_bottom')
 
-      / Visual  
-      .flex.items-center.justify-center.h-full{ id: "hero-video-container-wrapper" }
-        .relative{ id: "hero-video-container", style: "aspect-ratio: 4/5" }
-          %video#hero-video.rounded-2xl.border.shadow-2xl.w-full.h-full.object-cover{ autoplay: true, muted: true, loop: true, playsinline: true, style: "border-color: rgba(255,255,255,0.1); box-shadow: 0 0 120px -40px #FFC857; margin-top: 6em" }
-            %source{ src: "/videos/hero-video.mp4", type: "video/mp4" }
-            Your browser does not support the video tag.
+    / Fase 2
+    .mb-24#planes
+      .flex.items-center.gap-3.mb-8.justify-center
+        %span.text-4xl= t('landing.phase_2.icon')
+        %h2.text-3xl.md:text-4xl.font-bold.gradient-text
+          = t('landing.phase_2.title')
+      .text-gray-300.mb-12.max-w-4xl.mx-auto.text-center.text-base{ style: "line-height: 1.7;" }
+        = simple_format(t('landing.phase_2.subtitle'), {}, sanitize: false)
 
-  / KPI STRIP
-  %section.bg-white.border-y{ style: "border-color: rgba(0,0,0,0.05)" }
-    .max-w-6xl.mx-auto.px-6.py-10.grid.grid-cols-2.md:grid-cols-4.gap-6.text-center
-      - [{ k: "10x cheaper", l: "Than hiring an agency" }, { k: "24 hours saved/month", l: "Focus on running your business" }, { k: "<1 min setup", l: "Start publishing instantly" }, { k: "100% branded", l: "Content tailored to your voice" }].each do |item|
-        .p-4
-          .text-4xl.font-extrabold.tracking-tight= item[:k]
-          .text-sm.uppercase.tracking-wide{ style: "color: rgba(0,0,0,0.6)" }= item[:l]
+      .grid.md:grid-cols-3.gap-6.max-w-6xl.mx-auto
+        / Consistency
+        .bg-card-dark.rounded-2xl.p-6.card-glow.border.border-gray-800
+          %h3.text-xl.font-bold.mb-2.text-white= t('landing.phase_2.consistency.name')
+          %p.text-gray-400.mb-1.text-base.font-semibold= t('landing.phase_2.consistency.price')
+          %p.text-gray-400.mb-4.text-xs= t('landing.phase_2.consistency.total')
+          %p.text-gray-400.mb-4.text-sm= t('landing.phase_2.consistency.pieces')
+          %ul.text-xs.mb-4.space-y-1.text-gray-300
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
+              %span= t('landing.phase_2.consistency.feature_1')
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
+              %span= t('landing.phase_2.consistency.feature_2')
+            %li.flex.items-center.gap-2
+              %span.text-gray-600 ▸
+              %span.text-gray-500= t('landing.phase_2.consistency.feature_3')
+            %li.flex.items-center.gap-2
+              %span.text-gray-600 ▸
+              %span.text-gray-500= t('landing.phase_2.consistency.feature_4')
+          %p.text-xs.text-gray-400{ style: "line-height: 1.5;" }
+            = t('landing.phase_2.consistency.description')
 
-  / WHAT YOU GET
-  %section.py-20
-    .max-w-6xl.mx-auto.px-6
-      %h2.text-3xl.md:text-4xl.font-bold.mb-8 What You Get
-      .grid.md:grid-cols-2.gap-8
-        - [{ t: "Noctua (The Strategist)", d1: "Brand mapping and content clarity—so every post reflects your voice.", d2: "Transforms your brand's information into a draft content schedule.", img: "noctual-symbol.png", color: "#FFC857" }, { t: "Voxa (The Voice Constructor)", d1: "From raw ideas to practical scripts, complete with images and post descriptions.", d2: "Your content, ready to be created.", img: "voxa-symbol.png", color: "#F26419" }, { t: "Sagui (The Prompt Crafter)", d1: "Smart prompts turned into ready-to-use posts.", d2: "Helps bring your ideas to life.", img: "sagui_symbol_2.png", color: "#00C2FF" }, { t: "Alumo (Your Sales Assistant)", d1: "Replies, captures leads, and books clients automatically.", d2: "Understands your audience deeply.", img: "alumo-symbol.png", color: "#8E7CC3" }].each do |item|
-          .bg-black.text-white.rounded-2xl.p-8.border.border-black.shadow-lg.transition.hover:shadow-2xl{ style: "box-shadow: 0 0 0 2px #{item[:color]}20" }
-            .flex.items-center.gap-3.mb-4
-              = image_tag item[:img], alt: item[:t], class: "w-8 h-8 object-contain"
-              %h3.text-xl.font-bold{ style: "color: #{item[:color]}" }= item[:t]
-            %p.mb-3{ style: "color: rgba(255,255,255,0.9)" }= item[:d1]
-            %p{ style: "color: rgba(255,255,255,0.7)" }= item[:d2]
+        / Growth
+        .bg-card-dark.rounded-2xl.p-6.card-glow.relative{ style: "border: 2px solid; border-image: linear-gradient(90deg, #B277F8, #79E9F2) 1;" }
+          .absolute.-top-3.left-half.gradient-bg.px-3.py-1.rounded-full.text-xs.font-semibold{ style: "transform: translateX(-50%)" }
+            = t('landing.phase_2.growth.badge')
+          %h3.text-xl.font-bold.mb-2.gradient-text= t('landing.phase_2.growth.name')
+          %p.text-gray-400.mb-1.text-base.font-semibold= t('landing.phase_2.growth.price')
+          %p.text-gray-400.mb-4.text-xs= t('landing.phase_2.growth.total')
+          %p.text-gray-400.mb-4.text-sm= t('landing.phase_2.growth.pieces')
+          %ul.text-xs.mb-4.space-y-1.text-gray-300
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
+              %span= t('landing.phase_2.growth.feature_1')
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
+              %span= t('landing.phase_2.growth.feature_2')
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
+              %span= t('landing.phase_2.growth.feature_3')
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
+              %span= t('landing.phase_2.growth.feature_4')
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
+              %span= t('landing.phase_2.growth.feature_5')
+          %p.text-xs.text-gray-400{ style: "line-height: 1.5;" }
+            = t('landing.phase_2.growth.description')
 
-  / WHY
-  %section.py-20{ style: "background-color: #FFC857" }
-    .max-w-6xl.mx-auto.px-6.grid.md:grid-cols-2.gap-10.items-start
-      .space-y-6
-        - ["Show up daily without burnout.", "Keep your voice. Multiply your output.", "Intelligence that learns and compounds every week."].each do |text|
-          %p.text-xl.font-semibold= text
-      .bg-white.rounded-2xl.p-8.border{ style: "border-color: rgba(0,0,0,0.05)" }
-        %h3.text-2xl.font-bold.mb-3 Why small brands choose Gingga
-        %ul.space-y-2.list-disc.pl-5
-          %li Brand-first: clarity → ideas → execution
-          %li No complex tools or constant meetings
-          %li Results that grow with rhythm and consistency
+        / Domination
+        .bg-card-dark.rounded-2xl.p-6.card-glow.border.border-gray-800
+          %h3.text-xl.font-bold.mb-2.text-cyan= t('landing.phase_2.domination.name')
+          %p.text-gray-400.mb-1.text-base.font-semibold= t('landing.phase_2.domination.price')
+          %p.text-gray-400.mb-4.text-xs= t('landing.phase_2.domination.total')
+          %p.text-gray-400.mb-4.text-sm= t('landing.phase_2.domination.pieces')
+          %ul.text-xs.mb-4.space-y-1.text-gray-300
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
+              %span= t('landing.phase_2.domination.feature_1')
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
+              %span= t('landing.phase_2.domination.feature_2')
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
+              %span= t('landing.phase_2.domination.feature_3')
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
+              %span= t('landing.phase_2.domination.feature_4')
+            %li.flex.items-center.gap-2
+              %span.text-cyan ▸
+              %span= t('landing.phase_2.domination.feature_5')
+            %li.flex.items-center.gap-2
+              %span.text-purple ▸
+              %span.text-purple= t('landing.phase_2.domination.feature_6')
+          %p.text-xs.text-gray-400{ style: "line-height: 1.5;" }
+            = t('landing.phase_2.domination.description')
 
+    / Add-ons
+    .mb-20
+      .flex.items-center.gap-3.mb-4.justify-center
+        %span.text-3xl= t('landing.addons.icon')
+        %h2.text-2xl.md:text-3xl.font-bold.gradient-text= t('landing.addons.title')
+      %p.text-gray-300.mb-8.text-center.text-sm
+        = t('landing.addons.subtitle')
 
-  / HOW IT WORKS
-  %section#how.py-24
-    .max-w-5xl.mx-auto.px-6
-      %h2.text-3xl.md:text-4xl.font-bold.mb-12.text-center How it works
-      %ol.relative.border-l.ml-4.space-y-10{ style: "border-color: rgba(0,0,0,0.1)" }
-        - [{ h: "Noctua maps your brand", s: "Voice, values, audience and goals in one simple intake." }, { h: "Sagui spins prompts into ideas", s: "Scripts, hooks and content angles for the month." }, { h: "Voxa crafts visuals", s: "Reels and graphics aligned to your universe." }, { h: "Alumo anchors the rhythm", s: "You approve — we schedule and keep the cadence." }].each_with_index do |step, i|
-          %li.ml-4.relative
-            %span.absolute.w-6.h-6.rounded-full.bg-black.text-white.text-xs.font-bold.flex.items-center.justify-center.how-it-works-number{ style: "top: 0" }= i + 1
-            %h3.text-xl.font-semibold{ style: "margin-left: 1em" }= step[:h]
-            %p{ style: "color: rgba(0,0,0,0.6)" }= step[:s]
+      .gradient-border.p-4.max-w-5xl.mx-auto
+        %table.w-full
+          %thead
+            %tr.border-b.border-gray-700
+              %th.p-3.text-left.text-gray-300.font-semibold.text-sm= t('landing.addons.table_header_service')
+              %th.p-3.text-left.text-gray-300.font-semibold.text-sm= t('landing.addons.table_header_description')
+              %th.p-3.text-left.text-gray-300.font-semibold.text-sm= t('landing.addons.table_header_price')
+          %tbody.text-gray-300
+            %tr.border-b.border-gray-800
+              %td.p-3.text-sm= t('landing.addons.addon_1_name')
+              %td.p-3.text-xs= t('landing.addons.addon_1_desc')
+              %td.p-3.text-cyan.font-semibold.text-sm= t('landing.addons.addon_1_price')
+            %tr.border-b.border-gray-800
+              %td.p-3.text-sm= t('landing.addons.addon_2_name')
+              %td.p-3.text-xs= t('landing.addons.addon_2_desc')
+              %td.p-3.text-cyan.font-semibold.text-sm= t('landing.addons.addon_2_price')
+            %tr.border-b.border-gray-800
+              %td.p-3.text-sm= t('landing.addons.addon_3_name')
+              %td.p-3.text-xs= t('landing.addons.addon_3_desc')
+              %td.p-3.text-cyan.font-semibold.text-sm= t('landing.addons.addon_3_price')
+            %tr
+              %td.p-3.text-sm= t('landing.addons.addon_4_name')
+              %td.p-3.text-xs= t('landing.addons.addon_4_desc')
+              %td.p-3.text-cyan.font-semibold.text-sm= t('landing.addons.addon_4_price')
 
-  / TESTIMONIALS
-  %section.py-24.bg-black.text-white
-    .max-w-6xl.mx-auto.px-6.text-center
-      %h2.text-3xl.md:text-4xl.font-bold.mb-12 What people are saying
-      .grid.md:grid-cols-2.gap-8
-        - [{ q: "I used to dread content days. Now it flows.", a: "Camila — Wellness Coach" }, { q: "Feels like magic. Clients think I hired a team.", a: "Luis — Barbershop Owner" }].each do |testimonial|
-          .bg-white.text-black.rounded-2xl.p-10.shadow-lg
-            %p.text-2xl.mb-4{ style: "color: #FFC857" } ★★★★★
-            %p.italic.mb-4= "\"#{testimonial[:q]}\""
-            %p.font-semibold= testimonial[:a]
+    / CTA Final
+    .text-center.mt-12.mb-16
+      .rounded-3xl.p-8.border.border-gray-800.max-w-4xl.mx-auto{ style: "background: linear-gradient(to right, rgba(178, 119, 248, 0.1), rgba(121, 233, 242, 0.1))" }
+        %p.text-2xl.font-bold.mb-6.gradient-text
+          = t('landing.cta_final.title')
+        = link_to "https://calendly.com/guzman-vla/30min", class: "inline-block gradient-bg text-white px-10 py-3 rounded-full font-semibold text-base glow-button", target: "_blank", rel: "noopener noreferrer" do
+          = t('landing.cta_final.button')
+        %p.text-gray-400.text-xs.mt-6
+          = t('landing.cta_final.disclaimer')
 
-  / PRICING / CTA
-  %section#cta.relative.py-28.bg-white
-    .absolute.inset-0.-z-10{ style: "background: radial-gradient(ellipse at center, rgba(255,200,87,0.20), transparent 60%)" }
-    .max-w-6xl.mx-auto.px-6
-      .text-center.mb-12
-        %h2.text-4xl.font-extrabold.mb-3 Choose your rhythm
-        %p.text-lg
-          Start with a free discovery call. ProSumer pricing available if you run Gingga for yourself.
+  / Footer
+  %footer.border-t.border-gray-800.mt-12{ style: "background-color: #0d0d1a" }
+    .max-w-6xl.mx-auto.px-6.py-8
+      .grid.md:grid-cols-3.gap-6.mb-6
+        %div
+          .flex.items-center.gap-2.mb-3
+            .w-8.h-8.rounded-full.gradient-bg.flex.items-center.justify-center.font-bold.text-white.text-sm
+              G
+            %span.text-xl.font-bold= t('landing.brand_name')
+          %p.text-gray-400.text-xs{ style: "line-height: 1.5;" }
+            = t('landing.footer.tagline')
 
-      .grid.md:grid-cols-4.gap-6
-        - [{ name: "Rhythm", price: "£248/mo", badge: "Starter", perks: ["Monthly calendar", "3 reels + 2 carousels", "Basic scheduling"] }, { name: "Frequency", price: "£585/mo", badge: "Growth", perks: ["8–12 posts/month", "Concepts + scripts", "Automated approvals"] }, { name: "Resonance", price: "£748/mo", badge: "Pro", perks: ["12–16 posts/month", "DM replies (light)", "Reporting & insights"] }, { name: "Orbit", price: "£1,498/mo", badge: "Scale", perks: ["Full content ops", "Lead capture flows", "Priority support"] }].each do |plan|
-          .rounded-3xl.p-6.border.bg-white{ style: "border-color: rgba(0,0,0,0.1)" }
-            .flex.items-center.justify-between
-              %h3.text-xl.font-bold= plan[:name]
-              %span.text-xs.px-2.py-1.rounded-full{ style: "background: rgba(0,0,0,0.05)" }= plan[:badge]
-            .text-3xl.font-extrabold.mt-4= plan[:price]
-            %ul.mt-6.space-y-2.text-sm{ style: "color: rgba(0,0,0,0.8)" }
-              - plan[:perks].each do |perk|
-                %li= "• #{perk}"
-            = link_to new_user_session_path, class: "w-full mt-6 px-4 py-2 rounded-full bg-black text-white hover:bg-yellow-400 hover:text-black transition inline-block text-center" do
-              Book a free discovery call
+        %div
+          %h4.font-semibold.mb-3.text-gray-300.text-sm= t('landing.footer.services')
+          %ul.space-y-1.text-xs.text-gray-400
+            %li
+              = link_to "https://calendly.com/guzman-vla/30min", class: "hover:text-cyan transition", target: "_blank", rel: "noopener noreferrer" do
+                = t('landing.footer.setup_initial')
+            %li
+              = link_to "#planes", class: "hover:text-cyan transition" do
+                = t('landing.footer.monthly_plans')
+            %li
+              = link_to "https://calendly.com/guzman-vla/30min", class: "hover:text-cyan transition", target: "_blank", rel: "noopener noreferrer" do
+                = t('landing.footer.addons')
 
-  / FAQ
-  %section.py-20.border-t{ style: "border-color: rgba(0,0,0,0.05)" }
-    .max-w-4xl.mx-auto.px-6
-      %h3.text-2xl.font-bold.mb-6 FAQ
-      .divide-y{ style: "border-color: rgba(0,0,0,0.1)" }
-        - [{ q: "Do you replace a marketing team?", a: "No. Gingga amplifies you. We keep your voice and scale output so you can focus on the business." }, { q: "How fast can we start?", a: "Within 24 hours after you complete the onboarding form." }, { q: "Which platforms do you support?", a: "Instagram and TikTok to start. Others on request." }].each do |faq|
-          %details.py-4
-            %summary.cursor-pointer.font-semibold= faq[:q]
-            %p.mt-2{ style: "color: rgba(0,0,0,0.7)" }= faq[:a]
+        %div
+          %h4.font-semibold.mb-3.text-gray-300.text-sm= t('landing.footer.contact')
+          %ul.space-y-1.text-xs.text-gray-400
+            %li
+              = link_to "mailto:#{t('landing.footer.email')}", class: "hover:text-cyan transition" do
+                = t('landing.footer.email')
+            %li
+              = link_to "https://instagram.com/gingga.ai", class: "hover:text-cyan transition", target: "_blank", rel: "noopener noreferrer" do
+                = t('landing.footer.instagram')
+            %li
+              = link_to "https://linkedin.com/company/gingga", class: "hover:text-cyan transition", target: "_blank", rel: "noopener noreferrer" do
+                = t('landing.footer.linkedin')
 
-  / FOOTER
-  %footer.bg-black.text-white.py-12.text-center
-    %p.mb-2.font-bold.text-xl GINGGA
-    %p.text-sm.mb-4 Intelligence in Motion
-    %hr.my-4{ style: "background-color: rgba(255,255,255,0.2); border: none; height: 1px" }
-    .flex.justify-center.gap-6.text-sm
-      %a.hover:text-yellow-400{ href: "#" } Privacy Policy
-      %a.hover:text-yellow-400{ href: "#" } Terms of Service
-      %a.hover:text-yellow-400{ href: "#" } Contact
+      .border-t.border-gray-800.pt-4.text-center.text-xs.text-gray-500
+        %p= "© 2025 #{t('landing.brand_name')}. #{t('landing.footer.copyright')}"
