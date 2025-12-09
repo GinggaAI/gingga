@@ -136,10 +136,14 @@
               %td.p-3.text-sm= t('landing.addons.addon_2_name')
               %td.p-3.text-xs= t('landing.addons.addon_2_desc')
               %td.p-3.text-cyan.font-semibold.text-sm= t('landing.addons.addon_2_price')
-            %tr
+            %tr.border-b.border-gray-800
               %td.p-3.text-sm= t('landing.addons.addon_3_name')
               %td.p-3.text-xs= t('landing.addons.addon_3_desc')
               %td.p-3.text-cyan.font-semibold.text-sm= t('landing.addons.addon_3_price')
+            %tr
+              %td.p-3.text-sm= t('landing.addons.addon_4_name')
+              %td.p-3.text-xs= t('landing.addons.addon_4_desc')
+              %td.p-3.text-cyan.font-semibold.text-sm= t('landing.addons.addon_4_price')
 
     / CTA Final
     .text-center.mt-12.mb-16
@@ -183,7 +187,7 @@
               = link_to "mailto:#{t('landing.footer.email')}", class: "hover:text-cyan transition" do
                 = t('landing.footer.email')
             %li
-              = link_to "https://instagram.com/gingga", class: "hover:text-cyan transition", target: "_blank", rel: "noopener noreferrer" do
+              = link_to "https://instagram.com/gingga.ai", class: "hover:text-cyan transition", target: "_blank", rel: "noopener noreferrer" do
                 = t('landing.footer.instagram')
             %li
               = link_to "https://linkedin.com/company/gingga", class: "hover:text-cyan transition", target: "_blank", rel: "noopener noreferrer" do

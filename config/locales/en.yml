@@ -752,7 +752,7 @@ en:
     phase_2:
       icon: "🔥"
       title: "Intelligent Creation System Plans"
-      subtitle: "This is not a traditional content service. It's an automated visibility system that works for you month after month.\n\n<strong>Month 1:</strong> recording and setup of your AI identity. <strong>Months 2 and 3:</strong> continuous delivery of AI-optimized content. Your brand in constant motion, without friction."
+      subtitle: "This is not a traditional content service. It's an automated visibility system that works for you month after month."
 
       # Plans
       consistency:
@@ -809,6 +809,9 @@ en:
       addon_3_name: "🧠 Brand Intelligence Kit"
       addon_3_desc: "1:1 clarity session, value proposition refinement, mini brand kit (palette, logo, typography)"
       addon_3_price: "£249"
+      addon_4_name: "🎬 AI avatar recording session"
+      addon_4_desc: "Recording and setup of your AI identity"
+      addon_4_price: "£299"
 
     # CTA Final
     cta_final:
