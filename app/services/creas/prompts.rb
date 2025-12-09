@@ -239,6 +239,7 @@ module Creas
         "dubbing": { "enabled": false, "languages": [] },
         "pilar": "C | R | E | A | S",
         "template": "#{templates_list}",
+        "content_structure": "#{ContentStructures::Registry.to_list}",  // Narrative structure
         "video_source": "none | external | kling",
         "post_description": "...",       // what viewer sees + structure
         "text_base": "...",              // final caption/copy
@@ -276,6 +277,22 @@ module Creas
       CRITICAL TEMPLATE RULES (apply strictly - failure to follow = invalid output)
       #{build_template_rules(selected_templates)}
 
+      CONTENT STRUCTURE TEMPLATES (Choose ONE narrative structure per item)
+      Select the content structure that best matches the idea's intent, pillar, and content type.
+      Each structure provides a proven narrative framework optimized for engagement.
+
+      #{ContentStructures::Registry.to_prompt}
+
+      IMPORTANT: Match content_structure to the content strategy:
+        • For rankings/lists → voxa_radiant_rankings, impact_triad
+        • For warnings/mistakes → noctua_red_alerts, movement_blockers, shadows_triad
+        • For insights/secrets → secrets_from_living_book, noctua_hidden_truths
+        • For validation/signs → alumo_alignment_signals
+        • For education → things_you_didnt_know, awakening_data
+        • For storytelling → chronicles_in_motion, hero_inner_forge
+        • For debate/controversy → friction_echoes
+        • For persuasion → sagui_rationale, sagui_infinite_loop
+
       CONTENT QUALITY REQUIREMENTS
         Hook (0–3s): Strong POV/question/promise/stat that stops scrolling
         Development: Tangible value (framework/example/proof/checklist) - be SPECIFIC
@@ -305,7 +322,8 @@ module Creas
 
       MANDATORY VALIDATION (verify before responding)
         ✅ Root keys present; else ask.
-        ✅ Each item has all required fields: id, origin_id, week, content_name, status, dates, platform, aspect_ratio, language, pilar, template, video_source, post_description, text_base, hashtags.
+        ✅ Each item has all required fields: id, origin_id, week, content_name, status, dates, platform, aspect_ratio, language, pilar, template, content_structure, video_source, post_description, text_base, hashtags.
+        ✅ content_structure must be one of the 15 available structures
         ✅ TEMPLATE-SPECIFIC VALIDATION:
 #{build_template_validations(selected_templates)}
         ✅ hashtags = 3–5 items, space-separated, no # duplicates
