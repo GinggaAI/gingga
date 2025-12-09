@@ -36,6 +36,14 @@ class CreasContentItem < ApplicationRecord
     message: "%{value} is not a valid day of the week"
   }, allow_blank: true
 
+  validates :content_structure,
+    inclusion: {
+      in: -> (_record) { Creas::ContentStructures::Registry.keys },
+      message: "must be a valid content structure key"
+    },
+    allow_nil: true,
+    if: :content_structure_present?
+
   validates :hashtags, format: {
     with: /\A(?:#\w+(?:\s+#\w+)*|\s*)\z/m,
     message: "must be space-separated hashtags like '#tag1 #tag2 #tag3'"
@@ -89,6 +97,10 @@ class CreasContentItem < ApplicationRecord
   end
 
   private
+
+  def content_structure_present?
+    self[:content_structure].present?
+  end
 
   def no_newlines_in_hashtags
     return if hashtags.blank?

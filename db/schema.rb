@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_29_165253) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_09_102526) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -172,8 +172,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_29_165253) do
     t.string "day_of_the_week", comment: "Suggested day of the week for publishing (Monday, Tuesday, etc.)"
     t.integer "batch_number"
     t.integer "batch_total"
+    t.string "content_structure", comment: "Narrative structure from Content Structures registry (e.g., 'voxa_radiant_rankings')"
     t.index ["brand_id"], name: "index_creas_content_items_on_brand_id"
     t.index ["content_id"], name: "index_creas_content_items_on_content_id", unique: true
+    t.index ["content_structure"], name: "index_creas_content_items_on_content_structure"
     t.index ["creas_strategy_plan_id", "origin_id"], name: "index_creas_content_items_on_strategy_plan_and_origin_id"
     t.index ["creas_strategy_plan_id"], name: "index_creas_content_items_on_creas_strategy_plan_id"
     t.index ["day_of_the_week"], name: "index_creas_content_items_on_day_of_the_week"
@@ -295,6 +297,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_29_165253) do
     t.text "additional_instructions"
     t.integer "reel_scenes_count", default: 0, null: false
     t.uuid "brand_id", null: false
+    t.uuid "audience_id"
+    t.index ["audience_id"], name: "index_reels_on_audience_id"
     t.index ["brand_id"], name: "index_reels_on_brand_id"
     t.index ["user_id"], name: "index_reels_on_user_id"
   end
@@ -470,6 +474,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_29_165253) do
   add_foreign_key "creas_strategy_plans", "users"
   add_foreign_key "products", "brands"
   add_foreign_key "reel_scenes", "reels"
+  add_foreign_key "reels", "audiences"
   add_foreign_key "reels", "brands"
   add_foreign_key "reels", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

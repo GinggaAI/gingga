@@ -601,6 +601,7 @@ EXISTING CONTENT FROM PREVIOUS BATCHES (avoid duplication):
       language: item["language"],
       pilar: item.fetch("pilar"),
       template: normalize_template(item.fetch("template")),
+      content_structure: item["content_structure"],
       video_source: item.fetch("video_source"),
       post_description: item.fetch("post_description"),
       text_base: item.fetch("text_base"),

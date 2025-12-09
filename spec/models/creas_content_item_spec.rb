@@ -137,6 +137,38 @@ RSpec.describe CreasContentItem, type: :model do
         end
       end
     end
+
+    describe "content_structure validation" do
+      it "accepts valid content structure keys" do
+        valid_structures = [
+          'voxa_radiant_rankings',
+          'noctua_red_alerts',
+          'movement_blockers',
+          'impact_triad'
+        ]
+
+        valid_structures.each do |structure|
+          content_item = build(:creas_content_item, content_structure: structure)
+          expect(content_item).to be_valid, "Expected '#{structure}' to be valid"
+        end
+      end
+
+      it "rejects invalid content structure keys" do
+        content_item = build(:creas_content_item, content_structure: 'invalid_structure')
+        expect(content_item).not_to be_valid
+        expect(content_item.errors[:content_structure]).to include('must be a valid content structure key')
+      end
+
+      it "accepts nil as valid" do
+        content_item = build(:creas_content_item, content_structure: nil)
+        expect(content_item).to be_valid
+      end
+
+      it "accepts blank as valid" do
+        content_item = build(:creas_content_item, content_structure: "")
+        expect(content_item).to be_valid
+      end
+    end
   end
 
   describe "scopes" do

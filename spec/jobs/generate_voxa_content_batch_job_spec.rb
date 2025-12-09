@@ -1250,4 +1250,147 @@ RSpec.describe GenerateVoxaContentBatchJob do
       end
     end
   end
+
+  describe 'content_structure mapping' do
+    let(:mock_response_with_content_structure) do
+      {
+        "items" => [
+          {
+            "id" => "voxa-refined-1",
+            "origin_id" => "202508-test-w1-i1-C",
+            "week" => 1,
+            "content_name" => "Test Content with Structure",
+            "status" => "in_production",
+            "creation_date" => "2025-08-29",
+            "content_type" => "reel",
+            "platform" => "Instagram",
+            "pilar" => "C",
+            "template" => "only_avatars",
+            "content_structure" => "voxa_radiant_rankings",
+            "video_source" => "kling",
+            "post_description" => "Test description",
+            "text_base" => "Test text",
+            "hashtags" => "#test",
+            "publish_date" => "2025-08-29",
+            "day_of_the_week" => "Monday"
+          }
+        ]
+      }.to_json
+    end
+
+    before do
+      allow(mock_chat_client).to receive(:chat!).and_return(mock_response_with_content_structure)
+    end
+
+    context 'when Voxa provides content_structure' do
+      let!(:content_items) do
+        Creas::ContentItemInitializerService.new(strategy_plan: strategy_plan).call
+      end
+
+      it 'saves content_structure to database' do
+        described_class.perform_now(strategy_plan.id, batch_number, total_batches, batch_id)
+
+        updated_item = strategy_plan.creas_content_items.find_by(content_id: "202508-test-w1-i1-C")
+        expect(updated_item.content_structure).to eq("voxa_radiant_rankings")
+      end
+
+      it 'allows querying by content_structure' do
+        described_class.perform_now(strategy_plan.id, batch_number, total_batches, batch_id)
+
+        items = CreasContentItem.where(content_structure: "voxa_radiant_rankings")
+        expect(items.count).to eq(1)
+        expect(items.first.content_name).to eq("Test Content with Structure")
+      end
+    end
+
+    context 'when Voxa does not provide content_structure' do
+      let(:mock_response_without_structure) do
+        {
+          "items" => [
+            {
+              "id" => "voxa-refined-2",
+              "origin_id" => "202508-test-w1-i2-E",
+              "week" => 1,
+              "content_name" => "Test Content without Structure",
+              "status" => "in_production",
+              "creation_date" => "2025-08-29",
+              "content_type" => "reel",
+              "platform" => "Instagram",
+              "pilar" => "E",
+              "template" => "only_avatars",
+              "video_source" => "kling",
+              "post_description" => "Test description",
+              "text_base" => "Test text",
+              "hashtags" => "#test",
+              "publish_date" => "2025-08-29"
+            }
+          ]
+        }.to_json
+      end
+
+      before do
+        allow(mock_chat_client).to receive(:chat!).and_return(mock_response_without_structure)
+      end
+
+      it 'saves content_item with nil content_structure' do
+        content_items = Creas::ContentItemInitializerService.new(strategy_plan: strategy_plan).call
+
+        described_class.perform_now(strategy_plan.id, batch_number, total_batches, batch_id)
+
+        updated_item = strategy_plan.creas_content_items.find_by(content_id: "202508-test-w1-i2-E")
+        expect(updated_item.content_structure).to be_nil
+        expect(updated_item.persisted?).to be true
+      end
+    end
+  end
+
+  describe 'map_voxa_item_to_attrs with content_structure' do
+    let(:job) { described_class.new }
+
+    it 'includes content_structure in mapped attributes' do
+      voxa_item = {
+        "id" => "voxa-123",
+        "origin_id" => "origin-123",
+        "week" => 1,
+        "content_name" => "Test",
+        "status" => "in_production",
+        "creation_date" => "2025-08-29",
+        "content_type" => "reel",
+        "platform" => "Instagram",
+        "pilar" => "C",
+        "template" => "only_avatars",
+        "content_structure" => "noctua_red_alerts",
+        "video_source" => "kling",
+        "post_description" => "Test",
+        "text_base" => "Test",
+        "hashtags" => "#test"
+      }
+
+      attrs = job.send(:map_voxa_item_to_attrs, voxa_item)
+
+      expect(attrs[:content_structure]).to eq("noctua_red_alerts")
+    end
+
+    it 'handles missing content_structure gracefully' do
+      voxa_item = {
+        "id" => "voxa-456",
+        "week" => 1,
+        "content_name" => "Test",
+        "status" => "draft",
+        "creation_date" => "2025-08-29",
+        "content_type" => "reel",
+        "platform" => "Instagram",
+        "pilar" => "E",
+        "template" => "only_avatars",
+        "video_source" => "kling",
+        "post_description" => "Test",
+        "text_base" => "Test",
+        "hashtags" => "#test"
+      }
+
+      attrs = job.send(:map_voxa_item_to_attrs, voxa_item)
+
+      expect(attrs[:content_structure]).to be_nil
+    end
+  end
 end
