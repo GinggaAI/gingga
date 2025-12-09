@@ -394,13 +394,17 @@ RSpec.describe Creas::Prompts do
 
   describe '.build_template_rules' do
     context 'with single template' do
-      it 'returns rules for only_avatars' do
+      it 'returns rules for only_avatars with 6-7 scenes for HeyGen' do
         selected_templates = [ 'only_avatars' ]
         result = described_class.build_template_rules(selected_templates)
 
         expect(result).to include('only_avatars')
         expect(result).to include('video_source": "none"')
-        expect(result).to include('EXACTLY 3 scenes')
+        expect(result).to include('MINIMUM 6 scenes')
+        expect(result).to include('MAXIMUM 7 scenes')
+        expect(result).to include('3-5 seconds')
+        expect(result).to include('HeyGen')
+        expect(result).not_to include('EXACTLY 3 scenes')
         expect(result).not_to include('avatar_and_video')
         expect(result).not_to include('remix')
       end
@@ -483,6 +487,55 @@ RSpec.describe Creas::Prompts do
         expect(result).to include('avatar_and_video')
         expect(result).to include('remix')
       end
+    end
+  end
+
+  describe '.build_template_validations' do
+    context 'with only_avatars template' do
+      it 'validates 6-7 scenes instead of 3' do
+        selected_templates = [ 'only_avatars' ]
+        result = described_class.build_template_validations(selected_templates)
+
+        expect(result).to include('only_avatars')
+        expect(result).to include('6 OR 7 items')
+        expect(result).not_to include('3 items')
+      end
+    end
+
+    context 'with multiple templates' do
+      it 'includes validations for all selected templates' do
+        selected_templates = [ 'only_avatars', 'narration_over_7_images', 'remix' ]
+        result = described_class.build_template_validations(selected_templates)
+
+        expect(result).to include('only_avatars')
+        expect(result).to include('narration_over_7_images')
+        expect(result).to include('EXACTLY 7 beats')
+        expect(result).to include('remix')
+      end
+    end
+  end
+
+  describe 'HeyGen optimization' do
+    it 'includes HeyGen-specific timing guidance in only_avatars template' do
+      selected_templates = [ 'only_avatars' ]
+      result = described_class.build_template_rules(selected_templates)
+
+      expect(result).to include('3-5 seconds')
+      expect(result).to include('HeyGen')
+      expect(result).to include('~15-25 words per scene')
+    end
+
+    it 'defines 7-scene narrative structure for only_avatars' do
+      selected_templates = [ 'only_avatars' ]
+      result = described_class.build_template_rules(selected_templates)
+
+      # Validate the 7-scene structure
+      expect(result).to include('Hook')
+      expect(result).to include('Problem')
+      expect(result).to include('Context')
+      expect(result).to include('Solution')
+      expect(result).to include('Proof')
+      expect(result).to include('CTA')
     end
   end
 end

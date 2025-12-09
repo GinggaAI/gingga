@@ -368,14 +368,14 @@ EXISTING CONTENT FROM PREVIOUS BATCHES (avoid duplication):
         end
       }
     else
-      # Default for only_avatars, avatar_and_video, etc.
+      # Default for only_avatars - 7 scenes optimized for HeyGen (3-5s per clip)
       {
         "scenes" => [
           {
             "id" => 1,
             "role" => "Hook",
             "type" => "avatar",
-            "visual" => "Opening scene",
+            "visual" => "Attention-grabbing opener",
             "on_screen_text" => item["hook"] || "Hook text",
             "voiceover" => item["hook"] || "Hook voiceover",
             "avatar_id" => "default_avatar",
@@ -383,17 +383,57 @@ EXISTING CONTENT FROM PREVIOUS BATCHES (avoid duplication):
           },
           {
             "id" => 2,
-            "role" => "Development",
+            "role" => "Problem",
             "type" => "avatar",
-            "visual" => "Main content",
-            "on_screen_text" => item["description"] || "Main content",
-            "voiceover" => item["description"] || "Main content voiceover",
+            "visual" => "Problem setup",
+            "on_screen_text" => "The challenge...",
+            "voiceover" => "Introduce the pain point or challenge",
             "avatar_id" => "default_avatar",
             "voice_id" => "default_voice"
           },
           {
             "id" => 3,
-            "role" => "Close",
+            "role" => "Context",
+            "type" => "avatar",
+            "visual" => "Why this matters",
+            "on_screen_text" => item["description"] || "Context",
+            "voiceover" => item["description"] || "Why this matters now",
+            "avatar_id" => "default_avatar",
+            "voice_id" => "default_voice"
+          },
+          {
+            "id" => 4,
+            "role" => "Solution_1",
+            "type" => "avatar",
+            "visual" => "First solution",
+            "on_screen_text" => "Solution part 1",
+            "voiceover" => "First key point or tip",
+            "avatar_id" => "default_avatar",
+            "voice_id" => "default_voice"
+          },
+          {
+            "id" => 5,
+            "role" => "Solution_2",
+            "type" => "avatar",
+            "visual" => "Second solution",
+            "on_screen_text" => "Solution part 2",
+            "voiceover" => "Second key point or tip",
+            "avatar_id" => "default_avatar",
+            "voice_id" => "default_voice"
+          },
+          {
+            "id" => 6,
+            "role" => "Proof",
+            "type" => "avatar",
+            "visual" => "Evidence or example",
+            "on_screen_text" => "Results...",
+            "voiceover" => "Quick evidence, example, or result",
+            "avatar_id" => "default_avatar",
+            "voice_id" => "default_voice"
+          },
+          {
+            "id" => 7,
+            "role" => "CTA",
             "type" => "avatar",
             "visual" => "Call to action",
             "on_screen_text" => "CTA: Engage with this content!",

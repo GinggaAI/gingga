@@ -458,14 +458,32 @@ RSpec.describe GenerateVoxaContentBatchJob do
         expect(result["scenes"][0]["text"]).to eq("Existing scene")
       end
 
-      it 'generates default shotplan when neither is available' do
+      it 'generates default shotplan with 6-7 scenes for only_avatars (HeyGen optimized)' do
         voxa_item = { "hook" => "Test hook", "template" => "only_avatars" }
         existing_record.shotplan = nil
 
         result = job.send(:ensure_shot_plan, voxa_item, existing_record)
         expect(result["scenes"]).to be_present
+
+        # Should have 6-7 scenes for HeyGen optimization
+        scenes_count = result["scenes"].length
+        expect(scenes_count).to be >= 6
+        expect(scenes_count).to be <= 7
+
+        # First scene should have the hook
         expect(result["scenes"][0]["voiceover"]).to eq("Test hook")
-        expect(result["beats"]).to eq([])  # beats should be empty for only_avatars template
+        expect(result["scenes"][0]["role"]).to eq("Hook")
+
+        # Validate scene structure
+        result["scenes"].each_with_index do |scene, index|
+          expect(scene).to have_key("id")
+          expect(scene).to have_key("role")
+          expect(scene).to have_key("type")
+          expect(scene["type"]).to eq("avatar")
+        end
+
+        # beats should be empty for only_avatars template
+        expect(result["beats"]).to eq([])
       end
 
       it 'generates correct default shotplan for narration_over_7_images template' do

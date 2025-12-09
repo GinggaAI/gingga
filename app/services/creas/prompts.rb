@@ -333,11 +333,22 @@ module Creas
     def build_template_rules(selected_templates)
       template_rules = {
         "only_avatars" => <<~RULES,
-          only_avatars
+          only_avatars (Optimized for HeyGen - Short Clips)
             • "video_source": "none"
-            • shotplan.scenes: EXACTLY 3 scenes, all type:"avatar"#{' '}
+            • shotplan.scenes: MINIMUM 6 scenes, MAXIMUM 7 scenes, all type:"avatar"
+            • Each scene duration: 3-5 seconds (for dynamic HeyGen clips)
+            • Scene structure suggestion:
+              1. Hook (3-4s): Attention-grabbing question/statement
+              2. Problem Setup (3-4s): Introduce the pain point
+              3. Context (4-5s): Why this matters now
+              4. Solution Part 1 (4-5s): First key point/tip
+              5. Solution Part 2 (4-5s): Second key point/tip
+              6. Proof/Example (3-4s): Quick evidence or result
+              7. CTA (3-4s): Clear call to action
             • Each scene MUST have: avatar_id, voice_id, voiceover
+            • voiceover length: ~15-25 words per scene (fits 3-5s timing)
             • shotplan.beats: empty array []
+            • Total reel duration: ~25-30 seconds
         RULES
 
         "avatar_and_video" => <<~RULES,
@@ -391,7 +402,7 @@ module Creas
 
     def build_template_validations(selected_templates)
       validation_rules = {
-        "only_avatars" => "          • only_avatars → shotplan.scenes = 3 items, shotplan.beats = []",
+        "only_avatars" => "          • only_avatars → shotplan.scenes MUST have 6 OR 7 items, shotplan.beats = []",
         "avatar_and_video" => "          • avatar_and_video → shotplan.scenes = 3 items, shotplan.beats = []",
         "narration_over_7_images" => "          • narration_over_7_images → shotplan.scenes = [], shotplan.beats = 7 items",
         "remix" => "          • remix → has video_url",
