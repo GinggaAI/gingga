@@ -1024,4 +1024,230 @@ RSpec.describe GenerateVoxaContentBatchJob do
       end
     end
   end
+
+  describe 'ensure_draft_content_exists' do
+    let(:job) { described_class.new }
+
+    context 'when content items already exist' do
+      it 'does not create new items' do
+        # Create items first
+        Creas::ContentItemInitializerService.new(strategy_plan: strategy_plan).call
+        initial_count = strategy_plan.creas_content_items.count
+        expect(initial_count).to be > 0
+
+        # Call ensure_draft_content_exists
+        job.send(:ensure_draft_content_exists, strategy_plan)
+
+        # Should not create new items
+        expect(strategy_plan.creas_content_items.count).to eq(initial_count)
+      end
+    end
+  end
+
+  describe 'extract_day_of_week edge cases' do
+    let(:job) { described_class.new }
+
+    context 'with invalid publish_date' do
+      it 'falls back to pilar-based assignment when date parsing fails' do
+        item_with_invalid_date = { "publish_date" => "not-a-valid-date", "pilar" => "A" }
+
+        result = job.send(:extract_day_of_week, item_with_invalid_date)
+
+        expect(%w[Monday Tuesday Wednesday Thursday Friday Saturday Sunday]).to include(result)
+        expect(%w[Monday Tuesday Wednesday]).to include(result) # A pilar specific days
+      end
+    end
+
+    context 'with S pilar' do
+      it 'assigns strategic day for S pilar' do
+        item_s = { "pilar" => "S" }
+        result = job.send(:extract_day_of_week, item_s)
+
+        expect(%w[Tuesday Wednesday Thursday]).to include(result)
+      end
+    end
+
+    context 'with unknown pilar' do
+      it 'assigns random day for unknown pilar' do
+        item_unknown = { "pilar" => "X" }
+        result = job.send(:extract_day_of_week, item_unknown)
+
+        expect(%w[Monday Tuesday Wednesday Thursday Friday Saturday Sunday]).to include(result)
+      end
+    end
+  end
+
+  describe 'shotplan handling with beats' do
+    let(:job) { described_class.new }
+    let(:existing_record) { build(:creas_content_item) }
+
+    context 'when Voxa provides shotplan with beats only (no scenes)' do
+      it 'accepts shotplan with beats and no scenes' do
+        voxa_item = {
+          "shotplan" => {
+            "scenes" => [],
+            "beats" => [ { "idx" => 1, "image_prompt" => "Image 1" } ]
+          }
+        }
+
+        result = job.send(:ensure_shot_plan, voxa_item, existing_record)
+
+        expect(result["beats"]).to be_present
+        expect(result["beats"][0]["idx"]).to eq(1)
+      end
+    end
+
+    context 'when Voxa provides both scenes and beats' do
+      it 'accepts shotplan with both scenes and beats' do
+        voxa_item = {
+          "shotplan" => {
+            "scenes" => [ { "id" => 1, "text" => "Scene 1" } ],
+            "beats" => [ { "idx" => 1, "image_prompt" => "Image 1" } ]
+          }
+        }
+
+        result = job.send(:ensure_shot_plan, voxa_item, existing_record)
+
+        expect(result["scenes"]).to be_present
+        expect(result["beats"]).to be_present
+      end
+    end
+  end
+
+  describe 'default shotplan scene coverage' do
+    let(:job) { described_class.new }
+
+    it 'generates all 7 scene roles for only_avatars template' do
+      voxa_item = {
+        "template" => "only_avatars",
+        "hook" => "Test hook",
+        "description" => "Test description"
+      }
+
+      result = job.send(:generate_default_shotplan, voxa_item)
+
+      expect(result["scenes"].length).to eq(7)
+
+      roles = result["scenes"].map { |s| s["role"] }
+      expect(roles).to eq(["Hook", "Problem", "Context", "Solution_1", "Solution_2", "Proof", "CTA"])
+
+      # Verify each scene has required fields
+      result["scenes"].each do |scene|
+        expect(scene).to have_key("id")
+        expect(scene).to have_key("role")
+        expect(scene).to have_key("type")
+        expect(scene).to have_key("visual")
+        expect(scene).to have_key("on_screen_text")
+        expect(scene).to have_key("voiceover")
+        expect(scene).to have_key("avatar_id")
+        expect(scene).to have_key("voice_id")
+      end
+    end
+  end
+
+  describe 'create_new_batch_item error handling' do
+    let(:job) { described_class.new }
+
+    context 'when save fails with non-uniqueness error' do
+      it 'returns nil and continues processing' do
+        attrs = {
+          content_id: "test-123",
+          week: 1,
+          content_name: "Test Content",
+          status: "draft",
+          content_type: "reel",
+          platform: "instagram",
+          pilar: "C",
+          template: "only_avatars",
+          video_source: "kling",
+          post_description: "Test",
+          text_base: "Test",
+          hashtags: "#test"
+        }
+
+        # Mock a validation error that's not about content_name uniqueness
+        allow_any_instance_of(CreasContentItem).to receive(:save!).and_wrap_original do |method, *args|
+          record = method.receiver
+          error = ActiveRecord::RecordInvalid.new(record)
+          allow(record.errors).to receive(:[]).with(:content_name).and_return([])
+          raise error
+        end
+
+        result = job.send(:create_new_batch_item, strategy_plan, attrs, 1)
+
+        expect(result).to be_nil
+      end
+    end
+  end
+
+  describe 'update_existing_batch_item error handling' do
+    let(:job) { described_class.new }
+
+    context 'when save fails after unique name retry' do
+      it 'returns the record without re-raising' do
+        rec = create(:creas_content_item,
+                     user: user,
+                     brand: brand,
+                     creas_strategy_plan: strategy_plan,
+                     status: 'draft')
+
+        attrs = {
+          content_name: "Duplicate Name",
+          post_description: "Test",
+          text_base: "Test",
+          hashtags: "#test"
+        }
+
+        voxa_item = { "template" => "only_avatars" }
+
+        # Mock to fail on first save with uniqueness error, then fail again on retry
+        call_count = 0
+        allow(rec).to receive(:save!).and_wrap_original do |method|
+          call_count += 1
+          if call_count <= 2
+            error = ActiveRecord::RecordInvalid.new(rec)
+            allow(rec.errors).to receive(:[]).with(:content_name).and_return(
+              ["already exists for this brand"]
+            )
+            raise error
+          else
+            method.call
+          end
+        end
+
+        result = job.send(:update_existing_batch_item, rec, attrs, voxa_item, 1)
+
+        expect(result).to eq(rec)
+      end
+    end
+
+    context 'when save fails with non-uniqueness error' do
+      it 'returns the record without re-raising' do
+        rec = create(:creas_content_item,
+                     user: user,
+                     brand: brand,
+                     creas_strategy_plan: strategy_plan,
+                     status: 'draft')
+
+        attrs = {
+          content_name: "Test Name",
+          post_description: "Test",
+          text_base: "Test",
+          hashtags: "#test"
+        }
+
+        voxa_item = { "template" => "only_avatars" }
+
+        # Mock to fail with non-uniqueness error
+        allow(rec).to receive(:save!).and_raise(
+          ActiveRecord::RecordInvalid.new(rec)
+        )
+        allow(rec.errors).to receive(:[]).with(:content_name).and_return([])
+
+        result = job.send(:update_existing_batch_item, rec, attrs, voxa_item, 1)
+
+        expect(result).to eq(rec)
+      end
+    end
+  end
 end
