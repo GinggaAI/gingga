@@ -26,7 +26,8 @@ module Creas
           objective_details: @strategy_form[:objective_details],
           frequency_per_week: @strategy_form[:frequency_per_week],
           monthly_themes: @strategy_form[:monthly_themes] || [],
-          selected_templates: @strategy_form[:selected_templates] || [ "only_avatars" ]
+          selected_templates: @strategy_form[:selected_templates] || [ "only_avatars" ],
+          selected_channels: @strategy_form[:selected_channels] || [ "instagram" ]
         )
       end
 

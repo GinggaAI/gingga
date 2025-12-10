@@ -38,7 +38,7 @@ class BrandsController < ApplicationController
         notice: flash[:notice],
         brands_collection: @brands
       })
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 

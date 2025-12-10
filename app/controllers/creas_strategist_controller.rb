@@ -56,6 +56,7 @@ class CreasStrategistController < ApplicationController
       frequency_per_week: plan.frequency_per_week,
       monthly_themes: plan.monthly_themes,
       selected_templates: plan.selected_templates,
+      selected_channels: plan.selected_channels,
       content_distribution: plan.content_distribution,
       weekly_plan: plan.weekly_plan
     }
@@ -70,7 +71,8 @@ class CreasStrategistController < ApplicationController
       :objective_details,
       :frequency_per_week,
       :monthly_themes,
-      :selected_templates
+      :selected_templates,
+      :selected_channels
     )
 
     # Parse selected_templates JSON string to array
@@ -79,6 +81,15 @@ class CreasStrategistController < ApplicationController
         permitted_params[:selected_templates] = JSON.parse(permitted_params[:selected_templates])
       rescue JSON::ParserError
         permitted_params[:selected_templates] = []
+      end
+    end
+
+    # Parse selected_channels JSON string to array
+    if permitted_params[:selected_channels].present?
+      begin
+        permitted_params[:selected_channels] = JSON.parse(permitted_params[:selected_channels])
+      rescue JSON::ParserError
+        permitted_params[:selected_channels] = ["instagram"] # Default to Instagram on parse error
       end
     end
 

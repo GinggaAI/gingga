@@ -41,12 +41,12 @@ module Reels
       @controller.instance_variable_set(:@presenter, presenter_result.data[:presenter])
 
       @controller.render presenter_result.data[:view_template],
-        status: :unprocessable_entity
+        status: :unprocessable_content
     end
 
     def render_json_error(error_message)
       @controller.render json: { error: error_message },
-        status: :unprocessable_entity
+        status: :unprocessable_content
     end
   end
 end

@@ -36,6 +36,30 @@ module PlanningHelper
     "one_to_three_videos" => "Multiple Videos - Combine 1-3 video clips"
   }.freeze
 
+  # Available social media channels with their descriptions
+  SOCIAL_CHANNELS = {
+    "instagram" => {
+      name: "Instagram",
+      icon: "📸",
+      description: "Reels, Stories, and Feed posts"
+    },
+    "tiktok" => {
+      name: "TikTok",
+      icon: "🎵",
+      description: "Short-form vertical videos"
+    },
+    "youtube" => {
+      name: "YouTube Shorts",
+      icon: "▶️",
+      description: "Short vertical videos"
+    },
+    "linkedin" => {
+      name: "LinkedIn",
+      icon: "💼",
+      description: "Professional content"
+    }
+  }.freeze
+
   # Returns recommended themes for a given objective
   def recommended_themes_for(objective)
     OBJECTIVE_THEMES[objective.to_s] || []
@@ -44,6 +68,11 @@ module PlanningHelper
   # Returns all available templates with their descriptions
   def available_templates
     REEL_TEMPLATES
+  end
+
+  # Returns all available social channels with their metadata
+  def available_channels
+    SOCIAL_CHANNELS
   end
 
   # Returns all available objectives with their labels

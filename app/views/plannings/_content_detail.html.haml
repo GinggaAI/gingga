@@ -49,8 +49,15 @@
 
       - if content_piece["template"].present?
         .bg-indigo-50.p-3.rounded
-          %h5.font-medium.text-gray-900.mb-1 🎬 #{t('planning.content_pieces.template')}
+          %h5.font-medium.text-gray-900.mb-1 🎬 #{t('planning.content_pieces.visual_template')}
           %p.text-sm.text-gray-700= content_piece["template"].humanize
+          %p.text-xs.text-gray-500.mt-1.italic Visual format (how the video looks)
+
+      - if content_piece["content_structure"].present?
+        .bg-rose-50.p-3.rounded
+          %h5.font-medium.text-gray-900.mb-1 📖 #{t('planning.content_pieces.content_structure')}
+          %p.text-sm.text-gray-700= content_piece["content_structure"].humanize.gsub('_', ' ').titleize
+          %p.text-xs.text-gray-500.mt-1.italic Narrative framework (what the video says)
 
       - if content_piece["hashtags"].present?
         .bg-cyan-50.p-3.rounded

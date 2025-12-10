@@ -288,6 +288,8 @@ en:
       monthly_themes: "Monthly Themes"
       monthly_themes_placeholder: "e.g., Innovation, Sustainability, Customer Stories..."
       monthly_themes_help: "Separate multiple themes with commas"
+      channels_label: "Social Media Channels"
+      channels_help: "Select the platforms where you want to publish content"
       frequency_label: "Frequency per Week"
       frequency_per_week: "Frequency per Week"
       frequency_placeholder: "How many posts per week?"
@@ -358,6 +360,8 @@ en:
       call_to_action: "Call to Action"
       text_base: "Text Base"
       visual_notes: "Visual Notes"
+      visual_template: "Visual Template"
+      content_structure: "Narrative Structure"
       template: "Template"
       hashtags: "Hashtags"
       kpi_focus: "KPI Focus"
@@ -409,9 +413,11 @@ en:
       monthly_themes_label: "Monthly Themes"
       monthly_themes_placeholder: "Brand awareness, Product showcase, Community engagement"
       monthly_themes_help: "Separate with commas"
+      channels_label: "Social Media Channels"
+      channels_help: "Select the platforms where you want to publish content"
       frequency_label: "Frequency per Week"
       frequency_placeholder: "3"
-      
+
       # Resources override section
       resources_title: "Resources Override"
       resources_subtitle: "Configure additional resources and constraints for content creation"

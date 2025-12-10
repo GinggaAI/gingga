@@ -46,7 +46,8 @@ class CreateStrategyService
       objective_details: @strategy_params[:objective_details],
       frequency_per_week: parsed_frequency,
       monthly_themes: parsed_themes,
-      selected_templates: parsed_templates
+      selected_templates: parsed_templates,
+      selected_channels: parsed_channels
     }
   end
 
@@ -74,11 +75,27 @@ class CreateStrategyService
     valid_templates.presence || default_templates
   end
 
+  def parsed_channels
+    channels = @strategy_params[:selected_channels]
+    return default_channels unless channels.present?
+
+    valid_channels = Array(channels).select { |c| valid_channel?(c) }
+    valid_channels.presence || default_channels
+  end
+
+  def valid_channel?(channel)
+    %w[instagram tiktok youtube linkedin].include?(channel.to_s.downcase)
+  end
+
   def default_themes
     [ "Brand awareness", "Product showcase", "Community engagement" ]
   end
 
   def default_templates
     [ "only_avatars" ]
+  end
+
+  def default_channels
+    [ "instagram" ]
   end
 end

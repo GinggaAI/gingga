@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_09_102526) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_09_140859) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -244,8 +244,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_09_102526) do
     t.text "error_message"
     t.text "objective_details"
     t.jsonb "selected_templates"
+    t.jsonb "selected_channels", default: ["instagram"], null: false, comment: "Array of selected social media channels (e.g., ['instagram', 'tiktok']). Defaults to ['instagram']."
     t.index ["brand_id", "month"], name: "index_creas_strategy_plans_on_brand_id_and_month"
     t.index ["brand_id"], name: "index_creas_strategy_plans_on_brand_id"
+    t.index ["selected_channels"], name: "index_creas_strategy_plans_on_selected_channels", using: :gin
     t.index ["status"], name: "index_creas_strategy_plans_on_status"
     t.index ["user_id"], name: "index_creas_strategy_plans_on_user_id"
   end

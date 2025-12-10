@@ -30,7 +30,7 @@ class NoctuaBriefAssembler
           description: p.description
         }
       },
-      channels: brand.brand_channels.map { |c|
+      brand_channels: brand.brand_channels.map { |c|
         {
           platform: c.platform,
           handle: c.handle,
@@ -43,7 +43,10 @@ class NoctuaBriefAssembler
       objective_of_the_month: strategy_form[:primary_objective] || "awareness",
       objective_details: strategy_form[:objective_details], # User's specific objective details
       monthly_themes: strategy_form[:monthly_themes] || [],
-      frequency_per_week: strategy_form[:frequency_per_week]
+      frequency_per_week: strategy_form[:frequency_per_week],
+      selected_templates: strategy_form[:selected_templates] || [ "only_avatars" ],
+      # Priority platforms for this strategy (user-selected channels)
+      priority_platforms: (strategy_form[:selected_channels] || [ "instagram" ]).map(&:capitalize)
     }
   end
 end

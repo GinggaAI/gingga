@@ -17,7 +17,7 @@ module Creas
       1 Brand name; 2 Sector/industry; 3 Audience profile (demographics, pains, digital behavior);
       4 Languages: publishing language(s); account primary language; bilingual split %;
       5 Target region & timezone; 6 Value proposition; 7 Main offer/product; 8 Purpose/mission;
-      9 Tone & style; 10 Priority platforms; 11 Monthly themes/campaigns;
+      9 Tone & style; 10 Priority platforms (use priority_platforms from brief); 11 Monthly themes/campaigns;
       12 Primary objective (awareness | engagement | sales | community) and specific objective details (if provided, use these to create highly targeted content);
       13 Available resources (stock/podcast clips/editing/budget/AI avatars/Kling…);
       14 Posts per week (int); 15 Remix/duet references; 16 Restrictions/guardrails (legal, banned words, claims rules) + preferred CTAs.
@@ -27,7 +27,8 @@ module Creas
       • CRITICAL: weekly_plan must contain exactly 4 weeks, each with exactly frequency_per_week ideas in the ideas array.
       • Generate exactly frequency_per_week × 4 weeks of content ideas (e.g., 3/week = 12 total, 4/week = 16 total).
       • When objective_details are provided in the brief, ensure all content ideas specifically support and reflect these detailed goals rather than being generic.
-      • Distribute weekly posting volume strategically across platforms/pillars.
+      • **PLATFORM CONSTRAINT: ONLY generate content for platforms listed in brief.priority_platforms. Do not use any other platforms.**
+      • Distribute weekly posting volume strategically across selected platforms/pillars.
       • Map clear goals & formats to each pillar.
       • Every idea must include a specific hook + story logic that connects to the objective details when provided.
       • Balance: primary pillar = 40–50% of pieces; other four pillars = 50–60% total.

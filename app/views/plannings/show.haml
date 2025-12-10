@@ -92,6 +92,35 @@
               / Hidden input to store selected templates as JSON array
               = form.hidden_field "strategy_form[selected_templates]", id: "selected-templates-hidden", value: '["only_avatars"]'
 
+          .col-span-full.mb-4
+            = form.label "strategy_form[selected_channels]", t('planning.strategy_form.channels_label'),
+                class: "block text-sm font-medium mb-1 text-gray-700"
+
+            #channels-container.space-y-3
+              %p.text-xs.text-gray-500.mb-3= t('planning.strategy_form.channels_help')
+
+              #available-channels.grid.grid-cols-1.md:grid-cols-2.lg:grid-cols-4.gap-3.mb-3
+                - available_channels.each do |channel_key, channel_data|
+                  .channel-chip.border-2.rounded-lg.p-3.cursor-pointer.transition-all.hover:shadow-md{
+                    class: channel_key == 'instagram' ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white hover:border-gray-400',
+                    data: { channel: channel_key, selected: channel_key == 'instagram' ? 'true' : 'false' },
+                    onclick: "toggleChannel(this)" }
+                    .flex.items-center.justify-between.mb-2
+                      .flex.items-center.gap-2
+                        %span.text-2xl= channel_data[:icon]
+                        %span.font-medium.text-sm= channel_data[:name]
+                      .channel-check
+                        - if channel_key == 'instagram'
+                          %svg.w-5.h-5.text-blue-600{fill: "currentColor", viewBox: "0 0 20 20"}
+                            %path{d: "M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"}
+                        - else
+                          %svg.w-5.h-5.text-gray-300{fill: "currentColor", viewBox: "0 0 20 20"}
+                            %circle{cx: "10", cy: "10", r: "9", stroke: "currentColor", "stroke-width": "2", fill: "none"}
+                    %p.text-xs.text-gray-600= channel_data[:description]
+
+              / Hidden input to store selected channels as JSON array
+              = form.hidden_field "strategy_form[selected_channels]", id: "selected-channels-hidden", value: '["instagram"]'
+
           .grid.grid-cols-1.md:grid-cols-2.gap-4.mb-4
             .col-span-1
               = form.label "strategy_form[frequency_per_week]", t('planning.strategy_form.frequency_label'),
@@ -643,6 +672,58 @@
     const templates = Array.from(selectedChips).map(chip => chip.getAttribute('data-template'));
 
     hiddenInput.value = JSON.stringify(templates);
+  }
+
+  function toggleChannel(element) {
+    const channelKey = element.getAttribute('data-channel');
+    const isSelected = element.getAttribute('data-selected') === 'true';
+
+    // Toggle selection
+    element.setAttribute('data-selected', !isSelected);
+
+    // Update visual state
+    if (!isSelected) {
+      element.classList.remove('border-gray-300', 'bg-white', 'hover:border-gray-400');
+      element.classList.add('border-blue-500', 'bg-blue-50');
+
+      // Update checkmark
+      const checkSvg = element.querySelector('.channel-check svg');
+      checkSvg.classList.remove('text-gray-300');
+      checkSvg.classList.add('text-blue-600');
+      checkSvg.innerHTML = '<path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"></path>';
+    } else {
+      element.classList.remove('border-blue-500', 'bg-blue-50');
+      element.classList.add('border-gray-300', 'bg-white', 'hover:border-gray-400');
+
+      // Update checkmark
+      const checkSvg = element.querySelector('.channel-check svg');
+      checkSvg.classList.remove('text-blue-600');
+      checkSvg.classList.add('text-gray-300');
+      checkSvg.innerHTML = '<circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="2" fill="none"></circle>';
+    }
+
+    // Update hidden input
+    updateChannelsHiddenInput();
+  }
+
+  function updateChannelsHiddenInput() {
+    const hiddenInput = document.getElementById('selected-channels-hidden');
+    if (!hiddenInput) return;
+
+    const selectedChips = document.querySelectorAll('[data-channel][data-selected="true"]');
+    const channels = Array.from(selectedChips).map(chip => chip.getAttribute('data-channel'));
+
+    // Ensure at least one channel is selected (default to instagram)
+    if (channels.length === 0) {
+      channels.push('instagram');
+      // Reselect Instagram
+      const instagramChip = document.querySelector('[data-channel="instagram"]');
+      if (instagramChip) {
+        toggleChannel(instagramChip);
+      }
+    }
+
+    hiddenInput.value = JSON.stringify(channels);
   }
 
   function handleFormSubmit(e) {

@@ -91,5 +91,94 @@ RSpec.describe CreateStrategyService do
         expect(result.success?).to be true
       end
     end
+
+    context 'with selected_channels' do
+      let(:strategy_params) do
+        {
+          objective_of_the_month: 'awareness',
+          frequency_per_week: 3,
+          selected_channels: [ 'instagram', 'tiktok', 'youtube' ]
+        }
+      end
+
+      it 'creates strategy plan with selected channels' do
+        strategy_plan = double('CreasStrategyPlan', id: 1)
+        service_double = double('NoctuaStrategyService')
+
+        expect(Creas::NoctuaStrategyService).to receive(:new) do |args|
+          expect(args[:strategy_form][:selected_channels]).to eq([ 'instagram', 'tiktok', 'youtube' ])
+          service_double
+        end
+        expect(service_double).to receive(:call).and_return(strategy_plan)
+
+        result = described_class.call(
+          user: user,
+          brand: brand,
+          month: '2025-09',
+          strategy_params: strategy_params
+        )
+
+        expect(result.success?).to be true
+      end
+    end
+
+    context 'without selected_channels' do
+      let(:strategy_params) do
+        {
+          objective_of_the_month: 'engagement',
+          frequency_per_week: 3
+        }
+      end
+
+      it 'uses default channels (instagram)' do
+        strategy_plan = double('CreasStrategyPlan', id: 1)
+        service_double = double('NoctuaStrategyService')
+
+        expect(Creas::NoctuaStrategyService).to receive(:new) do |args|
+          expect(args[:strategy_form][:selected_channels]).to eq([ 'instagram' ])
+          service_double
+        end
+        expect(service_double).to receive(:call).and_return(strategy_plan)
+
+        result = described_class.call(
+          user: user,
+          brand: brand,
+          month: '2025-09',
+          strategy_params: strategy_params
+        )
+
+        expect(result.success?).to be true
+      end
+    end
+
+    context 'with invalid channels' do
+      let(:strategy_params) do
+        {
+          objective_of_the_month: 'sales',
+          frequency_per_week: 3,
+          selected_channels: [ 'invalid_channel', 'instagram', 'tiktok' ]
+        }
+      end
+
+      it 'filters out invalid channels and keeps valid ones' do
+        strategy_plan = double('CreasStrategyPlan', id: 1)
+        service_double = double('NoctuaStrategyService')
+
+        expect(Creas::NoctuaStrategyService).to receive(:new) do |args|
+          expect(args[:strategy_form][:selected_channels]).to eq([ 'instagram', 'tiktok' ])
+          service_double
+        end
+        expect(service_double).to receive(:call).and_return(strategy_plan)
+
+        result = described_class.call(
+          user: user,
+          brand: brand,
+          month: '2025-09',
+          strategy_params: strategy_params
+        )
+
+        expect(result.success?).to be true
+      end
+    end
   end
 end

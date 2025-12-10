@@ -275,6 +275,8 @@ es:
       call_to_action: "Llamada a la Acción"
       text_base: "Texto Base"
       visual_notes: "Notas Visuales"
+      visual_template: "Plantilla Visual"
+      content_structure: "Estructura Narrativa"
       template: "Plantilla"
       hashtags: "Hashtags"
       kpi_focus: "Enfoque KPI"
@@ -326,6 +328,8 @@ es:
       monthly_themes_label: "Temas Mensuales"
       monthly_themes_placeholder: "Reconocimiento de marca, Exhibición de productos, Engagement comunitario"
       monthly_themes_help: "Separar con comas"
+      channels_label: "Canales de Redes Sociales"
+      channels_help: "Selecciona las plataformas donde quieres publicar contenido"
       frequency_label: "Frecuencia por Semana"
       frequency_placeholder: "3"
       

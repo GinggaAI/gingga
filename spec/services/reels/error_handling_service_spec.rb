@@ -28,7 +28,7 @@ RSpec.describe Reels::ErrorHandlingService do
       it 'renders form with errors' do
         expect(controller).to receive(:instance_variable_set).with(:@reel, reel)
         expect(controller).to receive(:instance_variable_set).with(:@presenter, presenter_result.data[:presenter])
-        expect(controller).to receive(:render).with('reels/new', status: :unprocessable_entity)
+        expect(controller).to receive(:render).with('reels/new', status: :unprocessable_content)
 
         service.handle_creation_error(creation_result, reel_params)
       end
@@ -49,7 +49,7 @@ RSpec.describe Reels::ErrorHandlingService do
       it 'renders JSON error' do
         expect(controller).to receive(:render).with(
           json: { error: 'Presenter setup failed' },
-          status: :unprocessable_entity
+          status: :unprocessable_content
         )
 
         service.handle_creation_error(creation_result, reel_params)
@@ -147,19 +147,19 @@ RSpec.describe Reels::ErrorHandlingService do
       it 'sets instance variables and renders template' do
         expect(controller).to receive(:instance_variable_set).with(:@reel, reel)
         expect(controller).to receive(:instance_variable_set).with(:@presenter, presenter)
-        expect(controller).to receive(:render).with('reels/edit', status: :unprocessable_entity)
+        expect(controller).to receive(:render).with('reels/edit', status: :unprocessable_content)
 
         service.send(:render_form_with_errors, reel, presenter_result)
       end
     end
 
     describe '#render_json_error' do
-      it 'renders JSON error with unprocessable_entity status' do
+      it 'renders JSON error with unprocessable_content status' do
         error_message = 'Something went wrong'
 
         expect(controller).to receive(:render).with(
           json: { error: error_message },
-          status: :unprocessable_entity
+          status: :unprocessable_content
         )
 
         service.send(:render_json_error, error_message)
