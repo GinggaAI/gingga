@@ -242,6 +242,8 @@
               .text-lg.font-semibold.text-gray-700 📋 #{t('planning.weeks.week_details', number: week_number)}
               %button.text-gray-500.hover:text-gray-700.text-xl{onclick: "hideContentDetails('week-details-#{week_number - 1}')"} &times;
             .content-details-grid.grid.grid-cols-1.gap-3{"data-week-index": week_number - 1}
+              - @presenter.content_items_for_week(week_number).each do |content_piece|
+                = render partial: 'content_detail', locals: { content_piece: content_piece, presenter: @presenter }
 
 :javascript
   // Rails-first approach: Business logic moved to PlanningPresenter

@@ -117,6 +117,16 @@ class PlanningPresenter
     "#{base_classes} #{status_class}"
   end
 
+  # Get formatted content items for a specific week (for server-side rendering)
+  def content_items_for_week(week_number)
+    return [] unless current_plan
+
+    current_plan.creas_content_items
+                .where(week: week_number)
+                .order(:day_of_the_week, :created_at)
+                .map { |item| format_single_content_item(item) }
+  end
+
   # Get detailed status colors for content details
   def status_detail_colors_for(status)
     status_class = case status
@@ -192,6 +202,34 @@ class PlanningPresenter
 
   private
 
+  def format_single_content_item(item)
+    {
+      "title" => item.content_name,
+      "platform" => item.platform.capitalize,
+      "type" => item.content_type.capitalize,
+      "content_type" => item.content_type.capitalize,
+      "status" => item.status,
+      "pilar" => item.pilar,
+      "pillar" => item.pilar,
+      "description" => item.post_description,
+      "hook" => item.hook || item.meta&.dig("hook"),
+      "cta" => item.cta || item.meta&.dig("cta"),
+      "text_base" => item.text_base,
+      "visual_notes" => item.meta&.dig("visual_notes"),
+      "template" => item.template,
+      "content_structure" => item.content_structure,
+      "hashtags" => item.hashtags,
+      "kpi_focus" => item.kpi_focus,
+      "success_criteria" => item.success_criteria,
+      "publish_date" => item.publish_date&.strftime("%Y-%m-%d"),
+      "scheduled_day" => item.scheduled_day,
+      "day_of_the_week" => item.day_of_the_week,
+      "scenes" => item.scenes,
+      "beats" => item.beats,
+      "shotplan" => item.shotplan
+    }
+  end
+
   def format_content_items(content_items)
     content_items.map do |item|
       {
@@ -212,6 +250,7 @@ class PlanningPresenter
         scheduled_day: item.scheduled_day,
         day_of_the_week: item.day_of_the_week,
         template: item.template,
+        content_structure: item.content_structure,
         text_base: item.text_base,
         hashtags: item.hashtags,
         scenes: item.scenes,
@@ -251,6 +290,7 @@ class PlanningPresenter
             scheduled_day: item.scheduled_day,
             publish_date: item.publish_date&.strftime("%Y-%m-%d"),
             template: item.template,
+            content_structure: item.content_structure,
             text_base: item.text_base,
             hashtags: item.hashtags,
             scenes: item.scenes,

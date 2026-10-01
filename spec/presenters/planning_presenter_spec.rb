@@ -471,6 +471,53 @@ RSpec.describe PlanningPresenter do
         expect(idea['beats'].first['beat_number']).to eq(1)
       end
     end
+
+    context 'with content items having content_structure field' do
+      let!(:plan) { create(:creas_strategy_plan, brand: brand, month: '2025-08') }
+      let!(:content_item) do
+        create(:creas_content_item,
+               creas_strategy_plan: plan,
+               user: user,
+               brand: brand,
+               content_id: 'test-content-structure',
+               content_name: 'Test Content with Structure',
+               status: 'in_production',
+               platform: 'instagram',
+               content_type: 'reel',
+               week: 1,
+               pilar: 'C',
+               post_description: 'Test description',
+               template: 'only_avatars',
+               content_structure: 'voxa_radiant_rankings',
+               publish_date: Date.new(2025, 8, 15))
+      end
+      let(:params) { { month: '2025-08' } }
+
+      it 'includes content_structure in formatted content items' do
+        json_result = presenter.current_plan_json
+        parsed_result = JSON.parse(json_result)
+
+        expect(parsed_result['content_items']).to be_an(Array)
+        expect(parsed_result['content_items'].first).to include(
+          'id' => 'test-content-structure',
+          'template' => 'only_avatars',
+          'content_structure' => 'voxa_radiant_rankings'
+        )
+      end
+
+      it 'includes content_structure in formatted weekly plan' do
+        json_result = presenter.current_plan_json
+        parsed_result = JSON.parse(json_result)
+
+        week1 = parsed_result['weekly_plan'].first
+        expect(week1['ideas']).to be_an(Array)
+        expect(week1['ideas'].first).to include(
+          'id' => 'test-content-structure',
+          'template' => 'only_avatars',
+          'content_structure' => 'voxa_radiant_rankings'
+        )
+      end
+    end
   end
 
   describe '#current_plan (private method)' do
@@ -934,6 +981,97 @@ RSpec.describe PlanningPresenter do
       it 'uses Draft as ultimate fallback' do
         content_piece = {}
         expect(presenter.formatted_title_for_content(content_piece)).to eq('Draft')
+      end
+    end
+  end
+
+  describe '#content_items_for_week' do
+    let(:user) { create(:user) }
+    let(:brand) { create(:brand, user: user) }
+    let!(:plan) { create(:creas_strategy_plan, brand: brand, month: '2025-12') }
+    let(:presenter) { described_class.new({}, brand: brand, current_plan: plan) }
+
+    context 'when plan has content items for the week' do
+      let!(:item1) do
+        create(:creas_content_item,
+               creas_strategy_plan: plan,
+               user: user,
+               brand: brand,
+               content_id: 'week1-item1',
+               content_name: 'First Item',
+               week: 1,
+               status: 'in_production',
+               template: 'only_avatars',
+               content_structure: 'voxa_radiant_rankings',
+               publish_date: Date.new(2025, 12, 1))
+      end
+
+      let!(:item2) do
+        create(:creas_content_item,
+               creas_strategy_plan: plan,
+               user: user,
+               brand: brand,
+               content_id: 'week1-item2',
+               content_name: 'Second Item',
+               week: 1,
+               status: 'draft',
+               template: 'avatar_and_video',
+               content_structure: 'sagui_rationale',
+               publish_date: Date.new(2025, 12, 2))
+      end
+
+      let!(:item_week2) do
+        create(:creas_content_item,
+               creas_strategy_plan: plan,
+               user: user,
+               brand: brand,
+               content_id: 'week2-item1',
+               content_name: 'Week 2 Item',
+               week: 2,
+               publish_date: Date.new(2025, 12, 8))
+      end
+
+      it 'returns formatted content items for the specified week' do
+        items = presenter.content_items_for_week(1)
+
+        expect(items).to be_an(Array)
+        expect(items.length).to eq(2)
+      end
+
+      it 'includes content_structure in formatted items' do
+        items = presenter.content_items_for_week(1)
+
+        first_item = items.find { |i| i["title"] == "First Item" }
+        expect(first_item["template"]).to eq("only_avatars")
+        expect(first_item["content_structure"]).to eq("voxa_radiant_rankings")
+
+        second_item = items.find { |i| i["title"] == "Second Item" }
+        expect(second_item["template"]).to eq("avatar_and_video")
+        expect(second_item["content_structure"]).to eq("sagui_rationale")
+      end
+
+      it 'only returns items for the specified week' do
+        week1_items = presenter.content_items_for_week(1)
+        week2_items = presenter.content_items_for_week(2)
+
+        expect(week1_items.map { |i| i["title"] }).to contain_exactly("First Item", "Second Item")
+        expect(week2_items.map { |i| i["title"] }).to contain_exactly("Week 2 Item")
+      end
+    end
+
+    context 'when plan has no content items for the week' do
+      it 'returns empty array' do
+        items = presenter.content_items_for_week(3)
+        expect(items).to eq([])
+      end
+    end
+
+    context 'when there is no current plan' do
+      let(:presenter) { described_class.new({}, brand: brand) }
+
+      it 'returns empty array' do
+        items = presenter.content_items_for_week(1)
+        expect(items).to eq([])
       end
     end
   end

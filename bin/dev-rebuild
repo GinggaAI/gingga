@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Development Asset Rebuild Script
+# Limpia cache y rebuilds para evitar problemas de assets viejos
+
+set -e
+
+echo "🧹 Limpiando cache y assets viejos..."
+rm -rf public/assets/*
+rm -rf tmp/cache/*
+rm -rf app/assets/builds/*
+
+echo ""
+echo "🔨 Rebuilding JavaScript..."
+npm run build
+
+echo ""
+echo "🎨 Rebuilding CSS..."
+npm run build:css
+
+echo ""
+echo "✅ Assets rebuildeados correctamente"
+echo ""
+echo "📊 Archivos generados:"
+ls -lh app/assets/builds/*.{js,css} 2>/dev/null | awk '{print "  " $9 " - " $5}'
+
+echo ""
+echo "🚀 Ahora reinicia el servidor Rails:"
+echo "   rails server"
+echo ""
+echo "💡 Y haz hard refresh en el navegador:"
+echo "   Ctrl + Shift + R"
